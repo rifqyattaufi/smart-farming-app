@@ -3,7 +3,7 @@ import 'package:smart_farming_app/screen/detail_item_screen.dart';
 import 'package:smart_farming_app/screen/detail_report_screen.dart';
 import 'package:smart_farming_app/screen/garden/add_garden_screen.dart';
 import 'package:smart_farming_app/screen/history_screen.dart';
-import 'package:smart_farming_app/screen/plant/add_plant_screen.dart';
+import 'package:smart_farming_app/screen/plants/add_plant_screen.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/screen/detail_screen.dart';
 import 'package:smart_farming_app/widget/chart.dart';
@@ -27,50 +27,6 @@ class HomeScreen extends StatelessWidget {
         toolbarHeight: 100,
         title: const Header(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Aksi Pelaporan",
-                        style: medium16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 10),
-                      ListTile(
-                        leading:
-                            const Icon(Icons.agriculture, color: Colors.green),
-                        title: const Text("Laporan Harian Tanaman"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.pets, color: Colors.blue),
-                        title: const Text("Laporan Penggunaan Inventaris"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-        backgroundColor: blue2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: ConstrainedBox(
@@ -82,21 +38,6 @@ class HomeScreen extends StatelessWidget {
             children: [
               const Tabs(),
               const ChartWidget(),
-              DashboardGrid(
-                title: 'Statistik Mini',
-                items: [
-                  DashboardItem(title: 'Suhu (°C)', value: '28', icon: 'other'),
-                  DashboardItem(
-                      title: 'Total Tanaman', value: '65', icon: 'other'),
-                  DashboardItem(
-                      title: 'Tanaman Mati', value: '6.5', icon: 'other')
-                ],
-                crossAxisCount: 3,
-                valueFontSize: 32,
-                titleFontSize: 12,
-                detailFontSize: 12,
-                iconsWidth: 32,
-              ),
               DashboardGrid(
                 title: 'Statistik Tanaman',
                 items: [

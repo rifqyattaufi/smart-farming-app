@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/theme.dart';
-import 'package:smart_farming_app/screen/home_screen.dart';
-import 'package:smart_farming_app/screen/report_screen.dart';
-import 'package:smart_farming_app/screen/inventory_screen.dart';
-import 'package:smart_farming_app/screen/account_screen.dart';
+import 'package:smart_farming_app/screen/menu/home_screen.dart';
+import 'package:smart_farming_app/screen/menu/report_screen.dart';
+import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
+import 'package:smart_farming_app/screen/menu/account_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -63,7 +63,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _bottomNavItem({required String icon, required String label, required int index}) {
+  Widget _bottomNavItem(
+      {required String icon, required String label, required int index}) {
     bool isActive = _selectedIndex == index;
     return GestureDetector(
       onTap: () => _onItemTapped(index),
