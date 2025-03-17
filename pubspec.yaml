@@ -36,6 +36,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  flutter_svg: ^2.0.17
+  fl_chart: ^0.70.2
+  go_router: ^14.8.1
+  toastification: ^3.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -58,6 +63,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/images/
+    - assets/icons/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -69,6 +77,27 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
+  fonts:
+    - family: Onest
+      fonts:
+        - asset: assets/fonts/Onest-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Onest-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Onest-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Onest-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Onest-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Onest-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Onest-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Onest-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Onest-Thin.ttf
+          weight: 100
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
