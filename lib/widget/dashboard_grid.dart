@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:smart_farming_app/screen/detail_screen.dart';
+import 'package:smart_farming_app/theme.dart';
+
+class DashboardItem {
+  final String title;
+  final String value;
+  final String icon;
+
+  DashboardItem({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
+}
+
+class DashboardGrid extends StatelessWidget {
+  final String title;
+  final List<DashboardItem> items;
+
+  const DashboardGrid({
+    super.key,
+    required this.title,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15, top: 16, right: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: bold18.copyWith(color: dark1)),
+          const SizedBox(height: 10),
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: items.map((item) {
+              return SizedBox(
+                height: 30,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Text(
+                            item.value,
+                            style: bold20.copyWith(
+                              color: dark1,
+                              fontSize: 60,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFF00AED5),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: SvgPicture.asset(
+                                'assets/icons/${item.icon}.svg',
+                                color: Colors.white,
+                                width: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 20,
+                          left: 0,
+                          child: Text(
+                            item.title,
+                            style: semibold18.copyWith(color: dark1),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Lihat detail',
+                              style: regular14.copyWith(color: blue1),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
