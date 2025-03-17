@@ -18,11 +18,21 @@ class DashboardItem {
 class DashboardGrid extends StatelessWidget {
   final String title;
   final List<DashboardItem> items;
+  final int crossAxisCount;
+  final double iconsWidth;
+  final double titleFontSize;
+  final double valueFontSize;
+  final double detailFontSize;
 
   const DashboardGrid({
     super.key,
     required this.title,
     required this.items,
+    this.crossAxisCount = 2,
+    this.iconsWidth = 40,
+    this.titleFontSize = 18,
+    this.valueFontSize = 60,
+    this.detailFontSize = 14,
   });
 
   @override
@@ -35,9 +45,9 @@ class DashboardGrid extends StatelessWidget {
           Text(title, style: bold18.copyWith(color: dark1)),
           const SizedBox(height: 10),
           GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: items.map((item) {
@@ -59,7 +69,7 @@ class DashboardGrid extends StatelessWidget {
                             item.value,
                             style: bold20.copyWith(
                               color: dark1,
-                              fontSize: 60,
+                              fontSize: valueFontSize,
                             ),
                           ),
                         ),
@@ -67,8 +77,8 @@ class DashboardGrid extends StatelessWidget {
                           top: 0,
                           right: 0,
                           child: Container(
-                            width: 40,
-                            height: 40,
+                            width: iconsWidth,
+                            height: iconsWidth,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Color(0xFF00AED5),
@@ -88,7 +98,8 @@ class DashboardGrid extends StatelessWidget {
                           left: 0,
                           child: Text(
                             item.title,
-                            style: semibold18.copyWith(color: dark1),
+                            style: semibold18.copyWith(
+                                color: dark1, fontSize: titleFontSize),
                           ),
                         ),
                         Positioned(
@@ -105,7 +116,8 @@ class DashboardGrid extends StatelessWidget {
                             },
                             child: Text(
                               'Lihat detail',
-                              style: regular14.copyWith(color: blue1),
+                              style: regular14.copyWith(
+                                  color: blue1, fontSize: detailFontSize),
                             ),
                           ),
                         ),

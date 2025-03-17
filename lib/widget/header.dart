@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -38,17 +39,26 @@ class Header extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white38,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SvgPicture.asset(
-                      'assets/icons/bell.svg',
-                      color: white,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NotificationScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white38,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SvgPicture.asset(
+                        'assets/icons/bell.svg',
+                        color: white,
+                      ),
                     ),
                   ),
                 ],

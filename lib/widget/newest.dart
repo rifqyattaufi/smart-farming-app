@@ -6,12 +6,14 @@ class NewestReports extends StatelessWidget {
   final String title;
   final List<Map<String, String>> reports;
   final VoidCallback onViewAll;
+  final Function(BuildContext, Map<String, String>) onItemTap;
 
   const NewestReports({
     super.key,
     required this.title,
     required this.reports,
     required this.onViewAll,
+    required this.onItemTap,
   });
 
   @override
@@ -44,38 +46,41 @@ class NewestReports extends StatelessWidget {
               children: List.generate(reports.length, (index) {
                 return Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: green2,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: SvgPicture.asset(
-                              reports[index]['icon'] ??
-                                  'assets/icons/goclub.svg',
-                              color: Colors.white,
+                    InkWell(
+                      onTap: () => onItemTap(context, reports[index]),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
                               width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: green2,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: SvgPicture.asset(
+                                reports[index]['icon'] ??
+                                    'assets/icons/goclub.svg',
+                                color: Colors.white,
+                                width: 24,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              reports[index]['text'] ?? 'Unknown Report',
-                              style: regular14.copyWith(color: dark1),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                reports[index]['text'] ?? 'Unknown Report',
+                                style: regular14.copyWith(color: dark1),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 24),
-                          SvgPicture.asset(
-                            'assets/icons/left.svg',
-                            height: 24,
-                            color: dark1,
-                          ),
-                        ],
+                            const SizedBox(width: 24),
+                            SvgPicture.asset(
+                              'assets/icons/left.svg',
+                              height: 24,
+                              color: dark1,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     if (index != reports.length - 1)

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/screen/detail_item_screen.dart';
+import 'package:smart_farming_app/screen/detail_report_screen.dart';
+import 'package:smart_farming_app/screen/garden/add_garden_screen.dart';
+import 'package:smart_farming_app/screen/history_screen.dart';
+import 'package:smart_farming_app/screen/plants/add_plant_screen.dart';
 import 'package:smart_farming_app/theme.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/screen/detail_screen.dart';
+import 'package:smart_farming_app/widget/chart.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -32,17 +37,20 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Tabs(),
+              const ChartWidget(),
               DashboardGrid(
                 title: 'Statistik Tanaman',
                 items: [
-                  DashboardItem(title: '°C Suhu', value: '28', icon: 'other'),
+                  DashboardItem(title: 'Suhu (°C)', value: '28', icon: 'other'),
                   DashboardItem(
                       title: 'Total Tanaman', value: '65', icon: 'other'),
                   DashboardItem(
                       title: 'Tanaman Mati', value: '6.5', icon: 'other'),
                   DashboardItem(
-                      title: 'Kg Hasil Panen', value: '120', icon: 'other'),
+                      title: 'Hasil Panen (Kg)', value: '120', icon: 'other'),
                 ],
+                crossAxisCount: 2,
+                valueFontSize: 60,
               ),
               MenuGrid(
                 title: 'Menu Aplikasi',
@@ -121,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const DetailScreen()),
+                            builder: (context) => const AddGardenScreen()),
                       );
                     },
                   ),
@@ -134,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const DetailScreen()),
+                            builder: (context) => const AddPlantScreen()),
                       );
                     },
                   ),
@@ -172,10 +180,18 @@ class HomeScreen extends StatelessWidget {
                         builder: (context) => const DetailScreen()),
                   );
                 },
+                onItemTap: (context, report) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailReportScreen(report: report),
+                    ),
+                  );
+                },
               ),
-              const ListItem(
+              ListItem(
                 title: 'Daftar Tanaman',
-                items: [
+                items: const [
                   {
                     'name': 'Melon',
                     'category': 'Kebun A',
@@ -187,72 +203,61 @@ class HomeScreen extends StatelessWidget {
                     'icon': 'assets/icons/goclub.svg'
                   }
                 ],
+                type: 'basic',
+                onItemTap: (context, item) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailItemScreen(item: item),
+                    ),
+                  );
+                },
+              ),
+              ListItem(
+                title: "Riwayat Aktivitas",
+                type: "history",
+                items: const [
+                  {
+                    "name": "Panen Tomat",
+                    "date": "17 Maret 2025",
+                    "time": "10:30",
+                    "image": "assets/icons/goclub.svg"
+                  },
+                  {
+                    "name": "Penyiraman Tanaman",
+                    "date": "16 Maret 2025",
+                    "time": "08:00",
+                    "image": "assets/icons/goclub.svg"
+                  },
+                ],
+                navigateTo: (context) => const HistoryScreen(
+                  title: "Riwayat Aktivitas",
+                  items: [
+                    {
+                      "name": "Panen Tomat",
+                      "date": "17 Maret 2025",
+                      "time": "10:30"
+                    },
+                    {
+                      "name": "Penyiraman Tanaman",
+                      "date": "16 Maret 2025",
+                      "time": "08:00"
+                    },
+                  ],
+                ),
+                onItemTap: (context, item) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailItemScreen(item: item),
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: bottomNavigationBar(),
     );
   }
-}
-
-Widget bottomNavigationBar() {
-  return Container(
-    height: 120,
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0xFFD4D4D4).withOpacity(0.12),
-          spreadRadius: 0,
-          blurRadius: 25,
-          offset: const Offset(0, -8),
-        ),
-      ],
-      color: Colors.white,
-    ),
-    child: Row(
-      children: [
-        bottomNavigationBarItem(
-          icon: "other.svg",
-          label: "Beranda",
-          isActive: true,
-        ),
-        bottomNavigationBarItem(icon: "explore.svg", label: "Laporan"),
-        bottomNavigationBarItem(icon: "gosend.svg", label: "Inventaris"),
-        bottomNavigationBarItem(icon: "goclub.svg", label: "Akun"),
-      ],
-    ),
-  );
-}
-
-Widget bottomNavigationBarItem({
-  required String icon,
-  required String label,
-  bool isActive = false,
-}) {
-  return Flexible(
-    flex: 1,
-    fit: FlexFit.tight,
-    child: Column(
-      children: [
-        SvgPicture.asset(
-          "assets/icons/$icon",
-          height: 36,
-          colorFilter: ColorFilter.mode(
-            isActive ? blue2 : dark1,
-            BlendMode.srcIn,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: (isActive ? medium12 : regular12).copyWith(
-            color: isActive ? blue2 : dark1,
-          ),
-        ),
-      ],
-    ),
-  );
 }
