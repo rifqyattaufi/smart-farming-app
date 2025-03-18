@@ -26,7 +26,7 @@ class DetailReportScreen extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: green2.withOpacity(0.2),
+                  color: green2.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: report['icon'] != null
@@ -34,7 +34,7 @@ class DetailReportScreen extends StatelessWidget {
                         report['icon']!,
                         width: 60,
                         height: 60,
-                        color: green2,
+                        colorFilter: ColorFilter.mode(green2, BlendMode.srcIn),
                       )
                     : Icon(Icons.report, size: 60, color: green2),
               ),

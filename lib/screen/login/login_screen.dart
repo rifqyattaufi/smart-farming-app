@@ -11,8 +11,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Login Page")),
-      body: Center(child: Text("This is the Login screen")),
+      appBar: AppBar(title: const Text("Login Page")),
+      body: const Center(child: Text("This is the Login screen")),
     );
   }
 }

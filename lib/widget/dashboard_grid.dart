@@ -87,7 +87,10 @@ class DashboardGrid extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               child: SvgPicture.asset(
                                 'assets/icons/${item.icon}.svg',
-                                color: Colors.white,
+                                colorFilter: ColorFilter.mode(
+                                  white,
+                                  BlendMode.srcIn,
+                                ),
                                 width: 24,
                               ),
                             ),

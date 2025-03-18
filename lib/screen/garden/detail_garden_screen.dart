@@ -6,8 +6,8 @@ class DetailGardenScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail Garden Page")),
-      body: Center(child: Text("This is the detail garden screen")),
+      appBar: AppBar(title: const Text("Detail Garden Page")),
+      body: const Center(child: Text("This is the detail garden screen")),
     );
   }
 }

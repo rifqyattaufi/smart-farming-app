@@ -42,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD4D4D4).withOpacity(0.12),
+              color: const Color(0xFFD4D4D4).withValues(alpha: 0.12),
               spreadRadius: 0,
               blurRadius: 25,
               offset: const Offset(0, -8),

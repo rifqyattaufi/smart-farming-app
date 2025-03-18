@@ -11,8 +11,8 @@ class _AddCategoryInvScreenState extends State<AddCategoryInvScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Category Inventory Page")),
-      body: Center(child: Text("This is the add category inventory screen")),
+      appBar: AppBar(title: const Text("Add Category Inventory Page")),
+      body: const Center(child: Text("This is the add category inventory screen")),
     );
   }
 }

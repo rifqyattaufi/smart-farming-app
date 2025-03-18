@@ -11,8 +11,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Splash Page")),
-      body: Center(child: Text("This is the splash screen")),
+      appBar: AppBar(title: const Text("Splash Page")),
+      body: const Center(child: Text("This is the splash screen")),
     );
   }
 }

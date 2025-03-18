@@ -62,7 +62,7 @@ class NewestReports extends StatelessWidget {
                               child: SvgPicture.asset(
                                 reports[index]['icon'] ??
                                     'assets/icons/goclub.svg',
-                                color: Colors.white,
+                                colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
                                 width: 24,
                               ),
                             ),
@@ -77,7 +77,7 @@ class NewestReports extends StatelessWidget {
                             SvgPicture.asset(
                               'assets/icons/left.svg',
                               height: 24,
-                              color: dark1,
+                              colorFilter: ColorFilter.mode(dark1, BlendMode.srcIn),
                             ),
                           ],
                         ),

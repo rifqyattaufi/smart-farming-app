@@ -59,7 +59,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
             DropdownFieldWidget(
               label: "Lokasi Kebun",
               hint: "Pilih lokasi",
-              items: ["Kebun A", "Kebun B", "Kebun C"],
+              items: const ["Kebun A", "Kebun B", "Kebun C"],
               selectedValue: selectedLocation,
               onChanged: (newValue) {
                 setState(() {

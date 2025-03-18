@@ -6,8 +6,8 @@ class DetailInventoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail Inventory Page")),
-      body: Center(child: Text("This is the detail inventory screen")),
+      appBar: AppBar(title: const Text("Detail Inventory Page")),
+      body: const Center(child: Text("This is the detail inventory screen")),
     );
   }
 }

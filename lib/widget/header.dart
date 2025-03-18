@@ -57,7 +57,7 @@ class Header extends StatelessWidget {
                       ),
                       child: SvgPicture.asset(
                         'assets/icons/bell.svg',
-                        color: white,
+                        colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
                       ),
                     ),
                   ),

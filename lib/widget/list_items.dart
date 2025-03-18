@@ -9,7 +9,7 @@ class ListItem extends StatelessWidget {
 
   final Widget Function(BuildContext context)?
       navigateTo; // Custom navigation for "Lihat semua"
-  
+
   final void Function(BuildContext context, Map<String, String>)?
       onItemTap; // Item click event
 
@@ -95,7 +95,7 @@ class ListItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: green2.withOpacity(0.1),
+                  color: green2.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
@@ -169,7 +169,7 @@ class ListItem extends StatelessWidget {
         ),
         child: SvgPicture.asset(
           path,
-          color: Colors.white,
+          colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
         ),
       );
     } else {

@@ -6,8 +6,8 @@ class DetailPlantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail pet Page")),
-      body: Center(child: Text("This is the detail pet screen")),
+      appBar: AppBar(title: const Text("Detail pet Page")),
+      body: const Center(child: Text("This is the detail pet screen")),
     );
   }
 }

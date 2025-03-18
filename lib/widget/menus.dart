@@ -59,7 +59,7 @@ class MenuGrid extends StatelessWidget {
                             ),
                             child: SvgPicture.asset(
                               'assets/icons/${item.icon}.svg',
-                              color: item.iconColor,
+                              colorFilter: ColorFilter.mode(item.iconColor, BlendMode.srcIn),
                               width: 24,
                             ),
                           ),
