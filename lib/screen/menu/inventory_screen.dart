@@ -5,7 +5,7 @@ import 'package:smart_farming_app/widget/chart.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
-import 'package:smart_farming_app/widget/tabs.dart';
+// import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
 
 class InventoryScreen extends StatelessWidget {
@@ -74,7 +74,7 @@ class InventoryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Tabs(),
+              // const Tabs(),
               const ChartWidget(),
               DashboardGrid(
                 title: 'Statistik Mini',

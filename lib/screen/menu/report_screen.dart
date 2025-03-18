@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_farming_app/screen/detail_item_screen.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
-import 'package:smart_farming_app/widget/tabs.dart';
+// import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
 
 class ReportScreen extends StatelessWidget {
@@ -27,7 +27,7 @@ class ReportScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Tabs(),
+              // const Tabs(),
               ListItem(
                 title: 'Daftar Tanaman',
                 items: const [
