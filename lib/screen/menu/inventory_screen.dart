@@ -16,7 +16,7 @@ class InventoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: blue2,
+        backgroundColor: green1,
         elevation: 0,
         toolbarHeight: 100,
         title: const Header(),
@@ -59,7 +59,7 @@ class InventoryScreen extends StatelessWidget {
                 );
               });
         },
-        backgroundColor: blue2,
+        backgroundColor: green1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),

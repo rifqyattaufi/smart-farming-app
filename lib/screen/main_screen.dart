@@ -75,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
             "assets/icons/$icon",
             height: 28,
             colorFilter: ColorFilter.mode(
-              isActive ? blue2 : dark1,
+              isActive ? green1 : dark1,
               BlendMode.srcIn,
             ),
           ),
@@ -83,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
           Text(
             label,
             style: (isActive ? medium12 : regular12).copyWith(
-              color: isActive ? blue2 : dark1,
+              color: isActive ? green1 : dark1,
             ),
           ),
         ],

@@ -126,7 +126,7 @@ class ListItem extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.circle, size: 10, color: blue2),
+                  Icon(Icons.circle, size: 10, color: green1),
                   const SizedBox(width: 6),
                   Text(
                     item['person'] ?? 'Petugas Tidak Diketahui',

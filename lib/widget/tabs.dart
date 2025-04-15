@@ -35,12 +35,12 @@ class _TabsState extends State<Tabs> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: isActive ? blue2 : Colors.white,
+          color: isActive ? green1 : Colors.white,
           borderRadius: BorderRadius.circular(100),
         ),
         child: Text(
           title,
-          style: semibold14.copyWith(color: isActive ? Colors.white : blue2),
+          style: semibold14.copyWith(color: isActive ? Colors.white : green1),
         ),
       ),
     );

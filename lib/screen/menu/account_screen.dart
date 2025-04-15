@@ -12,7 +12,7 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: blue2,
+        backgroundColor: green1,
         elevation: 0,
         toolbarHeight: 100,
         title: const Header(),

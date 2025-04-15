@@ -22,7 +22,7 @@ class SectionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: iconColor ?? Colors.blue),
+      leading: Icon(icon, color: iconColor ?? green1),
       title: Text(
         title,
         style: semibold16.copyWith(color: titleColor ?? dark1),

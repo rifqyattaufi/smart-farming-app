@@ -79,9 +79,9 @@ class DashboardGrid extends StatelessWidget {
                           child: Container(
                             width: iconsWidth,
                             height: iconsWidth,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF00AED5),
+                              color: green1,
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
