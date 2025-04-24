@@ -16,7 +16,7 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 0),
       child: Row(
         children: [
           _tabItem(title: 'Perkebunan', index: 0),
@@ -32,15 +32,23 @@ class _TabsState extends State<Tabs> {
     return GestureDetector(
       onTap: () => widget.onTabChanged(index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        margin: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        margin: const EdgeInsets.only(left: 16),
         decoration: BoxDecoration(
           color: isActive ? green1 : Colors.white,
           borderRadius: BorderRadius.circular(100),
+          border: isActive
+              ? null
+              : Border.all(
+                  color: green1,
+                  width: 1.5,
+                ),
         ),
         child: Text(
           title,
-          style: semibold14.copyWith(color: isActive ? Colors.white : green1),
+          style: semibold14.copyWith(
+            color: isActive ? Colors.white : green1,
+          ),
         ),
       ),
     );

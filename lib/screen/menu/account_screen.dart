@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
-import 'package:smart_farming_app/widget/section_item.dart';
-import 'package:smart_farming_app/widget/section_title.dart';
+import 'package:smart_farming_app/widget/newest.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -12,41 +12,83 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: green1,
         elevation: 0,
-        toolbarHeight: 100,
-        title: const Header(),
+        toolbarHeight: 80,
+        title: const Header(headerType: HeaderType.basic),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
         children: [
-          const SectionTitle(title: "Akun"),
-          SectionItem(
-              title: "Data Akun", icon: Icons.account_circle, onTap: () {}),
-          SectionItem(
-              title: "Riwayat Aktivitas",
-              icon: Icons.insert_drive_file,
-              onTap: () {}),
-          const SectionTitle(title: "Informasi"),
-          SectionItem(
-              title: "Kebijakan Privasi",
-              icon: Icons.request_page,
-              tag: "Baru",
-              onTap: () {}),
-          SectionItem(
-              title: "Bantuan",
-              icon: Icons.help_center,
-              tag: "Baru",
-              onTap: () {}),
-          const SectionTitle(title: "Pengaturan Lainnya"),
-          SectionItem(
-              title: "Notifikasi", icon: Icons.notifications, onTap: () {}),
-          SectionItem(
-              title: "Keluar",
-              icon: Icons.logout,
-              onTap: () {},
-              iconColor: Colors.red,
-              titleColor: Colors.red),
+          NewestReports(
+            title: 'Pengaturan Utama',
+            reports: [
+              {
+                'text': 'Data Akun',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Pengingat Harian',
+                'onTap': () => context.push('/detail'),
+              },
+            ],
+            onItemTap: (context, report) =>
+                context.push('/detail', extra: report),
+            mode: NewestReportsMode.simple,
+            showIcon: false,
+            titleTextStyle: bold18.copyWith(color: dark1),
+            reportTextStyle: medium14.copyWith(color: dark1),
+          ),
+          const SizedBox(height: 12),
+          NewestReports(
+            title: 'Pengaturan Lainnya',
+            reports: [
+              {
+                'text': 'Manajemen Pengguna',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Manajemen Satuan',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Ubah Password',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Log Aktivitas',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Kebijakan Privasi',
+                'onTap': () => context.push('/detail'),
+              },
+              {
+                'text': 'Bantuan',
+                'onTap': () => context.push('/detail'),
+              }
+            ],
+            onItemTap: (context, report) =>
+                context.push('/detail', extra: report),
+            mode: NewestReportsMode.simple,
+            showIcon: false,
+            titleTextStyle: bold18.copyWith(color: dark1),
+            reportTextStyle: medium14.copyWith(color: dark1),
+          ),
+          const SizedBox(height: 12),
+          NewestReports(
+            title: 'Keluar',
+            reports: [
+              {
+                'text': 'Keluar Akun',
+                'onTap': () => context.push('/detail'),
+              },
+            ],
+            onItemTap: (context, report) =>
+                context.push('/detail', extra: report),
+            mode: NewestReportsMode.simple,
+            showIcon: false,
+            titleTextStyle: bold18.copyWith(color: dark1),
+            reportTextStyle: medium14.copyWith(color: dark1),
+          ),
         ],
       ),
     );
