@@ -172,12 +172,12 @@ class InventoryScreen extends StatelessWidget {
                 items: const [
                   {
                     'name': 'Bibit Melon',
-                    'category': '20 Pack',
+                    'category': 'Stok: 20 Pack',
                     'icon': 'assets/icons/goclub.svg',
                   },
                   {
                     'name': 'Pupuk A',
-                    'category': '10 Kg',
+                    'category': 'Stok: 10 Kg',
                     'icon': 'assets/icons/goclub.svg',
                   }
                 ],

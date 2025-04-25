@@ -5,6 +5,7 @@ import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
+import 'package:smart_farming_app/widget/weekly_calendar.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 
@@ -51,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: white, // Ganti sesuai warna yang kamu mau
+                    color: white,
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(20)),
                   ),
@@ -74,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: const Text("Tambah Jenis Kandang"),
                         onTap: () {
                           Navigator.pop(context);
-                          // Tambahkan aksi di sini
                         },
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -83,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: const Text("Tambah Jenis Hewan"),
                         onTap: () {
                           Navigator.pop(context);
-                          // Tambahkan aksi di sini
                         },
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -92,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: const Text("Tambah Komoditas"),
                         onTap: () {
                           Navigator.pop(context);
-                          // Tambahkan aksi di sini
                         },
                       ),
                     ],
@@ -131,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Column(
                       children: [
+                        WeeklyCalendar(),
                         DashboardGrid(
                           title: 'Statistik Perkebunan Bulan Ini',
                           type: DashboardGridType.basic,

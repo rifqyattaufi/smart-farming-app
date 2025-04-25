@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/screen/detail_item_screen.dart';
 import 'package:smart_farming_app/screen/detail_laporan_screen.dart';
-import 'package:smart_farming_app/screen/detail_report_screen.dart';
 import 'package:smart_farming_app/screen/detail_screen.dart';
-import 'package:smart_farming_app/screen/garden/add_garden_screen.dart';
-import 'package:smart_farming_app/screen/history_screen.dart';
 import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
 import 'package:smart_farming_app/screen/menu/account_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_farming_app/screen/plants/add_plant_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -63,42 +58,6 @@ final _router = GoRouter(
         return DetailLaporanScreen(name: name);
       },
     )
-    // GoRoute(
-    //   path: '/add-garden',
-    //   builder: (context, state) => const AddGardenScreen(),
-    // ),
-    // GoRoute(
-    //   path: '/add-plant',
-    //   builder: (context, state) => const AddPlantScreen(),
-    // ),
-    // GoRoute(
-    //   path: '/detail-item',
-    //   builder: (context, state) =>
-    //       DetailItemScreen(item: state.extra as Map<String, dynamic>),
-    // ),
-    // GoRoute(
-    //   path: '/detail-report',
-    //   builder: (context, state) =>
-    //       DetailReportScreen(report: state.extra as Map<String, dynamic>),
-    // ),
-    // GoRoute(
-    //   path: '/history',
-    //   builder: (context, state) => const HistoryScreen(
-    //     title: "Riwayat Aktivitas",
-    //     items: [
-    //       {
-    //         "name": "Panen Tomat",
-    //         "date": "17 Maret 2025",
-    //         "time": "10:30"
-    //       },
-    //       {
-    //         "name": "Penyiraman Tanaman",
-    //         "date": "16 Maret 2025",
-    //         "time": "08:00"
-    //       },
-    //     ],
-    //   ),
-    // ),
   ],
 );
 

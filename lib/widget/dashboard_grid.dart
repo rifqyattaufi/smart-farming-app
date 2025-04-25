@@ -88,8 +88,11 @@ class DashboardGrid extends StatelessWidget {
               return SizedBox(
                 child: Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                      borderRadius: BorderRadius.circular(15),
+                      side: BorderSide(
+                        color: dark1,
+                        width: 1,
+                      )),
                   color: item.bgColor,
                   child: Padding(
                     padding: EdgeInsets.all(paddingSize),

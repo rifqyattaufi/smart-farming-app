@@ -25,7 +25,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget _buildLeadingIcon() {
+    Widget buildLeadingIcon() {
       final iconPath = leadingIconPath ?? 'assets/icons/goclub.svg';
       final iconType = leadingIconType ?? IconType.svg;
 
@@ -55,7 +55,7 @@ class Header extends StatelessWidget {
                     color: green2,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: _buildLeadingIcon(),
+                  child: buildLeadingIcon(),
                 ),
               ],
               if (headerType == HeaderType.back) ...[
