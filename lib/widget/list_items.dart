@@ -36,7 +36,7 @@ class ListItem extends StatelessWidget {
                 Text(title, style: bold18.copyWith(color: dark1)),
                 GestureDetector(
                   onTap: () {
-                    final path = navigateTo!(context);
+                    final path = navigateTo!(context); // need care
                     context.push(path);
                   },
                   child: Text(

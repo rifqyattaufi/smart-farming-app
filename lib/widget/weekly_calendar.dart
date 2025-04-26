@@ -29,7 +29,7 @@ class WeeklyCalendar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(7, (index) {
+        children: List.generate(7, (index) {
             DateTime date = weekDates[index];
             bool isToday = date.day == now.day &&
                 date.month == now.month &&

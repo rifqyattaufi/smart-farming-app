@@ -109,11 +109,17 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const BannerWidget(),
+            const BannerWidget(
+              title: 'Kelola Perkebunan dan Peternakan dangen FarmCenter.',
+              subtitle:
+                  'Pantau, lapor, dan tingkatkan hasil panen produk budidayamu!',
+              showDate: true,
+            ),
             Tabs(
               onTabChanged: _onTabChanged,
               selectedIndex: _selectedTabIndex,
             ),
+            const SizedBox(height: 12),
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -126,10 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Perkebunan Tab
                   SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Column(
                       children: [
                         WeeklyCalendar(),
+                        const SizedBox(height: 12),
                         DashboardGrid(
                           title: 'Statistik Perkebunan Bulan Ini',
                           type: DashboardGridType.basic,
@@ -234,7 +240,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Peternakan Tab
                   SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Column(
                       children: [
                         DashboardGrid(
