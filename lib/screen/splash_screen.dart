@@ -10,9 +10,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Splash Page")),
-      body: const Center(child: Text("This is the splash screen")),
+    return const Scaffold(
+      body: Center(child: Text("This is the splash screen")),
     );
   }
 }
