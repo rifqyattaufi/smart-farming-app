@@ -5,7 +5,6 @@ import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
-import 'package:smart_farming_app/widget/weekly_calendar.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 
@@ -134,7 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
-                        WeeklyCalendar(),
                         const SizedBox(height: 12),
                         DashboardGrid(
                           title: 'Statistik Perkebunan Bulan Ini',
