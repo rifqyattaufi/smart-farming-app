@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/theme.dart';
 
-enum NewestReportsMode { full, simple }
+enum NewestReportsMode { full, simple, log }
 
 class NewestReports extends StatelessWidget {
-  final String title;
+  final String? title;
   final List<Map<String, dynamic>> reports;
   final VoidCallback? onViewAll;
   final Function(BuildContext, Map<String, dynamic>) onItemTap;
@@ -17,7 +17,7 @@ class NewestReports extends StatelessWidget {
 
   const NewestReports({
     super.key,
-    required this.title,
+    this.title,
     required this.reports,
     required this.onItemTap,
     this.onViewAll,
@@ -39,7 +39,7 @@ class NewestReports extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: titleTextStyle),
+              if (title != null) Text(title!, style: titleTextStyle),
               if (mode == NewestReportsMode.full && onViewAll != null)
                 GestureDetector(
                   onTap: onViewAll,
@@ -102,12 +102,61 @@ class NewestReports extends StatelessWidget {
                                     report['text'] ?? 'Unknown Report',
                                     style: reportTextStyle,
                                   ),
-                                  if (mode == NewestReportsMode.full)
+                                  if (mode == NewestReportsMode.full &&
+                                      report['time'] != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            report['time'] ?? 'Unknown Time',
+                                            style: timeTextStyle,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (mode == NewestReportsMode.full &&
+                                      report['subtext'] != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Text(
-                                        report['time'] ?? 'Unknown Time',
+                                        report['subtext'] ?? 'Unknown Subtext',
                                         style: timeTextStyle,
+                                      ),
+                                    ),
+                                  if (mode == NewestReportsMode.log)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            margin:
+                                                const EdgeInsets.only(right: 8),
+                                            decoration: BoxDecoration(
+                                              color: report['action'] ==
+                                                      'CREATE'
+                                                  ? blue2.withValues(alpha: 0.1)
+                                                  : report['action'] == 'UPDATE'
+                                                      ? yellow.withValues(
+                                                          alpha: 0.1)
+                                                      : red.withValues(
+                                                          alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                            ),
+                                            child: Text(
+                                              report['action'] ?? 'CREATE',
+                                              style: regular10.copyWith(
+                                                  color: dark2),
+                                            ),
+                                          ),
+                                          Text(
+                                            report['time'] ?? 'Unknown Time',
+                                            style: timeTextStyle,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                 ],

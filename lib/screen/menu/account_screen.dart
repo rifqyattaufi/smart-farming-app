@@ -43,11 +43,11 @@ class AccountScreen extends StatelessWidget {
             reports: [
               {
                 'text': 'Manajemen Pengguna',
-                'onTap': () => context.push('/detail'),
+                'onTap': () => context.push('/manajemen-pengguna'),
               },
               {
                 'text': 'Manajemen Satuan',
-                'onTap': () => context.push('/detail'),
+                'onTap': () => context.push('/manajemen-satuan'),
               },
               {
                 'text': 'Ubah Password',
@@ -55,7 +55,7 @@ class AccountScreen extends StatelessWidget {
               },
               {
                 'text': 'Log Aktivitas',
-                'onTap': () => context.push('/detail'),
+                'onTap': () => context.push('/log-aktivitas'),
               },
               {
                 'text': 'Kebijakan Privasi',
@@ -66,8 +66,10 @@ class AccountScreen extends StatelessWidget {
                 'onTap': () => context.push('/detail'),
               }
             ],
-            onItemTap: (context, report) =>
-                context.push('/detail', extra: report),
+            onItemTap: (context, item) {
+              final name = item['name'] ?? '';
+              context.push('/detail-laporan/$name');
+            },
             mode: NewestReportsMode.simple,
             showIcon: false,
             titleTextStyle: bold18.copyWith(color: dark1),
@@ -82,8 +84,10 @@ class AccountScreen extends StatelessWidget {
                 'onTap': () => context.push('/detail'),
               },
             ],
-            onItemTap: (context, report) =>
-                context.push('/detail', extra: report),
+            onItemTap: (context, item) {
+              final name = item['name'] ?? '';
+              context.push('/detail-laporan/$name');
+            },
             mode: NewestReportsMode.simple,
             showIcon: false,
             titleTextStyle: bold18.copyWith(color: dark1),

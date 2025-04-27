@@ -56,8 +56,7 @@ class InventoryScreen extends StatelessWidget {
                         leading: Icon(Icons.house_outlined, color: green1),
                         title: const Text("Tambah Pemakaian Inventaris"),
                         onTap: () {
-                          Navigator.pop(context);
-                          // Tambahkan aksi di sini
+                          context.push('/tambah-pemakaian-inventaris');
                         },
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -65,8 +64,7 @@ class InventoryScreen extends StatelessWidget {
                         leading: Icon(Icons.pets_outlined, color: green1),
                         title: const Text("Tambah Inventaris"),
                         onTap: () {
-                          Navigator.pop(context);
-                          // Tambahkan aksi di sini
+                          context.push('/tambah-inventaris');
                         },
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -74,8 +72,7 @@ class InventoryScreen extends StatelessWidget {
                         leading: Icon(Icons.category_outlined, color: green1),
                         title: const Text("Tambah Kategori Inventaris"),
                         onTap: () {
-                          Navigator.pop(context);
-                          // Tambahkan aksi di sini
+                          context.push('/tambah-kategori-inventaris');
                         },
                       ),
                     ],
@@ -160,7 +157,7 @@ class InventoryScreen extends StatelessWidget {
                     'time': '14:30',
                   },
                 ],
-                navigateTo: (context) => '/laporan-inventaris',
+                onViewAll: () => context.push('/riwayat-pemakaian-inventaris'),
                 onItemTap: (context, item) {
                   final name = item['name'] ?? '';
                   context.push('/detail-laporan/$name');
@@ -182,8 +179,11 @@ class InventoryScreen extends StatelessWidget {
                   }
                 ],
                 type: 'basic',
-                onItemTap: (context, item) =>
-                    context.push('/detail', extra: item),
+                onViewAll: () => context.push('/inventaris'),
+                onItemTap: (context, item) {
+                  final name = item['name'] ?? '';
+                  context.push('/detail-laporan/$name');
+                },
               ),
             ],
           ),

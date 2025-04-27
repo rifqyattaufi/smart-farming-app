@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class ImagePickerWidget extends StatelessWidget {
   final String label;
@@ -17,27 +18,31 @@ class ImagePickerWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(label, style: semibold14.copyWith(color: dark1)),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: onPickImage,
           child: Container(
-            height: 150,
+            height: 200,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(10),
               color: Colors.grey[100],
             ),
             child: image == null
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.cloud_upload, size: 40, color: Colors.grey),
-                        Text("Upload", style: TextStyle(color: Colors.grey)),
-                        Text("Drag a file here or click to browse",
-                            style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        const Icon(Icons.cloud_upload,
+                            size: 40, color: Colors.grey),
+                        Text("Upload", style: semibold16.copyWith(color: grey)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                              "Drag a file here or click in this area to browse \nin your folder explorer",
+                              style: medium14.copyWith(color: grey),
+                              textAlign: TextAlign.center),
+                        ),
                       ],
                     ),
                   )

@@ -19,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTabIndex = 0;
   final PageController _pageController = PageController();
 
+  String? selectedType;
+
   void _onTabChanged(int index) {
     setState(() {
       _selectedTabIndex = index;
@@ -49,52 +51,101 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               builder: (context) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: white,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Aksi",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                if (_selectedTabIndex == 0) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Aksi",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.house_outlined, color: green1),
-                        title: const Text("Tambah Jenis Kandang"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.pets_outlined, color: green1),
-                        title: const Text("Tambah Jenis Hewan"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.category_outlined, color: green1),
-                        title: const Text("Tambah Komoditas"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
+                        const SizedBox(height: 10),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.house_outlined, color: green1),
+                          title: const Text("Tambah Kebun"),
+                          onTap: () {
+                            context.push('/tambah-kebun');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.pets_outlined, color: green1),
+                          title: const Text("Tambah Jenis Tanaman"),
+                          onTap: () {
+                            context.push('/tambah-tanaman');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.category_outlined, color: green1),
+                          title: const Text("Tambah Komoditas"),
+                          onTap: () {
+                            context.push('/tambah-komoditas-tanaman');
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Aksi",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.house_outlined, color: green1),
+                          title: const Text("Tambah Kandang"),
+                          onTap: () {
+                            context.push('/tambah-kandang');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.pets_outlined, color: green1),
+                          title: const Text("Tambah Ternak"),
+                          onTap: () {
+                            context.push('/tambah-ternak');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.category_outlined, color: green1),
+                          title: const Text("Tambah Komoditas"),
+                          onTap: () {
+                            context.push('/tambah-komoditas-ternak');
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
             );
           },
@@ -133,7 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
-                        const SizedBox(height: 12),
                         DashboardGrid(
                           title: 'Statistik Perkebunan Bulan Ini',
                           type: DashboardGridType.basic,
@@ -169,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                           crossAxisCount: 2,
                           valueFontSize: 60,
+                          onViewAll: () => context.push('/report'),
                         ),
                         const SizedBox(height: 12),
                         NewestReports(
@@ -186,9 +237,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               'icon': 'assets/icons/goclub.svg',
                             },
                           ],
-                          onViewAll: () => context.push('/detail'),
-                          onItemTap: (context, report) =>
-                              context.push('/detail', extra: report),
+                          onViewAll: () => context.push('/riwayat-aktivitas'),
+                          onItemTap: (context, item) {
+                            final name = item['text'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                           mode: NewestReportsMode.full,
                           titleTextStyle: bold18.copyWith(color: dark1),
                           reportTextStyle: medium12.copyWith(color: dark1),
@@ -210,8 +263,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onViewAll: () => context.push('/manajemen-kebun'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                         const SizedBox(height: 12),
                         ListItem(
@@ -229,8 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onViewAll: () =>
+                              context.push('/manajemen-jenis-tanaman'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                       ],
                     ),
@@ -275,26 +335,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                           crossAxisCount: 2,
                           valueFontSize: 60,
+                          onViewAll: () => context.push('/report'),
                         ),
                         const SizedBox(height: 12),
                         NewestReports(
                           title: 'Aktivitas Terbaru',
                           reports: const [
                             {
-                              'text':
-                                  'Pak Adi telah melaporkan kondisi tanaman',
+                              'text': 'Pak Adi telah melaporkan kondisi ternak',
                               'time': 'Senin, 17 Februari 2025 | 08.20',
                               'icon': 'assets/icons/goclub.svg',
                             },
                             {
-                              'text': 'Pak Adi telah melaporkan tanaman sakit',
+                              'text': 'Pak Adi telah melaporkan ternak sakit',
                               'time': 'Senin, 17 Februari 2025 | 08.20',
                               'icon': 'assets/icons/goclub.svg',
                             },
                           ],
-                          onViewAll: () => context.push('/detail'),
-                          onItemTap: (context, report) =>
-                              context.push('/detail', extra: report),
+                          onViewAll: () => context.push('/riwayat-aktivitas'),
+                          onItemTap: (context, item) {
+                            final name = item['text'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
+                          mode: NewestReportsMode.full,
+                          titleTextStyle: bold18.copyWith(color: dark1),
+                          reportTextStyle: medium12.copyWith(color: dark1),
+                          timeTextStyle: regular12.copyWith(color: dark2),
                         ),
                         const SizedBox(height: 12),
                         ListItem(
@@ -312,8 +378,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onViewAll: () => context.push('/manajemen-kandang'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                         const SizedBox(height: 12),
                         ListItem(
@@ -331,8 +400,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onViewAll: () => context.push('/manajemen-ternak'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                       ],
                     ),

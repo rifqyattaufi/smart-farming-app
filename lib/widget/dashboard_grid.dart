@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_farming_app/screen/detail_screen.dart';
 import 'package:smart_farming_app/theme.dart';
 
 enum DashboardGridType { basic, none }
@@ -31,6 +30,7 @@ class DashboardGrid extends StatelessWidget {
   final double detailFontSize;
   final double paddingSize;
   final DashboardGridType type;
+  final VoidCallback? onViewAll;
 
   const DashboardGrid({
     super.key,
@@ -42,6 +42,7 @@ class DashboardGrid extends StatelessWidget {
     this.valueFontSize = 60,
     this.detailFontSize = 14,
     this.paddingSize = 20,
+    this.onViewAll,
     this.type = DashboardGridType.none,
   });
 
@@ -60,14 +61,7 @@ class DashboardGrid extends StatelessWidget {
                 Text(title, style: bold18.copyWith(color: dark1)),
                 if (type == DashboardGridType.basic) ...[
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DetailScreen(),
-                        ),
-                      );
-                    },
+                    onTap: onViewAll,
                     child: Text(
                       'Lihat Laporan',
                       style: regular14.copyWith(color: green1),

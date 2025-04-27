@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:flutter_svg/svg.dart';
 
-enum HeaderType { basic, menu, back }
+enum HeaderType { basic, menu }
 
 enum IconType { svg, image }
 
@@ -58,26 +58,6 @@ class Header extends StatelessWidget {
                   child: buildLeadingIcon(),
                 ),
               ],
-              if (headerType == HeaderType.back) ...[
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: green3,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SvgPicture.asset(
-                      'assets/icons/left.svg',
-                      colorFilter: ColorFilter.mode(green1, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ],
               if (headerType == HeaderType.basic) ...[
                 const SizedBox(width: 12),
               ],
@@ -113,11 +93,7 @@ class Header extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const NotificationScreen()),
-                        );
+                        context.push('/notifikasi');
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),
