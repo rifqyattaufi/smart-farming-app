@@ -12,11 +12,13 @@ import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
 import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
+import 'package:smart_farming_app/screen/menu/privacy_policy_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
 import 'package:smart_farming_app/screen/menu/account_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/screen/menu/terms_condition_screen.dart';
 import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/log_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_screen.dart';
@@ -174,6 +176,14 @@ final _router = GoRouter(
     GoRoute(
       path: '/log-aktivitas',
       builder: (context, state) => const LogScreen(),
+    ),
+    GoRoute(
+      path: '/kebijakan-privasi',
+      builder: (context, state) => const PrivacyPolicyScreen(),
+    ),
+    GoRoute(
+      path: '/syarat-dan-ketentuan',
+      builder: (context, state) => const TermsConditionScreen(),
     ),
   ],
 );

@@ -59,7 +59,7 @@ class AccountScreen extends StatelessWidget {
               },
               {
                 'text': 'Kebijakan Privasi',
-                'onTap': () => context.push('/detail'),
+                'onTap': () => context.push('/kebijakan-privasi'),
               },
               {
                 'text': 'Bantuan',
