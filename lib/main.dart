@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
+import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/riwayat_pemakaian_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/inventaris_screen.dart';
@@ -75,6 +76,14 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/',
+      builder: (context, state) => const Introduction(),
+    ),
+    GoRoute(
+      path: '/introduction',
+      builder: (context, state) => const Introduction(),
+    ),
+    GoRoute(
+      path: '/login',
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(

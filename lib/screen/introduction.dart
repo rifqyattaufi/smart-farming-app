@@ -1,5 +1,6 @@
 import 'dart:async'; // Import for Timer
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Introduction extends StatefulWidget {
   const Introduction({super.key});
@@ -139,8 +140,7 @@ class _IntroductionState extends State<Introduction> {
                     curve: Curves.easeInOut,
                   );
                 } else {
-                  // Navigate to the main screen or perform another action
-                  Navigator.pushReplacementNamed(context, '/main_screen');
+                  context.push('/login');
                 }
               },
               style: ElevatedButton.styleFrom(

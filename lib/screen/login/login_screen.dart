@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                     CustomButton(
                       onPressed: () {
-                        // Action login
+                        context.push('/home');
                       },
                       buttonText: 'Masuk',
                       backgroundColor: green1,
