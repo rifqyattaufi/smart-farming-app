@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class MenuCard extends StatelessWidget {
   final Color bgColor;
@@ -38,21 +39,10 @@ class MenuCard extends StatelessWidget {
                   child: Icon(icon, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(title, style: semibold16.copyWith(color: dark1)),
                 const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black87,
-                  ),
-                ),
+                Text(subtitle,
+                    style: regular12.copyWith(color: dark1, fontSize: 13)),
               ],
             ),
           ),

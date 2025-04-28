@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:popover/popover.dart';
+import 'package:dotted_border/dotted_border.dart';
 
-class MenuButton extends StatelessWidget {
+class MenuButton extends StatefulWidget {
   final String title;
   final String subtext;
   final IconData icon;
   final Color backgroundColor;
   final Color iconColor;
-  final VoidCallback onTapNavigate;
 
   const MenuButton({
     super.key,
@@ -17,69 +17,91 @@ class MenuButton extends StatelessWidget {
     required this.icon,
     required this.backgroundColor,
     required this.iconColor,
-    required this.onTapNavigate,
   });
 
   @override
+  State<MenuButton> createState() => _MenuButtonState();
+}
+
+class _MenuButtonState extends State<MenuButton> {
+  bool isSelected = false;
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTapNavigate,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: 32),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: semibold16.copyWith(color: dark1),
-                  ),
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: () {
-                      showPopover(
-                        context: context,
-                        bodyBuilder: (context) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            subtext,
-                            style: regular14.copyWith(color: dark1),
-                          ),
+    Widget content = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: widget.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(widget.icon, color: widget.iconColor, size: 32),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  widget.title,
+                  style: semibold16.copyWith(color: dark1),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () {
+                    showPopover(
+                      context: context,
+                      bodyBuilder: (context) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          widget.subtext,
+                          style: regular14.copyWith(color: dark1),
                         ),
-                        direction: PopoverDirection.bottom,
-                        width: 220,
-                        height: 100,
-                        arrowHeight: 10,
-                        arrowWidth: 20,
-                        barrierColor: Colors.transparent,
-                      );
-                    },
-                    child: Transform.translate(
-                      offset: const Offset(0, -4), // Move up a little
-                      child: Icon(
-                        Icons.info_outline,
-                        color: iconColor,
-                        size: 16, // Smaller icon
                       ),
+                      direction: PopoverDirection.bottom,
+                      width: 220,
+                      height: 100,
+                      arrowHeight: 10,
+                      arrowWidth: 20,
+                      barrierColor: Colors.transparent,
+                    );
+                  },
+                  child: Transform.translate(
+                    offset: const Offset(0, -4),
+                    child: Icon(
+                      Icons.info_outline,
+                      color: widget.iconColor,
+                      size: 16,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: Colors.black45),
-          ],
-        ),
+          ),
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+        ],
+      ),
+    );
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isSelected = !isSelected;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: isSelected
+            ? DottedBorder(
+                color: green1,
+                strokeWidth: 2,
+                borderType: BorderType.RRect,
+                radius: const Radius.circular(12),
+                dashPattern: const [6, 4],
+                child: content,
+              )
+            : content,
       ),
     );
   }

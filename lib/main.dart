@@ -10,8 +10,14 @@ import 'package:smart_farming_app/screen/kandang/kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/login/login_screen.dart';
 import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
+import 'package:smart_farming_app/screen/menu/petugas/home_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_harian_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pilih_kandang_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pilih_kebun_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_khusus_screen.dart';
 import 'package:smart_farming_app/screen/menu/privacy_policy_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
@@ -20,6 +26,7 @@ import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/menu/terms_condition_screen.dart';
 import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pilih_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/log_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_screen.dart';
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
@@ -45,7 +52,7 @@ final _router = GoRouter(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
         GoRoute(
-          path: '/',
+          path: '/ss',
           builder: (context, state) => const HomeScreen(),
         ),
         GoRoute(
@@ -65,6 +72,38 @@ final _router = GoRouter(
           builder: (context, state) => const AccountScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-harian-tanaman',
+      builder: (context, state) => const PelaporanHarianTanamanScreen(),
+    ),
+    GoRoute(
+      path: '/pilih-tanaman',
+      builder: (context, state) => const PilihTanamanScreen(),
+    ),
+    GoRoute(
+      path: '/pilih-kebun',
+      builder: (context, state) => const PilihKebunScreen(),
+    ),
+    GoRoute(
+      path: '/pilih-kandang',
+      builder: (context, state) => const PilihKandangScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-harian',
+      builder: (context, state) => const PelaporanKhususScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-khusus',
+      builder: (context, state) => const PelaporanKhususScreen(),
+    ),
+    GoRoute(
+      path: '/home-petugas',
+      builder: (context, state) => const HomePetugasScreen(),
     ),
     GoRoute(
       path: '/detail',
