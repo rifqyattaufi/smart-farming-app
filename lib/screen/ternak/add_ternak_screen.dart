@@ -40,63 +40,71 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Jenis Hewan',
-            greeting: 'Tambah Jenis Hewan'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama hewan ternak",
-                hint: "Contoh: Ayam",
-                controller: _nameController,
-              ),
-              InputFieldWidget(
-                  label: "Nama latin",
-                  hint: "Contoh: Gallus gallus domesticus",
-                  controller: _latinController),
-              RadioField(
-                label: 'Status ternak',
-                selectedValue: statusTernak,
-                options: const ['Ternak', 'Tidak ternak'],
-                onChanged: (value) {
-                  setState(() {
-                    statusTernak = value;
-                  });
-                },
-              ),
-              ImagePickerWidget(
-                label: "Unggah gambar hewan ternak",
-                image: _image,
-                onPickImage: _pickImage,
-              ),
-              InputFieldWidget(
-                  label: "Deskripsi hewan ternak",
-                  hint: "Keterangan",
-                  controller: _descriptionController,
-                  maxLines: 10),
-              const SizedBox(height: 16),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Jenis Hewan',
+              greeting: 'Tambah Jenis Hewan'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama hewan ternak",
+                  hint: "Contoh: Ayam",
+                  controller: _nameController,
+                ),
+                InputFieldWidget(
+                    label: "Nama latin",
+                    hint: "Contoh: Gallus gallus domesticus",
+                    controller: _latinController),
+                RadioField(
+                  label: 'Status ternak',
+                  selectedValue: statusTernak,
+                  options: const ['Ternak', 'Tidak ternak'],
+                  onChanged: (value) {
+                    setState(() {
+                      statusTernak = value;
+                    });
+                  },
+                ),
+                ImagePickerWidget(
+                  label: "Unggah gambar hewan ternak",
+                  image: _image,
+                  onPickImage: _pickImage,
+                ),
+                InputFieldWidget(
+                    label: "Deskripsi hewan ternak",
+                    hint: "Keterangan",
+                    controller: _descriptionController,
+                    maxLines: 10),
+                const SizedBox(height: 16),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

@@ -18,39 +18,47 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Kategori Inventaris',
-            greeting: 'Tambah Kategori Inventaris'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama kategori inventaris",
-                hint: "Contoh: Bibit tanaman",
-                controller: _nameController,
-              ),
-              const SizedBox(height: 520),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Kategori Inventaris',
+              greeting: 'Tambah Kategori Inventaris'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama kategori inventaris",
+                  hint: "Contoh: Bibit tanaman",
+                  controller: _nameController,
+                ),
+                const SizedBox(height: 520),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

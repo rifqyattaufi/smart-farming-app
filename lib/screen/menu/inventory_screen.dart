@@ -13,13 +13,19 @@ class InventoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Menu Aplikasi',
-            greeting: 'Inventaris'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.menu,
+              title: 'Menu Aplikasi',
+              greeting: 'Inventaris'),
+        ),
       ),
       floatingActionButton: SizedBox(
         width: 70,
@@ -88,104 +94,107 @@ class InventoryScreen extends StatelessWidget {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DashboardGrid(
-                title: 'Statistik Inventaris Bulan Ini',
-                items: [
-                  DashboardItem(
-                      title: 'Total Item',
-                      value: '33',
-                      icon: 'other',
-                      bgColor: green3,
-                      iconColor: yellow),
-                  DashboardItem(
-                      title: 'Stok Rendah',
-                      value: '3',
-                      icon: 'other',
-                      bgColor: red2,
-                      iconColor: red),
-                  DashboardItem(
-                      title: 'Item Baru',
-                      value: '3',
-                      icon: 'other',
-                      bgColor: green4,
-                      iconColor: green2),
-                ],
-                crossAxisCount: 3,
-                valueFontSize: 32,
-                titleFontSize: 14,
-                paddingSize: 10,
-                iconsWidth: 36,
-              ),
-              const SizedBox(height: 12),
-              RingkasanInv(
-                totalItem: 33,
-                kategoriInventaris: 4,
-                seringDigunakan: 2,
-                jarangDigunakan: 2,
-                itemTersedia: 28,
-                stokRendah: 3,
-                itemBaru: 2,
-                tanggal: DateTime(2025, 2, 17, 8, 20),
-              ),
-              const SizedBox(height: 12),
-              ListItem(
-                title: "Riwayat Pemakaian Terbaru",
-                type: "history",
-                items: const [
-                  {
-                    'name': 'Pupuk NPK',
-                    'category': 'Pupuk',
-                    'image': 'assets/images/pupuk.jpg',
-                    'person': 'Pak Budi',
-                    'date': '22 Apr 2025',
-                    'time': '10:45',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DashboardGrid(
+                  title: 'Statistik Inventaris Bulan Ini',
+                  items: [
+                    DashboardItem(
+                        title: 'Total Item',
+                        value: '33',
+                        icon: 'other',
+                        bgColor: green3,
+                        iconColor: yellow),
+                    DashboardItem(
+                        title: 'Stok Rendah',
+                        value: '3',
+                        icon: 'other',
+                        bgColor: red2,
+                        iconColor: red),
+                    DashboardItem(
+                        title: 'Item Baru',
+                        value: '3',
+                        icon: 'other',
+                        bgColor: green4,
+                        iconColor: green2),
+                  ],
+                  crossAxisCount: 3,
+                  valueFontSize: 32,
+                  titleFontSize: 14,
+                  paddingSize: 10,
+                  iconsWidth: 36,
+                ),
+                const SizedBox(height: 12),
+                RingkasanInv(
+                  totalItem: 33,
+                  kategoriInventaris: 4,
+                  seringDigunakan: 2,
+                  jarangDigunakan: 2,
+                  itemTersedia: 28,
+                  stokRendah: 3,
+                  itemBaru: 2,
+                  tanggal: DateTime(2025, 2, 17, 8, 20),
+                ),
+                const SizedBox(height: 12),
+                ListItem(
+                  title: "Riwayat Pemakaian Terbaru",
+                  type: "history",
+                  items: const [
+                    {
+                      'name': 'Pupuk NPK',
+                      'category': 'Pupuk',
+                      'image': 'assets/images/pupuk.jpg',
+                      'person': 'Pak Budi',
+                      'date': '22 Apr 2025',
+                      'time': '10:45',
+                    },
+                    {
+                      'name': 'Disinfektan A',
+                      'category': 'Disinfektan',
+                      'image': 'assets/images/pupuk.jpg',
+                      'person': 'Bu Sari',
+                      'date': '21 Apr 2025',
+                      'time': '14:30',
+                    },
+                  ],
+                  onViewAll: () =>
+                      context.push('/riwayat-pemakaian-inventaris'),
+                  onItemTap: (context, item) {
+                    final name = item['name'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                  {
-                    'name': 'Disinfektan A',
-                    'category': 'Disinfektan',
-                    'image': 'assets/images/pupuk.jpg',
-                    'person': 'Bu Sari',
-                    'date': '21 Apr 2025',
-                    'time': '14:30',
+                ),
+                const SizedBox(height: 12),
+                ListItem(
+                  title: 'Daftar Inventaris',
+                  items: const [
+                    {
+                      'name': 'Bibit Melon',
+                      'category': 'Stok: 20 Pack',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'name': 'Pupuk A',
+                      'category': 'Stok: 10 Kg',
+                      'icon': 'assets/icons/goclub.svg',
+                    }
+                  ],
+                  type: 'basic',
+                  onViewAll: () => context.push('/inventaris'),
+                  onItemTap: (context, item) {
+                    final name = item['name'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                ],
-                onViewAll: () => context.push('/riwayat-pemakaian-inventaris'),
-                onItemTap: (context, item) {
-                  final name = item['name'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-              ),
-              const SizedBox(height: 12),
-              ListItem(
-                title: 'Daftar Inventaris',
-                items: const [
-                  {
-                    'name': 'Bibit Melon',
-                    'category': 'Stok: 20 Pack',
-                    'icon': 'assets/icons/goclub.svg',
-                  },
-                  {
-                    'name': 'Pupuk A',
-                    'category': 'Stok: 10 Kg',
-                    'icon': 'assets/icons/goclub.svg',
-                  }
-                ],
-                type: 'basic',
-                onViewAll: () => context.push('/inventaris'),
-                onItemTap: (context, item) {
-                  final name = item['name'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

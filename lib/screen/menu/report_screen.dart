@@ -32,13 +32,19 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Menu Aplikasi',
-            greeting: 'Laporan'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.menu,
+              title: 'Menu Aplikasi',
+              greeting: 'Laporan'),
+        ),
       ),
       body: SafeArea(
         child: Column(

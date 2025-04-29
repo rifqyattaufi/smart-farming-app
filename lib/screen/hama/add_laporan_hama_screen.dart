@@ -42,92 +42,100 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Pelaporan Khusus',
-            greeting: 'Pelaporan Hama'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Pelaporan Khusus',
+              greeting: 'Pelaporan Hama'),
+        ),
       ),
-      body: ListView(children: [
-        const BannerWidget(
-          title: 'Isi Form Pelaporan Hama Tanaman',
-          subtitle:
-              'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-          showDate: true,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RadioField(
-                label: 'Status hama',
-                selectedValue: hamaStatus,
-                options: const ['Ada', 'Tidak ada'],
-                onChanged: (value) {
-                  setState(() {
-                    hamaStatus = value;
-                  });
-                },
-              ),
-              DropdownFieldWidget(
-                label: "Jenis hama",
-                hint: "Pilih jenis hama",
-                items: const ["Tikus", "Ulat Bulu", "Lainnya"],
-                selectedValue: selectedHama,
-                onChanged: (value) {
-                  setState(() {
-                    selectedHama = value;
-                  });
-                },
-              ),
-              if (selectedHama == "Lainnya")
-                InputFieldWidget(
-                  label: "Nama hama",
-                  hint: "Masukkan nama hama",
-                  controller: _namaHamaController,
-                ),
-              DropdownFieldWidget(
-                label: "Terlihat di",
-                hint: "Pilih lokasi",
-                items: const ["Kebun A", "Kebun B"],
-                selectedValue: selectedLocation,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              InputFieldWidget(
-                  label: "Jumlah hama",
-                  hint: "Contoh: 5 (ekor)",
-                  controller: _sizeController),
-              ImagePickerWidget(
-                label: "Unggah bukti adanya hama",
-                image: _image,
-                onPickImage: _pickImage,
-              ),
-              InputFieldWidget(
-                  label: "Catatan/jurnal pelaporan",
-                  hint: "Keterangan",
-                  controller: _descriptionController,
-                  maxLines: 10),
-              const SizedBox(height: 16),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
+      body: SafeArea(
+        child: ListView(children: [
+          const BannerWidget(
+            title: 'Isi Form Pelaporan Hama Tanaman',
+            subtitle:
+                'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+            showDate: true,
           ),
-        ),
-      ]),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RadioField(
+                  label: 'Status hama',
+                  selectedValue: hamaStatus,
+                  options: const ['Ada', 'Tidak ada'],
+                  onChanged: (value) {
+                    setState(() {
+                      hamaStatus = value;
+                    });
+                  },
+                ),
+                DropdownFieldWidget(
+                  label: "Jenis hama",
+                  hint: "Pilih jenis hama",
+                  items: const ["Tikus", "Ulat Bulu", "Lainnya"],
+                  selectedValue: selectedHama,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedHama = value;
+                    });
+                  },
+                ),
+                if (selectedHama == "Lainnya")
+                  InputFieldWidget(
+                    label: "Nama hama",
+                    hint: "Masukkan nama hama",
+                    controller: _namaHamaController,
+                  ),
+                DropdownFieldWidget(
+                  label: "Terlihat di",
+                  hint: "Pilih lokasi",
+                  items: const ["Kebun A", "Kebun B"],
+                  selectedValue: selectedLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
+                InputFieldWidget(
+                    label: "Jumlah hama",
+                    hint: "Contoh: 5 (ekor)",
+                    controller: _sizeController),
+                ImagePickerWidget(
+                  label: "Unggah bukti adanya hama",
+                  image: _image,
+                  onPickImage: _pickImage,
+                ),
+                InputFieldWidget(
+                    label: "Catatan/jurnal pelaporan",
+                    hint: "Keterangan",
+                    controller: _descriptionController,
+                    maxLines: 10),
+                const SizedBox(height: 16),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

@@ -10,33 +10,32 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
-class PelaporanHarianTanamanScreen extends StatefulWidget {
-  const PelaporanHarianTanamanScreen({super.key});
+class PelaporanHarianTernakScreen extends StatefulWidget {
+  const PelaporanHarianTernakScreen({super.key});
 
   @override
-  State<PelaporanHarianTanamanScreen> createState() =>
-      _PelaporanHarianTanamanScreenState();
+  State<PelaporanHarianTernakScreen> createState() =>
+      _PelaporanHarianTernakScreenState();
 }
 
-class _PelaporanHarianTanamanScreenState
-    extends State<PelaporanHarianTanamanScreen> {
-  String statusPenyiraman = '';
-  String statusPruning = '';
+class _PelaporanHarianTernakScreenState
+    extends State<PelaporanHarianTernakScreen> {
+  String statusPakan = '';
+  String statusKandang = '';
   String statusNutrisi = '';
-  String statusRepotting = '';
   String statusPemberian = '';
   String? selectedBahan;
   String? selectedSatuan;
 
-  File? _imageTanaman;
+  File? _imageTernak;
   File? _imageDosis;
   final picker = ImagePicker();
 
-  Future<void> _pickImageTanaman() async {
+  Future<void> _pickImageTernak() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _imageTanaman = File(pickedFile.path);
+        _imageTernak = File(pickedFile.path);
       });
     }
   }
@@ -90,27 +89,27 @@ class _PelaporanHarianTanamanScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RadioField(
-                    label: 'Dilakukan penyiraman?',
-                    selectedValue: statusPenyiraman,
+                    label: 'Dilakukan pemberian pakan?',
+                    selectedValue: statusPakan,
                     options: const ['Ya', 'Belum'],
                     onChanged: (value) {
                       setState(() {
-                        statusPenyiraman = value;
+                        statusPakan = value;
                       });
                     },
                   ),
                   RadioField(
-                    label: 'Dilakukan pruning?',
-                    selectedValue: statusPruning,
+                    label: 'Dilakukan pengecekan kandang?',
+                    selectedValue: statusKandang,
                     options: const ['Ya', 'Tidak'],
                     onChanged: (value) {
                       setState(() {
-                        statusPruning = value;
+                        statusKandang = value;
                       });
                     },
                   ),
                   RadioField(
-                    label: 'Dilakukan pemberian pupuk/vitamin/disinfektan?',
+                    label: 'Dilakukan pemberian vaksin/vitamin/disinfektan?',
                     selectedValue: statusNutrisi,
                     options: const ['Ya', 'Tidak'],
                     onChanged: (value) {
@@ -119,21 +118,10 @@ class _PelaporanHarianTanamanScreenState
                       });
                     },
                   ),
-                  RadioField(
-                    label:
-                        'Dilakukan repotting (pemindahan pot/mengganti media tanam)?',
-                    selectedValue: statusRepotting,
-                    options: const ['Ya', 'Tidak'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusRepotting = value;
-                      });
-                    },
-                  ),
                   ImagePickerWidget(
-                    label: "Unggah bukti kondisi tanaman",
-                    image: _imageTanaman,
-                    onPickImage: _pickImageTanaman,
+                    label: "Unggah bukti kondisi ternak",
+                    image: _imageTernak,
+                    onPickImage: _pickImageTernak,
                   ),
                   InputFieldWidget(
                       label: "Catatan/jurnal pelaporan",
@@ -146,7 +134,6 @@ class _PelaporanHarianTanamanScreenState
                       selectedValue: statusPemberian,
                       options: const [
                         'Vitamin',
-                        'Pupuk',
                         'Vaksin',
                         'Disinfektan'
                       ],
@@ -159,7 +146,7 @@ class _PelaporanHarianTanamanScreenState
                   DropdownFieldWidget(
                     label: "Nama bahan",
                     hint: "Pilih jenis bahan",
-                    items: const ["Pupuk A", "Pupuk B", "Pupuk C"],
+                    items: const ["Vaksin A", "Vaksin B", "Vaksin C"],
                     selectedValue: selectedBahan,
                     onChanged: (value) {
                       setState(() {
@@ -184,7 +171,7 @@ class _PelaporanHarianTanamanScreenState
                     },
                   ),
                   ImagePickerWidget(
-                    label: "Unggah bukti pemberian dosis ke tanaman",
+                    label: "Unggah bukti pemberian dosis ke ternak",
                     image: _imageDosis,
                     onPickImage: _pickImageDosis,
                   ),

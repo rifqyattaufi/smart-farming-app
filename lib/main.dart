@@ -16,9 +16,15 @@ import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
 import 'package:smart_farming_app/screen/menu/petugas/home_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/pelaporan_harian_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_harian_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_khusus_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_nutrisi_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_tanaman_mati_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_tanaman_panen_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_tanaman_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/pilih_kebun_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/pelaporan_khusus_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/pelaporan_khusus_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/menu/privacy_policy_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
@@ -87,10 +93,6 @@ final _router = GoRouter(
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-      path: '/pelaporan-harian-tanaman',
-      builder: (context, state) => const PelaporanHarianTanamanScreen(),
-    ),
-    GoRoute(
       path: '/pilih-tanaman',
       builder: (context, state) => const PilihTanamanScreen(),
     ),
@@ -103,12 +105,36 @@ final _router = GoRouter(
       builder: (context, state) => const PilihKandangScreen(),
     ),
     GoRoute(
-      path: '/pelaporan-harian',
-      builder: (context, state) => const PelaporanKhususScreen(),
+      path: '/pelaporan-harian-tanaman',
+      builder: (context, state) => const PelaporanHarianTanamanScreen(),
     ),
     GoRoute(
-      path: '/pelaporan-khusus',
-      builder: (context, state) => const PelaporanKhususScreen(),
+      path: '/pelaporan-harian-ternak',
+      builder: (context, state) => const PelaporanHarianTernakScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-khusus-ternak',
+      builder: (context, state) => const PelaporanKhususTernakScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-khusus-tanaman',
+      builder: (context, state) => const PelaporanKhususTanamanScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-nutrisi-tanaman',
+      builder: (context, state) => const PelaporanNutrisiTanamanScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-tanaman-mati',
+      builder: (context, state) => const PelaporanTanamanMatiScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-tanaman-panen',
+      builder: (context, state) => const PelaporanTanamanPanenScreen(),
+    ),
+    GoRoute(
+      path: '/pelaporan-tanaman-sakit',
+      builder: (context, state) => const PelaporanTanamanSakitScreen(),
     ),
     GoRoute(
       path: '/home-petugas',

@@ -18,39 +18,47 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Laporan Hama',
-            greeting: 'Tambah Hama'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama hama",
-                hint: "Contoh: Tikus",
-                controller: _nameController,
-              ),
-              const SizedBox(height: 520),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Laporan Hama',
+              greeting: 'Tambah Hama'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama hama",
+                  hint: "Contoh: Tikus",
+                  controller: _nameController,
+                ),
+                const SizedBox(height: 520),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

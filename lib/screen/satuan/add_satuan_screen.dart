@@ -19,44 +19,52 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Satuan',
-            greeting: 'Tambah Satuan'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama satuan",
-                hint: "Contoh: Kilogram",
-                controller: _nameController,
-              ),
-              InputFieldWidget(
-                label: "Lambang satuan",
-                hint: "Contoh: Kg",
-                controller: _lambangController,
-              ),
-              const SizedBox(height: 450),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Satuan',
+              greeting: 'Tambah Satuan'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama satuan",
+                  hint: "Contoh: Kilogram",
+                  controller: _nameController,
+                ),
+                InputFieldWidget(
+                  label: "Lambang satuan",
+                  hint: "Contoh: Kg",
+                  controller: _lambangController,
+                ),
+                const SizedBox(height: 450),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

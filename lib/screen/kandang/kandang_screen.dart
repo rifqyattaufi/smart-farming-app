@@ -19,13 +19,19 @@ class _KandangScreenState extends State<KandangScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-          headerType: HeaderType.menu,
-          title: 'Manajemen Kandang',
-          greeting: 'Daftar Kandang',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+            headerType: HeaderType.back,
+            title: 'Manajemen Kandang',
+            greeting: 'Daftar Kandang',
+          ),
         ),
       ),
       floatingActionButton: SizedBox(
@@ -42,49 +48,51 @@ class _KandangScreenState extends State<KandangScreen> {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SearchField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
-                  ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SearchField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              ListItem(
-                title: 'Daftar Kandang',
-                items: const [
-                  {
-                    'name': 'Kandang A',
-                    'category': 'Ayam',
-                    'icon': 'assets/icons/goclub.svg',
+                ListItem(
+                  title: 'Daftar Kandang',
+                  items: const [
+                    {
+                      'name': 'Kandang A',
+                      'category': 'Ayam',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'name': 'Kandang B',
+                      'category': 'Lele',
+                      'icon': 'assets/icons/goclub.svg',
+                    }
+                  ],
+                  type: 'basic',
+                  onItemTap: (context, item) {
+                    final name = item['name'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                  {
-                    'name': 'Kandang B',
-                    'category': 'Lele',
-                    'icon': 'assets/icons/goclub.svg',
-                  }
-                ],
-                type: 'basic',
-                onItemTap: (context, item) {
-                  final name = item['name'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

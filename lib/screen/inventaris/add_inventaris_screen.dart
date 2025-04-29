@@ -43,100 +43,108 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Inventaris',
-            greeting: 'Tambah Inventaris'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama inventaris",
-                hint: "Contoh: Bibit A",
-                controller: _nameController,
-              ),
-              DropdownFieldWidget(
-                label: "Kategori inventaris",
-                hint: "Pilih kategori inventaris",
-                items: const [
-                  "Bibit tanaman",
-                  "Perlengkapan",
-                  "Nutrisi tanaman"
-                ],
-                selectedValue: selectedLocation,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              InputFieldWidget(
-                  label: "Jumlah stok",
-                  hint: "Contoh: 20",
-                  controller: _sizeController),
-              DropdownFieldWidget(
-                label: "Satuan",
-                hint: "Pilih satuan",
-                items: const ["Kg", "Pack", "Ml", "Unit"],
-                selectedValue: selectedSatuan,
-                onChanged: (value) {
-                  setState(() {
-                    selectedSatuan = value;
-                  });
-                },
-              ),
-              DropdownFieldWidget(
-                label: "Status inventaris",
-                hint: "Pilih status",
-                items: const ["Tersedia", "Tidak tersedia"],
-                selectedValue: selectedStatus,
-                onChanged: (value) {
-                  setState(() {
-                    selectedStatus = value;
-                  });
-                },
-              ),
-              RadioField(
-                label: 'Kondisi inventaris',
-                selectedValue: kondisiInv,
-                options: const ['Baik', 'Rusak'],
-                onChanged: (value) {
-                  setState(() {
-                    kondisiInv = value;
-                  });
-                },
-              ),
-              ImagePickerWidget(
-                label: "Unggah gambar inventaris",
-                image: _image,
-                onPickImage: _pickImage,
-              ),
-              InputFieldWidget(
-                  label: "Deskripsi inventaris",
-                  hint: "Keterangan",
-                  controller: _descriptionController,
-                  maxLines: 10),
-              const SizedBox(height: 16),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Inventaris',
+              greeting: 'Tambah Inventaris'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama inventaris",
+                  hint: "Contoh: Bibit A",
+                  controller: _nameController,
+                ),
+                DropdownFieldWidget(
+                  label: "Kategori inventaris",
+                  hint: "Pilih kategori inventaris",
+                  items: const [
+                    "Bibit tanaman",
+                    "Perlengkapan",
+                    "Nutrisi tanaman"
+                  ],
+                  selectedValue: selectedLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
+                InputFieldWidget(
+                    label: "Jumlah stok",
+                    hint: "Contoh: 20",
+                    controller: _sizeController),
+                DropdownFieldWidget(
+                  label: "Satuan",
+                  hint: "Pilih satuan",
+                  items: const ["Kg", "Pack", "Ml", "Unit"],
+                  selectedValue: selectedSatuan,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSatuan = value;
+                    });
+                  },
+                ),
+                DropdownFieldWidget(
+                  label: "Status inventaris",
+                  hint: "Pilih status",
+                  items: const ["Tersedia", "Tidak tersedia"],
+                  selectedValue: selectedStatus,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedStatus = value;
+                    });
+                  },
+                ),
+                RadioField(
+                  label: 'Kondisi inventaris',
+                  selectedValue: kondisiInv,
+                  options: const ['Baik', 'Rusak'],
+                  onChanged: (value) {
+                    setState(() {
+                      kondisiInv = value;
+                    });
+                  },
+                ),
+                ImagePickerWidget(
+                  label: "Unggah gambar inventaris",
+                  image: _image,
+                  onPickImage: _pickImage,
+                ),
+                InputFieldWidget(
+                    label: "Deskripsi inventaris",
+                    hint: "Keterangan",
+                    controller: _descriptionController,
+                    maxLines: 10),
+                const SizedBox(height: 16),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

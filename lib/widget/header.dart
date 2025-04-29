@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:flutter_svg/svg.dart';
 
-enum HeaderType { basic, menu }
+enum HeaderType { basic, menu, back }
 
 enum IconType { svg, image }
 
@@ -44,6 +44,7 @@ class Header extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (headerType == HeaderType.basic) ...[
                 Container(
@@ -57,13 +58,28 @@ class Header extends StatelessWidget {
                   ),
                   child: buildLeadingIcon(),
                 ),
+                const SizedBox(width: 12),
               ],
-              if (headerType == HeaderType.basic) ...[
+              if (headerType == HeaderType.back) ...[
+                Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: IconButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: dark1,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
               ],
               Container(
-                padding: const EdgeInsets.only(
-                  left: 0,
+                padding: EdgeInsets.only(
+                  left: headerType == HeaderType.back ? 0 : 16,
                   right: 16,
                   top: 12,
                   bottom: 12,

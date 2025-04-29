@@ -42,102 +42,110 @@ class _AddUserScreenState extends State<AddUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Pengguna',
-            greeting: 'Tambah Pengguna'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ProfileImagePicker(
-                    image: _selectedImage,
-                    onPickImage: _pickImage,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              DropdownFieldWidget(
-                label: "Pilih role",
-                hint: "Pilih role",
-                items: const [
-                  "Penanggung Jawab",
-                  "Petugas Pelaporan",
-                  "Inventor RFC"
-                ],
-                selectedValue: selectedLocation,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              InputFieldWidget(
-                  label: "Nama pengguna",
-                  hint: "Contoh: James Doe",
-                  controller: _namaController),
-              InputFieldWidget(
-                  label: "Email pengguna",
-                  hint: "Contoh: example@mail.com",
-                  controller: _emailController),
-              InputFieldWidget(
-                  label: "Nomor telepon",
-                  hint: "Contoh: 08**********",
-                  controller: _nomorController),
-              InputFieldWidget(
-                label: "Masukkan Password",
-                hint: "Contoh: password",
-                controller: _passwordController,
-                obscureText: !_isPasswordVisible,
-                suffixIcon: Icon(
-                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
-                onSuffixIconTap: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Catatan:',
-                    style: medium14.copyWith(color: dark1),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '- Password minimal 8 karakter.\n'
-                    '- Password terdiri dari kombinasi huruf, angka, dan simbol.\n'
-                    '- Kosongi kolom jika ingin mendapat password default dari sistem.',
-                    style: regular12.copyWith(color: dark1),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Pengguna',
+              greeting: 'Tambah Pengguna'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ProfileImagePicker(
+                      image: _selectedImage,
+                      onPickImage: _pickImage,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                DropdownFieldWidget(
+                  label: "Pilih role",
+                  hint: "Pilih role",
+                  items: const [
+                    "Penanggung Jawab",
+                    "Petugas Pelaporan",
+                    "Inventor RFC"
+                  ],
+                  selectedValue: selectedLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
+                InputFieldWidget(
+                    label: "Nama pengguna",
+                    hint: "Contoh: James Doe",
+                    controller: _namaController),
+                InputFieldWidget(
+                    label: "Email pengguna",
+                    hint: "Contoh: example@mail.com",
+                    controller: _emailController),
+                InputFieldWidget(
+                    label: "Nomor telepon",
+                    hint: "Contoh: 08**********",
+                    controller: _nomorController),
+                InputFieldWidget(
+                  label: "Masukkan Password",
+                  hint: "Contoh: password",
+                  controller: _passwordController,
+                  obscureText: !_isPasswordVisible,
+                  suffixIcon: Icon(
+                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onSuffixIconTap: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Catatan:',
+                      style: medium14.copyWith(color: dark1),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '- Password minimal 8 karakter.\n'
+                      '- Password terdiri dari kombinasi huruf, angka, dan simbol.\n'
+                      '- Kosongi kolom jika ingin mendapat password default dari sistem.',
+                      style: regular12.copyWith(color: dark1),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

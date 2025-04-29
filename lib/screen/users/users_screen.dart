@@ -20,13 +20,19 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-          headerType: HeaderType.menu,
-          title: 'Pengaturan Lainnya',
-          greeting: 'Manajemen Pengguna',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+            headerType: HeaderType.back,
+            title: 'Pengaturan Lainnya',
+            greeting: 'Manajemen Pengguna',
+          ),
         ),
       ),
       floatingActionButton: SizedBox(
@@ -43,101 +49,103 @@ class _UsersScreenState extends State<UsersScreen> {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SearchField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SearchField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              NewestReports(
-                title: 'Penanggung Jawab RFC',
-                reports: const [
-                  {
-                    'text': 'Pak Dimas',
-                    'subtext': 'dimas@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
+                const SizedBox(height: 20),
+                NewestReports(
+                  title: 'Penanggung Jawab RFC',
+                  reports: const [
+                    {
+                      'text': 'Pak Dimas',
+                      'subtext': 'dimas@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'text': 'Pak Dwi',
+                      'subtext': 'dwi@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    }
+                  ],
+                  onItemTap: (context, item) {
+                    final name = item['text'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                  {
-                    'text': 'Pak Dwi',
-                    'subtext': 'dwi@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
-                  }
-                ],
-                onItemTap: (context, item) {
-                  final name = item['text'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-                mode: NewestReportsMode.full,
-                titleTextStyle: bold18.copyWith(color: dark1),
-                reportTextStyle: medium12.copyWith(color: dark1),
-                timeTextStyle: regular12.copyWith(color: dark2),
-              ),
-              const SizedBox(height: 12),
-              NewestReports(
-                title: 'Petugas Pelaporan',
-                reports: const [
-                  {
-                    'text': 'Pak Adi',
-                    'subtext': 'adi@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
+                  mode: NewestReportsMode.full,
+                  titleTextStyle: bold18.copyWith(color: dark1),
+                  reportTextStyle: medium12.copyWith(color: dark1),
+                  timeTextStyle: regular12.copyWith(color: dark2),
+                ),
+                const SizedBox(height: 12),
+                NewestReports(
+                  title: 'Petugas Pelaporan',
+                  reports: const [
+                    {
+                      'text': 'Pak Adi',
+                      'subtext': 'adi@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'text': 'Pak Ebi',
+                      'subtext': 'ebi@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    }
+                  ],
+                  onItemTap: (context, item) {
+                    final name = item['text'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                  {
-                    'text': 'Pak Ebi',
-                    'subtext': 'ebi@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
-                  }
-                ],
-                onItemTap: (context, item) {
-                  final name = item['text'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-                mode: NewestReportsMode.full,
-                titleTextStyle: bold18.copyWith(color: dark1),
-                reportTextStyle: medium12.copyWith(color: dark1),
-                timeTextStyle: regular12.copyWith(color: dark2),
-              ),
-              const SizedBox(height: 12),
-              NewestReports(
-                title: 'Inventor RFC',
-                reports: const [
-                  {
-                    'text': 'Ryan',
-                    'subtext': 'ryan@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
+                  mode: NewestReportsMode.full,
+                  titleTextStyle: bold18.copyWith(color: dark1),
+                  reportTextStyle: medium12.copyWith(color: dark1),
+                  timeTextStyle: regular12.copyWith(color: dark2),
+                ),
+                const SizedBox(height: 12),
+                NewestReports(
+                  title: 'Inventor RFC',
+                  reports: const [
+                    {
+                      'text': 'Ryan',
+                      'subtext': 'ryan@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'text': 'Rifqy',
+                      'subtext': 'rifqy@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                    {
+                      'text': 'Abriel',
+                      'subtext': 'abriel@mail.com',
+                      'icon': 'assets/icons/goclub.svg',
+                    },
+                  ],
+                  onItemTap: (context, item) {
+                    final name = item['text'] ?? '';
+                    context.push('/detail-laporan/$name');
                   },
-                  {
-                    'text': 'Rifqy',
-                    'subtext': 'rifqy@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
-                  },
-                  {
-                    'text': 'Abriel',
-                    'subtext': 'abriel@mail.com',
-                    'icon': 'assets/icons/goclub.svg',
-                  },
-                ],
-                onItemTap: (context, item) {
-                  final name = item['text'] ?? '';
-                  context.push('/detail-laporan/$name');
-                },
-                mode: NewestReportsMode.full,
-                titleTextStyle: bold18.copyWith(color: dark1),
-                reportTextStyle: medium12.copyWith(color: dark1),
-                timeTextStyle: regular12.copyWith(color: dark2),
-              ),
-            ],
+                  mode: NewestReportsMode.full,
+                  titleTextStyle: bold18.copyWith(color: dark1),
+                  reportTextStyle: medium12.copyWith(color: dark1),
+                  timeTextStyle: regular12.copyWith(color: dark2),
+                ),
+              ],
+            ),
           ),
         ),
       ),

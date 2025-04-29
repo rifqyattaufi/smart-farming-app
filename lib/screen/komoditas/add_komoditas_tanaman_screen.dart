@@ -38,65 +38,73 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Komoditas',
-            greeting: 'Tambah Komoditas'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                  label: "Nama komoditas",
-                  hint: "Contoh: Buah Melon",
-                  controller: _nameController),
-              DropdownFieldWidget(
-                label: "Pilih jenis tanaman",
-                hint: "Pilih jenis tanaman",
-                items: const ["Melon", "Anggur", "Pakcoy"],
-                selectedValue: selectedLocation,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              DropdownFieldWidget(
-                label: "Satuan",
-                hint: "Pilih satuan",
-                items: const ["Kg", "Pack", "Ml", "Unit"],
-                selectedValue: selectedSatuan,
-                onChanged: (value) {
-                  setState(() {
-                    selectedSatuan = value;
-                  });
-                },
-              ),
-              ImagePickerWidget(
-                label: "Unggah gambar komoditas",
-                image: _image,
-                onPickImage: _pickImage,
-              ),
-              const SizedBox(height: 16),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Komoditas',
+              greeting: 'Tambah Komoditas'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                    label: "Nama komoditas",
+                    hint: "Contoh: Buah Melon",
+                    controller: _nameController),
+                DropdownFieldWidget(
+                  label: "Pilih jenis tanaman",
+                  hint: "Pilih jenis tanaman",
+                  items: const ["Melon", "Anggur", "Pakcoy"],
+                  selectedValue: selectedLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
+                DropdownFieldWidget(
+                  label: "Satuan",
+                  hint: "Pilih satuan",
+                  items: const ["Kg", "Pack", "Ml", "Unit"],
+                  selectedValue: selectedSatuan,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSatuan = value;
+                    });
+                  },
+                ),
+                ImagePickerWidget(
+                  label: "Unggah gambar komoditas",
+                  image: _image,
+                  onPickImage: _pickImage,
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

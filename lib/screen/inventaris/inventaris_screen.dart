@@ -40,13 +40,19 @@ class _InventarisScreenState extends State<InventarisScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-          headerType: HeaderType.menu,
-          title: 'Manajemen Inventaris',
-          greeting: 'Daftar Inventaris',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+            headerType: HeaderType.back,
+            title: 'Manajemen Inventaris',
+            greeting: 'Daftar Inventaris',
+          ),
         ),
       ),
       floatingActionButton: SizedBox(
@@ -63,43 +69,45 @@ class _InventarisScreenState extends State<InventarisScreen> {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SearchField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {});
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SearchField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                CustomTabBar(
+                  tabs: const ['Inventaris', 'Hasil Panen'],
+                  activeColor: green1,
+                  underlineWidth: 120,
+                  spacing: 100,
+                  onTabSelected: (index) {
+                    setState(() {
+                      selectedTab = index;
+                      if (selectedTab == 0) {
+                        selectedInventarisCategory = 'Semua Item';
+                      } else {
+                        selectedHarvestCategory = 'Semua Hasil Panen';
+                      }
+                    });
                   },
                 ),
-              ),
-              const SizedBox(height: 20),
-              CustomTabBar(
-                tabs: const ['Inventaris', 'Hasil Panen'],
-                activeColor: green1,
-                underlineWidth: 120,
-                spacing: 100,
-                onTabSelected: (index) {
-                  setState(() {
-                    selectedTab = index;
-                    if (selectedTab == 0) {
-                      selectedInventarisCategory = 'Semua Item';
-                    } else {
-                      selectedHarvestCategory = 'Semua Hasil Panen';
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildTabContent(),
-            ],
+                const SizedBox(height: 20),
+                _buildTabContent(),
+              ],
+            ),
           ),
         ),
       ),

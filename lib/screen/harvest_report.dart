@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class HarvestStatsScreen extends StatefulWidget {
   const HarvestStatsScreen({super.key});
@@ -41,43 +42,51 @@ class _HarvestStatsScreenState extends State<HarvestStatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Panen')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total Hasil Panen\nPer Apr 2024 - Feb 2025'),
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: _openDatePicker,
-                )
-              ],
-            ),
-            const SizedBox(height: 12),
-            const CustomStatCard(
-              value: '20',
-              label: 'Hasil Panen (Kg)',
-              icon: Icons.egg,
-            ),
-            const SizedBox(height: 24),
-            const Text('Statistik Hasil Panen Ayam - Komoditas Telur'),
-            CustomBarChart(data: telurData),
-            const SizedBox(height: 24),
-            const Text('Statistik Hasil Panen Ayam - Komoditas Daging'),
-            CustomBarChart(data: dagingData),
-            const SizedBox(height: 24),
-            const Text(
-              'Rangkuman Statistik',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'Berdasarkan statistik pelaporan panen ayam komoditas telur menghasilkan rata-rata 18 butir telur yang ...',
-            ),
-          ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          elevation: 0,
+          titleSpacing: 0,title: const Text('Panen'))),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Hasil Panen\nPer Apr 2024 - Feb 2025'),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: _openDatePicker,
+                  )
+                ],
+              ),
+              const SizedBox(height: 12),
+              const CustomStatCard(
+                value: '20',
+                label: 'Hasil Panen (Kg)',
+                icon: Icons.egg,
+              ),
+              const SizedBox(height: 24),
+              const Text('Statistik Hasil Panen Ayam - Komoditas Telur'),
+              CustomBarChart(data: telurData),
+              const SizedBox(height: 24),
+              const Text('Statistik Hasil Panen Ayam - Komoditas Daging'),
+              CustomBarChart(data: dagingData),
+              const SizedBox(height: 24),
+              const Text(
+                'Rangkuman Statistik',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Text(
+                'Berdasarkan statistik pelaporan panen ayam komoditas telur menghasilkan rata-rata 18 butir telur yang ...',
+              ),
+            ],
+          ),
         ),
       ),
     );

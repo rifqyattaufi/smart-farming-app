@@ -19,15 +19,21 @@ class _SatuanScreenState extends State<SatuanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: AppBar(
-        elevation: 0,
-        surfaceTintColor: white,
-        scrolledUnderElevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Pengaturan Lainnya',
-            greeting: 'Manajemen Satuan'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          surfaceTintColor: white,
+          scrolledUnderElevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Pengaturan Lainnya',
+              greeting: 'Manajemen Satuan'),
+        ),
       ),
       floatingActionButton: SizedBox(
         width: 70,
@@ -43,66 +49,68 @@ class _SatuanScreenState extends State<SatuanScreen> {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SearchField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-                const SizedBox(height: 12),
-                Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
-                const SizedBox(height: 12),
-                UnitItem(
-                  unitName: 'Kilogram',
-                  unitSymbol: 'Kg',
-                  onEdit: () {
-                    // handle edit Kg
-                  },
-                  onDelete: () {
-                    // handle delete Kg
-                  },
-                ),
-                UnitItem(
-                  unitName: 'Gram',
-                  unitSymbol: 'g',
-                  onEdit: () {
-                    // handle edit g
-                  },
-                  onDelete: () {
-                    // handle delete g
-                  },
-                ),
-                UnitItem(
-                  unitName: 'Mililiter',
-                  unitSymbol: 'ml',
-                  onEdit: () {
-                    // handle edit ml
-                  },
-                  onDelete: () {
-                    // handle delete ml
-                  },
-                ),
-                UnitItem(
-                  unitName: 'Buah',
-                  unitSymbol: 'buah',
-                  onEdit: () {
-                    // handle edit buah
-                  },
-                  onDelete: () {
-                    // handle delete buah
-                  },
-                ),
-              ],
+      body: SafeArea(
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SearchField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
+                  const SizedBox(height: 12),
+                  UnitItem(
+                    unitName: 'Kilogram',
+                    unitSymbol: 'Kg',
+                    onEdit: () {
+                      // handle edit Kg
+                    },
+                    onDelete: () {
+                      // handle delete Kg
+                    },
+                  ),
+                  UnitItem(
+                    unitName: 'Gram',
+                    unitSymbol: 'g',
+                    onEdit: () {
+                      // handle edit g
+                    },
+                    onDelete: () {
+                      // handle delete g
+                    },
+                  ),
+                  UnitItem(
+                    unitName: 'Mililiter',
+                    unitSymbol: 'ml',
+                    onEdit: () {
+                      // handle edit ml
+                    },
+                    onDelete: () {
+                      // handle delete ml
+                    },
+                  ),
+                  UnitItem(
+                    unitName: 'Buah',
+                    unitSymbol: 'buah',
+                    onEdit: () {
+                      // handle edit buah
+                    },
+                    onDelete: () {
+                      // handle delete buah
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

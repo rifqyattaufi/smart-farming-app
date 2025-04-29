@@ -43,82 +43,90 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Manajemen Kandang',
-            greeting: 'Tambah Kandang'),
-      ),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputFieldWidget(
-                label: "Nama kandang",
-                hint: "Contoh: kandang A",
-                controller: _nameController,
-              ),
-              InputFieldWidget(
-                  label: "Lokasi kandang",
-                  hint: "Contoh: Rooftop",
-                  controller: _locationController),
-              InputFieldWidget(
-                  label: "Luas kandang",
-                  hint: "Contoh: 30m²",
-                  controller: _sizeController),
-              DropdownFieldWidget(
-                label: "Pilih jenis hewan ternak yang diternak",
-                hint: "Pilih jenis hewan ternak",
-                items: const ["Ayam", "Lele", "Kepiting"],
-                selectedValue: selectedLocation,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              InputFieldWidget(
-                  label: "Jumlah hewan ternak",
-                  hint: "Contoh: 20 (satuan ekor)",
-                  controller: _jumlahController),
-              RadioField(
-                label: 'Status kandang',
-                selectedValue: statusKandang,
-                options: const ['Aktif', 'Tidak aktif'], // bebas mau apa aja
-                onChanged: (value) {
-                  setState(() {
-                    statusKandang = value;
-                  });
-                },
-              ),
-              ImagePickerWidget(
-                label: "Unggah gambar kandang",
-                image: _image,
-                onPickImage: _pickImage,
-              ),
-              InputFieldWidget(
-                  label: "Deskripsi kandang",
-                  hint: "Keterangan",
-                  controller: _descriptionController,
-                  maxLines: 10),
-              const SizedBox(height: 16),
-              CustomButton(
-                onPressed: () {
-                  // Your action here
-                },
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Manajemen Kandang',
+              greeting: 'Tambah Kandang'),
         ),
-      ]),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputFieldWidget(
+                  label: "Nama kandang",
+                  hint: "Contoh: kandang A",
+                  controller: _nameController,
+                ),
+                InputFieldWidget(
+                    label: "Lokasi kandang",
+                    hint: "Contoh: Rooftop",
+                    controller: _locationController),
+                InputFieldWidget(
+                    label: "Luas kandang",
+                    hint: "Contoh: 30m²",
+                    controller: _sizeController),
+                DropdownFieldWidget(
+                  label: "Pilih jenis hewan ternak yang diternak",
+                  hint: "Pilih jenis hewan ternak",
+                  items: const ["Ayam", "Lele", "Kepiting"],
+                  selectedValue: selectedLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
+                InputFieldWidget(
+                    label: "Jumlah hewan ternak",
+                    hint: "Contoh: 20 (satuan ekor)",
+                    controller: _jumlahController),
+                RadioField(
+                  label: 'Status kandang',
+                  selectedValue: statusKandang,
+                  options: const ['Aktif', 'Tidak aktif'], // bebas mau apa aja
+                  onChanged: (value) {
+                    setState(() {
+                      statusKandang = value;
+                    });
+                  },
+                ),
+                ImagePickerWidget(
+                  label: "Unggah gambar kandang",
+                  image: _image,
+                  onPickImage: _pickImage,
+                ),
+                InputFieldWidget(
+                    label: "Deskripsi kandang",
+                    hint: "Keterangan",
+                    controller: _descriptionController,
+                    maxLines: 10),
+                const SizedBox(height: 16),
+                CustomButton(
+                  onPressed: () {
+                    // Your action here
+                  },
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }
