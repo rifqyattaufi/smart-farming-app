@@ -2,15 +2,22 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_farming_app/service/auth_service.dart';
 
 class DashboardService {
+  final AuthService _authService = AuthService();
+
+  late final Future<String?> token;
+
+  DashboardService() {
+    token = _authService.getToken();
+  }
+
   final String baseUrl = '${dotenv.env['BASE_URL'] ?? ''}/dashboard';
 
-  final Map<String, String> headers = {
-    'Authorization':
-        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZjNTcxYWZhLWU2NmItNDM3Yi04YjE1LWRjZTY4ZWRlZTNmMyIsIm5hbWUiOiJwamF3YWIiLCJlbWFpbCI6InBqYXdhYkBlbWFpbC5jb20iLCJwaG9uZSI6IjA4MTIzNDU2Nzg5Iiwicm9sZSI6InBqYXdhYiIsImlhdCI6MTc0NTg1Mjk5OCwiZXhwIjoxNzQ1OTM5Mzk4fQ.JrIvxtlIPnEtGf0GzHHbjbkBkREYVE9ypMbmgfq--m0'
-  };
   Future<Map<String, dynamic>> getDashboardPerkebunan() async {
+    final resolvedToken = await token;
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
     final url = Uri.parse('$baseUrl/perkebunan');
     final response = await http.get(url, headers: headers);
 
@@ -24,6 +31,8 @@ class DashboardService {
   }
 
   Future<Map<String, dynamic>> getDashboardPeternakan() async {
+    final resolvedToken = await token;
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
     final url = Uri.parse('$baseUrl/peternakan');
     final response = await http.get(url, headers: headers);
 

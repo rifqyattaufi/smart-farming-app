@@ -106,7 +106,12 @@ class NewestReports extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            report['time'] ?? 'Unknown Time',
+                                            report['time'] != null
+                                                ? DateFormat(
+                                                        'EEEE, d MMMM yyyy | HH:mm')
+                                                    .format(DateTime.parse(
+                                                        report['time']))
+                                                : 'Unknown Time',
                                             style: timeTextStyle,
                                           ),
                                         ],
@@ -116,11 +121,13 @@ class NewestReports extends StatelessWidget {
                                       report['subtext'] != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
-                                        child: Text(
+                                      child: Text(
                                         report['time'] != null
-                                          ? DateFormat('EEEE, d MMMM yyyy | HH:mm')
-                                            .format(DateTime.parse(report['time']))
-                                          : 'Unknown Time',
+                                            ? DateFormat(
+                                                    'EEEE, d MMMM yyyy | HH:mm')
+                                                .format(DateTime.parse(
+                                                    report['time']))
+                                            : 'Unknown Time',
                                         style: timeTextStyle,
                                       ),
                                     ),
@@ -153,7 +160,12 @@ class NewestReports extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            report['time'] ?? 'Unknown Time',
+                                            report['time'] != null
+                                                ? DateFormat(
+                                                        'EEEE, d MMMM yyyy | HH:mm')
+                                                    .format(DateTime.parse(
+                                                        report['time']))
+                                                : 'Unknown Time',
                                             style: timeTextStyle,
                                           ),
                                         ],

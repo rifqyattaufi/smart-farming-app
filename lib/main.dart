@@ -43,27 +43,29 @@ import 'package:smart_farming_app/screen/riwayat_aktivitas/log_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_screen.dart';
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/screen/satuan/satuan_screen.dart';
+import 'package:smart_farming_app/screen/splash_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
+final _authService = AuthService();
+
 final _router = GoRouter(
+  initialLocation: '/splash',
   routes: [
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
-        GoRoute(
-          path: '/ss',
-          builder: (context, state) => const HomeScreen(),
-        ),
         GoRoute(
           path: '/home',
           builder: (context, state) => const HomeScreen(),
@@ -81,10 +83,6 @@ final _router = GoRouter(
           builder: (context, state) => const AccountScreen(),
         ),
       ],
-    ),
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const Introduction(),
     ),
     GoRoute(
       path: '/introduction',

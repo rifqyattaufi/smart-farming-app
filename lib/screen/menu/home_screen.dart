@@ -302,6 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) =>
                                     context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -318,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) =>
                                     context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
                               ),
                             ],
                           ),
