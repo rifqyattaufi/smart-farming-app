@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_farming_app/screen/detail_laporan_screen.dart';
 import 'package:smart_farming_app/screen/detail_screen.dart';
 import 'package:smart_farming_app/screen/main_screen.dart';
@@ -8,7 +9,8 @@ import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
 import 'package:smart_farming_app/screen/menu/account_screen.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
 class ListItem extends StatelessWidget {
   final String title;
-  final List<Map<String, String>> items;
+  final List<Map<String, dynamic>> items;
   final String type; // "basic" or "history"
 
   final String Function(BuildContext context)? navigateTo;
 
-  final void Function(BuildContext context, Map<String, String>)? onItemTap;
+  final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
 
   const ListItem({
     super.key,
@@ -76,10 +77,20 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildBasicItem(Map<String, String> item) {
+  Widget _buildBasicItem(Map<String, dynamic> item) {
     return Row(
       children: [
-        _buildImageOrIcon(item['icon']),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: ImageBuilder(
+              url: item['icon'],
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -108,10 +119,20 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(Map<String, String> item) {
+  Widget _buildHistoryItem(Map<String, dynamic> item) {
     return Row(
       children: [
-        _buildImageOrIcon(item['image']),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: ImageBuilder(
+              url: item['image'],
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -151,42 +172,42 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildImageOrIcon(String? path) {
-    if (path == null || path.isEmpty) {
-      return Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      );
-    }
+  // Widget _buildImageOrIcon(String? path) {
+  //   if (path == null || path.isEmpty) {
+  //     return Container(
+  //       width: 60,
+  //       height: 60,
+  //       decoration: BoxDecoration(
+  //         color: Colors.grey[300],
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //     );
+  //   }
 
-    if (path.endsWith('.svg')) {
-      return Container(
-        width: 60,
-        height: 60,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: green2,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SvgPicture.asset(
-          path,
-          colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
-        ),
-      );
-    } else {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          path,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-      );
-    }
-  }
+  //   if (path.endsWith('.svg')) {
+  //     return Container(
+  //       width: 60,
+  //       height: 60,
+  //       padding: const EdgeInsets.all(12),
+  //       decoration: BoxDecoration(
+  //         color: green2,
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       child: SvgPicture.asset(
+  //         path,
+  //         colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
+  //       ),
+  //     );
+  //   } else {
+  //     return ClipRRect(
+  //       borderRadius: BorderRadius.circular(10),
+  //       child: Image.asset(
+  //         path,
+  //         width: 60,
+  //         height: 60,
+  //         fit: BoxFit.cover,
+  //       ),
+  //     );
+  //   }
+  // }
 }
