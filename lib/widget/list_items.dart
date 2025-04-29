@@ -4,7 +4,7 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 
 class ListItem extends StatelessWidget {
-  final String title;
+  final String? title;
   final List<Map<String, dynamic>> items;
   final String type; // "basic" or "history"
 
@@ -14,7 +14,7 @@ class ListItem extends StatelessWidget {
 
   const ListItem({
     super.key,
-    required this.title,
+    this.title,
     required this.items,
     this.type = "basic",
     this.onViewAll,
