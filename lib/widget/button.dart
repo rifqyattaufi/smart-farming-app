@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
 
-class SubmitButton extends StatelessWidget {
+class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final String buttonText;
+  final Color? backgroundColor;
+  final TextStyle? textStyle;
+  final Color? textColor;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadiusGeometry? borderRadius;
 
-  const SubmitButton({super.key, required this.onPressed});
+  const CustomButton({
+    super.key,
+    required this.onPressed,
+    this.buttonText = "Simpan",
+    this.backgroundColor,
+    this.textStyle,
+    this.textColor,
+    this.padding = const EdgeInsets.symmetric(vertical: 14),
+    this.borderRadius = const BorderRadius.all(Radius.circular(10)),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +28,15 @@ class SubmitButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey[700],
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          backgroundColor: backgroundColor,
+          padding: padding,
+          shape: RoundedRectangleBorder(borderRadius: borderRadius!),
         ),
-        child: const Text("Tambah",
-            style: TextStyle(color: Colors.white, fontSize: 16)),
+        child: Text(buttonText, style: textStyle?.copyWith(color: white)),
       ),
     );
   }
 }
+
+
+

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
@@ -9,7 +8,7 @@ class ListItem extends StatelessWidget {
   final List<Map<String, dynamic>> items;
   final String type; // "basic" or "history"
 
-  final String Function(BuildContext context)? navigateTo;
+  final VoidCallback? onViewAll;
 
   final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
 
@@ -18,7 +17,7 @@ class ListItem extends StatelessWidget {
     required this.title,
     required this.items,
     this.type = "basic",
-    this.navigateTo,
+    this.onViewAll,
     this.onItemTap,
   });
 
@@ -29,25 +28,24 @@ class ListItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.only(right: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(title, style: bold18.copyWith(color: dark1)),
-                GestureDetector(
-                  onTap: () {
-                    final path = navigateTo!(context); // need care
-                    context.push(path);
-                  },
-                  child: Text(
-                    "Lihat semua",
-                    style: regular14.copyWith(color: green1),
-                  ),
-                ),
-              ],
+          if (title != null && title!.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.only(right: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(title!, style: bold18.copyWith(color: dark1)),
+                  if (onViewAll != null)
+                    GestureDetector(
+                      onTap: onViewAll,
+                      child: Text(
+                        "Lihat semua",
+                        style: regular14.copyWith(color: green1),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: 10),
           Column(
             children: items.map((item) {

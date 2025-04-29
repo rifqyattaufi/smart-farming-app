@@ -32,13 +32,19 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(
-            headerType: HeaderType.menu,
-            title: 'Menu Aplikasi',
-            greeting: 'Laporan'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.menu,
+              title: 'Menu Aplikasi',
+              greeting: 'Laporan'),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -114,8 +120,10 @@ class _ReportScreenState extends State<ReportScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                         const SizedBox(height: 12),
                         ListItem(
@@ -133,8 +141,11 @@ class _ReportScreenState extends State<ReportScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onViewAll: () => context.push('/laporan-hama'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                       ],
                     ),
@@ -197,8 +208,10 @@ class _ReportScreenState extends State<ReportScreen> {
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) =>
-                              context.push('/detail', extra: item),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
                         ),
                       ],
                     ),

@@ -49,6 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTabIndex = 0;
   final PageController _pageController = PageController();
 
+  String? selectedType;
+
   void _onTabChanged(int index) {
     setState(() {
       _selectedTabIndex = index;
@@ -79,52 +81,101 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               builder: (context) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: white,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Aksi",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                if (_selectedTabIndex == 0) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Aksi",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.house_outlined, color: green1),
-                        title: const Text("Tambah Jenis Kandang"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.pets_outlined, color: green1),
-                        title: const Text("Tambah Jenis Hewan"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                      ListTile(
-                        leading: Icon(Icons.category_outlined, color: green1),
-                        title: const Text("Tambah Komoditas"),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
+                        const SizedBox(height: 10),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.house_outlined, color: green1),
+                          title: const Text("Tambah Kebun"),
+                          onTap: () {
+                            context.push('/tambah-kebun');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.pets_outlined, color: green1),
+                          title: const Text("Tambah Jenis Tanaman"),
+                          onTap: () {
+                            context.push('/tambah-tanaman');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.category_outlined, color: green1),
+                          title: const Text("Tambah Komoditas"),
+                          onTap: () {
+                            context.push('/tambah-komoditas-tanaman');
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Aksi",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.house_outlined, color: green1),
+                          title: const Text("Tambah Kandang"),
+                          onTap: () {
+                            context.push('/tambah-kandang');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.pets_outlined, color: green1),
+                          title: const Text("Tambah Ternak"),
+                          onTap: () {
+                            context.push('/tambah-ternak');
+                          },
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
+                        ListTile(
+                          leading: Icon(Icons.category_outlined, color: green1),
+                          title: const Text("Tambah Komoditas"),
+                          onTap: () {
+                            context.push('/tambah-komoditas-ternak');
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
             );
           },

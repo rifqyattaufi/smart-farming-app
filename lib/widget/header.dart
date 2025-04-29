@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -44,6 +44,7 @@ class Header extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (headerType == HeaderType.basic) ...[
                 Container(
@@ -57,33 +58,28 @@ class Header extends StatelessWidget {
                   ),
                   child: buildLeadingIcon(),
                 ),
+                const SizedBox(width: 12),
               ],
               if (headerType == HeaderType.back) ...[
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: green3,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SvgPicture.asset(
-                      'assets/icons/left.svg',
-                      colorFilter: ColorFilter.mode(green1, BlendMode.srcIn),
+                Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: IconButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: dark1,
                     ),
                   ),
                 ),
-              ],
-              if (headerType == HeaderType.basic) ...[
                 const SizedBox(width: 12),
               ],
               Container(
-                padding: const EdgeInsets.only(
-                  left: 0,
+                padding: EdgeInsets.only(
+                  left: headerType == HeaderType.back ? 0 : 16,
                   right: 16,
                   top: 12,
                   bottom: 12,
@@ -113,11 +109,7 @@ class Header extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const NotificationScreen()),
-                        );
+                        context.push('/notifikasi');
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),
