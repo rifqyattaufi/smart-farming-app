@@ -24,6 +24,9 @@ class DashboardService {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       return body['data'];
+    } else if (response.statusCode == 401) {
+      await _authService.refreshToken();
+      return await getDashboardPerkebunan();
     } else {
       throw Exception(
           'Failed to load dashboard perkebunan data ${response.statusCode}');
@@ -39,6 +42,9 @@ class DashboardService {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       return body['data'];
+    } else if (response.statusCode == 401) {
+      await _authService.refreshToken();
+      return await getDashboardPeternakan();
     } else {
       throw Exception('Failed to load dashboard peternakan data');
     }
