@@ -233,7 +233,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-satuan',
-      builder: (context, state) => const AddSatuanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddSatuanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/tambah-pemakaian-inventaris',

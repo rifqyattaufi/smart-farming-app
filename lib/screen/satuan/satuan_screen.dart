@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
+import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
@@ -13,7 +15,30 @@ class SatuanScreen extends StatefulWidget {
 }
 
 class _SatuanScreenState extends State<SatuanScreen> {
-  TextEditingController searchController = TextEditingController();
+  final SatuanService _satuanService = SatuanService();
+  List<dynamic> satuanList = [];
+
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSatuan();
+  }
+
+  Future<void> _fetchSatuan() async {
+    final response = await _satuanService.getSatuan();
+
+    if (response['status'] == true) {
+      setState(() {
+        satuanList = response['data'];
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +65,14 @@ class _SatuanScreenState extends State<SatuanScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-satuan');
+            context.push('/tambah-satuan',
+                extra: AddSatuanScreen(
+                  isUpdate: false,
+                  id: '',
+                  nama: '',
+                  lambang: '',
+                  onSatuanAdded: _fetchSatuan,
+                ));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
@@ -50,66 +82,79 @@ class _SatuanScreenState extends State<SatuanScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
-                  const SizedBox(height: 12),
-                  UnitItem(
-                    unitName: 'Kilogram',
-                    unitSymbol: 'Kg',
-                    onEdit: () {
-                      // handle edit Kg
-                    },
-                    onDelete: () {
-                      // handle delete Kg
-                    },
-                  ),
-                  UnitItem(
-                    unitName: 'Gram',
-                    unitSymbol: 'g',
-                    onEdit: () {
-                      // handle edit g
-                    },
-                    onDelete: () {
-                      // handle delete g
-                    },
-                  ),
-                  UnitItem(
-                    unitName: 'Mililiter',
-                    unitSymbol: 'ml',
-                    onEdit: () {
-                      // handle edit ml
-                    },
-                    onDelete: () {
-                      // handle delete ml
-                    },
-                  ),
-                  UnitItem(
-                    unitName: 'Buah',
-                    unitSymbol: 'buah',
-                    onEdit: () {
-                      // handle edit buah
-                    },
-                    onDelete: () {
-                      // handle delete buah
-                    },
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SearchField(
+                controller: searchController,
+                onChanged: (value) {
+                  setState(() {});
+                },
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: satuanList.length,
+                  itemBuilder: (context, index) {
+                    final satuan = satuanList[index];
+                    return UnitItem(
+                      unitName: satuan['nama']!,
+                      unitSymbol: satuan['lambang']!,
+                      onEdit: () {
+                        context.push('/tambah-satuan',
+                            extra: AddSatuanScreen(
+                              isUpdate: true,
+                              id: satuan['id']!,
+                              nama: satuan['nama']!,
+                              lambang: satuan['lambang']!,
+                              onSatuanAdded: _fetchSatuan,
+                            ));
+                      },
+                      onDelete: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Konfirmasi Hapus'),
+                                content: const Text(
+                                    'Apakah Anda yakin ingin menghapus satuan ini?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Batal'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final response = await _satuanService
+                                          .deleteSatuan(satuan['id']!);
+                                      if (response['status'] == true) {
+                                        _fetchSatuan();
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(response['message']),
+                                        ));
+                                      }
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Hapus'),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
