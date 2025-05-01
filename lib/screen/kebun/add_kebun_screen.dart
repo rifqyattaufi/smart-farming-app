@@ -243,11 +243,11 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     hint: "Pilih jenis tanaman",
                     items: jenisTanamanList
                         .map((item) => item['nama'] as String)
-                        .toList(), // Menampilkan nama di dropdown
+                        .toList(),
                     selectedValue: jenisTanamanList.firstWhere(
                       (item) => item['id'] == selectedJenisTanaman,
                       orElse: () => {'nama': null},
-                    )['nama'], // Menampilkan nama yang sesuai dengan id yang dipilih
+                    )['nama'],
                     onChanged: (value) {
                       setState(() {
                         selectedJenisTanaman = jenisTanamanList.firstWhere(

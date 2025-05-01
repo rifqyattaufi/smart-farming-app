@@ -211,7 +211,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-kandang',
-      builder: (context, state) => const AddKandangScreen(),
+      builder: (context, state) {
+        final onKandangAdded = state.extra as VoidCallback?;
+        return AddKandangScreen(onKandangAdded: onKandangAdded);
+      },
     ),
     GoRoute(
       path: '/tambah-ternak',
