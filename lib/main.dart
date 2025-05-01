@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/blank_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
+import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/riwayat_pemakaian_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/inventaris_screen.dart';
+import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kandang/kandang_screen.dart';
+import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
+import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/kebun/kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
@@ -33,12 +38,12 @@ import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_sakit
 import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_khusus_tanaman_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:smart_farming_app/screen/detail_laporan_screen.dart';
 import 'package:smart_farming_app/screen/menu/privacy_policy_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
 import 'package:smart_farming_app/screen/menu/account_screen.dart';
-import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
-import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/menu/terms_condition_screen.dart';
 import 'package:smart_farming_app/screen/notifications/notification_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_tanaman_screen.dart';
@@ -48,19 +53,16 @@ import 'package:smart_farming_app/screen/riwayat_aktivitas/log_screen.dart';
 import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_screen.dart';
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/screen/satuan/satuan_screen.dart';
+import 'package:smart_farming_app/screen/splash_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
-import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
-import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
-import 'package:smart_farming_app/screen/detail_laporan_screen.dart';
-import 'package:smart_farming_app/screen/blank_screen.dart';
 import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
-import 'package:smart_farming_app/screen/splash_screen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -198,7 +200,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-kebun',
-      builder: (context, state) => const AddKebunScreen(),
+      builder: (context, state) {
+        final onKebunAdded = state.extra as VoidCallback?;
+        return AddKebunScreen(onKebunAdded: onKebunAdded);
+      },
     ),
     GoRoute(
       path: '/tambah-tanaman',

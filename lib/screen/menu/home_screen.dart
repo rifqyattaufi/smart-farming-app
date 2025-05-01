@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -17,6 +18,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final DashboardService _dashboardService = DashboardService();
+  Map<String, dynamic>? _perkebunanData;
+  Map<String, dynamic>? _peternakanData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final perkebunanData = await _dashboardService.getDashboardPerkebunan();
+      final peternakanData = await _dashboardService.getDashboardPeternakan();
+
+      setState(() {
+        _perkebunanData = perkebunanData;
+        _peternakanData = peternakanData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching data: $e');
+    }
+  }
+
   int _selectedTabIndex = 0;
   final PageController _pageController = PageController();
 
@@ -77,7 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.house_outlined, color: green1),
                           title: const Text("Tambah Kebun"),
                           onTap: () {
-                            context.push('/tambah-kebun');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-kebun', extra: () {
+                              _fetchData();
+                            });
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -157,365 +191,365 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const BannerWidget(
-              title: 'Kelola Perkebunan dan Peternakan dangen FarmCenter.',
-              subtitle:
-                  'Pantau, lapor, dan tingkatkan hasil panen produk budidayamu!',
-              showDate: true,
-            ),
-            Tabs(
-              onTabChanged: _onTabChanged,
-              selectedIndex: _selectedTabIndex,
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedTabIndex = index;
-                  });
-                },
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: Column(
                 children: [
-                  // Perkebunan Tab
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        DashboardGrid(
-                          title: 'Statistik Perkebunan Bulan Ini',
-                          type: DashboardGridType.basic,
-                          items: [
-                            DashboardItem(
-                              title: 'Suhu (°C)',
-                              value: '28',
-                              icon: 'other',
-                              bgColor: green3,
-                              iconColor: yellow,
-                            ),
-                            DashboardItem(
-                              title: 'Jenis Tanaman',
-                              value: '18',
-                              icon: 'other',
-                              bgColor: green4,
-                              iconColor: green2,
-                            ),
-                            DashboardItem(
-                              title: 'Tanaman Mati',
-                              value: '2',
-                              icon: 'other',
-                              bgColor: red2,
-                              iconColor: red,
-                            ),
-                            DashboardItem(
-                              title: 'Laporan Panen',
-                              value: '8',
-                              icon: 'other',
-                              bgColor: blue3,
-                              iconColor: blue1,
-                            ),
-                          ],
-                          crossAxisCount: 2,
-                          valueFontSize: 60,
-                          onViewAll: () => context.push('/report'),
-                        ),
-                        const SizedBox(height: 12),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            double cardWidth = (constraints.maxWidth / 2) - 24;
-                            return Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Wrap(
-                                spacing: 16,
-                                runSpacing: 16,
-                                children: [
-                                  SizedBox(
-                                    width: cardWidth,
-                                    child: MenuCard(
-                                      bgColor: yellow1,
-                                      iconColor: yellow,
-                                      icon: Icons.add,
-                                      title: 'Pelaporan Harian',
-                                      subtitle:
-                                          'Pelaporan rutin kondisi tanaman setiap hari',
-                                      onTap: () {
-                                        context.push('/pilih-kebun');
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: cardWidth,
-                                    child: MenuCard(
-                                      bgColor: const Color(0xFFDDE7D9),
-                                      iconColor: Colors.green,
-                                      icon: Icons.edit,
-                                      title: 'Pelaporan Khusus',
-                                      subtitle:
-                                          'Pelaporan khusus kondisi tanaman seperti sakit, mati, atau panen',
-                                      onTap: () {
-                                        context
-                                            .push('/pelaporan-khusus-tanaman');
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        NewestReports(
-                          title: 'Aktivitas Terbaru',
-                          reports: const [
-                            {
-                              'text':
-                                  'Pak Adi telah melaporkan kondisi tanaman',
-                              'time': 'Senin, 17 Februari 2025 | 08.20',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'text': 'Pak Adi telah melaporkan tanaman sakit',
-                              'time': 'Senin, 17 Februari 2025 | 08.20',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                          ],
-                          onViewAll: () => context.push('/riwayat-aktivitas'),
-                          onItemTap: (context, item) {
-                            final name = item['text'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                          mode: NewestReportsMode.full,
-                          titleTextStyle: bold18.copyWith(color: dark1),
-                          reportTextStyle: medium12.copyWith(color: dark1),
-                          timeTextStyle: regular12.copyWith(color: dark2),
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Kebun',
-                          items: const [
-                            {
-                              'name': 'Kebun A',
-                              'category': 'Melon',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Kebun B',
-                              'category': 'Anggur',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/manajemen-kebun'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Jenis Tanaman',
-                          items: const [
-                            {
-                              'name': 'Melon',
-                              'category': 'Kebun A',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Anggur',
-                              'category': 'Kebun B',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () =>
-                              context.push('/manajemen-jenis-tanaman'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Komoditas',
-                          items: const [
-                            {
-                              'name': 'Buah Melon',
-                              'category': 'Melon',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Buah Anggur',
-                              'category': 'Anggur',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/manajemen-komoditas'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                        ),
-                      ],
-                    ),
+                  const BannerWidget(
+                    title:
+                        'Kelola Perkebunan dan Peternakan dengan FarmCenter.',
+                    subtitle:
+                        'Pantau, lapor, dan tingkatkan hasil panen produk budidaya mu!',
+                    showDate: true,
                   ),
-                  // Peternakan Tab
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
+                  Tabs(
+                    onTabChanged: _onTabChanged,
+                    selectedIndex: _selectedTabIndex,
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _selectedTabIndex = index;
+                        });
+                      },
                       children: [
-                        DashboardGrid(
-                          title: 'Statistik Peternakan Bulan Ini',
-                          type: DashboardGridType.basic,
-                          items: [
-                            DashboardItem(
-                              title: 'Jumlah Ternak',
-                              value: '30',
-                              icon: 'other',
-                              bgColor: green3,
-                              iconColor: yellow,
-                            ),
-                            DashboardItem(
-                              title: 'Jenis Ternak',
-                              value: '18',
-                              icon: 'other',
-                              bgColor: green4,
-                              iconColor: green2,
-                            ),
-                            DashboardItem(
-                              title: 'Ternak Mati',
-                              value: '2',
-                              icon: 'other',
-                              bgColor: red2,
-                              iconColor: red,
-                            ),
-                            DashboardItem(
-                              title: 'Laporan Panen',
-                              value: '8',
-                              icon: 'other',
-                              bgColor: blue3,
-                              iconColor: blue1,
-                            ),
-                          ],
-                          crossAxisCount: 2,
-                          valueFontSize: 60,
-                          onViewAll: () => context.push('/report'),
-                        ),
-                        const SizedBox(height: 12),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            double cardWidth = (constraints.maxWidth / 2) - 24;
-                            return Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Wrap(
-                                spacing: 16,
-                                runSpacing: 16,
-                                children: [
-                                  SizedBox(
-                                    width: cardWidth,
-                                    child: MenuCard(
-                                      bgColor: yellow1,
-                                      iconColor: yellow,
-                                      icon: Icons.add,
-                                      title: 'Pelaporan Harian',
-                                      subtitle:
-                                          'Pelaporan rutin kondisi ternak setiap hari',
-                                      onTap: () {
-                                        context.push('/pilih-kandang');
-                                      },
-                                    ),
+                        // Perkebunan Tab
+                        SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              DashboardGrid(
+                                title: 'Statistik Perkebunan Bulan Ini',
+                                type: DashboardGridType.basic,
+                                items: [
+                                  DashboardItem(
+                                    title: 'Suhu (°C)',
+                                    value:
+                                        _perkebunanData?['suhu'].toString() ??
+                                            '-',
+                                    icon: 'other',
+                                    bgColor: green3,
+                                    iconColor: yellow,
                                   ),
-                                  SizedBox(
-                                    width: cardWidth,
-                                    child: MenuCard(
-                                      bgColor: const Color(0xFFDDE7D9),
-                                      iconColor: Colors.green,
-                                      icon: Icons.edit,
-                                      title: 'Pelaporan Khusus',
-                                      subtitle:
-                                          'Pelaporan khusus kondisi ternak seperti sakit, mati, atau panen',
-                                      onTap: () {
-                                        context
-                                            .push('/pelaporan-khusus-ternak');
-                                      },
-                                    ),
+                                  DashboardItem(
+                                    title: 'Jenis Tanaman',
+                                    value: _perkebunanData?['jenisTanaman']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: green4,
+                                    iconColor: green2,
+                                  ),
+                                  DashboardItem(
+                                    title: 'Tanaman Mati',
+                                    value: _perkebunanData?['jumlahKematian']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: red2,
+                                    iconColor: red,
+                                  ),
+                                  DashboardItem(
+                                    title: 'Laporan Panen',
+                                    value: _perkebunanData?['jumlahPanen']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: blue3,
+                                    iconColor: blue1,
                                   ),
                                 ],
+                                crossAxisCount: 2,
+                                valueFontSize: 60,
                               ),
-                            );
-                          },
+                              const SizedBox(height: 12),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double cardWidth =
+                                      (constraints.maxWidth / 2) - 24;
+                                  return Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Wrap(
+                                      spacing: 16,
+                                      runSpacing: 16,
+                                      children: [
+                                        SizedBox(
+                                          width: cardWidth,
+                                          child: MenuCard(
+                                            bgColor: yellow1,
+                                            iconColor: yellow,
+                                            icon: Icons.add,
+                                            title: 'Pelaporan Harian',
+                                            subtitle:
+                                                'Pelaporan rutin kondisi tanaman setiap hari',
+                                            onTap: () {
+                                              context.push('/pilih-kebun');
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: cardWidth,
+                                          child: MenuCard(
+                                            bgColor: const Color(0xFFDDE7D9),
+                                            iconColor: Colors.green,
+                                            icon: Icons.edit,
+                                            title: 'Pelaporan Khusus',
+                                            subtitle:
+                                                'Pelaporan khusus kondisi tanaman seperti sakit, mati, atau panen',
+                                            onTap: () {
+                                              context.push(
+                                                  '/pelaporan-khusus-tanaman');
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              NewestReports(
+                                title: 'Aktivitas Terbaru',
+                                reports: (_perkebunanData?['aktivitasTerbaru']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((aktivitas) => {
+                                          'text': aktivitas['judul'] ?? '-',
+                                          'time': aktivitas['createdAt'],
+                                          'icon':
+                                              aktivitas['userAvatarUrl'] ?? '-',
+                                        })
+                                    .toList(),
+                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, report) =>
+                                    context.push('/detail', extra: report),
+                                mode: NewestReportsMode.full,
+                                titleTextStyle: bold18.copyWith(color: dark1),
+                                reportTextStyle:
+                                    medium12.copyWith(color: dark1),
+                                timeTextStyle: regular12.copyWith(color: dark2),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Kebun',
+                                items: (_perkebunanData?['daftarKebun']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((kebun) => {
+                                          'name': kebun['nama'],
+                                          'category': kebun['JenisBudidaya']
+                                              ['nama'],
+                                          'icon': kebun['gambar'],
+                                        })
+                                    .toList(),
+                                type: 'basic',
+                                onItemTap: (context, item) =>
+                                    context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Jenis Tanaman',
+                                items: (_perkebunanData?['daftarTanaman']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((tanaman) => {
+                                          'name': tanaman['nama'],
+                                          'category': tanaman['tipe'],
+                                          'icon': tanaman['gambar'],
+                                        })
+                                    .toList(),
+                                type: 'basic',
+                                onItemTap: (context, item) =>
+                                    context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Komoditas',
+                                items: const [
+                                  {
+                                    'name': 'Buah Melon',
+                                    'category': 'Melon',
+                                    'icon': 'assets/icons/goclub.svg',
+                                  },
+                                  {
+                                    'name': 'Buah Anggur',
+                                    'category': 'Anggur',
+                                    'icon': 'assets/icons/goclub.svg',
+                                  }
+                                ],
+                                type: 'basic',
+                                onViewAll: () =>
+                                    context.push('/manajemen-komoditas'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        NewestReports(
-                          title: 'Aktivitas Terbaru',
-                          reports: const [
-                            {
-                              'text': 'Pak Adi telah melaporkan kondisi ternak',
-                              'time': 'Senin, 17 Februari 2025 | 08.20',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'text': 'Pak Adi telah melaporkan ternak sakit',
-                              'time': 'Senin, 17 Februari 2025 | 08.20',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                          ],
-                          onViewAll: () => context.push('/riwayat-aktivitas'),
-                          onItemTap: (context, item) {
-                            final name = item['text'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                          mode: NewestReportsMode.full,
-                          titleTextStyle: bold18.copyWith(color: dark1),
-                          reportTextStyle: medium12.copyWith(color: dark1),
-                          timeTextStyle: regular12.copyWith(color: dark2),
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Kandang',
-                          items: const [
-                            {
-                              'name': 'Kandang A',
-                              'category': 'Ayam',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Kandang B',
-                              'category': 'Lele',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/manajemen-kandang'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Jenis Ternak',
-                          items: const [
-                            {
-                              'name': 'Ayam',
-                              'category': 'Kandang A',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Lele',
-                              'category': 'Kandang B',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/manajemen-ternak'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
+                        // Peternakan Tab
+                        SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              DashboardGrid(
+                                title: 'Statistik Peternakan Bulan Ini',
+                                type: DashboardGridType.basic,
+                                items: [
+                                  DashboardItem(
+                                    title: 'Jumlah Ternak',
+                                    value: _peternakanData?['jumlahTernak']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: green3,
+                                    iconColor: yellow,
+                                  ),
+                                  DashboardItem(
+                                    title: 'Jenis Ternak',
+                                    value: _peternakanData?['jenisTernak']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: green4,
+                                    iconColor: green2,
+                                  ),
+                                  DashboardItem(
+                                    title: 'Ternak Mati',
+                                    value: _peternakanData?['jumlahKematian']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: red2,
+                                    iconColor: red,
+                                  ),
+                                  DashboardItem(
+                                    title: 'Laporan Panen',
+                                    value: _peternakanData?['jumlahPanen']
+                                            .toString() ??
+                                        '-',
+                                    icon: 'other',
+                                    bgColor: blue3,
+                                    iconColor: blue1,
+                                  ),
+                                ],
+                                crossAxisCount: 2,
+                                valueFontSize: 60,
+                              ),
+                              const SizedBox(height: 12),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double cardWidth =
+                                      (constraints.maxWidth / 2) - 24;
+                                  return Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Wrap(
+                                      spacing: 16,
+                                      runSpacing: 16,
+                                      children: [
+                                        SizedBox(
+                                          width: cardWidth,
+                                          child: MenuCard(
+                                            bgColor: yellow1,
+                                            iconColor: yellow,
+                                            icon: Icons.add,
+                                            title: 'Pelaporan Harian',
+                                            subtitle:
+                                                'Pelaporan rutin kondisi ternak setiap hari',
+                                            onTap: () {
+                                              context.push('/pilih-kandang');
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: cardWidth,
+                                          child: MenuCard(
+                                            bgColor: const Color(0xFFDDE7D9),
+                                            iconColor: Colors.green,
+                                            icon: Icons.edit,
+                                            title: 'Pelaporan Khusus',
+                                            subtitle:
+                                                'Pelaporan khusus kondisi ternak seperti sakit, mati, atau panen',
+                                            onTap: () {
+                                              context.push(
+                                                  '/pelaporan-khusus-ternak');
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              NewestReports(
+                                title: 'Aktivitas Terbaru',
+                                reports: (_peternakanData?['aktivitasTerbaru']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((aktivitas) => {
+                                          'text': aktivitas['judul'] ?? '-',
+                                          'time': aktivitas['createdAt'],
+                                          'icon':
+                                              aktivitas['userAvatarUrl'] ?? '-',
+                                        })
+                                    .toList(),
+                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, report) =>
+                                    context.push('/detail', extra: report),
+                                mode: NewestReportsMode.full,
+                                titleTextStyle: bold18.copyWith(color: dark1),
+                                reportTextStyle:
+                                    medium12.copyWith(color: dark1),
+                                timeTextStyle: regular12.copyWith(color: dark2),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Kandang',
+                                items: (_peternakanData?['daftarKandang']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((kandang) => {
+                                          'name': kandang['nama'],
+                                          'category': kandang['JenisBudidaya']
+                                              ['nama'],
+                                          'icon': kandang['gambar'],
+                                        })
+                                    .toList(),
+                                type: 'basic',
+                                onItemTap: (context, item) =>
+                                    context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Jenis Ternak',
+                                items: (_peternakanData?['daftarTernak']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((tanaman) => {
+                                          'name': tanaman['nama'],
+                                          'category': tanaman['tipe'],
+                                          'icon': tanaman['gambar'],
+                                        })
+                                    .toList(),
+                                type: 'basic',
+                                onItemTap: (context, item) =>
+                                    context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 12),
                         ListItem(
@@ -545,9 +579,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,6 +13,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  final AuthService _authService = AuthService();
+
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -29,13 +33,42 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
+    // Mulai navigasi setelah animasi
     _navigateToNextScreen();
   }
 
   Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(seconds: 2));
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+    if (isFirstLaunch) {
+      await prefs.setBool('isFirstLaunch', false);
+      if (!mounted) return;
+      context.go('/introduction');
+      return;
+    }
+
+    // Cek validitas token
+    final isRefreshTokenValid = await _authService.refreshToken();
+    if (!isRefreshTokenValid) {
+      await _authService.logout();
+      if (!mounted) return;
+      context.go('/login');
+      return;
+    }
+
+    // Cek role pengguna dan arahkan ke halaman sesuai role
+    final role = await _authService.getUserRole();
     if (!mounted) return;
-    context.go('/introduction');
+    // if (role == 'admin') {
+    //   context.go('/home'); // Halaman untuk admin
+    // } else if (role == 'pjawab') {
+    //   context.go('/home-petugas'); // Halaman untuk penanggung jawab
+    // } else {
+    //   context.go('/home'); // Default halaman
+    // }
+    context.go('/home'); // Atur sesuai role jika diperlukan
   }
 
   @override

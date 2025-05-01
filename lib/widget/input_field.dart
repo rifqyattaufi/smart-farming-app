@@ -10,6 +10,7 @@ class InputFieldWidget extends StatelessWidget {
   final Widget? suffixIcon;
   final VoidCallback? onSuffixIconTap;
   final bool obscureText;
+  final String? Function(String?)? validator;
 
   const InputFieldWidget({
     super.key,
@@ -21,6 +22,7 @@ class InputFieldWidget extends StatelessWidget {
     this.suffixIcon,
     this.onSuffixIconTap,
     this.obscureText = false,
+    this.validator,
   });
 
   @override
@@ -32,10 +34,11 @@ class InputFieldWidget extends StatelessWidget {
       children: [
         Text(label, style: semibold14.copyWith(color: dark1)),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: obscureText,
           maxLines: obscureText ? 1 : maxLines,
+          validator: validator,
           decoration: InputDecoration(
             hintText: obscureText && isTextEmpty ? '● ● ● ● ● ● ● ●' : hint,
             hintStyle: medium14.copyWith(color: grey),

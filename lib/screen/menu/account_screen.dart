@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +90,10 @@ class AccountScreen extends StatelessWidget {
               reports: [
                 {
                   'text': 'Keluar Akun',
-                  'onTap': () => context.push('/detail'),
+                  'onTap': () async {
+                    await _authService.logout();
+                    context.go('/login');
+                  }
                 },
               ],
               onItemTap: (context, item) {

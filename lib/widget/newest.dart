@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
 enum NewestReportsMode { full, simple, log }
 
@@ -78,19 +80,14 @@ class NewestReports extends StatelessWidget {
                         child: Row(
                           children: [
                             if (showIcon)
-                              Container(
-                                width: 36,
-                                height: 36,
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: green2,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: SvgPicture.asset(
-                                  report['icon'] ?? 'assets/icons/goclub.svg',
-                                  colorFilter:
-                                      ColorFilter.mode(white, BlendMode.srcIn),
-                                  width: 24,
+                              ClipOval(
+                                child: SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: ImageBuilder(
+                                    url: report['icon'],
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             if (showIcon) const SizedBox(width: 12),
@@ -109,7 +106,12 @@ class NewestReports extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            report['time'] ?? 'Unknown Time',
+                                            report['time'] != null
+                                                ? DateFormat(
+                                                        'EEEE, d MMMM yyyy | HH:mm')
+                                                    .format(DateTime.parse(
+                                                        report['time']))
+                                                : 'Unknown Time',
                                             style: timeTextStyle,
                                           ),
                                         ],
@@ -120,7 +122,12 @@ class NewestReports extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Text(
-                                        report['subtext'] ?? 'Unknown Subtext',
+                                        report['time'] != null
+                                            ? DateFormat(
+                                                    'EEEE, d MMMM yyyy | HH:mm')
+                                                .format(DateTime.parse(
+                                                    report['time']))
+                                            : 'Unknown Time',
                                         style: timeTextStyle,
                                       ),
                                     ),
@@ -153,7 +160,12 @@ class NewestReports extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            report['time'] ?? 'Unknown Time',
+                                            report['time'] != null
+                                                ? DateFormat(
+                                                        'EEEE, d MMMM yyyy | HH:mm')
+                                                    .format(DateTime.parse(
+                                                        report['time']))
+                                                : 'Unknown Time',
                                             style: timeTextStyle,
                                           ),
                                         ],
