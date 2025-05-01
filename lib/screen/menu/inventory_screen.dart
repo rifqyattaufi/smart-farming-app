@@ -144,8 +144,8 @@ class InventoryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ListItem(
-                  title: "Riwayat Pemakaian Terbaru",
-                  type: "history",
+                  title: 'Riwayat Pemakaian Terbaru',
+                  type: 'history',
                   items: const [
                     {
                       'name': 'Pupuk NPK',

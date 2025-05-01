@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+// import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -32,22 +34,45 @@ class _PelaporanHarianTanamanScreenState
   File? _imageDosis;
   final picker = ImagePicker();
 
-  Future<void> _pickImageTanaman() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageTanaman = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _pickImageDosis() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageDosis = File(pickedFile.path);
-      });
-    }
+  Future<void> _pickImage(
+      BuildContext context, Function(File) onImagePicked) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Ambil dari Kamera'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (pickedFile != null) {
+                  onImagePicked(File(pickedFile.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (pickedFile != null) {
+                  onImagePicked(File(pickedFile.path));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   final TextEditingController _catatanController = TextEditingController();
@@ -74,8 +99,7 @@ class _PelaporanHarianTanamanScreenState
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(
-              bottom: 100), // kasih space bawah biar gak ketutupan tombol
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const BannerWidget(
               title: 'Step 3 - Isi Form Pelaporan',
@@ -83,7 +107,39 @@ class _PelaporanHarianTanamanScreenState
                   'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
               showDate: true,
             ),
-            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Data Tanaman',
+                    style: semibold16.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Melon #1',
+                    style: bold20.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Melon Fujisawa - Kebun A',
+                    style: semibold16.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Tanggal dan waktu tanam: ',
+                    style: regular14.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                        .format(DateTime.now()),
+                    style: regular14.copyWith(color: dark1),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -133,14 +189,20 @@ class _PelaporanHarianTanamanScreenState
                   ImagePickerWidget(
                     label: "Unggah bukti kondisi tanaman",
                     image: _imageTanaman,
-                    onPickImage: _pickImageTanaman,
+                    onPickImage: (context) {
+                      _pickImage(context, (file) {
+                        setState(() {
+                          _imageTanaman = file;
+                        });
+                      });
+                    },
                   ),
                   InputFieldWidget(
                       label: "Catatan/jurnal pelaporan",
                       hint: "Keterangan",
                       controller: _catatanController,
                       maxLines: 10),
-                  if (statusNutrisi == 'Ya')
+                  if (statusNutrisi == 'Ya') ...[
                     RadioField(
                       label: 'Jenis Pemberian',
                       selectedValue: statusPemberian,
@@ -156,38 +218,45 @@ class _PelaporanHarianTanamanScreenState
                         });
                       },
                     ),
-                  DropdownFieldWidget(
-                    label: "Nama bahan",
-                    hint: "Pilih jenis bahan",
-                    items: const ["Pupuk A", "Pupuk B", "Pupuk C"],
-                    selectedValue: selectedBahan,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedBahan = value;
-                      });
-                    },
-                  ),
-                  InputFieldWidget(
-                    label: "Jumlah/dosis",
-                    hint: "Contoh: 10",
-                    controller: _sizeController,
-                  ),
-                  DropdownFieldWidget(
-                    label: "Satuan dosis",
-                    hint: "Pilih satuan dosis",
-                    items: const ["ml", "gram", "liter"],
-                    selectedValue: selectedSatuan,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSatuan = value;
-                      });
-                    },
-                  ),
-                  ImagePickerWidget(
-                    label: "Unggah bukti pemberian dosis ke tanaman",
-                    image: _imageDosis,
-                    onPickImage: _pickImageDosis,
-                  ),
+                    DropdownFieldWidget(
+                      label: "Nama bahan",
+                      hint: "Pilih jenis bahan",
+                      items: const ["Pupuk A", "Pupuk B", "Pupuk C"],
+                      selectedValue: selectedBahan,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedBahan = value;
+                        });
+                      },
+                    ),
+                    InputFieldWidget(
+                      label: "Jumlah/dosis",
+                      hint: "Contoh: 10",
+                      controller: _sizeController,
+                    ),
+                    DropdownFieldWidget(
+                      label: "Satuan dosis",
+                      hint: "Pilih satuan dosis",
+                      items: const ["ml", "gram", "liter"],
+                      selectedValue: selectedSatuan,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSatuan = value;
+                        });
+                      },
+                    ),
+                    ImagePickerWidget(
+                      label: "Unggah bukti pemberian dosis ke tanaman",
+                      image: _imageDosis,
+                      onPickImage: (context) {
+                        _pickImage(context, (file) {
+                          setState(() {
+                            _imageDosis = file;
+                          });
+                        });
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -198,9 +267,7 @@ class _PelaporanHarianTanamanScreenState
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: CustomButton(
-          onPressed: () {
-            // Your action here
-          },
+          onPressed: () {},
           backgroundColor: green1,
           textStyle: semibold16,
           textColor: white,

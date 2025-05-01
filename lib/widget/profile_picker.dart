@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class ProfileImagePicker extends StatelessWidget {
   final File? image;
@@ -31,7 +32,7 @@ class ProfileImagePicker extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: yellow,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),

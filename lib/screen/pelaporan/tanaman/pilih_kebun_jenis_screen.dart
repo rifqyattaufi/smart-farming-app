@@ -6,8 +6,8 @@ import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
-class PilihTanamanScreen extends StatelessWidget {
-  const PilihTanamanScreen({super.key});
+class PilihKebunJenisScreen extends StatelessWidget {
+  const PilihKebunJenisScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,41 +22,55 @@ class PilihTanamanScreen extends StatelessWidget {
           elevation: 0,
           toolbarHeight: 80,
           title: const Header(
-            headerType: HeaderType.back,
-            title: 'Menu Pelaporan',
-            greeting: 'Pelaporan Harian',
-          ),
+              headerType: HeaderType.back,
+              title: 'Pelaporan Khusus',
+              greeting: 'Pelaporan Nutrisi Tanaman'),
         ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(
-              bottom: 100), // kasih space bawah biar gak ketutupan tombol
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const BannerWidget(
-              title: 'Step 2 - Pilih Tanaman',
-              subtitle: 'Pilih tanaman yang akan dilakukan pelaporan!',
+              title: 'Step 1 - Pilih Kebun/Jenis Tanaman',
+              subtitle:
+                  'Pilih kebun/jenis tanaman yang akan dilakukan pelaporan!',
               showDate: true,
+            ),
+            ListItem(
+              title: 'Daftar Kebun',
+              items: const [
+                {
+                  'name': 'Kebun A',
+                  'category': 'Melon',
+                  'icon': 'assets/icons/goclub.svg',
+                },
+                {
+                  'name': 'Kebun B',
+                  'category': 'Anggur',
+                  'icon': 'assets/icons/goclub.svg',
+                },
+              ],
+              type: 'basic',
+              onItemTap: (context, item) {
+                final name = item['name'] ?? '';
+                context.push('/detail-laporan/$name');
+              },
             ),
             const SizedBox(height: 12),
             ListItem(
-              title: 'Daftar Jenis Tanaman',
+              title: 'Pelaporan Per Jenis Tanaman',
               items: const [
                 {
-                  'name': 'Melon #1',
+                  'name': 'Melon',
                   'category': 'Kebun A',
                   'icon': 'assets/icons/goclub.svg',
                 },
                 {
-                  'name': 'Melon #2',
-                  'category': 'Kebun A',
+                  'name': 'Anggur',
+                  'category': 'Kebun B',
                   'icon': 'assets/icons/goclub.svg',
                 },
-                {
-                  'name': 'Melon #3',
-                  'category': 'Kebun A',
-                  'icon': 'assets/icons/goclub.svg',
-                }
               ],
               type: 'basic',
               onItemTap: (context, item) {
@@ -72,7 +86,7 @@ class PilihTanamanScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: CustomButton(
           onPressed: () {
-            // Your action here
+            context.push('/pelaporan-nutrisi-tanaman');
           },
           buttonText: 'Selanjutnya',
           backgroundColor: green1,

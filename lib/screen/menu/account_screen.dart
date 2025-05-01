@@ -52,7 +52,7 @@ class AccountScreen extends StatelessWidget {
                 },
                 {
                   'text': 'Ubah Password',
-                  'onTap': () => context.push('/detail'),
+                  'onTap': () => context.push('/lupa-password'),
                 },
                 {
                   'text': 'Log Aktivitas',

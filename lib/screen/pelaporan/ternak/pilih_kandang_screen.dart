@@ -4,13 +4,27 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
-import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:smart_farming_app/widget/list_item_selectable.dart';
 
 class PilihKandangScreen extends StatelessWidget {
   const PilihKandangScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final List<Map<String, String>> listKandang = [
+      {
+        'name': 'Kandang A',
+        'category': 'Ayam',
+        'icon': 'assets/icons/goclub.svg',
+      },
+      {
+        'name': 'Kandang B',
+        'category': 'Lele',
+        'icon': 'assets/icons/goclub.svg',
+      }
+    ];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -23,41 +37,24 @@ class PilihKandangScreen extends StatelessWidget {
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Menu Pelaporan',
-            greeting: 'Pelaporan Harian',
+            title: 'Menu Pelaporan', //or 'Pelaporan Khusus'
+            greeting: 'Pelaporan Harian', //or 'Pelaporan Kematian Ternak' or 'Pelaporan Nutrisi Ternak' or 'Pelaporan Ternak Sakit' or 'Pelaporan Panen Ternak'
           ),
         ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(
-              bottom: 100), // kasih space bawah biar gak ketutupan tombol
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const BannerWidget(
               title: 'Step 1 - Pilih Kandang',
               subtitle: 'Pilih kandang yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            const SizedBox(height: 12),
-            ListItem(
+            ListItemSelectable(
               title: 'Daftar Kandang',
-              items: const [
-                {
-                  'name': 'Kandang A',
-                  'category': 'Ayam',
-                  'icon': 'assets/icons/goclub.svg',
-                },
-                {
-                  'name': 'Kandang B',
-                  'category': 'Lele',
-                  'icon': 'assets/icons/goclub.svg',
-                }
-              ],
-              type: 'basic',
-              onItemTap: (context, item) {
-                final name = item['name'] ?? '';
-                context.push('/detail-laporan/$name');
-              },
+              type: ListItemType.simple,
+              items: listKandang,
             ),
             const SizedBox(height: 16),
           ],
@@ -67,7 +64,7 @@ class PilihKandangScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: CustomButton(
           onPressed: () {
-            // Your action here
+            context.push('/pilih-ternak');
           },
           buttonText: 'Selanjutnya',
           backgroundColor: green1,

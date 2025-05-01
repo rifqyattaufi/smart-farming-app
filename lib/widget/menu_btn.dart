@@ -9,6 +9,8 @@ class MenuButton extends StatefulWidget {
   final IconData icon;
   final Color backgroundColor;
   final Color iconColor;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   const MenuButton({
     super.key,
@@ -17,6 +19,8 @@ class MenuButton extends StatefulWidget {
     required this.icon,
     required this.backgroundColor,
     required this.iconColor,
+    required this.isSelected,
+    required this.onTap,
   });
 
   @override
@@ -24,8 +28,6 @@ class MenuButton extends StatefulWidget {
 }
 
 class _MenuButtonState extends State<MenuButton> {
-  bool isSelected = false;
-
   @override
   Widget build(BuildContext context) {
     Widget content = Container(
@@ -35,18 +37,13 @@ class _MenuButtonState extends State<MenuButton> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(widget.icon, color: widget.iconColor, size: 32),
           const SizedBox(width: 12),
           Expanded(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  widget.title,
-                  style: semibold16.copyWith(color: dark1),
-                ),
+                Text(widget.title, style: semibold16.copyWith(color: dark1)),
                 const SizedBox(width: 4),
                 GestureDetector(
                   onTap: () {
@@ -61,7 +58,6 @@ class _MenuButtonState extends State<MenuButton> {
                       ),
                       direction: PopoverDirection.bottom,
                       width: 220,
-                      height: 100,
                       arrowHeight: 10,
                       arrowWidth: 20,
                       barrierColor: Colors.transparent,
@@ -69,11 +65,8 @@ class _MenuButtonState extends State<MenuButton> {
                   },
                   child: Transform.translate(
                     offset: const Offset(0, -4),
-                    child: Icon(
-                      Icons.info_outline,
-                      color: widget.iconColor,
-                      size: 16,
-                    ),
+                    child: Icon(Icons.info_outline,
+                        color: widget.iconColor, size: 16),
                   ),
                 ),
               ],
@@ -85,14 +78,10 @@ class _MenuButtonState extends State<MenuButton> {
     );
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          isSelected = !isSelected;
-        });
-      },
+      onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: isSelected
+        child: widget.isSelected
             ? DottedBorder(
                 color: green1,
                 strokeWidth: 2,

@@ -21,16 +21,51 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
   String? selectedLocation;
   String statusBudidaya = 'Budidaya';
 
-  File? _image;
+  File? _imageTanaman;
   final picker = ImagePicker();
 
-  Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
+  Future<void> _pickImageTanaman(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Buka Kamera'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (pickedFile != null) {
+                  setState(() {
+                    _imageTanaman = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (pickedFile != null) {
+                  setState(() {
+                    _imageTanaman = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   final TextEditingController _nameController = TextEditingController();
@@ -83,8 +118,8 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                 ),
                 ImagePickerWidget(
                   label: "Unggah gambar tanaman",
-                  image: _image,
-                  onPickImage: _pickImage,
+                  image: _imageTanaman,
+                  onPickImage: _pickImageTanaman,
                 ),
                 InputFieldWidget(
                     label: "Deskripsi tanaman",

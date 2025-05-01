@@ -157,8 +157,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
             : Column(
                 children: [
                   ListItem(
-                    title: "Riwayat Pemakaian Terbaru",
-                    type: "history",
+                    title: 'Riwayat Pemakaian Terbaru',
+                    type: 'history',
                     items: filteredItems,
                     onItemTap: (context, item) {
                       final name = item['name'] ?? '';
@@ -167,8 +167,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
                   ),
                   const SizedBox(height: 12),
                   ListItem(
-                    title: "Semua Riwayat Pemakaian",
-                    type: "history",
+                    title: 'Semua Riwayat Pemakaian',
+                    type: 'history',
                     items: filteredItems,
                     onItemTap: (context, item) {
                       final name = item['name'] ?? '';
@@ -216,8 +216,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
                       item['category'] == 'Perkebunan' ||
                       item['category'] == 'Semua Hasil Panen'))
                     ListItem(
-                      title: "Perkebunan",
-                      type: "history",
+                      title: 'Perkebunan',
+                      type: 'history',
                       items: filteredHarvestItems
                           .where((item) =>
                               item['category'] == 'Perkebunan' ||
@@ -233,8 +233,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
                       item['category'] == 'Peternakan' ||
                       item['category'] == 'Semua Hasil Panen'))
                     ListItem(
-                      title: "Peternakan",
-                      type: "history",
+                      title: 'Peternakan',
+                      type: 'history',
                       items: filteredHarvestItems
                           .where((item) =>
                               item['category'] == 'Peternakan' ||

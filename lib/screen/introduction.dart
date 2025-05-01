@@ -1,6 +1,9 @@
-import 'dart:async'; // Import for Timer
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/widget/button.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class Introduction extends StatefulWidget {
   const Introduction({super.key});
@@ -10,21 +13,32 @@ class Introduction extends StatefulWidget {
 }
 
 class _IntroductionState extends State<Introduction> {
-  int _currentPage = 0; // Define _currentPage to track the current page index
-  late PageController _pageController; // PageController to control the PageView
-  Timer? _timer; // Timer for auto-rotation
+  int _currentPage = 0;
+  late PageController _pageController;
+  Timer? _timer;
+
+  final List<String> images = [
+    'assets/images/onboarding1.svg',
+    'assets/images/onboarding2.svg',
+    'assets/images/onboarding3.svg',
+  ];
+
+  final List<String> texts = [
+    'Kelola pertanian dan peternakanmu\nlebih cerdas dan efisien dalam\nsatu genggaman.',
+    'Pantau, lapor, dan tingkatkan hasil panen serta kesehatan ternakmu lewat FarmCenter.',
+    'Mari bersama dukung\nPertanian Berkelanjutan',
+  ];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
 
-    // Start a timer to auto-rotate the pages every 10 seconds
     _timer = Timer.periodic(const Duration(seconds: 10), (Timer timer) {
       if (_currentPage < 2) {
         _currentPage++;
       } else {
-        _currentPage = 0; // Reset to the first page
+        _currentPage = 0;
       }
       _pageController.animateToPage(
         _currentPage,
@@ -36,8 +50,8 @@ class _IntroductionState extends State<Introduction> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
-    _pageController.dispose(); // Dispose the PageController
+    _timer?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -45,124 +59,76 @@ class _IntroductionState extends State<Introduction> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: PageView(
-                  controller: _pageController, // Attach the PageController
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  children: [
-                    const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.eco, size: 100, color: Colors.green),
-                        SizedBox(height: 20),
-                        Text(
-                          'Welcome to Smart Farming',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Optimize your farming with technology.',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.analytics, size: 100, color: Colors.blue),
-                        SizedBox(height: 20),
-                        Text(
-                          'Analyze Your Data',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Get insights to improve your yield.',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.cloud, size: 100, color: Colors.orange),
-                        SizedBox(height: 20),
-                        Text(
-                          'Stay Connected',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Monitor your farm from anywhere.',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: _currentPage == index ? 12 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color:
-                                _currentPage == index ? Colors.blue : Colors.grey,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_currentPage < 2) {
-                    _currentPage++;
-                    _pageController.animateToPage(
-                      _currentPage,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  } else {
-                    context.push('/login');
-                  }
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
                 },
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  backgroundColor: const Color.fromARGB(255, 0, 98, 100),
-                ),
-                child: Text(
-                  _currentPage == 2 ? 'Get Started' : 'Next',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          images[index],
+                          height: 300,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          texts[index],
+                          textAlign: TextAlign.center,
+                          style: medium18.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 40),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(3, (dotIndex) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _currentPage == dotIndex ? green1 : grey,
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-              const SizedBox(height: 100),
-            ],
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          width: double.infinity,
+          child: CustomButton(
+            buttonText: _currentPage == 2 ? 'Masuk' : 'Selanjutnya',
+            onPressed: () {
+              if (_currentPage < 2) {
+                _currentPage++;
+                _pageController.animateToPage(
+                  _currentPage,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              } else {
+                context.push('/login');
+              }
+            },
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
           ),
         ),
       ),

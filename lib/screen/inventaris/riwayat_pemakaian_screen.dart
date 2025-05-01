@@ -49,8 +49,8 @@ class RiwayatPemakaianScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListItem(
-                  title: "Riwayat Pemakaian Terbaru",
-                  type: "history",
+                  title: 'Riwayat Pemakaian Terbaru',
+                  type: 'history',
                   items: const [
                     {
                       'name': 'Pupuk NPK',
@@ -76,8 +76,8 @@ class RiwayatPemakaianScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ListItem(
-                  title: "Semua Riwayat Pemakaian",
-                  type: "history",
+                  title: 'Semua Riwayat Pemakaian',
+                  type: 'history',
                   items: const [
                     {
                       'name': 'Pupuk NPK',

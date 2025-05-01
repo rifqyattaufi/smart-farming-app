@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.center,
                       child: TextButton(
                         onPressed: () {
-                          // Action lupa password
+                          context.push('/lupa-password');
                         },
                         child: Text(
                           'Lupa password?',

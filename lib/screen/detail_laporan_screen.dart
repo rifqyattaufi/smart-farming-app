@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/header.dart';
 
 class DetailLaporanScreen extends StatelessWidget {
   final String name;
@@ -16,8 +17,11 @@ class DetailLaporanScreen extends StatelessWidget {
           leadingWidth: 0,
           titleSpacing: 0,
           elevation: 0,
-          title:
-              Text('Detail Laporan', style: semibold16.copyWith(color: dark1)),
+          title: const Header(
+            headerType: HeaderType.back,
+            title: 'Menu Pelaporan',
+            greeting: 'Detail Laporan',
+          ),
         ),
       ),
       body: SafeArea(

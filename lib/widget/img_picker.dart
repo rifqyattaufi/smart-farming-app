@@ -6,7 +6,7 @@ import 'package:smart_farming_app/theme.dart';
 class ImagePickerWidget extends StatelessWidget {
   final String label;
   final File? image;
-  final VoidCallback onPickImage;
+  final void Function(BuildContext context) onPickImage;
 
   const ImagePickerWidget({
     super.key,
@@ -26,9 +26,9 @@ class ImagePickerWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: onPickImage,
+          onTap: () => onPickImage(context),
           child: DottedBorder(
-            color: Colors.green, // Dashed green border
+            color: green1,
             strokeWidth: 2,
             borderType: BorderType.RRect,
             radius: const Radius.circular(10),
@@ -52,14 +52,14 @@ class ImagePickerWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "Upload",
+                            "Unggah file atau ambil foto langsung",
                             style: semibold16.copyWith(color: green1),
                           ),
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              "Drag a file here or click in this area to browse\nin your folder explorer",
+                              "Ketuk di sini untuk memilih file dari perangkat Anda atau buka kamera.",
                               style: medium14.copyWith(
                                   color: green1.withValues(alpha: 0.6)),
                               textAlign: TextAlign.center,

@@ -7,6 +7,7 @@ import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/widget/banner.dart';
+import 'package:smart_farming_app/widget/menu_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -222,6 +223,50 @@ class _HomeScreenState extends State<HomeScreen> {
                           onViewAll: () => context.push('/report'),
                         ),
                         const SizedBox(height: 12),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            double cardWidth = (constraints.maxWidth / 2) - 24;
+                            return Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Wrap(
+                                spacing: 16,
+                                runSpacing: 16,
+                                children: [
+                                  SizedBox(
+                                    width: cardWidth,
+                                    child: MenuCard(
+                                      bgColor: yellow1,
+                                      iconColor: yellow,
+                                      icon: Icons.add,
+                                      title: 'Pelaporan Harian',
+                                      subtitle:
+                                          'Pelaporan rutin kondisi tanaman setiap hari',
+                                      onTap: () {
+                                        context.push('/pilih-kebun');
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: cardWidth,
+                                    child: MenuCard(
+                                      bgColor: const Color(0xFFDDE7D9),
+                                      iconColor: Colors.green,
+                                      icon: Icons.edit,
+                                      title: 'Pelaporan Khusus',
+                                      subtitle:
+                                          'Pelaporan khusus kondisi tanaman seperti sakit, mati, atau panen',
+                                      onTap: () {
+                                        context
+                                            .push('/pelaporan-khusus-tanaman');
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
                         NewestReports(
                           title: 'Aktivitas Terbaru',
                           reports: const [
@@ -292,6 +337,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             context.push('/detail-laporan/$name');
                           },
                         ),
+                        const SizedBox(height: 12),
+                        ListItem(
+                          title: 'Daftar Komoditas',
+                          items: const [
+                            {
+                              'name': 'Buah Melon',
+                              'category': 'Melon',
+                              'icon': 'assets/icons/goclub.svg',
+                            },
+                            {
+                              'name': 'Buah Anggur',
+                              'category': 'Anggur',
+                              'icon': 'assets/icons/goclub.svg',
+                            }
+                          ],
+                          type: 'basic',
+                          onViewAll: () => context.push('/manajemen-komoditas'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -336,6 +403,50 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisCount: 2,
                           valueFontSize: 60,
                           onViewAll: () => context.push('/report'),
+                        ),
+                        const SizedBox(height: 12),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            double cardWidth = (constraints.maxWidth / 2) - 24;
+                            return Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Wrap(
+                                spacing: 16,
+                                runSpacing: 16,
+                                children: [
+                                  SizedBox(
+                                    width: cardWidth,
+                                    child: MenuCard(
+                                      bgColor: yellow1,
+                                      iconColor: yellow,
+                                      icon: Icons.add,
+                                      title: 'Pelaporan Harian',
+                                      subtitle:
+                                          'Pelaporan rutin kondisi ternak setiap hari',
+                                      onTap: () {
+                                        context.push('/pilih-kandang');
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: cardWidth,
+                                    child: MenuCard(
+                                      bgColor: const Color(0xFFDDE7D9),
+                                      iconColor: Colors.green,
+                                      icon: Icons.edit,
+                                      title: 'Pelaporan Khusus',
+                                      subtitle:
+                                          'Pelaporan khusus kondisi ternak seperti sakit, mati, atau panen',
+                                      onTap: () {
+                                        context
+                                            .push('/pelaporan-khusus-ternak');
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 12),
                         NewestReports(
@@ -401,6 +512,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                           type: 'basic',
                           onViewAll: () => context.push('/manajemen-ternak'),
+                          onItemTap: (context, item) {
+                            final name = item['name'] ?? '';
+                            context.push('/detail-laporan/$name');
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        ListItem(
+                          title: 'Daftar Komoditas',
+                          items: const [
+                            {
+                              'name': 'Telur',
+                              'category': 'Ayam',
+                              'icon': 'assets/icons/goclub.svg',
+                            },
+                            {
+                              'name': 'Daging',
+                              'category': 'Ayam',
+                              'icon': 'assets/icons/goclub.svg',
+                            }
+                          ],
+                          type: 'basic',
+                          onViewAll: () => context.push('/manajemen-komoditas'),
                           onItemTap: (context, item) {
                             final name = item['name'] ?? '';
                             context.push('/detail-laporan/$name');

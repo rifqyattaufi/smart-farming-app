@@ -31,22 +31,45 @@ class _PelaporanHarianTernakScreenState
   File? _imageDosis;
   final picker = ImagePicker();
 
-  Future<void> _pickImageTernak() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageTernak = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _pickImageDosis() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageDosis = File(pickedFile.path);
-      });
-    }
+  Future<void> _pickImage(
+      BuildContext context, Function(File) onImagePicked) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Ambil dari Kamera'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (pickedFile != null) {
+                  onImagePicked(File(pickedFile.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (pickedFile != null) {
+                  onImagePicked(File(pickedFile.path));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   final TextEditingController _catatanController = TextEditingController();
@@ -73,8 +96,7 @@ class _PelaporanHarianTernakScreenState
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(
-              bottom: 100), // kasih space bawah biar gak ketutupan tombol
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const BannerWidget(
               title: 'Step 3 - Isi Form Pelaporan',
@@ -82,7 +104,28 @@ class _PelaporanHarianTernakScreenState
                   'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
               showDate: true,
             ),
-            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Data Ternak',
+                    style: semibold16.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Ayam',
+                    style: bold20.copyWith(color: dark1),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Kandang A',
+                    style: semibold16.copyWith(color: dark1),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -121,60 +164,69 @@ class _PelaporanHarianTernakScreenState
                   ImagePickerWidget(
                     label: "Unggah bukti kondisi ternak",
                     image: _imageTernak,
-                    onPickImage: _pickImageTernak,
+                    onPickImage: (context) {
+                      _pickImage(context, (file) {
+                        setState(() {
+                          _imageTernak = file;
+                        });
+                      });
+                    },
                   ),
                   InputFieldWidget(
                       label: "Catatan/jurnal pelaporan",
                       hint: "Keterangan",
                       controller: _catatanController,
                       maxLines: 10),
-                  if (statusNutrisi == 'Ya')
+                  if (statusNutrisi == 'Ya') ...[
                     RadioField(
                       label: 'Jenis Pemberian',
                       selectedValue: statusPemberian,
-                      options: const [
-                        'Vitamin',
-                        'Vaksin',
-                        'Disinfektan'
-                      ],
+                      options: const ['Vitamin', 'Vaksin'],
                       onChanged: (value) {
                         setState(() {
                           statusPemberian = value;
                         });
                       },
                     ),
-                  DropdownFieldWidget(
-                    label: "Nama bahan",
-                    hint: "Pilih jenis bahan",
-                    items: const ["Vaksin A", "Vaksin B", "Vaksin C"],
-                    selectedValue: selectedBahan,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedBahan = value;
-                      });
-                    },
-                  ),
-                  InputFieldWidget(
-                    label: "Jumlah/dosis",
-                    hint: "Contoh: 10",
-                    controller: _sizeController,
-                  ),
-                  DropdownFieldWidget(
-                    label: "Satuan dosis",
-                    hint: "Pilih satuan dosis",
-                    items: const ["ml", "gram", "liter"],
-                    selectedValue: selectedSatuan,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSatuan = value;
-                      });
-                    },
-                  ),
-                  ImagePickerWidget(
-                    label: "Unggah bukti pemberian dosis ke ternak",
-                    image: _imageDosis,
-                    onPickImage: _pickImageDosis,
-                  ),
+                    DropdownFieldWidget(
+                      label: "Nama bahan",
+                      hint: "Pilih jenis bahan",
+                      items: const ["Vaksin A", "Vaksin B", "Vaksin C"],
+                      selectedValue: selectedBahan,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedBahan = value;
+                        });
+                      },
+                    ),
+                    InputFieldWidget(
+                      label: "Jumlah/dosis",
+                      hint: "Contoh: 10",
+                      controller: _sizeController,
+                    ),
+                    DropdownFieldWidget(
+                      label: "Satuan dosis",
+                      hint: "Pilih satuan dosis",
+                      items: const ["ml", "gram", "liter"],
+                      selectedValue: selectedSatuan,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSatuan = value;
+                        });
+                      },
+                    ),
+                    ImagePickerWidget(
+                      label: "Unggah bukti pemberian dosis ke ternak",
+                      image: _imageDosis,
+                      onPickImage: (context) {
+                        _pickImage(context, (file) {
+                          setState(() {
+                            _imageDosis = file;
+                          });
+                        });
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -4,13 +4,26 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
-import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:smart_farming_app/widget/list_item_selectable.dart';
 
 class PilihKebunScreen extends StatelessWidget {
   const PilihKebunScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> listKebun = [
+      {
+        'name': 'Kebun A',
+        'category': 'Melon',
+        'icon': 'assets/icons/goclub.svg',
+      },
+      {
+        'name': 'Kebun B',
+        'category': 'Anggur',
+        'icon': 'assets/icons/goclub.svg',
+      }
+    ];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -23,41 +36,25 @@ class PilihKebunScreen extends StatelessWidget {
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Menu Pelaporan',
-            greeting: 'Pelaporan Harian',
+            title: 'Menu Pelaporan', //or 'Pelaporan Khusus'
+            greeting:
+                'Pelaporan Harian', //or 'Pelaporan Hasil Panen' or 'Pelaporan Tanaman Sakit' or 'Pelaporan Tanaman Mati' or 'Pelaporan Nutrisi Tanaman'
           ),
         ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(
-              bottom: 100), // kasih space bawah biar gak ketutupan tombol
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const BannerWidget(
               title: 'Step 1 - Pilih Kebun',
               subtitle: 'Pilih kebun yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            const SizedBox(height: 12),
-            ListItem(
+            ListItemSelectable(
               title: 'Daftar Kebun',
-              items: const [
-                {
-                  'name': 'Kebun A',
-                  'category': 'Melon',
-                  'icon': 'assets/icons/goclub.svg',
-                },
-                {
-                  'name': 'Kebun B',
-                  'category': 'Anggur',
-                  'icon': 'assets/icons/goclub.svg',
-                },
-              ],
-              type: 'basic',
-              onItemTap: (context, item) {
-                final name = item['name'] ?? '';
-                context.push('/detail-laporan/$name');
-              },
+              type: ListItemType.simple,
+              items: listKebun,
             ),
             const SizedBox(height: 16),
           ],
@@ -67,7 +64,7 @@ class PilihKebunScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: CustomButton(
           onPressed: () {
-            // Your action here
+            context.push('/pilih-tanaman');
           },
           buttonText: 'Selanjutnya',
           backgroundColor: green1,

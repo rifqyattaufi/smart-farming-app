@@ -5,16 +5,15 @@ import 'package:smart_farming_app/widget/custom_tab.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
-import 'package:smart_farming_app/widget/unit_item.dart';
 
-class HamaScreen extends StatefulWidget {
-  const HamaScreen({super.key});
+class KomoditasScreen extends StatefulWidget {
+  const KomoditasScreen({super.key});
 
   @override
-  State<HamaScreen> createState() => _HamaScreenState();
+  State<KomoditasScreen> createState() => _KomoditasScreenState();
 }
 
-class _HamaScreenState extends State<HamaScreen> {
+class _KomoditasScreenState extends State<KomoditasScreen> {
   int selectedTab = 0;
   TextEditingController searchController = TextEditingController();
 
@@ -32,8 +31,8 @@ class _HamaScreenState extends State<HamaScreen> {
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Laporan Hama',
-            greeting: 'Riwayat Pelaporan Hama',
+            title: 'Manajemen Komoditas',
+            greeting: 'Daftar Komoditas',
           ),
         ),
       ),
@@ -43,9 +42,9 @@ class _HamaScreenState extends State<HamaScreen> {
         child: FloatingActionButton(
           onPressed: () {
             if (selectedTab == 0) {
-              context.push('/pelaporan-hama');
+              context.push('/tambah-komoditas-tanaman');
             } else {
-              context.push('/tambah-hama');
+              context.push('/tambah-komoditas-ternak');
             }
           },
           backgroundColor: green1,
@@ -75,7 +74,7 @@ class _HamaScreenState extends State<HamaScreen> {
                 ),
                 const SizedBox(height: 20),
                 CustomTabBar(
-                  tabs: const ['Laporan Hama', 'Daftar Hama'],
+                  tabs: const ['Perkebunan', 'Peternakan'],
                   activeColor: green1,
                   underlineWidth: 120,
                   spacing: 100,
@@ -96,22 +95,25 @@ class _HamaScreenState extends State<HamaScreen> {
   }
 
   Widget _buildTabContent() {
-    return selectedTab == 0 ? _buildLaporanHamaContent() : _buildHamaContent();
+    return selectedTab == 0
+        ? _buildPerkebunanContent()
+        : _buildPeternakanContent();
   }
 
-  Widget _buildLaporanHamaContent() {
+  Widget _buildPerkebunanContent() {
     return Column(
       children: [
         ListItem(
+          title: 'Daftar Komoditas',
           items: const [
             {
-              'name': 'Tikus',
-              'category': 'Diidentifikasi terdapat 2 ekor',
+              'name': 'Buah Melon',
+              'category': 'Melon',
               'icon': 'assets/icons/goclub.svg',
             },
             {
-              'name': 'Ulat Bulu',
-              'category': 'Diidentifikasi terdapat 5 ekor',
+              'name': 'Buah Anggur',
+              'category': 'Anggur',
               'icon': 'assets/icons/goclub.svg',
             }
           ],
@@ -125,31 +127,30 @@ class _HamaScreenState extends State<HamaScreen> {
     );
   }
 
-  Widget _buildHamaContent() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          UnitItem(
-            unitName: 'Ulat Bulu',
-            onEdit: () {
-              // handle edit ulat bulu
+  Widget _buildPeternakanContent() {
+    return Column(
+      children: [
+        ListItem(
+          title: 'Daftar Komoditas',
+          items: const [
+            {
+              'name': 'Telur',
+              'category': 'Ayam',
+              'icon': 'assets/icons/goclub.svg',
             },
-            onDelete: () {
-              // handle delete ulat bulu
-            },
-          ),
-          UnitItem(
-            unitName: 'Tikus',
-            onEdit: () {
-              // handle edit tikus
-            },
-            onDelete: () {
-              // handle delete tikus
-            },
-          ),
-        ],
-      ),
+            {
+              'name': 'Daging',
+              'category': 'Ayam',
+              'icon': 'assets/icons/goclub.svg',
+            }
+          ],
+          type: 'basic',
+          onItemTap: (context, item) {
+            final name = item['name'] ?? '';
+            context.push('/detail-laporan/$name');
+          },
+        ),
+      ],
     );
   }
 }
