@@ -58,17 +58,14 @@ class _LogScreenState extends State<LogScreen> {
                   reports: const [
                     {
                       'text': 'Pak Adi telah melaporkan kondisi tanaman',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'action': 'CREATE',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan kondisi ternak',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'action': 'UPDATE',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan tanaman sakit',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'action': 'DELETE',
                     },
                   ],

@@ -232,6 +232,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               DashboardGrid(
                                 title: 'Statistik Perkebunan Bulan Ini',
                                 type: DashboardGridType.basic,
+                                onViewAll: () {
+                                  context.push('/report');
+                                },
                                 items: [
                                   DashboardItem(
                                     title: 'Suhu (°C)',
@@ -331,9 +334,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               aktivitas['userAvatarUrl'] ?? '-',
                                         })
                                     .toList(),
-                                onViewAll: () => context.push('/detail'),
-                                onItemTap: (context, report) =>
-                                    context.push('/detail', extra: report),
+                                onViewAll: () =>
+                                    context.push('/riwayat-aktivitas'),
+                                onItemTap: (context, item) {
+                                  final name = item['text'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
                                 reportTextStyle:
@@ -354,9 +360,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onItemTap: (context, item) =>
-                                    context.push('/detail', extra: item),
-                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
+                                onViewAll: () =>
+                                    context.push('/manajemen-kebun'),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -371,9 +380,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onItemTap: (context, item) =>
-                                    context.push('/detail', extra: item),
-                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
+                                onViewAll: () =>
+                                    context.push('/manajemen-jenis-tanaman'),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -409,6 +421,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               DashboardGrid(
                                 title: 'Statistik Peternakan Bulan Ini',
                                 type: DashboardGridType.basic,
+                                onViewAll: () {
+                                  context.push('/report');
+                                },
                                 items: [
                                   DashboardItem(
                                     title: 'Jumlah Ternak',
@@ -508,9 +523,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               aktivitas['userAvatarUrl'] ?? '-',
                                         })
                                     .toList(),
-                                onViewAll: () => context.push('/detail'),
-                                onItemTap: (context, report) =>
-                                    context.push('/detail', extra: report),
+                                onViewAll: () =>
+                                    context.push('/riwayat-aktivitas'),
+                                onItemTap: (context, item) {
+                                  final name = item['text'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
                                 reportTextStyle:
@@ -531,9 +549,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onItemTap: (context, item) =>
-                                    context.push('/detail', extra: item),
-                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
+                                onViewAll: () =>
+                                    context.push('/manajemen-kandang'),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -548,34 +569,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onItemTap: (context, item) =>
-                                    context.push('/detail', extra: item),
-                                onViewAll: () => context.push('/detail'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
+                                onViewAll: () =>
+                                    context.push('/manajemen-ternak'),
+                              ),
+                              const SizedBox(height: 12),
+                              ListItem(
+                                title: 'Daftar Komoditas',
+                                items: const [
+                                  {
+                                    'name': 'Telur',
+                                    'category': 'Ayam',
+                                    'icon': 'assets/icons/goclub.svg',
+                                  },
+                                  {
+                                    'name': 'Daging',
+                                    'category': 'Ayam',
+                                    'icon': 'assets/icons/goclub.svg',
+                                  }
+                                ],
+                                type: 'basic',
+                                onViewAll: () =>
+                                    context.push('/manajemen-komoditas'),
+                                onItemTap: (context, item) {
+                                  final name = item['name'] ?? '';
+                                  context.push('/detail-laporan/$name');
+                                },
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Komoditas',
-                          items: const [
-                            {
-                              'name': 'Telur',
-                              'category': 'Ayam',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Daging',
-                              'category': 'Ayam',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/manajemen-komoditas'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
                         ),
                       ],
                     ),

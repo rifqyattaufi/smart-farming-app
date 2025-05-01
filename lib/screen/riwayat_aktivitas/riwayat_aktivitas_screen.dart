@@ -59,12 +59,10 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                   reports: const [
                     {
                       'text': 'Pak Adi telah melaporkan kondisi tanaman',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan kondisi ternak',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                   ],
@@ -83,22 +81,18 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                   reports: const [
                     {
                       'text': 'Pak Adi telah melaporkan kondisi tanaman',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan kondisi ternak',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan tanaman sakit',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                     {
                       'text': 'Pak Adi telah melaporkan ternak sakit',
-                      'time': 'Senin, 17 Februari 2025 | 08.20',
                       'icon': 'assets/icons/goclub.svg',
                     },
                   ],
