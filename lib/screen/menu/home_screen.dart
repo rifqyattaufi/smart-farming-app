@@ -170,7 +170,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.pets_outlined, color: green1),
                           title: const Text("Tambah Jenis Ternak"),
                           onTap: () {
-                            context.push('/tambah-ternak');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-ternak', extra: () {
+                              _fetchData();
+                            });
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),

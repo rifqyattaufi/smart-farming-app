@@ -218,7 +218,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-ternak',
-      builder: (context, state) => const AddTernakScreen(),
+      builder: (context, state) {
+        final onTernakAdded = state.extra as VoidCallback?;
+        return AddTernakScreen(onTernakAdded: onTernakAdded);
+      },
     ),
     GoRoute(
       path: '/tambah-kategori-inventaris',

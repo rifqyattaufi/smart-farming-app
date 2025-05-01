@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
   final EdgeInsetsGeometry? padding;
   final BorderRadiusGeometry? borderRadius;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
@@ -19,6 +20,7 @@ class CustomButton extends StatelessWidget {
     this.textColor,
     this.padding = const EdgeInsets.symmetric(vertical: 14),
     this.borderRadius = const BorderRadius.all(Radius.circular(10)),
+    this.isLoading = false,
   });
 
   @override
@@ -32,11 +34,17 @@ class CustomButton extends StatelessWidget {
           padding: padding,
           shape: RoundedRectangleBorder(borderRadius: borderRadius!),
         ),
-        child: Text(buttonText, style: textStyle?.copyWith(color: white)),
+        child: isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeWidth: 2.0,
+                ),
+              )
+            : Text(buttonText, style: textStyle?.copyWith(color: white)),
       ),
     );
   }
 }
-
-
-

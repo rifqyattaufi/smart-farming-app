@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/service/image_service.dart';
+import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -10,18 +12,24 @@ import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddTernakScreen extends StatefulWidget {
-  const AddTernakScreen({super.key});
+  final VoidCallback? onTernakAdded;
+
+  const AddTernakScreen({super.key, this.onTernakAdded});
 
   @override
   _AddTernakScreenState createState() => _AddTernakScreenState();
 }
 
 class _AddTernakScreenState extends State<AddTernakScreen> {
+  final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+  final ImageService _imageService = ImageService();
+  final _formKey = GlobalKey<FormState>();
   String? selectedLocation;
-  String statusTernak = 'Ternak';
+  String statusTernak = 'Aktif';
 
   File? _imageTernak;
   final picker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> _pickImageTernak(BuildContext context) async {
     showModalBottomSheet(
@@ -71,6 +79,66 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
   final TextEditingController _latinController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  Future<void> _submitForm() async {
+    if (_isLoading) return;
+
+    try {
+      if (!_formKey.currentState!.validate()) return;
+
+      if (_imageTernak == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gambar hewan ternak tidak boleh kosong'),
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      final imageUrl = await _imageService.uploadImage(_imageTernak!);
+
+      final data = {
+        "nama": _nameController.text,
+        "latin": _latinController.text,
+        "tipe": "hewan",
+        "status": statusTernak == 'Aktif',
+        "detail": _descriptionController.text,
+        "gambar": imageUrl['data'],
+      };
+
+      final response = await _jenisBudidayaService.createJenisBudidaya(data);
+
+      if (response['status'] == true) {
+        if (widget.onTernakAdded != null) {
+          widget.onTernakAdded!();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berhasil menambahkan jenis hewan ternak'),
+          ),
+        );
+
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: $e'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,51 +159,71 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       ),
       body: SafeArea(
         child: ListView(children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InputFieldWidget(
-                  label: "Nama hewan ternak",
-                  hint: "Contoh: Ayam",
-                  controller: _nameController,
-                ),
-                InputFieldWidget(
-                    label: "Nama latin",
-                    hint: "Contoh: Gallus gallus domesticus",
-                    controller: _latinController),
-                RadioField(
-                  label: 'Status ternak',
-                  selectedValue: statusTernak,
-                  options: const ['Ternak', 'Tidak ternak'],
-                  onChanged: (value) {
-                    setState(() {
-                      statusTernak = value;
-                    });
-                  },
-                ),
-                ImagePickerWidget(
-                  label: "Unggah gambar hewan ternak",
-                  image: _imageTernak,
-                  onPickImage: _pickImageTernak,
-                ),
-                InputFieldWidget(
-                    label: "Deskripsi hewan ternak",
-                    hint: "Keterangan",
-                    controller: _descriptionController,
-                    maxLines: 10),
-                const SizedBox(height: 16),
-                CustomButton(
-                  onPressed: () {
-                    // Your action here
-                  },
-                  backgroundColor: green1,
-                  textStyle: semibold16,
-                  textColor: white,
-                ),
-                const SizedBox(height: 16),
-              ],
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InputFieldWidget(
+                    label: "Nama hewan ternak",
+                    hint: "Contoh: Ayam",
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama hewan ternak tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  InputFieldWidget(
+                      label: "Nama latin",
+                      hint: "Contoh: Gallus gallus domesticus",
+                      controller: _latinController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama latin tidak boleh kosong';
+                        }
+                        return null;
+                      }),
+                  RadioField(
+                    label: 'Status ternak',
+                    selectedValue: statusTernak,
+                    options: const ['Aktif', 'Tidak Aktif'],
+                    onChanged: (value) {
+                      setState(() {
+                        statusTernak = value;
+                      });
+                    },
+                  ),
+                  ImagePickerWidget(
+                    label: "Unggah gambar hewan ternak",
+                    image: _imageTernak,
+                    onPickImage: _pickImageTernak,
+                  ),
+                  InputFieldWidget(
+                      label: "Deskripsi hewan ternak",
+                      hint: "Keterangan",
+                      controller: _descriptionController,
+                      maxLines: 10,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Deskripsi tidak boleh kosong';
+                        }
+                        return null;
+                      }),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    onPressed: _submitForm,
+                    backgroundColor: green1,
+                    textStyle: semibold16,
+                    textColor: white,
+                    isLoading: _isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ]),
