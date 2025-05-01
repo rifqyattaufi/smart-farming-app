@@ -1,54 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
 class ListItem extends StatelessWidget {
-  final String title;
-  final List<Map<String, String>> items;
+  final String? title;
+  final List<Map<String, dynamic>> items;
   final String type; // "basic" or "history"
 
-  final Widget Function(BuildContext context)?
-      navigateTo; // Custom navigation for "Lihat semua"
+  final VoidCallback? onViewAll;
 
-  final void Function(BuildContext context, Map<String, String>)?
-      onItemTap; // Item click event
+  final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
 
   const ListItem({
     super.key,
-    required this.title,
+    this.title,
     required this.items,
     this.type = "basic",
-    this.navigateTo,
+    this.onViewAll,
     this.onItemTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15, top: 16, right: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: bold18.copyWith(color: dark1)),
-              if (type == "history" && navigateTo != null)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => navigateTo!(context)),
-                    );
-                  },
-                  child: Text(
-                    "Lihat semua",
-                    style: regular14.copyWith(color: blue1),
-                  ),
-                ),
-            ],
-          ),
+          if (title != null && title!.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.only(right: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(title!, style: bold18.copyWith(color: dark1)),
+                  if (onViewAll != null)
+                    GestureDetector(
+                      onTap: onViewAll,
+                      child: Text(
+                        "Lihat semua",
+                        style: regular14.copyWith(color: green1),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           const SizedBox(height: 10),
           Column(
             children: items.map((item) {
@@ -78,10 +74,20 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildBasicItem(Map<String, String> item) {
+  Widget _buildBasicItem(Map<String, dynamic> item) {
     return Row(
       children: [
-        _buildImageOrIcon(item['icon']),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: ImageBuilder(
+              url: item['icon'],
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -110,10 +116,20 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(Map<String, String> item) {
+  Widget _buildHistoryItem(Map<String, dynamic> item) {
     return Row(
       children: [
-        _buildImageOrIcon(item['image']),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: ImageBuilder(
+              url: item['image'],
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -121,23 +137,30 @@ class ListItem extends StatelessWidget {
             children: [
               Text(
                 item['name'] ?? 'Unknown',
-                style: semibold14.copyWith(color: dark1),
+                style: semibold16.copyWith(color: dark1),
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.circle, size: 10, color: green1),
-                  const SizedBox(width: 6),
+                  // Icon(Icons.circle, size: 10, color: green1),
+                  // const SizedBox(width: 6),
                   Text(
-                    item['person'] ?? 'Petugas Tidak Diketahui',
+                    'Pemakaian oleh: ${item['person'] ?? 'Petugas Tidak Diketahui'}',
                     style: regular12.copyWith(color: dark2),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
-              Text(
-                '${item['date'] ?? 'Unknown Date'} | ${item['time'] ?? 'Unknown Time'}',
-                style: regular12.copyWith(color: dark2),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: green2.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Text(
+                  '${item['date'] ?? 'Unknown Date'} | ${item['time'] ?? 'Unknown Time'}',
+                  style: regular10.copyWith(color: dark2),
+                ),
               ),
             ],
           ),
@@ -146,42 +169,42 @@ class ListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildImageOrIcon(String? path) {
-    if (path == null || path.isEmpty) {
-      return Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      );
-    }
+  // Widget _buildImageOrIcon(String? path) {
+  //   if (path == null || path.isEmpty) {
+  //     return Container(
+  //       width: 60,
+  //       height: 60,
+  //       decoration: BoxDecoration(
+  //         color: Colors.grey[300],
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //     );
+  //   }
 
-    if (path.endsWith('.svg')) {
-      return Container(
-        width: 60,
-        height: 60,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: green2,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SvgPicture.asset(
-          path,
-          colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
-        ),
-      );
-    } else {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          path,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-      );
-    }
-  }
+  //   if (path.endsWith('.svg')) {
+  //     return Container(
+  //       width: 60,
+  //       height: 60,
+  //       padding: const EdgeInsets.all(12),
+  //       decoration: BoxDecoration(
+  //         color: green2,
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       child: SvgPicture.asset(
+  //         path,
+  //         colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
+  //       ),
+  //     );
+  //   } else {
+  //     return ClipRRect(
+  //       borderRadius: BorderRadius.circular(10),
+  //       child: Image.asset(
+  //         path,
+  //         width: 60,
+  //         height: 60,
+  //         fit: BoxFit.cover,
+  //       ),
+  //     );
+  //   }
+  // }
 }

@@ -1,0 +1,192 @@
+import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+enum ListItemType { basic, simple }
+
+class ListItemSelectable extends StatefulWidget {
+  final String? title;
+  final List<Map<String, String>> items;
+  final ListItemType type;
+
+  const ListItemSelectable({
+    super.key,
+    this.title,
+    required this.items,
+    this.type = ListItemType.basic,
+  });
+
+  @override
+  State<ListItemSelectable> createState() => _ListItemSelectableState();
+}
+
+class _ListItemSelectableState extends State<ListItemSelectable> {
+  bool isBatchMode = false;
+  Set<int> selectedIndexes = {};
+
+  void _toggleBatchMode(bool enable) {
+    setState(() {
+      isBatchMode = enable;
+      if (!enable) selectedIndexes.clear();
+    });
+  }
+
+  void _handleTap(int index) {
+    if (widget.type == ListItemType.basic && isBatchMode) {
+      setState(() {
+        if (selectedIndexes.contains(index)) {
+          selectedIndexes.remove(index);
+        } else {
+          selectedIndexes.add(index);
+        }
+      });
+    } else {
+      setState(() {
+        selectedIndexes = {index}; // hanya satu aktif di simple
+      });
+    }
+  }
+
+  void _handleLongPress(int index) {
+    if (widget.type == ListItemType.basic) {
+      _toggleBatchMode(true);
+      _handleTap(index);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.title != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.title!, style: bold18.copyWith(color: dark1)),
+              ],
+            ),
+          if (widget.type == ListItemType.basic) const SizedBox(height: 8),
+          if (widget.type == ListItemType.basic)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Tekan dan tahan untuk mengaktifkan mode pelaporan batch.",
+                  style: medium12.copyWith(color: green1),
+                ),
+                if (isBatchMode)
+                  GestureDetector(
+                    onTap: () => _toggleBatchMode(false),
+                    child: Icon(Icons.close, size: 20, color: red),
+                  )
+              ],
+            ),
+          const SizedBox(height: 10),
+          ...widget.items.asMap().entries.map((entry) {
+            int index = entry.key;
+            var item = entry.value;
+            bool isSelected = selectedIndexes.contains(index);
+
+            Widget cardContent = _buildItemContent(item, isSelected);
+            Widget child = isSelected
+                ? DottedBorder(
+                    color: green1,
+                    strokeWidth: 2,
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(18),
+                    dashPattern: const [6, 4],
+                    child: cardContent,
+                  )
+                : cardContent;
+
+            return GestureDetector(
+              onTap: () => _handleTap(index),
+              onLongPress: widget.type == ListItemType.basic
+                  ? () => _handleLongPress(index)
+                  : null,
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: child,
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemContent(Map<String, String> item, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          _buildImageOrIcon(item['icon']),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item['name'] ?? '',
+                    style: semibold14.copyWith(color: dark1)),
+                const SizedBox(height: 4),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    item['category'] ?? '',
+                    style: regular12.copyWith(color: green2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (widget.type == ListItemType.basic && isBatchMode)
+            Checkbox(
+              value: selectedIndexes.contains(widget.items.indexOf(item)),
+              onChanged: (_) => _handleTap(widget.items.indexOf(item)),
+              activeColor: green1,
+              side: BorderSide(color: green1),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageOrIcon(String? path) {
+    if (path == null || path.isEmpty) {
+      return Container(width: 60, height: 60, color: Colors.grey[300]);
+    }
+
+    if (path.endsWith('.svg')) {
+      return Container(
+        width: 60,
+        height: 60,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: SvgPicture.asset(path,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+      );
+    } else {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset(path, width: 60, height: 60, fit: BoxFit.cover),
+      );
+    }
+  }
+}

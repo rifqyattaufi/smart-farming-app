@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_farming_app/screen/detail_screen.dart';
 import 'package:smart_farming_app/theme.dart';
+
+enum DashboardGridType { basic, none }
 
 class DashboardItem {
   final String title;
   final String value;
   final String icon;
+  final Color bgColor;
+  final Color iconColor;
 
   DashboardItem({
     required this.title,
     required this.value,
     required this.icon,
+    required this.bgColor,
+    required this.iconColor,
   });
 }
 
@@ -23,6 +28,9 @@ class DashboardGrid extends StatelessWidget {
   final double titleFontSize;
   final double valueFontSize;
   final double detailFontSize;
+  final double paddingSize;
+  final DashboardGridType type;
+  final VoidCallback? onViewAll;
 
   const DashboardGrid({
     super.key,
@@ -33,16 +41,36 @@ class DashboardGrid extends StatelessWidget {
     this.titleFontSize = 18,
     this.valueFontSize = 60,
     this.detailFontSize = 14,
+    this.paddingSize = 20,
+    this.onViewAll,
+    this.type = DashboardGridType.none,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15, top: 16, right: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: bold18.copyWith(color: dark1)),
+          Container(
+            padding: const EdgeInsets.only(right: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(title, style: bold18.copyWith(color: dark1)),
+                if (type == DashboardGridType.basic) ...[
+                  GestureDetector(
+                    onTap: onViewAll,
+                    child: Text(
+                      'Lihat Laporan',
+                      style: regular14.copyWith(color: green1),
+                    ),
+                  ),
+                ]
+              ],
+            ),
+          ),
           const SizedBox(height: 10),
           GridView.count(
             crossAxisCount: crossAxisCount,
@@ -52,14 +80,16 @@ class DashboardGrid extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: items.map((item) {
               return SizedBox(
-                height: 30,
                 child: Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      side: BorderSide(
+                        color: dark1,
+                        width: 1,
+                      )),
+                  color: item.bgColor,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(paddingSize),
                     child: Stack(
                       children: [
                         Positioned(
@@ -81,7 +111,7 @@ class DashboardGrid extends StatelessWidget {
                             height: iconsWidth,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: green1,
+                              color: item.iconColor,
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
@@ -97,7 +127,7 @@ class DashboardGrid extends StatelessWidget {
                           ),
                         ),
                         Positioned(
-                          bottom: 20,
+                          bottom: 10,
                           left: 0,
                           child: Text(
                             item.title,
@@ -105,25 +135,25 @@ class DashboardGrid extends StatelessWidget {
                                 color: dark1, fontSize: titleFontSize),
                           ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const DetailScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Lihat detail',
-                              style: regular14.copyWith(
-                                  color: blue1, fontSize: detailFontSize),
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   bottom: 0,
+                        //   left: 0,
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //           builder: (context) => const DetailScreen(),
+                        //         ),
+                        //       );
+                        //     },
+                        //     child: Text(
+                        //       'Lihat detail',
+                        //       style: regular14.copyWith(
+                        //           color: blue1, fontSize: detailFontSize),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

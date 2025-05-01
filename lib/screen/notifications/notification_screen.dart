@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/header.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -6,8 +8,20 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Notification Page")),
-      body: const Center(child: Text("This is the Notification screen")),
+      appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80),
+          child: AppBar(
+            backgroundColor: white,
+            leadingWidth: 0,
+            titleSpacing: 0,
+            title: const Header(
+              headerType: HeaderType.back,
+              title: 'Menu Aplikasi',
+              greeting: 'Notifikasi',
+            ),
+          )),
+      body: const SafeArea(
+          child: Center(child: Text("This is the Notification screen"))),
     );
   }
 }
