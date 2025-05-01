@@ -393,6 +393,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () => context.push('/detail'),
                                 onItemTap: (context, report) =>
                                     context.push('/detail', extra: report),
+                                mode: NewestReportsMode.full,
+                                titleTextStyle: bold18.copyWith(color: dark1),
+                                reportTextStyle:
+                                    medium12.copyWith(color: dark1),
+                                timeTextStyle: regular12.copyWith(color: dark2),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -410,6 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) =>
                                     context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -426,6 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) =>
                                     context.push('/detail', extra: item),
+                                onViewAll: () => context.push('/detail'),
                               ),
                             ],
                           ),
