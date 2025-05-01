@@ -106,12 +106,18 @@ class NewestReports extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            report['time'] != null
-                                                ? DateFormat(
-                                                        'EEEE, d MMMM yyyy | HH:mm')
-                                                    .format(DateTime.parse(
-                                                        report['time']))
-                                                : 'Unknown Time',
+                                            () {
+                                              try {
+                                                return report['time'] != null
+                                                    ? DateFormat(
+                                                            'EEEE, d MMMM yyyy | HH:mm')
+                                                        .format(DateTime.parse(
+                                                            report['time']))
+                                                    : 'Unknown Time';
+                                              } catch (e) {
+                                                return 'Unknown Time';
+                                              }
+                                            }(),
                                             style: timeTextStyle,
                                           ),
                                         ],
