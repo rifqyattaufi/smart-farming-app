@@ -50,14 +50,11 @@ import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
-import 'package:smart_farming_app/service/auth_service.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
-
-final _authService = AuthService();
 
 final _router = GoRouter(
   initialLocation: '/splash',
