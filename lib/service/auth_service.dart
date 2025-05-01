@@ -9,7 +9,7 @@ class AuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/login');
+    final url = Uri.parse('$baseUrl/auth/login');
     try {
       final response = await http.post(
         url,
@@ -63,7 +63,7 @@ class AuthService {
 
   Future<bool> refreshToken() async {
     final refreshToken = await _secureStorage.read(key: 'refreshToken');
-    final url = Uri.parse('$baseUrl/refresh');
+    final url = Uri.parse('$baseUrl/auth/refresh');
 
     if (refreshToken == null) {
       return false;
@@ -75,13 +75,13 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
+        await _secureStorage.deleteAll();
         await _secureStorage.write(key: 'token', value: body['token']);
         await _secureStorage.write(
             key: 'refreshToken', value: body['refreshToken']);
         await _secureStorage.write(
             key: 'user', value: json.encode(body['data']));
       }
-
       return true;
     } catch (e) {
       return false;

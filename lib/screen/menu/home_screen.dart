@@ -106,7 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.house_outlined, color: green1),
                           title: const Text("Tambah Kebun"),
                           onTap: () {
-                            context.push('/tambah-kebun');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-kebun', extra: () {
+                              _fetchData();
+                            });
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),

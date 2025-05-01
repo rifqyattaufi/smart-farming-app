@@ -40,10 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response['status'] == true) {
-        // Navigate to the home screen if login is successful
         context.go('/home');
       } else {
-        // Show error message from the response
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'])),
         );

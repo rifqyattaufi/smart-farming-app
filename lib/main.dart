@@ -153,7 +153,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-kebun',
-      builder: (context, state) => const AddKebunScreen(),
+      builder: (context, state) {
+        final onKebunAdded = state.extra as VoidCallback?;
+        return AddKebunScreen(onKebunAdded: onKebunAdded);
+      },
     ),
     GoRoute(
       path: '/tambah-tanaman',
