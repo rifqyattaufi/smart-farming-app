@@ -33,6 +33,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
 
   File? _image;
   final picker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> _pickImage(BuildContext context) async {
     showModalBottomSheet(
@@ -113,6 +114,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
   }
 
   Future<void> _submitForm() async {
+    if (_isLoading) return;
+
     try {
       if (!_formKey.currentState!.validate()) return;
 
@@ -122,6 +125,10 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         );
         return;
       }
+
+      setState(() {
+        _isLoading = true;
+      });
 
       final imageUrl = await _imageService.uploadImage(_image!);
 
@@ -149,11 +156,19 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         );
         Navigator.pop(context);
       } else {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'])),
         );
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
@@ -294,6 +309,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                     backgroundColor: green1,
                     textStyle: semibold16,
                     textColor: white,
+                    isLoading: _isLoading,
                   ),
                   const SizedBox(height: 16),
                 ],

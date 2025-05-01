@@ -33,6 +33,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
   File? _image;
   final picker = ImagePicker();
   bool _isPickingImage = false;
+  bool _isLoading = false;
 
   Future<void> _pickImage(BuildContext context) async {
     if (_isPickingImage) return;
@@ -139,6 +140,10 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         return;
       }
 
+      setState(() {
+        _isLoading = true;
+      });
+
       final imageUrl = await _imageService.uploadImage(_image!);
 
       final data = {
@@ -165,11 +170,19 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         );
         Navigator.pop(context);
       } else {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'])),
         );
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
@@ -304,6 +317,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     backgroundColor: green1,
                     textStyle: semibold16,
                     textColor: white,
+                    isLoading: _isLoading,
                   ),
                   const SizedBox(height: 16),
                 ],

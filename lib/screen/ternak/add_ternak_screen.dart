@@ -124,6 +124,10 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
 
         Navigator.pop(context);
       } else {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response['message']),
@@ -131,6 +135,10 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         );
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Terjadi kesalahan: $e'),
