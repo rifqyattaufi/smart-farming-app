@@ -13,7 +13,7 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {

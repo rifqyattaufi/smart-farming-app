@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
 enum HeaderType { basic, menu, back }
 
 enum IconType { svg, image }
 
-class Header extends StatelessWidget {
+class Header extends StatefulWidget {
   final HeaderType headerType;
   final String? title;
   final String? greeting;
@@ -24,18 +26,47 @@ class Header extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    Widget buildLeadingIcon() {
-      final iconPath = leadingIconPath ?? 'assets/icons/goclub.svg';
-      final iconType = leadingIconType ?? IconType.svg;
+  State<Header> createState() => _HeaderState();
+}
 
-      if (iconType == IconType.svg) {
-        return SvgPicture.asset(iconPath);
-      } else {
-        return Image.asset(iconPath);
+class _HeaderState extends State<Header> {
+  final AuthService _authService = AuthService();
+  String? _title;
+  String? _greeting;
+  String? _profilePictureUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _title = widget.title;
+    _greeting = widget.greeting;
+
+    _authService.getUser().then((user) {
+      if (user != null) {
+        setState(() {
+          _greeting = 'Halo, ${user['name']} 👋';
+          _title = _getTitleBasedOnRole(user['role']);
+          _profilePictureUrl = user['avatar'];
+        });
       }
-    }
+    });
+  }
 
+  String _getTitleBasedOnRole(String role) {
+    switch (role) {
+      case 'pjawab':
+        return 'Penanggung Jawab RFC';
+      case 'inventor':
+        return 'Inventor';
+      case 'petugas':
+        return 'Petugas RFC';
+      default:
+        return 'Pengguna';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(color: white),
@@ -46,21 +77,20 @@ class Header extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (headerType == HeaderType.basic) ...[
-                Container(
-                  width: 40,
-                  height: 40,
-                  padding: const EdgeInsets.only(
-                      left: 8, right: 8, top: 8, bottom: 8),
-                  decoration: BoxDecoration(
-                    color: green2,
-                    borderRadius: BorderRadius.circular(20),
+              if (widget.headerType == HeaderType.basic) ...[
+                ClipOval(
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: ImageBuilder(
+                      url: _profilePictureUrl ?? 'assets/images/user.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  child: buildLeadingIcon(),
                 ),
                 const SizedBox(width: 12),
               ],
-              if (headerType == HeaderType.back) ...[
+              if (widget.headerType == HeaderType.back) ...[
                 Container(
                   width: 50,
                   height: 50,
@@ -79,7 +109,7 @@ class Header extends StatelessWidget {
               ],
               Container(
                 padding: EdgeInsets.only(
-                  left: headerType == HeaderType.back ? 0 : 16,
+                  left: widget.headerType == HeaderType.back ? 0 : 16,
                   right: 16,
                   top: 12,
                   bottom: 12,
@@ -88,12 +118,12 @@ class Header extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title ?? 'Penanggung Jawab RFC',
+                      _title ?? 'Penanggung Jawab RFC',
                       style: regular12.copyWith(color: dark1),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      greeting ?? 'Halo, Pak Dwi 👋',
+                      _greeting ?? 'Halo, Pak Dwi 👋',
                       style: semibold20.copyWith(color: dark1),
                     ),
                   ],
@@ -101,34 +131,24 @@ class Header extends StatelessWidget {
               ),
             ],
           ),
-          if (headerType == HeaderType.basic) ...[
-            Column(
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        context.push('/notifikasi');
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: green3,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: SvgPicture.asset(
-                          'assets/icons/bell.svg',
-                          colorFilter:
-                              ColorFilter.mode(green1, BlendMode.srcIn),
-                        ),
-                      ),
-                    ),
-                  ],
+          if (widget.headerType == HeaderType.basic) ...[
+            GestureDetector(
+              onTap: () {
+                context.push('/notifikasi');
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: green3,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
+                child: SvgPicture.asset(
+                  'assets/icons/bell.svg',
+                  colorFilter: ColorFilter.mode(green1, BlendMode.srcIn),
+                ),
+              ),
             ),
           ]
         ],

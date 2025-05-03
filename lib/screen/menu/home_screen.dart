@@ -182,7 +182,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.category_outlined, color: green1),
                           title: const Text("Tambah Komoditas"),
                           onTap: () {
-                            context.push('/tambah-komoditas-ternak');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-komoditas-ternak', extra: () {
+                              _fetchData();
+                            });
                           },
                         ),
                       ],
@@ -394,18 +398,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 12),
                               ListItem(
                                 title: 'Daftar Komoditas',
-                                items: const [
-                                  {
-                                    'name': 'Buah Melon',
-                                    'category': 'Melon',
-                                    'icon': 'assets/icons/goclub.svg',
-                                  },
-                                  {
-                                    'name': 'Buah Anggur',
-                                    'category': 'Anggur',
-                                    'icon': 'assets/icons/goclub.svg',
-                                  }
-                                ],
+                                items: (_perkebunanData?['daftarKomoditas']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((komoditas) => {
+                                          'name': komoditas['nama'],
+                                          'category': komoditas['JenisBudidaya']
+                                              ['nama'],
+                                          'icon': komoditas['gambar'],
+                                        })
+                                    .toList(),
                                 type: 'basic',
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
@@ -583,18 +585,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 12),
                               ListItem(
                                 title: 'Daftar Komoditas',
-                                items: const [
-                                  {
-                                    'name': 'Telur',
-                                    'category': 'Ayam',
-                                    'icon': 'assets/icons/goclub.svg',
-                                  },
-                                  {
-                                    'name': 'Daging',
-                                    'category': 'Ayam',
-                                    'icon': 'assets/icons/goclub.svg',
-                                  }
-                                ],
+                                items: (_peternakanData?['daftarKomoditas']
+                                            as List<dynamic>? ??
+                                        [])
+                                    .map((komoditas) => {
+                                          'name': komoditas['nama'],
+                                          'category': komoditas['JenisBudidaya']
+                                              ['nama'],
+                                          'icon': komoditas['gambar'],
+                                        })
+                                    .toList(),
                                 type: 'basic',
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
