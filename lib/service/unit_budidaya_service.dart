@@ -74,6 +74,79 @@ class UnitBudidayaService {
     }
   }
 
+  Future<Map<String, dynamic>> getUnitBudidayaSearch(
+      String search, String tipe) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/search/$search/$tipe');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': 'Data not found',
+          'data': [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getUnitBudidayaSearch(search, tipe);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getUnitBudidayaByTipe(String tipe) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/tipe/$tipe');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getUnitBudidayaByTipe(tipe);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> createUnitBudidaya(
       Map<String, dynamic> data) async {
     final resolvedToken = await _authService.getToken();

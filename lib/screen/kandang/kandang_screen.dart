@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -13,7 +14,60 @@ class KandangScreen extends StatefulWidget {
 }
 
 class _KandangScreenState extends State<KandangScreen> {
+  final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+
+  List<dynamic> _kandangList = [];
+  List<dynamic> _filteredKandangList = [];
+
   TextEditingController searchController = TextEditingController();
+
+  Future<void> _fetchData() async {
+    try {
+      final response =
+          await _unitBudidayaService.getUnitBudidayaByTipe('hewan');
+      setState(() {
+        _kandangList = response['data'];
+        _filteredKandangList = _kandangList;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _searchKandang(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredKandangList = _kandangList;
+      });
+    } else {
+      final response =
+          await _unitBudidayaService.getUnitBudidayaSearch(query, 'hewan');
+
+      if (response['status']) {
+        setState(() {
+          _filteredKandangList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error searching data: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,31 +118,25 @@ class _KandangScreenState extends State<KandangScreen> {
                     children: [
                       SearchField(
                         controller: searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        onChanged: _searchKandang,
                       ),
                     ],
                   ),
                 ),
                 ListItem(
                   title: 'Daftar Kandang',
-                  items: const [
-                    {
-                      'name': 'Kandang A',
-                      'category': 'Ayam',
-                      'icon': 'assets/icons/goclub.svg',
-                    },
-                    {
-                      'name': 'Kandang B',
-                      'category': 'Lele',
-                      'icon': 'assets/icons/goclub.svg',
-                    }
-                  ],
+                  items: _filteredKandangList
+                      .map((kandang) => {
+                            'name': kandang['nama'],
+                            'category': kandang['JenisBudidaya']['nama'],
+                            'icon': kandang['gambar'],
+                            'id': kandang['id'],
+                          })
+                      .toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
+                    final id = item['id'] ?? '';
+                    context.push('/detail-laporan/$id');
                   },
                 ),
               ],
