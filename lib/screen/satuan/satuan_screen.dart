@@ -17,6 +17,7 @@ class SatuanScreen extends StatefulWidget {
 class _SatuanScreenState extends State<SatuanScreen> {
   final SatuanService _satuanService = SatuanService();
   List<dynamic> satuanList = [];
+  List<dynamic> filteredSatuanList = [];
 
   final TextEditingController searchController = TextEditingController();
 
@@ -26,12 +27,33 @@ class _SatuanScreenState extends State<SatuanScreen> {
     _fetchSatuan();
   }
 
+  void _searchSatuan(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        filteredSatuanList = satuanList;
+      });
+    } else {
+      final response = await _satuanService.getSatuanSearch(query);
+
+      if (response['status'] == true) {
+        setState(() {
+          filteredSatuanList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
+
   Future<void> _fetchSatuan() async {
     final response = await _satuanService.getSatuan();
 
     if (response['status'] == true) {
       setState(() {
         satuanList = response['data'];
+        filteredSatuanList = satuanList;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,18 +111,16 @@ class _SatuanScreenState extends State<SatuanScreen> {
             children: [
               SearchField(
                 controller: searchController,
-                onChanged: (value) {
-                  setState(() {});
-                },
+                onChanged: _searchSatuan,
               ),
               const SizedBox(height: 12),
               Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.builder(
-                  itemCount: satuanList.length,
+                  itemCount: filteredSatuanList.length,
                   itemBuilder: (context, index) {
-                    final satuan = satuanList[index];
+                    final satuan = filteredSatuanList[index];
                     return UnitItem(
                       unitName: satuan['nama']!,
                       unitSymbol: satuan['lambang']!,

@@ -74,6 +74,44 @@ class SatuanService {
     }
   }
 
+  Future<Map<String, dynamic>> getSatuanSearch(String query) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/search/$query');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': 'Data not found',
+          'data': [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getSatuanSearch(query);
+      } else {
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> createSatuan(Map<String, dynamic> data) async {
     final resolvedToken = await _authService.getToken();
     final headers = {
