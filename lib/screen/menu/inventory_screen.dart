@@ -76,9 +76,9 @@ class InventoryScreen extends StatelessWidget {
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
                         leading: Icon(Icons.category_outlined, color: green1),
-                        title: const Text("Tambah Kategori Inventaris"),
+                        title: const Text("Kategori Inventaris"),
                         onTap: () {
-                          context.push('/tambah-kategori-inventaris');
+                          context.push('/kategori-inventaris');
                         },
                       ),
                     ],
@@ -152,7 +152,7 @@ class InventoryScreen extends StatelessWidget {
                       'category': 'Pupuk',
                       'image': 'assets/images/pupuk.jpg',
                       'person': 'Pak Budi',
-                      'date': '22 Apr 2025',
+                      'date': 'Senin, 22 Apr 2025',
                       'time': '10:45',
                     },
                     {

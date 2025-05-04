@@ -57,7 +57,7 @@ class RiwayatPemakaianScreen extends StatelessWidget {
                       'category': 'Pupuk',
                       'image': 'assets/images/pupuk.jpg',
                       'person': 'Pak Budi',
-                      'date': '22 Apr 2025',
+                      'date': 'Senin, 22 Apr 2025',
                       'time': '10:45',
                     },
                     {
@@ -84,7 +84,7 @@ class RiwayatPemakaianScreen extends StatelessWidget {
                       'category': 'Pupuk',
                       'image': 'assets/images/pupuk.jpg',
                       'person': 'Pak Budi',
-                      'date': '22 Apr 2025',
+                      'date': 'Senin, 22 Apr 2025',
                       'time': '10:45',
                     },
                     {
