@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
+import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -13,7 +15,60 @@ class TernakScreen extends StatefulWidget {
 }
 
 class _TernakScreenState extends State<TernakScreen> {
+  final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+
+  List<dynamic> _ternakList = [];
+  List<dynamic> _filteredTernakList = [];
+
   TextEditingController searchController = TextEditingController();
+
+  Future<void> _fetchData() async {
+    try {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaByTipe('hewan');
+      setState(() {
+        _ternakList = response['data'];
+        _filteredTernakList = _ternakList;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _searchTernak(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredTernakList = _ternakList;
+      });
+    } else {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaSearch(query, 'hewan');
+
+      if (response['status']) {
+        setState(() {
+          _filteredTernakList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error searching data: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +94,9 @@ class _TernakScreenState extends State<TernakScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-ternak');
+            context.push('/tambah-ternak',
+                extra: AddTernakScreen(
+                    isEdit: false, onTernakAdded: () => _fetchData()));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
@@ -64,27 +121,21 @@ class _TernakScreenState extends State<TernakScreen> {
                     children: [
                       SearchField(
                         controller: searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        onChanged: _searchTernak,
                       ),
                     ],
                   ),
                 ),
                 ListItem(
                   title: 'Daftar Jenis Ternak',
-                  items: const [
-                    {
-                      'name': 'Ayam',
-                      'category': 'Kandang A',
-                      'icon': 'assets/icons/goclub.svg',
-                    },
-                    {
-                      'name': 'Lele',
-                      'category': 'Kandang B',
-                      'icon': 'assets/icons/goclub.svg',
-                    }
-                  ],
+                  items: _filteredTernakList
+                      .map((ternak) => {
+                            'name': ternak['nama'],
+                            'icon': ternak['gambar'],
+                            'id': ternak['id'],
+                            'isActive': ternak['status'],
+                          })
+                      .toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
                     final name = item['name'] ?? '';

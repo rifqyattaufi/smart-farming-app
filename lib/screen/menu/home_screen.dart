@@ -166,10 +166,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-kandang', extra: AddKandangScreen(
-                              isEdit: false,
-                              onKandangAdded: _fetchData,
-                            ));
+                            context.push('/tambah-kandang',
+                                extra: AddKandangScreen(
+                                  isEdit: false,
+                                  onKandangAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -179,10 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-ternak', extra: AddTernakScreen(
-                              isEdit: false,
-                              onTernakAdded: _fetchData,
-                            ));
+                            context.push('/tambah-ternak',
+                                extra: AddTernakScreen(
+                                  isEdit: false,
+                                  onTernakAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -192,10 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-komoditas-ternak', extra: AddKomoditasTernakScreen(
-                              isEdit: false,
-                              onKomoditasAdded: _fetchData,
-                            ));
+                            context.push('/tambah-komoditas-ternak',
+                                extra: AddKomoditasTernakScreen(
+                                  isEdit: false,
+                                  onKomoditasAdded: _fetchData,
+                                ));
                           },
                         ),
                       ],
@@ -392,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         [])
                                     .map((tanaman) => {
                                           'name': tanaman['nama'],
-                                          'category': tanaman['tipe'],
+                                          'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
                                         })
                                     .toList(),
@@ -579,7 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         [])
                                     .map((tanaman) => {
                                           'name': tanaman['nama'],
-                                          'category': tanaman['tipe'],
+                                          'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
                                         })
                                     .toList(),
