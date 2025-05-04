@@ -3,16 +3,22 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/blank_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
+import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
+import 'package:smart_farming_app/screen/inventaris/detail_inventaris_screen.dart';
+import 'package:smart_farming_app/screen/inventaris/detail_pemakaian_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/riwayat_pemakaian_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/inventaris_screen.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/screen/kandang/detail_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kandang/kandang_screen.dart';
 import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
+import 'package:smart_farming_app/screen/kategory_inv/kategori_inv_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/screen/kebun/detail_kebun_screen.dart';
 import 'package:smart_farming_app/screen/kebun/kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
@@ -23,8 +29,19 @@ import 'package:smart_farming_app/screen/login/otp_screen.dart';
 import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
 import 'package:smart_farming_app/screen/menu/petugas/home_screen.dart';
+import 'package:smart_farming_app/screen/notifications/detail_notif_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_harian_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_mati_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_nutrisi_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_panen_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_jenis_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_harian_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_mati_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_nutrisi_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_panen_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_sakit_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_kematian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_khusus_ternak_screen.dart';
@@ -55,10 +72,13 @@ import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/screen/satuan/satuan_screen.dart';
 import 'package:smart_farming_app/screen/splash_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/tanaman/detail_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
+import 'package:smart_farming_app/screen/ternak/detail_ternak_screen.dart';
 import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
+import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
 
 void main() async {
@@ -140,8 +160,15 @@ final _router = GoRouter(
       builder: (context, state) => const PelaporanHarianTanamanScreen(),
     ),
     GoRoute(
+        path: '/detail-laporan-harian-tanaman',
+        builder: (context, state) => const DetailLaporanHarianScreen()),
+    GoRoute(
       path: '/pelaporan-harian-ternak',
       builder: (context, state) => const PelaporanHarianTernakScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-harian-ternak',
+      builder: (context, state) => const DetailLaporanHarianTernakScreen(),
     ),
     GoRoute(
       path: '/pelaporan-khusus-ternak',
@@ -156,32 +183,62 @@ final _router = GoRouter(
       builder: (context, state) => const PelaporanNutrisiTanamanScreen(),
     ),
     GoRoute(
+      path: '/detail-laporan-nutrisi-tanaman',
+      builder: (context, state) => const DetailLaporanNutrisiScreen(),
+    ),
+    GoRoute(
       path: '/pelaporan-nutrisi-ternak',
       builder: (context, state) => const PelaporanNutrisiTernakScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-nutrisi-ternak',
+      builder: (context, state) => const DetailLaporanNutrisiTernakScreen(),
     ),
     GoRoute(
       path: '/pelaporan-kematian-ternak',
       builder: (context, state) => const PelaporanKematianTernakScreen(),
     ),
     GoRoute(
+      path: '/detail-laporan-kematian-ternak',
+      builder: (context, state) => const DetailLaporanMatiTernakScreen(),
+    ),
+    GoRoute(
       path: '/pelaporan-tanaman-mati',
       builder: (context, state) => const PelaporanTanamanMatiScreen(),
     ),
     GoRoute(
+        path: '/detail-laporan-mati-tanaman',
+        builder: (context, state) => const DetailLaporanMatiScreen()),
+    GoRoute(
       path: '/pelaporan-panen-tanaman',
       builder: (context, state) => const PelaporanTanamanPanenScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-panen-tanaman',
+      builder: (context, state) => const DetailLaporanPanenScreen(),
     ),
     GoRoute(
       path: '/pelaporan-panen-ternak',
       builder: (context, state) => const PelaporanTernakPanenScreen(),
     ),
     GoRoute(
+        path: '/detail-laporan-panen-ternak',
+        builder: (context, state) => const DetailLaporanPanenTernakScreen()),
+    GoRoute(
       path: '/pelaporan-tanaman-sakit',
       builder: (context, state) => const PelaporanTanamanSakitScreen(),
     ),
     GoRoute(
+      path: '/detail-laporan-sakit-tanaman',
+      builder: (context, state) => const DetailLaporanSakitScreen(),
+    ),
+    GoRoute(
       path: '/pelaporan-ternak-sakit',
       builder: (context, state) => const PelaporanTernakSakitScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-sakit-ternak',
+      builder: (context, state) => const DetailLaporanSakitTernakScreen(),
     ),
     GoRoute(
       path: '/home-petugas',
@@ -228,6 +285,10 @@ final _router = GoRouter(
       builder: (context, state) => const AddKategoriInvScreen(),
     ),
     GoRoute(
+      path: '/kategori-inventaris',
+      builder: (context, state) => const KategoriInvScreen(),
+    ),
+    GoRoute(
       path: '/tambah-inventaris',
       builder: (context, state) => const AddInventarisScreen(),
     ),
@@ -262,12 +323,28 @@ final _router = GoRouter(
       builder: (context, state) => const InventarisScreen(),
     ),
     GoRoute(
+      path: '/detail-inventaris',
+      builder: (context, state) => const DetailInventarisScreen(),
+    ),
+    GoRoute(
+      path: '/detail-pemakaian-inventaris',
+      builder: (context, state) => const DetailPemakaianInventarisScreen(),
+    ),
+    GoRoute(
       path: '/manajemen-satuan',
       builder: (context, state) => const SatuanScreen(),
     ),
     GoRoute(
       path: '/manajemen-kebun',
       builder: (context, state) => const KebunScreen(),
+    ),
+    GoRoute(
+      path: '/detail-kebun',
+      builder: (context, state) => const DetailKebunScreen(),
+    ),
+    GoRoute(
+      path: '/detail-jenis-tanaman',
+      builder: (context, state) => const DetailTanamanScreen(),
     ),
     GoRoute(
       path: '/manajemen-jenis-tanaman',
@@ -278,6 +355,14 @@ final _router = GoRouter(
       builder: (context, state) => const KandangScreen(),
     ),
     GoRoute(
+      path: '/detail-kandang',
+      builder: (context, state) => const DetailKandangScreen(),
+    ),
+    GoRoute(
+      path: '/detail-ternak',
+      builder: (context, state) => const DetailTernakScreen(),
+    ),
+    GoRoute(
       path: '/manajemen-ternak',
       builder: (context, state) => const TernakScreen(),
     ),
@@ -286,8 +371,21 @@ final _router = GoRouter(
       builder: (context, state) => const NotificationScreen(),
     ),
     GoRoute(
+      path: '/detail-notifikasi',
+      builder: (context, state) {
+        final title = state.extra != null ? (state.extra as Map)['title'] : '';
+        final date = state.extra != null ? (state.extra as Map)['date'] : '';
+        final message = state.extra != null ? (state.extra as Map)['message'] : '';
+        return DetailNotifScreen(title: title, date: date, message: message);
+      },
+    ),
+    GoRoute(
       path: '/manajemen-pengguna',
       builder: (context, state) => const UsersScreen(),
+    ),
+    GoRoute(
+      path: '/detail-pengguna',
+      builder: (context, state) => const DetailUserScreen(),
     ),
     GoRoute(
       path: '/tambah-pengguna',
@@ -296,6 +394,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/laporan-hama',
       builder: (context, state) => const HamaScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-hama',
+      builder: (context, state) => const DetailHamaScreen(),
     ),
     GoRoute(
       path: '/pelaporan-hama',

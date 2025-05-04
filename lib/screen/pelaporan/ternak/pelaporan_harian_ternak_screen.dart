@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
-import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/radio_field.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
@@ -22,13 +21,8 @@ class _PelaporanHarianTernakScreenState
     extends State<PelaporanHarianTernakScreen> {
   String statusPakan = '';
   String statusKandang = '';
-  String statusNutrisi = '';
-  String statusPemberian = '';
-  String? selectedBahan;
-  String? selectedSatuan;
 
   File? _imageTernak;
-  File? _imageDosis;
   final picker = ImagePicker();
 
   Future<void> _pickImage(
@@ -73,7 +67,6 @@ class _PelaporanHarianTernakScreenState
   }
 
   final TextEditingController _catatanController = TextEditingController();
-  final TextEditingController _sizeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -151,16 +144,6 @@ class _PelaporanHarianTernakScreenState
                       });
                     },
                   ),
-                  RadioField(
-                    label: 'Dilakukan pemberian vaksin/vitamin/disinfektan?',
-                    selectedValue: statusNutrisi,
-                    options: const ['Ya', 'Tidak'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusNutrisi = value;
-                      });
-                    },
-                  ),
                   ImagePickerWidget(
                     label: "Unggah bukti kondisi ternak",
                     image: _imageTernak,
@@ -177,56 +160,6 @@ class _PelaporanHarianTernakScreenState
                       hint: "Keterangan",
                       controller: _catatanController,
                       maxLines: 10),
-                  if (statusNutrisi == 'Ya') ...[
-                    RadioField(
-                      label: 'Jenis Pemberian',
-                      selectedValue: statusPemberian,
-                      options: const ['Vitamin', 'Vaksin'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusPemberian = value;
-                        });
-                      },
-                    ),
-                    DropdownFieldWidget(
-                      label: "Nama bahan",
-                      hint: "Pilih jenis bahan",
-                      items: const ["Vaksin A", "Vaksin B", "Vaksin C"],
-                      selectedValue: selectedBahan,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedBahan = value;
-                        });
-                      },
-                    ),
-                    InputFieldWidget(
-                      label: "Jumlah/dosis",
-                      hint: "Contoh: 10",
-                      controller: _sizeController,
-                    ),
-                    DropdownFieldWidget(
-                      label: "Satuan dosis",
-                      hint: "Pilih satuan dosis",
-                      items: const ["ml", "gram", "liter"],
-                      selectedValue: selectedSatuan,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSatuan = value;
-                        });
-                      },
-                    ),
-                    ImagePickerWidget(
-                      label: "Unggah bukti pemberian dosis ke ternak",
-                      image: _imageDosis,
-                      onPickImage: (context) {
-                        _pickImage(context, (file) {
-                          setState(() {
-                            _imageDosis = file;
-                          });
-                        });
-                      },
-                    ),
-                  ],
                 ],
               ),
             ),
