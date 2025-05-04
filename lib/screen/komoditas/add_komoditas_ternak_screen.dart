@@ -13,9 +13,11 @@ import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
 class AddKomoditasTernakScreen extends StatefulWidget {
+  final bool isEdit;
   final VoidCallback? onKomoditasAdded;
 
-  const AddKomoditasTernakScreen({super.key, this.onKomoditasAdded});
+  const AddKomoditasTernakScreen(
+      {super.key, this.onKomoditasAdded, this.isEdit = false});
 
   @override
   _AddKomoditasTernakScreenState createState() =>

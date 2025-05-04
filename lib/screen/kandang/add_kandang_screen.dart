@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
@@ -15,7 +16,9 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddKandangScreen extends StatefulWidget {
   final VoidCallback? onKandangAdded;
-  const AddKandangScreen({super.key, this.onKandangAdded});
+  final bool isEdit;
+
+  const AddKandangScreen({super.key, this.onKandangAdded, this.isEdit = false});
 
   @override
   _AddKandangScreenState createState() => _AddKandangScreenState();
