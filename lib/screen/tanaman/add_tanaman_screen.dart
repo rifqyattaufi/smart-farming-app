@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -10,13 +11,23 @@ import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddTanamanScreen extends StatefulWidget {
-  const AddTanamanScreen({super.key});
+  final VoidCallback? onTanamanAdded;
+  final bool isEdit;
+
+  const AddTanamanScreen({
+    super.key,
+    this.onTanamanAdded,
+    this.isEdit = false,
+  });
 
   @override
   _AddTanamanScreenState createState() => _AddTanamanScreenState();
 }
 
 class _AddTanamanScreenState extends State<AddTanamanScreen> {
+  final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+
+  final _formKey = GlobalKey<FormState>();
   String? selectedLocation;
   String statusBudidaya = 'Budidaya';
 

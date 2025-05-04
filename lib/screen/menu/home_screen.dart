@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -125,7 +126,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.pets_outlined, color: green1),
                           title: const Text("Tambah Jenis Tanaman"),
                           onTap: () {
-                            context.push('/tambah-tanaman');
+                            context.push('/tambah-tanaman',
+                                extra: AddTanamanScreen(
+                                  isEdit: false,
+                                  onTanamanAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),

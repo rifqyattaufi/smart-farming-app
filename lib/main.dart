@@ -264,7 +264,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-tanaman',
-      builder: (context, state) => const AddTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/tambah-kandang',
@@ -375,7 +378,8 @@ final _router = GoRouter(
       builder: (context, state) {
         final title = state.extra != null ? (state.extra as Map)['title'] : '';
         final date = state.extra != null ? (state.extra as Map)['date'] : '';
-        final message = state.extra != null ? (state.extra as Map)['message'] : '';
+        final message =
+            state.extra != null ? (state.extra as Map)['message'] : '';
         return DetailNotifScreen(title: title, date: date, message: message);
       },
     ),
