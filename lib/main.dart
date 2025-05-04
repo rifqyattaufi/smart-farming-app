@@ -87,9 +87,7 @@ void main() async {
 }
 
 final _router = GoRouter(
-  // initialLocation: '/splash',
-  // initialLocation: '/detail-inventaris',
-  initialLocation: '/notifikasi',
+  initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     ShellRoute(
