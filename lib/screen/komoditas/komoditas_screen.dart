@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -14,6 +15,74 @@ class KomoditasScreen extends StatefulWidget {
 }
 
 class _KomoditasScreenState extends State<KomoditasScreen> {
+  final KomoditasService _komoditasService = KomoditasService();
+
+  List<dynamic> komoditasTernakList = [];
+  List<dynamic> komoditasTernakListFiltered = [];
+  List<dynamic> komoditasKebunList = [];
+  List<dynamic> komoditasKebunListFiltered = [];
+
+  Future<void> _fetchData() async {
+    final komoditasTernakResponse =
+        await _komoditasService.getKomoditasByTipe('hewan');
+    final komoditasKebunResponse =
+        await _komoditasService.getKomoditasByTipe('tumbuhan');
+    setState(() {
+      komoditasTernakList = komoditasTernakResponse['data'];
+      komoditasKebunList = komoditasKebunResponse['data'];
+      komoditasTernakListFiltered = komoditasTernakList;
+      komoditasKebunListFiltered = komoditasKebunList;
+    });
+  }
+
+  void _searchKomoditas(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        komoditasTernakListFiltered = komoditasTernakList;
+        komoditasKebunListFiltered = komoditasKebunList;
+      });
+    } else {
+      final komoditasTernakResponse =
+          await _komoditasService.getKomoditasSearch(query, 'hewan');
+      final komoditasKebunResponse =
+          await _komoditasService.getKomoditasSearch(query, 'tumbuhan');
+
+      if (komoditasTernakResponse['status']) {
+        setState(() {
+          komoditasTernakListFiltered = komoditasTernakResponse['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error searching data: ${komoditasTernakResponse['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      if (komoditasKebunResponse['status']) {
+        setState(() {
+          komoditasKebunListFiltered = komoditasKebunResponse['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error searching data: ${komoditasKebunResponse['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
   int selectedTab = 0;
   TextEditingController searchController = TextEditingController();
 
@@ -66,11 +135,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SearchField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
+                      controller: searchController,
+                      onChanged: _searchKomoditas),
                 ),
                 const SizedBox(height: 20),
                 CustomTabBar(
@@ -105,18 +171,14 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
       children: [
         ListItem(
           title: 'Daftar Komoditas',
-          items: const [
-            {
-              'name': 'Buah Melon',
-              'category': 'Melon',
-              'icon': 'assets/icons/goclub.svg',
-            },
-            {
-              'name': 'Buah Anggur',
-              'category': 'Anggur',
-              'icon': 'assets/icons/goclub.svg',
-            }
-          ],
+          items: komoditasKebunListFiltered
+              .map((komoditas) => {
+                    'name': komoditas['nama'],
+                    'category': komoditas['JenisBudidaya']['nama'],
+                    'icon': komoditas['gambar'],
+                    'id': komoditas['id'],
+                  })
+              .toList(),
           type: 'basic',
           onItemTap: (context, item) {
             final name = item['name'] ?? '';
@@ -132,18 +194,14 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
       children: [
         ListItem(
           title: 'Daftar Komoditas',
-          items: const [
-            {
-              'name': 'Telur',
-              'category': 'Ayam',
-              'icon': 'assets/icons/goclub.svg',
-            },
-            {
-              'name': 'Daging',
-              'category': 'Ayam',
-              'icon': 'assets/icons/goclub.svg',
-            }
-          ],
+          items: komoditasTernakListFiltered
+              .map((komoditas) => {
+                    'name': komoditas['nama'],
+                    'category': komoditas['JenisBudidaya']['nama'],
+                    'icon': komoditas['gambar'],
+                    'id': komoditas['id'],
+                  })
+              .toList(),
           type: 'basic',
           onItemTap: (context, item) {
             final name = item['name'] ?? '';
