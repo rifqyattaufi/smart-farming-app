@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 
-class BannerWidget extends StatelessWidget {
+class BannerWidget extends StatefulWidget {
   final String title;
   final String subtitle;
   final bool showDate;
@@ -13,6 +14,31 @@ class BannerWidget extends StatelessWidget {
     required this.subtitle,
     this.showDate = true,
   });
+
+  @override
+  State<BannerWidget> createState() => _BannerWidgetState();
+}
+
+class _BannerWidgetState extends State<BannerWidget> {
+  late Timer _timer;
+  late DateTime _currentTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      setState(() {
+        _currentTime = DateTime.now();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // Hentikan timer saat widget dihapus
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +54,18 @@ class BannerWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            widget.title,
             style: semibold20.copyWith(color: dark1),
           ),
           const SizedBox(height: 8),
           Text(
-            subtitle,
+            widget.subtitle,
             style: regular16.copyWith(color: dark1),
           ),
-          if (showDate) ...[
+          if (widget.showDate) ...[
             const SizedBox(height: 20),
             Text(
-              DateFormat('EEEE, dd MMMM yyyy HH:mm').format(DateTime.now()),
+              DateFormat('EEEE, dd MMMM yyyy HH:mm').format(_currentTime),
               style: regular14.copyWith(color: dark1),
             ),
           ]
