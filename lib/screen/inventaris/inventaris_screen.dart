@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/chip_filter.dart';
@@ -22,18 +23,54 @@ class _InventarisScreenState extends State<InventarisScreen> {
   String selectedHarvestCategory = 'Semua Hasil Panen';
 
   final List<Map<String, String>> items = [
-    {'name': 'Tanaman A', 'category': 'Bibit Tanaman'},
-    {'name': 'Tanaman B', 'category': 'Bibit Tanaman'},
-    {'name': 'Peralatan C', 'category': 'Peralatan'},
-    {'name': 'Peralatan D', 'category': 'Peralatan'},
-    {'name': 'Item E', 'category': 'Semua Item'},
+    {
+      'name': 'Tanaman A',
+      'category': 'Bibit Tanaman',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Tanaman B',
+      'category': 'Bibit Tanaman',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Peralatan C',
+      'category': 'Peralatan',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Peralatan D',
+      'category': 'Peralatan',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Item E',
+      'category': 'Semua Item',
+      'image': 'assets/images/rooftop.jpg'
+    },
   ];
 
   final List<Map<String, String>> harvestItems = [
-    {'name': 'Telur Ayam', 'category': 'Peternakan'},
-    {'name': 'Telur Ayam', 'category': 'Semua Hasil Panen'},
-    {'name': 'Buah Melon', 'category': 'Semua Hasil Panen'},
-    {'name': 'Buah Melon', 'category': 'Perkebunan'},
+    {
+      'name': 'Telur Ayam',
+      'category': 'Peternakan',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Telur Ayam',
+      'category': 'Semua Hasil Panen',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Buah Melon',
+      'category': 'Semua Hasil Panen',
+      'image': 'assets/images/rooftop.jpg'
+    },
+    {
+      'name': 'Buah Melon',
+      'category': 'Perkebunan',
+      'image': 'assets/images/rooftop.jpg'
+    },
   ];
 
   @override
@@ -148,11 +185,19 @@ class _InventarisScreenState extends State<InventarisScreen> {
         ),
         const SizedBox(height: 12),
         filteredItems.isEmpty
-            ? const Center(
+            ? Center(
                 child: Padding(
-                padding: EdgeInsets.all(20),
-                child:
-                    Text('Data Kosong', style: TextStyle(color: Colors.grey)),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/nodata.svg',
+                      height: 300,
+                    ),
+                    Text('Oops, Data Kosong!',
+                        style: bold20.copyWith(color: grey)),
+                  ],
+                ),
               ))
             : Column(
                 children: [
@@ -204,11 +249,19 @@ class _InventarisScreenState extends State<InventarisScreen> {
         ),
         const SizedBox(height: 12),
         filteredHarvestItems.isEmpty
-            ? const Center(
+            ? Center(
                 child: Padding(
-                padding: EdgeInsets.all(20),
-                child:
-                    Text('Data Kosong', style: TextStyle(color: Colors.grey)),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/nodata.svg',
+                      height: 300,
+                    ),
+                    Text('Oops, Data Kosong!',
+                        style: bold20.copyWith(color: grey)),
+                  ],
+                ),
               ))
             : Column(
                 children: [

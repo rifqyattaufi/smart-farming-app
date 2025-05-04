@@ -8,6 +8,7 @@ Color green4 = const Color(0xFFDBE4D6);
 
 Color yellow = const Color(0xFFFF9306);
 Color yellow1 = const Color(0xFFEEE3D4);
+Color yellow2 = const Color(0xFFFAC96C);
 Color grey = const Color(0xFFD9D9D9);
 
 Color dark1 = const Color(0xFF494953);

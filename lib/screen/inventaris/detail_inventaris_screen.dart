@@ -1,0 +1,197 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/button.dart';
+import 'package:smart_farming_app/widget/header.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:smart_farming_app/widget/list_items.dart';
+
+class DetailInventarisScreen extends StatefulWidget {
+  const DetailInventarisScreen({super.key});
+
+  @override
+  State<DetailInventarisScreen> createState() => _DetailInventarisScreenState();
+}
+
+class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: white,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          elevation: 0,
+          toolbarHeight: 80,
+          title: const Header(
+            headerType: HeaderType.back,
+            title: 'Manajemen Inventaris',
+            greeting: 'Detail Inventaris',
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DottedBorder(
+                    color: green1,
+                    strokeWidth: 1.5,
+                    dashPattern: const [6, 4],
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/images/pupuk.jpg',
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Informasi Inventaris",
+                          style: bold18.copyWith(color: dark1)),
+                      const SizedBox(height: 12),
+                      infoItem("Nama inventaris", "Pupuk A"),
+                      infoItem("Kategori inventaris", "Nutrisi Tanaman"),
+                      infoItem("Didaftarkan oleh", "Adi Santoso"),
+                      infoItem("Jumlah Stok", "20"),
+                      infoItem("Satuan", "Kg"),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Status inventaris",
+                                style: medium14.copyWith(color: dark1)),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: green2.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                'Tersedia',
+                                style: regular12.copyWith(color: green2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Kondisi inventaris",
+                                style: medium14.copyWith(color: dark1)),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: green2.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                'Baik',
+                                style: regular12.copyWith(color: green2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      infoItem(
+                          "Tanggal didaftarkan",
+                          DateFormat('EEEE, dd MMMM yyyy')
+                              .format(DateTime.now())),
+                      infoItem("Waktu didaftarkan",
+                          DateFormat('HH:mm').format(DateTime.now())),
+                      const SizedBox(height: 8),
+                      Text("Deskripsi inventaris",
+                          style: medium14.copyWith(color: dark1)),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Pupuk A adalah pupuk organik yang cocok digunakan untuk tanaman A.",
+                        style: regular14.copyWith(color: dark2),
+                      ),
+                    ],
+                  ),
+                ),
+                //statistik pemakaian inventaris
+                ListItem(
+                  title: 'Riwayat Pemakaian Inventaris',
+                  type: 'history',
+                  items: const [
+                    {
+                      'name': 'Pupuk NPK',
+                      'category': 'Pupuk',
+                      'image': 'assets/images/pupuk.jpg',
+                      'person': 'Pak Budi',
+                      'date': 'Senin, 22 Apr 2025',
+                      'time': '10:45',
+                    },
+                    {
+                      'name': 'Pupuk NPK',
+                      'category': 'Pupuk',
+                      'image': 'assets/images/pupuk.jpg',
+                      'person': 'Pak Budi',
+                      'date': 'Senin, 22 Apr 2025',
+                      'time': '10:45',
+                    },
+                  ],
+                  onItemTap: (context, item) {
+                    final name = item['name'] ?? '';
+                    context.push('/detail-laporan/$name');
+                  },
+                ),
+                const SizedBox(height: 80),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: CustomButton(
+          onPressed: () {},
+          buttonText: 'Ubah Data',
+          backgroundColor: yellow2,
+          textStyle: semibold16,
+          textColor: white,
+        ),
+      ),
+    );
+  }
+
+  Widget infoItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: medium14.copyWith(color: dark1)),
+          Text(value, style: regular14.copyWith(color: dark2)),
+        ],
+      ),
+    );
+  }
+}
