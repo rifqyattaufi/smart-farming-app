@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
@@ -109,9 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-kebun', extra: () {
-                              _fetchData();
-                            });
+                            context.push('/tambah-kebun',
+                                extra: AddKebunScreen(
+                                  isEdit: false,
+                                  onKebunAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -160,9 +166,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-kandang', extra: () {
-                              _fetchData();
-                            });
+                            context.push('/tambah-kandang',
+                                extra: AddKandangScreen(
+                                  isEdit: false,
+                                  onKandangAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -172,9 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-ternak', extra: () {
-                              _fetchData();
-                            });
+                            context.push('/tambah-ternak',
+                                extra: AddTernakScreen(
+                                  isEdit: false,
+                                  onTernakAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -184,9 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pop(context);
 
-                            context.push('/tambah-komoditas-ternak', extra: () {
-                              _fetchData();
-                            });
+                            context.push('/tambah-komoditas-ternak',
+                                extra: AddKomoditasTernakScreen(
+                                  isEdit: false,
+                                  onKomoditasAdded: _fetchData,
+                                ));
                           },
                         ),
                       ],
@@ -383,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         [])
                                     .map((tanaman) => {
                                           'name': tanaman['nama'],
-                                          'category': tanaman['tipe'],
+                                          'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
                                         })
                                     .toList(),
@@ -570,7 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         [])
                                     .map((tanaman) => {
                                           'name': tanaman['nama'],
-                                          'category': tanaman['tipe'],
+                                          'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
                                         })
                                     .toList(),

@@ -13,8 +13,9 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddTernakScreen extends StatefulWidget {
   final VoidCallback? onTernakAdded;
+  final bool isEdit;
 
-  const AddTernakScreen({super.key, this.onTernakAdded});
+  const AddTernakScreen({super.key, this.onTernakAdded, this.isEdit = false});
 
   @override
   _AddTernakScreenState createState() => _AddTernakScreenState();
@@ -138,7 +139,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Terjadi kesalahan: $e'),

@@ -14,8 +14,9 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddKebunScreen extends StatefulWidget {
   final VoidCallback? onKebunAdded;
+  final bool isEdit;
 
-  const AddKebunScreen({super.key, this.onKebunAdded});
+  const AddKebunScreen({super.key, this.onKebunAdded, this.isEdit = false});
 
   @override
   _AddKebunScreenState createState() => _AddKebunScreenState();

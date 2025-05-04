@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -93,7 +94,11 @@ class _KandangScreenState extends State<KandangScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-kandang');
+            context.push('/tambah-kandang',
+                extra: AddKandangScreen(
+                  isEdit: false,
+                  onKandangAdded: () => _fetchData(),
+                ));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(

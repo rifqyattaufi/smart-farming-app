@@ -260,8 +260,8 @@ final _router = GoRouter(
     GoRoute(
       path: '/tambah-kebun',
       builder: (context, state) {
-        final onKebunAdded = state.extra as VoidCallback?;
-        return AddKebunScreen(onKebunAdded: onKebunAdded);
+        final extra = state.extra as AddKebunScreen;
+        return extra;
       },
     ),
     GoRoute(
@@ -271,15 +271,15 @@ final _router = GoRouter(
     GoRoute(
       path: '/tambah-kandang',
       builder: (context, state) {
-        final onKandangAdded = state.extra as VoidCallback?;
-        return AddKandangScreen(onKandangAdded: onKandangAdded);
+        final extra = state.extra as AddKandangScreen;
+        return extra;
       },
     ),
     GoRoute(
       path: '/tambah-ternak',
       builder: (context, state) {
-        final onTernakAdded = state.extra as VoidCallback?;
-        return AddTernakScreen(onTernakAdded: onTernakAdded);
+        final extra = state.extra as AddTernakScreen;
+        return extra;
       },
     ),
     GoRoute(
@@ -308,8 +308,8 @@ final _router = GoRouter(
     GoRoute(
       path: '/tambah-komoditas-ternak',
       builder: (context, state) {
-        final onKomoditasAdded = state.extra as VoidCallback?;
-        return AddKomoditasTernakScreen(onKomoditasAdded: onKomoditasAdded);
+        final extra = state.extra as AddKomoditasTernakScreen;
+        return extra;
       },
     ),
     GoRoute(
