@@ -7,7 +7,7 @@
 <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <application
-        android:label="smart_farming_app"
+        android:label="FarmCenter"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
