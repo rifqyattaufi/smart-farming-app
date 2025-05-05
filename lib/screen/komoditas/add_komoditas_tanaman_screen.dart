@@ -9,7 +9,11 @@ import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
 class AddKomoditasTanamanScreen extends StatefulWidget {
-  const AddKomoditasTanamanScreen({super.key});
+  final VoidCallback? onKomoditasTanamanAdded;
+  final bool isEdit;
+
+  const AddKomoditasTanamanScreen(
+      {super.key, this.onKomoditasTanamanAdded, this.isEdit = false});
 
   @override
   _AddKomoditasTanamanScreenState createState() =>

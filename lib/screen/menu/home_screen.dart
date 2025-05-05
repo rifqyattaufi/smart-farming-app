@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
@@ -126,6 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.pets_outlined, color: green1),
                           title: const Text("Tambah Jenis Tanaman"),
                           onTap: () {
+                            Navigator.pop(context);
+
                             context.push('/tambah-tanaman',
                                 extra: AddTanamanScreen(
                                   isEdit: false,
@@ -138,7 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.category_outlined, color: green1),
                           title: const Text("Tambah Komoditas"),
                           onTap: () {
-                            context.push('/tambah-komoditas-tanaman');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-komoditas-tanaman',
+                                extra: AddKomoditasTanamanScreen(
+                                  isEdit: false,
+                                  onKomoditasTanamanAdded: _fetchData,
+                                ));
                           },
                         ),
                       ],

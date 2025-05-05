@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,13 +27,15 @@ class AddTanamanScreen extends StatefulWidget {
 
 class _AddTanamanScreenState extends State<AddTanamanScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+  final ImageService _imageService = ImageService();
 
   final _formKey = GlobalKey<FormState>();
   String? selectedLocation;
-  String statusBudidaya = 'Budidaya';
+  String statusBudidaya = 'Aktif';
 
   File? _imageTanaman;
   final picker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> _pickImageTanaman(BuildContext context) async {
     showModalBottomSheet(
@@ -78,6 +81,64 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
     );
   }
 
+  Future<void> _submitForm() async {
+    if (_isLoading) return;
+
+    try {
+      if (!_formKey.currentState!.validate()) return;
+
+      if (_imageTanaman == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gambar tanaman tidak boleh kosong')),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      final imageUrl = await _imageService.uploadImage(_imageTanaman!);
+
+      final data = {
+        'nama': _nameController.text,
+        'latin': _latinController.text,
+        'detail': _descriptionController.text,
+        'tipe': 'tumbuhan',
+        'gambar': imageUrl['data'],
+        'status': statusBudidaya == 'Aktif' ? 1 : 0,
+      };
+
+      final response = await _jenisBudidayaService.createJenisBudidaya(data);
+
+      if (response['status'] == true) {
+        if (widget.onTanamanAdded != null) {
+          widget.onTanamanAdded!();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Berhasil menambahkan jenis tanaman')),
+        );
+
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+      );
+    }
+  }
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _latinController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -102,51 +163,65 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
       ),
       body: SafeArea(
         child: ListView(children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InputFieldWidget(
-                  label: "Nama jenis tanaman",
-                  hint: "Contoh: Melon",
-                  controller: _nameController,
-                ),
-                InputFieldWidget(
-                    label: "Nama latin",
-                    hint: "Contoh: Melo melo",
-                    controller: _latinController),
-                RadioField(
-                  label: 'Status budidaya',
-                  selectedValue: statusBudidaya,
-                  options: const ['Budidaya', 'Tidak budidaya'],
-                  onChanged: (value) {
-                    setState(() {
-                      statusBudidaya = value;
-                    });
-                  },
-                ),
-                ImagePickerWidget(
-                  label: "Unggah gambar tanaman",
-                  image: _imageTanaman,
-                  onPickImage: _pickImageTanaman,
-                ),
-                InputFieldWidget(
-                    label: "Deskripsi tanaman",
-                    hint: "Keterangan",
-                    controller: _descriptionController,
-                    maxLines: 10),
-                const SizedBox(height: 16),
-                CustomButton(
-                  onPressed: () {
-                    // Your action here
-                  },
-                  backgroundColor: green1,
-                  textStyle: semibold16,
-                  textColor: white,
-                ),
-                const SizedBox(height: 16),
-              ],
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InputFieldWidget(
+                    label: "Nama jenis tanaman",
+                    hint: "Contoh: Melon",
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama jenis tanaman tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  InputFieldWidget(
+                      label: "Nama latin",
+                      hint: "Contoh: Melo melo",
+                      controller: _latinController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama latin tidak boleh kosong';
+                        }
+                        return null;
+                      }),
+                  RadioField(
+                    label: 'Status budidaya',
+                    selectedValue: statusBudidaya,
+                    options: const ['Aktif', 'Tidak aktif'],
+                    onChanged: (value) {
+                      setState(() {
+                        statusBudidaya = value;
+                      });
+                    },
+                  ),
+                  ImagePickerWidget(
+                    label: "Unggah gambar tanaman",
+                    image: _imageTanaman,
+                    onPickImage: _pickImageTanaman,
+                  ),
+                  InputFieldWidget(
+                      label: "Deskripsi tanaman",
+                      hint: "Keterangan",
+                      controller: _descriptionController,
+                      maxLines: 10),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    onPressed: _submitForm,
+                    backgroundColor: green1,
+                    textStyle: semibold16,
+                    textColor: white,
+                    isLoading: _isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ]),
