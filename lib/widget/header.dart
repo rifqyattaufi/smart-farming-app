@@ -41,15 +41,17 @@ class _HeaderState extends State<Header> {
     _title = widget.title;
     _greeting = widget.greeting;
 
-    _authService.getUser().then((user) {
-      if (user != null) {
-        setState(() {
-          _greeting = 'Halo, ${user['name']} 👋';
-          _title = _getTitleBasedOnRole(user['role']);
-          _profilePictureUrl = user['avatar'];
-        });
-      }
-    });
+    if (widget.title == null) {
+      _authService.getUser().then((user) {
+        if (user != null) {
+          setState(() {
+            _greeting = 'Halo, ${user['name']} 👋';
+            _title = _getTitleBasedOnRole(user['role']);
+            _profilePictureUrl = user['avatar'];
+          });
+        }
+      });
+    }
   }
 
   String _getTitleBasedOnRole(String role) {
