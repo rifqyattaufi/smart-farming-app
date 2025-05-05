@@ -5,7 +5,9 @@ import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 
 class DetailUserScreen extends StatefulWidget {
-  const DetailUserScreen({super.key});
+  final String? idUser;
+
+  const DetailUserScreen({super.key, this.idUser});
 
   @override
   State<DetailUserScreen> createState() => _DetailUserScreenState();

@@ -8,7 +8,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
 class DetailKebunScreen extends StatefulWidget {
-  const DetailKebunScreen({super.key});
+  final String? idKebun;
+
+  const DetailKebunScreen({super.key, this.idKebun});
 
   @override
   State<DetailKebunScreen> createState() => _DetailKebunScreenState();

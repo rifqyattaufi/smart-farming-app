@@ -5,7 +5,9 @@ import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class DetailLaporanPanenScreen extends StatelessWidget {
-  const DetailLaporanPanenScreen({super.key});
+  final String? idLaporanPanen;
+
+  const DetailLaporanPanenScreen({super.key, this.idLaporanPanen});
 
   @override
   Widget build(BuildContext context) {

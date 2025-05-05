@@ -387,6 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((kebun) => {
+                                          'id': kebun['id'],
                                           'name': kebun['nama'],
                                           'category': kebun['JenisBudidaya']
                                               ['nama'],
@@ -395,8 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-kebun/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-kebun'),

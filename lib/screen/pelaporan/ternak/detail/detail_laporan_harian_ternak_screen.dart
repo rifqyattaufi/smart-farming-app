@@ -5,7 +5,10 @@ import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class DetailLaporanHarianTernakScreen extends StatefulWidget {
-  const DetailLaporanHarianTernakScreen({super.key});
+  final String? idLaporanHarianTernak;
+
+  const DetailLaporanHarianTernakScreen(
+      {super.key, this.idLaporanHarianTernak});
 
   @override
   State<DetailLaporanHarianTernakScreen> createState() =>

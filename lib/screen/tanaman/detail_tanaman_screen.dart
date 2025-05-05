@@ -8,7 +8,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
 class DetailTanamanScreen extends StatefulWidget {
-  const DetailTanamanScreen({super.key});
+  final String? idTanaman;
+
+  const DetailTanamanScreen({super.key, this.idTanaman});
 
   @override
   State<DetailTanamanScreen> createState() => _DetailTanamanScreenState();

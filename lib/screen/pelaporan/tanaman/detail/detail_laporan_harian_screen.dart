@@ -7,7 +7,9 @@ import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:go_router/go_router.dart';
 
 class DetailLaporanHarianScreen extends StatefulWidget {
-  const DetailLaporanHarianScreen({super.key});
+  final String? idLaporanHarian;
+
+  const DetailLaporanHarianScreen({super.key, this.idLaporanHarian});
 
   @override
   State<DetailLaporanHarianScreen> createState() =>
