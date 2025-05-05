@@ -409,6 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((tanaman) => {
+                                          'id': tanaman['id'],
                                           'name': tanaman['nama'],
                                           'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
@@ -416,8 +417,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-tanaman/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-jenis-tanaman'),
@@ -429,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((komoditas) => {
+                                          'id': komoditas['id'],
                                           'name': komoditas['nama'],
                                           'category': komoditas['JenisBudidaya']
                                               ['nama'],
@@ -439,8 +441,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-komoditas/$id');
                                 },
                               ),
                             ],
@@ -550,6 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((aktivitas) => {
+                                          'id': aktivitas['id'],
                                           'text': aktivitas['judul'] ?? '-',
                                           'time': aktivitas['createdAt'],
                                           'icon':
@@ -559,8 +562,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/riwayat-aktivitas'),
                                 onItemTap: (context, item) {
-                                  final name = item['text'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-laporan/$id');
                                 },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
@@ -575,6 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((kandang) => {
+                                          'id': kandang['id'],
                                           'name': kandang['nama'],
                                           'category': kandang['JenisBudidaya']
                                               ['nama'],
@@ -583,8 +587,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-kandang/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-kandang'),
@@ -596,6 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((tanaman) => {
+                                          'id': tanaman['id'],
                                           'name': tanaman['nama'],
                                           'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
@@ -603,8 +608,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-ternak/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-ternak'),
@@ -616,6 +621,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((komoditas) => {
+                                          'id': komoditas['id'],
                                           'name': komoditas['nama'],
                                           'category': komoditas['JenisBudidaya']
                                               ['nama'],
@@ -626,8 +632,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-komoditas/$id');
                                 },
                               ),
                             ],
