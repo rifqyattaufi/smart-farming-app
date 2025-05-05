@@ -415,7 +415,7 @@ final _router = GoRouter(
           );
         }),
     GoRoute(
-      path: '/detail-jenis-tanaman/:id',
+      path: '/detail-tanaman/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'];
         return DetailTanamanScreen(

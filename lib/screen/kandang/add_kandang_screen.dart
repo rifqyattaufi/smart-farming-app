@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
@@ -17,8 +16,10 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 class AddKandangScreen extends StatefulWidget {
   final VoidCallback? onKandangAdded;
   final bool isEdit;
+  final String? idKandang;
 
-  const AddKandangScreen({super.key, this.onKandangAdded, this.isEdit = false});
+  const AddKandangScreen(
+      {super.key, this.onKandangAdded, this.isEdit = false, this.idKandang});
 
   @override
   _AddKandangScreenState createState() => _AddKandangScreenState();
@@ -104,16 +105,48 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
     }
   }
 
+  Future<void> _fetchKandang() async {
+    final response =
+        await _unitBudidayaService.getUnitBudidayaById(widget.idKandang ?? '');
+
+    if (response['status'] == true) {
+      final data = response['data']['unitBudidaya'];
+      setState(() {
+        _nameController.text = data['nama'] ?? '';
+        _locationController.text = data['lokasi'] ?? '';
+        _sizeController.text = data['luas']?.toString() ?? '';
+        _jumlahController.text = data['jumlah']?.toString() ?? '';
+        _descriptionController.text = data['deskripsi'] ?? '';
+        statusKandang = data['status'] == true ? 'Aktif' : 'Tidak aktif';
+        jenisPencatatan = data['tipe'] == 'individu' ? 'Individu' : 'Kolektif';
+        selectedJenisHewan = data['JenisBudidayaId'].toString();
+        imageUrl = {
+          'data': data['gambar'],
+        };
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response['message']),
+        ),
+      );
+    }
+  }
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _jumlahController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  Map<String, dynamic> imageUrl = {};
 
   @override
   void initState() {
     super.initState();
     _getJenisHewan();
+    if (widget.isEdit) {
+      _fetchKandang();
+    }
   }
 
   Future<void> _submitForm() async {
@@ -122,7 +155,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
     try {
       if (!_formKey.currentState!.validate()) return;
 
-      if (_image == null) {
+      if (_image == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Gambar kandang tidak boleh kosong')),
         );
@@ -133,7 +166,9 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         _isLoading = true;
       });
 
-      final imageUrl = await _imageService.uploadImage(_image!);
+      if (_image != null) {
+        imageUrl = await _imageService.uploadImage(_image!);
+      }
 
       final data = {
         'jenisBudidayaId': selectedJenisHewan,
@@ -147,7 +182,16 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         'gambar': imageUrl['data'],
       };
 
-      final response = await _unitBudidayaService.createUnitBudidaya(data);
+      print(data);
+
+      Map<String, dynamic>? response;
+
+      if (widget.isEdit) {
+        data['id'] = widget.idKandang;
+        response = await _unitBudidayaService.updateUnitBudidaya(data);
+      } else {
+        response = await _unitBudidayaService.createUnitBudidaya(data);
+      }
 
       if (response['status'] == true) {
         if (widget.onKandangAdded != null) {
@@ -171,7 +215,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       setState(() {
         _isLoading = false;
       });
-
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
@@ -256,6 +300,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                         )['id'];
                       });
                     },
+                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                       label: "Jumlah hewan ternak",

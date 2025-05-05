@@ -187,4 +187,45 @@ class UnitBudidayaService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> updateUnitBudidaya(
+      Map<String, dynamic> data) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json',
+    };
+    final url = Uri.parse('$baseUrl/${data['id']}');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await updateUnitBudidaya(data);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }

@@ -7,6 +7,7 @@ class DropdownFieldWidget extends StatelessWidget {
   final List<String> items;
   final String? selectedValue;
   final ValueChanged<String?> onChanged;
+  final bool isEdit;
 
   const DropdownFieldWidget({
     super.key,
@@ -15,6 +16,7 @@ class DropdownFieldWidget extends StatelessWidget {
     required this.items,
     required this.selectedValue,
     required this.onChanged,
+    this.isEdit = false,
   });
 
   @override
@@ -34,10 +36,13 @@ class DropdownFieldWidget extends StatelessWidget {
           value: valueToUse, // Use the corrected value
           decoration: InputDecoration(
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
             filled: true,
-            fillColor: Colors.grey[100],
+            fillColor: isEdit
+                ? Colors.grey[300]
+                : Colors.grey[100], // Change color if disabled
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
@@ -51,7 +56,7 @@ class DropdownFieldWidget extends StatelessWidget {
                     ),
                   ))
               .toList(),
-          onChanged: onChanged,
+          onChanged: isEdit ? null : onChanged, // Disable if isEdit is true
         ),
         const SizedBox(height: 12),
       ],
