@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
+import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -13,7 +15,60 @@ class TanamanScreen extends StatefulWidget {
 }
 
 class _TanamanScreenState extends State<TanamanScreen> {
+  final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+
+  List<dynamic> _tanamanList = [];
+  List<dynamic> _filteredTanamanList = [];
+
   TextEditingController searchController = TextEditingController();
+
+  Future<void> _fetchData() async {
+    try {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaByTipe('tumbuhan');
+      setState(() {
+        _tanamanList = response['data'];
+        _filteredTanamanList = _tanamanList;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _searchTanaman(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredTanamanList = _tanamanList;
+      });
+    } else {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaSearch(query, 'tumbuhan');
+
+      if (response['status']) {
+        setState(() {
+          _filteredTanamanList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error searching data: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +94,11 @@ class _TanamanScreenState extends State<TanamanScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-tanaman');
+            context.push('/tambah-tanaman',
+                extra: AddTanamanScreen(
+                  isEdit: false,
+                  onTanamanAdded: () => _fetchData(),
+                ));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
@@ -64,27 +123,21 @@ class _TanamanScreenState extends State<TanamanScreen> {
                     children: [
                       SearchField(
                         controller: searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        onChanged: _searchTanaman,
                       ),
                     ],
                   ),
                 ),
                 ListItem(
                   title: 'Daftar Jenis Tanaman',
-                  items: const [
-                    {
-                      'name': 'Melon',
-                      'category': 'Kebun A',
-                      'icon': 'assets/icons/goclub.svg',
-                    },
-                    {
-                      'name': 'Anggur',
-                      'category': 'Kebun B',
-                      'icon': 'assets/icons/goclub.svg',
-                    }
-                  ],
+                  items: _filteredTanamanList.map((item) {
+                    return {
+                      'name': item['nama'],
+                      'icon': item['gambar'],
+                      'id': item['id'],
+                      'isActive': item['status'],
+                    };
+                  }).toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
                     final name = item['name'] ?? '';
