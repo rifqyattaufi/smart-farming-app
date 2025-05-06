@@ -15,6 +15,10 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   int _selectedTabIndex = 0;
+  final List<String> tabList = [
+    'Perkebunan',
+    'Peternakan',
+  ];
   final PageController _pageController = PageController();
 
   void _onTabChanged(int index) {
@@ -48,10 +52,12 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Tabs(
               onTabChanged: _onTabChanged,
               selectedIndex: _selectedTabIndex,
+              tabTitles: tabList,
             ),
             Expanded(
               child: PageView(

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/widget/chart.dart';
+import 'package:smart_farming_app/widget/header.dart';
+import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:smart_farming_app/widget/tabs.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class HarvestStatsScreen extends StatefulWidget {
   const HarvestStatsScreen({super.key});
@@ -26,167 +32,274 @@ class _HarvestStatsScreenState extends State<HarvestStatsScreen> {
     }
   }
 
-  List<ChartData> telurData = [
-    ChartData('Apr', 18),
-    ChartData('Juni', 18),
-    ChartData('Agu', 20),
-    ChartData('Okt', 18),
-    ChartData('Des', 18),
-    ChartData('Feb', 20),
+  int _selectedTabIndex = 0;
+  final List<String> tabList = [
+    'Informasi',
+    'Laporan Panen',
+    'Laporan Harian',
+    'Laporan Sakit',
+    'Laporan Mati',
+    'Laporan Nutrisi',
   ];
+  final PageController _pageController = PageController();
 
-  List<ChartData> dagingData = [
-    ChartData('Feb', 3),
+  void _onTabChanged(int index) {
+    setState(() {
+      _selectedTabIndex = index;
+    });
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  // Definisikan tanggal pertama dan terakhir
+  DateTime firstDate = DateTime(2025, 1, 1);
+  DateTime lastDate = DateTime(2025, 1, 31);
+
+  // Data laporan (contoh data)
+  List<double> data = [
+    10,
+    15,
+    30,
+    25,
+    20,
+    35,
+    40,
+    50,
+    45,
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
           backgroundColor: white,
           leadingWidth: 0,
           elevation: 0,
-          titleSpacing: 0,title: const Text('Panen'))),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Total Hasil Panen\nPer Apr 2024 - Feb 2025'),
-                  IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: _openDatePicker,
-                  )
-                ],
-              ),
-              const SizedBox(height: 12),
-              const CustomStatCard(
-                value: '20',
-                label: 'Hasil Panen (Kg)',
-                icon: Icons.egg,
-              ),
-              const SizedBox(height: 24),
-              const Text('Statistik Hasil Panen Ayam - Komoditas Telur'),
-              CustomBarChart(data: telurData),
-              const SizedBox(height: 24),
-              const Text('Statistik Hasil Panen Ayam - Komoditas Daging'),
-              CustomBarChart(data: dagingData),
-              const SizedBox(height: 24),
-              const Text(
-                'Rangkuman Statistik',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                'Berdasarkan statistik pelaporan panen ayam komoditas telur menghasilkan rata-rata 18 butir telur yang ...',
-              ),
-            ],
-          ),
+          titleSpacing: 0,
+          toolbarHeight: 80,
+          title: const Header(
+              headerType: HeaderType.back,
+              title: 'Laporan Perkebunan',
+              greeting: 'Laporan Tanaman Melon'),
         ),
       ),
-    );
-  }
-}
-
-class CustomStatCard extends StatelessWidget {
-  final String value;
-  final String label;
-  final IconData icon;
-
-  const CustomStatCard({
-    super.key,
-    required this.value,
-    required this.label,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.green[50],
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Tabs(
+              onTabChanged: _onTabChanged,
+              selectedIndex: _selectedTabIndex,
+              tabTitles: tabList,
+            ),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(value, style: Theme.of(context).textTheme.displaySmall),
-                  Text(label),
-                ],
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _selectedTabIndex = index;
+                  });
+                },
+                children: [_buildTabContent()],
               ),
             ),
-            Icon(icon, size: 32, color: Colors.green[800])
           ],
         ),
       ),
     );
   }
-}
 
-class CustomBarChart extends StatelessWidget {
-  final List<ChartData> data;
+  Widget _buildTabContent() {
+    switch (_selectedTabIndex) {
+      case 0:
+        return _buildInfo();
+      case 1:
+        return _buildPanen();
+      case 2:
+        return _buildHarian();
+      case 3:
+        return _buildSakit();
+      case 4:
+        return _buildMati();
+      case 5:
+        return _buildNutrisi();
+      default:
+        return const Center(child: Text('Tab tidak dikenal'));
+    }
+  }
 
-  const CustomBarChart({super.key, required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: 25,
-          barTouchData: BarTouchData(enabled: true),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  int index = value.toInt();
-                  if (index >= 0 && index < data.length) {
-                    return Text(data[index].month);
-                  } else {
-                    return const Text('');
-                  }
-                },
+  Widget _buildInfo() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DottedBorder(
+              color: green1,
+              strokeWidth: 1.5,
+              dashPattern: const [6, 4],
+              borderType: BorderType.RRect,
+              radius: const Radius.circular(12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/rooftop.jpg',
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: true, interval: 5),
-            ),
-            topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          barGroups: data.asMap().entries.map((entry) {
-            int index = entry.key;
-            ChartData d = entry.value;
-            return BarChartGroupData(x: index, barRods: [
-              BarChartRodData(
-                  toY: d.value,
-                  color: Colors.green[700],
-                  width: 18,
-                  borderRadius: BorderRadius.circular(4)),
-            ]);
-          }).toList(),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Informasi Jenis Tanaman",
+                    style: bold18.copyWith(color: dark1)),
+                const SizedBox(height: 12),
+                infoItem("Nama jenis tanaman", "Melon"),
+                infoItem("Nama latin", "Fujisawa no melon"),
+                infoItem("Lokasi tanaman", "Kebun A"),
+                infoItem("Jumlah tanaman", "20 tanaman"),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Status tanaman",
+                          style: medium14.copyWith(color: dark1)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: green2.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          'Budidaya',
+                          style: regular12.copyWith(color: green2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                infoItem("Tanggal didaftarkan",
+                    DateFormat('EEEE, dd MMMM yyyy').format(DateTime.now())),
+                infoItem("Waktu didaftarkan",
+                    DateFormat('HH:mm').format(DateTime.now())),
+                const SizedBox(height: 8),
+                Text("Deskripsi tanaman",
+                    style: medium14.copyWith(color: dark1)),
+                const SizedBox(height: 8),
+                Text(
+                  "Tanaman ini digunakan untuk budidaya buah A.",
+                  style: regular14.copyWith(color: dark2),
+                ),
+              ],
+            ),
+          ),
+          ListItem(
+            title: 'Daftar Tanaman',
+            type: 'basic',
+            items: const [
+              {
+                'name': 'Melon #1',
+                'category': 'Kebun A',
+                'icon': 'assets/icons/goclub.svg',
+              },
+              {
+                'name': 'Melon #2',
+                'category': 'Kebun A',
+                'icon': 'assets/icons/goclub.svg',
+              },
+            ],
+            onItemTap: (context, item) {
+              final name = item['name'] ?? '';
+              context.push('/detail-laporan/$name');
+            },
+          ),
+          const SizedBox(height: 80),
+        ],
       ),
     );
   }
-}
 
-class ChartData {
-  final String month;
-  final double value;
+  Widget infoItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: medium14.copyWith(color: dark1)),
+          Text(value, style: regular14.copyWith(color: dark2)),
+        ],
+      ),
+    );
+  }
 
-  ChartData(this.month, this.value);
+  Widget _buildPanen() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [
+          ChartWidget(
+            firstDate: firstDate,
+            lastDate: lastDate,
+            data: data,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHarian() {
+    return const SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [Text("Halo")],
+      ),
+    );
+  }
+
+  Widget _buildSakit() {
+    return const SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [Text("Halo")],
+      ),
+    );
+  }
+
+  Widget _buildMati() {
+    return const SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [Text("Halo")],
+      ),
+    );
+  }
+
+  Widget _buildNutrisi() {
+    return const SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        children: [Text("Halo")],
+      ),
+    );
+  }
 }

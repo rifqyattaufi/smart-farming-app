@@ -52,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   int _selectedTabIndex = 0;
+  final List<String> tabList = [
+    'Perkebunan',
+    'Peternakan',
+  ];
   final PageController _pageController = PageController();
 
   String? selectedType;
@@ -221,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           : SafeArea(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const BannerWidget(
                     title:
@@ -232,6 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Tabs(
                     onTabChanged: _onTabChanged,
                     selectedIndex: _selectedTabIndex,
+                    tabTitles: tabList,
                   ),
                   const SizedBox(height: 12),
                   Expanded(

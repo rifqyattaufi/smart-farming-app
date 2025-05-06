@@ -17,6 +17,10 @@ class HomePetugasScreen extends StatefulWidget {
 
 class _HomePetugasScreenState extends State<HomePetugasScreen> {
   int _selectedTabIndex = 0;
+  final List<String> tabList = [
+    'Perkebunan',
+    'Peternakan',
+  ];
   final PageController _pageController = PageController();
 
   String? selectedType;
@@ -42,6 +46,7 @@ class _HomePetugasScreenState extends State<HomePetugasScreen> {
           title: const Header(headerType: HeaderType.basic)),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const BannerWidget(
               title: 'Kelola Perkebunan dan Peternakan dangen FarmCenter.',
@@ -52,6 +57,7 @@ class _HomePetugasScreenState extends State<HomePetugasScreen> {
             Tabs(
               onTabChanged: _onTabChanged,
               selectedIndex: _selectedTabIndex,
+              tabTitles: tabList,
             ),
             const SizedBox(height: 12),
             Expanded(

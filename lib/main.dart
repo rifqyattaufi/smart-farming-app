@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
+import 'package:smart_farming_app/screen/harvest_report.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
@@ -88,7 +89,9 @@ void main() async {
 
 final _router = GoRouter(
   initialLocation: '/splash',
+  // initialLocation: '/harvest',
   routes: [
+    GoRoute(path: '/harvest', builder: (context, state) => const HarvestStatsScreen()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
