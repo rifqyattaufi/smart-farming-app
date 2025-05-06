@@ -163,15 +163,25 @@ final _router = GoRouter(
       builder: (context, state) => const PelaporanHarianTanamanScreen(),
     ),
     GoRoute(
-        path: '/detail-laporan-harian-tanaman',
-        builder: (context, state) => const DetailLaporanHarianScreen()),
+        path: '/detail-laporan-harian-tanaman/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return DetailLaporanHarianScreen(
+            idLaporanHarian: id,
+          );
+        }),
     GoRoute(
       path: '/pelaporan-harian-ternak',
       builder: (context, state) => const PelaporanHarianTernakScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-harian-ternak',
-      builder: (context, state) => const DetailLaporanHarianTernakScreen(),
+      path: '/detail-laporan-harian-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanHarianTernakScreen(
+          idLaporanHarianTernak: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-khusus-ternak',
@@ -186,62 +196,104 @@ final _router = GoRouter(
       builder: (context, state) => const PelaporanNutrisiTanamanScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-nutrisi-tanaman',
-      builder: (context, state) => const DetailLaporanNutrisiScreen(),
+      path: '/detail-laporan-nutrisi-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanNutrisiScreen(
+          idLaporanNutrisi: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-nutrisi-ternak',
       builder: (context, state) => const PelaporanNutrisiTernakScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-nutrisi-ternak',
-      builder: (context, state) => const DetailLaporanNutrisiTernakScreen(),
+      path: '/detail-laporan-nutrisi-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanNutrisiTernakScreen(
+          idLaporanNutrisiTernak: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-kematian-ternak',
       builder: (context, state) => const PelaporanKematianTernakScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-kematian-ternak',
-      builder: (context, state) => const DetailLaporanMatiTernakScreen(),
+      path: '/detail-laporan-kematian-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanMatiTernakScreen(
+          idLaporanMatiTernak: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-tanaman-mati',
       builder: (context, state) => const PelaporanTanamanMatiScreen(),
     ),
     GoRoute(
-        path: '/detail-laporan-mati-tanaman',
-        builder: (context, state) => const DetailLaporanMatiScreen()),
+      path: '/detail-laporan-mati-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanMatiScreen(
+          idLaporanMati: id,
+        );
+      },
+    ),
     GoRoute(
       path: '/pelaporan-panen-tanaman',
       builder: (context, state) => const PelaporanTanamanPanenScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-panen-tanaman',
-      builder: (context, state) => const DetailLaporanPanenScreen(),
+      path: '/detail-laporan-panen-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanPanenScreen(
+          idLaporanPanen: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-panen-ternak',
       builder: (context, state) => const PelaporanTernakPanenScreen(),
     ),
     GoRoute(
-        path: '/detail-laporan-panen-ternak',
-        builder: (context, state) => const DetailLaporanPanenTernakScreen()),
+      path: '/detail-laporan-panen-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanPanenTernakScreen(
+          idLaporanPanenTernak: id,
+        );
+      },
+    ),
     GoRoute(
       path: '/pelaporan-tanaman-sakit',
       builder: (context, state) => const PelaporanTanamanSakitScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-sakit-tanaman',
-      builder: (context, state) => const DetailLaporanSakitScreen(),
+      path: '/detail-laporan-sakit-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanSakitScreen(
+          idLaporanSakit: id,
+        );
+      },
     ),
     GoRoute(
       path: '/pelaporan-ternak-sakit',
       builder: (context, state) => const PelaporanTernakSakitScreen(),
     ),
     GoRoute(
-      path: '/detail-laporan-sakit-ternak',
-      builder: (context, state) => const DetailLaporanSakitTernakScreen(),
+      path: '/detail-laporan-sakit-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailLaporanSakitTernakScreen(
+          idLaporanSakitTernak: id,
+        );
+      },
     ),
     GoRoute(
       path: '/home-petugas',
@@ -267,7 +319,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-tanaman',
-      builder: (context, state) => const AddTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/tambah-kandang',
@@ -315,7 +370,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-komoditas-tanaman',
-      builder: (context, state) => const AddKomoditasTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddKomoditasTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/riwayat-pemakaian-inventaris',
@@ -326,12 +384,22 @@ final _router = GoRouter(
       builder: (context, state) => const InventarisScreen(),
     ),
     GoRoute(
-      path: '/detail-inventaris',
-      builder: (context, state) => const DetailInventarisScreen(),
+      path: '/detail-inventaris/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailInventarisScreen(
+          idInventaris: id,
+        );
+      },
     ),
     GoRoute(
-      path: '/detail-pemakaian-inventaris',
-      builder: (context, state) => const DetailPemakaianInventarisScreen(),
+      path: '/detail-pemakaian-inventaris/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailPemakaianInventarisScreen(
+          idPemakaianInventaris: id,
+        );
+      },
     ),
     GoRoute(
       path: '/manajemen-satuan',
@@ -342,12 +410,21 @@ final _router = GoRouter(
       builder: (context, state) => const KebunScreen(),
     ),
     GoRoute(
-      path: '/detail-kebun',
-      builder: (context, state) => const DetailKebunScreen(),
-    ),
+        path: '/detail-kebun/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return DetailKebunScreen(
+            idKebun: id,
+          );
+        }),
     GoRoute(
-      path: '/detail-jenis-tanaman',
-      builder: (context, state) => const DetailTanamanScreen(),
+      path: '/detail-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailTanamanScreen(
+          idTanaman: id,
+        );
+      },
     ),
     GoRoute(
       path: '/manajemen-jenis-tanaman',
@@ -358,8 +435,26 @@ final _router = GoRouter(
       builder: (context, state) => const KandangScreen(),
     ),
     GoRoute(
+      path: '/detail-kandang/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailKandangScreen(
+          idKandang: id,
+        );
+      },
+    ),
+    GoRoute(
       path: '/detail-kandang',
       builder: (context, state) => const DetailKandangScreen(),
+    ),
+    GoRoute(
+      path: '/detail-ternak/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailTernakScreen(
+          idTernak: id,
+        );
+      },
     ),
     GoRoute(
       path: '/detail-ternak',
@@ -378,13 +473,23 @@ final _router = GoRouter(
       builder: (context, state) {
         final title = state.extra != null ? (state.extra as Map)['title'] : '';
         final date = state.extra != null ? (state.extra as Map)['date'] : '';
-        final message = state.extra != null ? (state.extra as Map)['message'] : '';
+        final message =
+            state.extra != null ? (state.extra as Map)['message'] : '';
         return DetailNotifScreen(title: title, date: date, message: message);
       },
     ),
     GoRoute(
       path: '/manajemen-pengguna',
       builder: (context, state) => const UsersScreen(),
+    ),
+    GoRoute(
+      path: '/detail-pengguna/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailUserScreen(
+          idUser: id,
+        );
+      },
     ),
     GoRoute(
       path: '/detail-pengguna',
@@ -397,6 +502,15 @@ final _router = GoRouter(
     GoRoute(
       path: '/laporan-hama',
       builder: (context, state) => const HamaScreen(),
+    ),
+    GoRoute(
+      path: '/detail-laporan-hama/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailHamaScreen(
+          idLaporanHama: id,
+        );
+      },
     ),
     GoRoute(
       path: '/detail-laporan-hama',

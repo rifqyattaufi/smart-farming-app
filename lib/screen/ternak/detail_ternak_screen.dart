@@ -8,7 +8,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
 class DetailTernakScreen extends StatefulWidget {
-  const DetailTernakScreen({super.key});
+  final String? idTernak;
+
+  const DetailTernakScreen({super.key, this.idTernak});
 
   @override
   State<DetailTernakScreen> createState() => _DetailTernakScreenState();

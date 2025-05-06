@@ -8,7 +8,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
 class DetailInventarisScreen extends StatefulWidget {
-  const DetailInventarisScreen({super.key});
+  final String? idInventaris;
+
+  const DetailInventarisScreen({super.key, this.idInventaris});
 
   @override
   State<DetailInventarisScreen> createState() => _DetailInventarisScreenState();

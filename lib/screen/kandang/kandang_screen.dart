@@ -141,7 +141,9 @@ class _KandangScreenState extends State<KandangScreen> {
                   type: 'basic',
                   onItemTap: (context, item) {
                     final id = item['id'] ?? '';
-                    context.push('/detail-laporan/$id');
+                    context.push('/detail-kandang/$id').then((_) {
+                      _fetchData();
+                    });
                   },
                 ),
               ],

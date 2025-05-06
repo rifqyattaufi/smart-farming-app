@@ -5,7 +5,9 @@ import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class DetailLaporanNutrisiTernakScreen extends StatelessWidget {
-  const DetailLaporanNutrisiTernakScreen({super.key});
+  final String? idLaporanNutrisiTernak;
+
+  const DetailLaporanNutrisiTernakScreen({super.key, this.idLaporanNutrisiTernak});
 
   @override
   Widget build(BuildContext context) {

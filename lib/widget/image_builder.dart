@@ -7,8 +7,15 @@ import 'package:http/http.dart' as http;
 class ImageBuilder extends StatelessWidget {
   final String url;
   final BoxFit fit;
+  final double? height;
+  final double? width;
 
-  const ImageBuilder({super.key, required this.url, required this.fit});
+  const ImageBuilder(
+      {super.key,
+      required this.url,
+      required this.fit,
+      this.height,
+      this.width});
 
   Future<String> _getContentType(String url) async {
     try {
@@ -47,6 +54,8 @@ class ImageBuilder extends StatelessWidget {
               Icons.broken_image,
               color: Colors.red,
             ),
+            height: height,
+            width: width,
           );
         } else {
           return Image.network(
@@ -62,6 +71,8 @@ class ImageBuilder extends StatelessWidget {
               Icons.broken_image,
               color: Colors.red,
             ),
+            height: height,
+            width: width,
           );
         }
       },

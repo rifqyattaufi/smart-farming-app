@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -129,7 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.pets_outlined, color: green1),
                           title: const Text("Tambah Jenis Tanaman"),
                           onTap: () {
-                            context.push('/tambah-tanaman');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-tanaman',
+                                extra: AddTanamanScreen(
+                                  isEdit: false,
+                                  onTanamanAdded: _fetchData,
+                                ));
                           },
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -137,7 +145,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.category_outlined, color: green1),
                           title: const Text("Tambah Komoditas"),
                           onTap: () {
-                            context.push('/tambah-komoditas-tanaman');
+                            Navigator.pop(context);
+
+                            context.push('/tambah-komoditas-tanaman',
+                                extra: AddKomoditasTanamanScreen(
+                                  isEdit: false,
+                                  onKomoditasTanamanAdded: _fetchData,
+                                ));
                           },
                         ),
                       ],
@@ -379,6 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((kebun) => {
+                                          'id': kebun['id'],
                                           'name': kebun['nama'],
                                           'category': kebun['JenisBudidaya']
                                               ['nama'],
@@ -387,8 +402,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-kebun/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-kebun'),
@@ -400,6 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((tanaman) => {
+                                          'id': tanaman['id'],
                                           'name': tanaman['nama'],
                                           'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
@@ -407,8 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-tanaman/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-jenis-tanaman'),
@@ -420,6 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((komoditas) => {
+                                          'id': komoditas['id'],
                                           'name': komoditas['nama'],
                                           'category': komoditas['JenisBudidaya']
                                               ['nama'],
@@ -430,8 +447,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-komoditas/$id');
                                 },
                               ),
                             ],
@@ -541,6 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((aktivitas) => {
+                                          'id': aktivitas['id'],
                                           'text': aktivitas['judul'] ?? '-',
                                           'time': aktivitas['createdAt'],
                                           'icon':
@@ -550,8 +568,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/riwayat-aktivitas'),
                                 onItemTap: (context, item) {
-                                  final name = item['text'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-laporan/$id');
                                 },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
@@ -566,6 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((kandang) => {
+                                          'id': kandang['id'],
                                           'name': kandang['nama'],
                                           'category': kandang['JenisBudidaya']
                                               ['nama'],
@@ -574,8 +593,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-kandang/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-kandang'),
@@ -587,6 +606,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((tanaman) => {
+                                          'id': tanaman['id'],
                                           'name': tanaman['nama'],
                                           'isActive': tanaman['status'],
                                           'icon': tanaman['gambar'],
@@ -594,8 +614,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toList(),
                                 type: 'basic',
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-ternak/$id');
                                 },
                                 onViewAll: () =>
                                     context.push('/manajemen-ternak'),
@@ -607,6 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             as List<dynamic>? ??
                                         [])
                                     .map((komoditas) => {
+                                          'id': komoditas['id'],
                                           'name': komoditas['nama'],
                                           'category': komoditas['JenisBudidaya']
                                               ['nama'],
@@ -617,8 +638,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onViewAll: () =>
                                     context.push('/manajemen-komoditas'),
                                 onItemTap: (context, item) {
-                                  final name = item['name'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  final id = item['id'] ?? '';
+                                  context.push('/detail-komoditas/$id');
                                 },
                               ),
                             ],

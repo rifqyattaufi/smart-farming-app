@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -13,7 +15,60 @@ class KebunScreen extends StatefulWidget {
 }
 
 class _KebunScreenState extends State<KebunScreen> {
+  final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+
+  List<dynamic> _kebunList = [];
+  List<dynamic> _filteredKebunList = [];
+
   TextEditingController searchController = TextEditingController();
+
+  Future<void> _fetchData() async {
+    try {
+      final response =
+          await _unitBudidayaService.getUnitBudidayaByTipe('tumbuhan');
+      setState(() {
+        _kebunList = response['data'];
+        _filteredKebunList = _kebunList;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _searchKebun(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredKebunList = _kebunList;
+      });
+    } else {
+      final response =
+          await _unitBudidayaService.getUnitBudidayaSearch(query, 'tumbuhan');
+
+      if (response['status']) {
+        setState(() {
+          _filteredKebunList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error searching data: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +94,11 @@ class _KebunScreenState extends State<KebunScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-kebun');
+            context.push('/tambah-kebun',
+                extra: AddKebunScreen(
+                  isEdit: false,
+                  onKebunAdded: () => _fetchData(),
+                ));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
@@ -64,31 +123,24 @@ class _KebunScreenState extends State<KebunScreen> {
                     children: [
                       SearchField(
                         controller: searchController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        onChanged: _searchKebun,
                       ),
                     ],
                   ),
                 ),
                 ListItem(
                   title: 'Daftar Kebun',
-                  items: const [
-                    {
-                      'name': 'Kebun A',
-                      'category': 'Melon',
-                      'icon': 'assets/icons/goclub.svg',
-                    },
-                    {
-                      'name': 'Kebun B',
-                      'category': 'Anggur',
-                      'icon': 'assets/icons/goclub.svg',
-                    }
-                  ],
+                  items: _filteredKebunList
+                      .map((kebun) => {
+                            'id': kebun['id'],
+                            'name': kebun['nama'],
+                            'category': kebun['JenisBudidaya']['nama'],
+                            'icon': kebun['gambar'],
+                          })
+                      .toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
+                    context.push('/detail-kebun');
                   },
                 ),
               ],
