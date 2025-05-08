@@ -4,9 +4,14 @@ import 'package:smart_farming_app/theme.dart';
 class Tabs extends StatefulWidget {
   final Function(int) onTabChanged;
   final int selectedIndex;
+  final List<String> tabTitles;
 
-  const Tabs(
-      {super.key, required this.onTabChanged, required this.selectedIndex});
+  const Tabs({
+    super.key,
+    required this.onTabChanged,
+    required this.selectedIndex,
+    required this.tabTitles,
+  });
 
   @override
   State<Tabs> createState() => _TabsState();
@@ -15,13 +20,13 @@ class Tabs extends StatefulWidget {
 class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 0),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
-        children: [
-          _tabItem(title: 'Perkebunan', index: 0),
-          _tabItem(title: 'Peternakan', index: 1),
-        ],
+        children: List.generate(widget.tabTitles.length, (index) {
+          return _tabItem(title: widget.tabTitles[index], index: index);
+        }),
       ),
     );
   }
@@ -32,10 +37,10 @@ class _TabsState extends State<Tabs> {
     return GestureDetector(
       onTap: () => widget.onTabChanged(index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        margin: const EdgeInsets.only(left: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: isActive ? green1 : Colors.white,
+          color: isActive ? green1 : white,
           borderRadius: BorderRadius.circular(100),
           border: isActive
               ? null
@@ -47,7 +52,7 @@ class _TabsState extends State<Tabs> {
         child: Text(
           title,
           style: semibold14.copyWith(
-            color: isActive ? Colors.white : green1,
+            color: isActive ? white : green1,
           ),
         ),
       ),

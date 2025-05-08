@@ -15,6 +15,10 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   int _selectedTabIndex = 0;
+  final List<String> tabList = [
+    'Perkebunan',
+    'Peternakan',
+  ];
   final PageController _pageController = PageController();
 
   void _onTabChanged(int index) {
@@ -48,10 +52,12 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Tabs(
               onTabChanged: _onTabChanged,
               selectedIndex: _selectedTabIndex,
+              tabTitles: tabList,
             ),
             Expanded(
               child: PageView(
@@ -112,17 +118,12 @@ class _ReportScreenState extends State<ReportScreen> {
                               'name': 'Melon',
                               'category': 'Kebun A',
                               'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Anggur',
-                              'category': 'Kebun B',
-                              'icon': 'assets/icons/goclub.svg',
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
+                          onItemTap: (BuildContext context,
+                              Map<String, dynamic> item) {
+                            context.push('/statistik-laporan-tanaman');
                           },
                         ),
                         const SizedBox(height: 12),
@@ -200,17 +201,12 @@ class _ReportScreenState extends State<ReportScreen> {
                               'name': 'Ayam',
                               'category': 'Kandang A',
                               'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Lele',
-                              'category': 'Kandang B',
-                              'icon': 'assets/icons/goclub.svg',
                             }
                           ],
                           type: 'basic',
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
+                          onItemTap: (BuildContext context,
+                              Map<String, dynamic> item) {
+                            context.push('/statistik-laporan-ternak');
                           },
                         ),
                       ],

@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
+import 'package:smart_farming_app/screen/statistik_tanaman_report.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
@@ -71,6 +72,7 @@ import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_scr
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/screen/satuan/satuan_screen.dart';
 import 'package:smart_farming_app/screen/splash_screen.dart';
+import 'package:smart_farming_app/screen/statistik_ternak_report.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/detail_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/tanaman_screen.dart';
@@ -307,6 +309,12 @@ final _router = GoRouter(
         return DetailLaporanScreen(name: name);
       },
     ),
+    GoRoute(
+        path: '/statistik-laporan-tanaman',
+        builder: (context, state) => const StatistikTanamanReport()),
+    GoRoute(
+        path: '/statistik-laporan-ternak',
+        builder: (context, state) => const StatistikTernakReport()),
     GoRoute(
       path: '/tambah-kebun',
       builder: (context, state) {
