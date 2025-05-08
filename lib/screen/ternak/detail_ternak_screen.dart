@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -192,7 +193,14 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                context.push('/tambah-ternak',
+                    extra: AddTernakScreen(
+                      isEdit: true,
+                      idTernak: widget.idTernak,
+                      onTernakAdded: () => _fetchData(),
+                    ));
+              },
               buttonText: 'Ubah Data',
               backgroundColor: yellow2,
               textStyle: semibold16,
@@ -220,7 +228,25 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                   ),
                 );
 
-                if (confirm == true) {}
+                if (confirm == true) {
+                  final response = await _jenisBudidayaService
+                      .deleteJenisBudidaya(widget.idTernak ?? '');
+                  if (response['status'] == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Berhasil menghapus data ternak'),
+                      ),
+                    );
+                    context.pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(response['message']),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               },
               buttonText: 'Hapus Data',
               backgroundColor: red,

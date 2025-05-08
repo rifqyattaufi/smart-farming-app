@@ -182,8 +182,6 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         'gambar': imageUrl['data'],
       };
 
-      print(data);
-
       Map<String, dynamic>? response;
 
       if (widget.isEdit) {
@@ -199,7 +197,13 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kandang berhasil ditambahkan')),
+          SnackBar(
+            content: Text(
+              widget.isEdit
+                  ? 'Kandang berhasil diperbarui'
+                  : 'Kandang berhasil ditambahkan',
+            ),
+          ),
         );
         Navigator.pop(context);
       } else {
@@ -215,7 +219,6 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       setState(() {
         _isLoading = false;
       });
-      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );

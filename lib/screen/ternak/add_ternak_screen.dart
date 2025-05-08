@@ -14,8 +14,10 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 class AddTernakScreen extends StatefulWidget {
   final VoidCallback? onTernakAdded;
   final bool isEdit;
+  final String? idTernak;
 
-  const AddTernakScreen({super.key, this.onTernakAdded, this.isEdit = false});
+  const AddTernakScreen(
+      {super.key, this.onTernakAdded, this.isEdit = false, this.idTernak});
 
   @override
   _AddTernakScreenState createState() => _AddTernakScreenState();
@@ -23,6 +25,7 @@ class AddTernakScreen extends StatefulWidget {
 
 class _AddTernakScreenState extends State<AddTernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+
   final ImageService _imageService = ImageService();
   final _formKey = GlobalKey<FormState>();
   String? selectedLocation;
@@ -79,6 +82,32 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _latinController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  Map<String, dynamic> _imageUrl = {};
+
+  Future<void> _fetchData() async {
+    final response =
+        await _jenisBudidayaService.getJenisBudidayaById(widget.idTernak!);
+
+    if (response['status'] == true) {
+      final data = response['data']['jenisBudidaya'];
+
+      setState(() {
+        _nameController.text = data['nama'];
+        _latinController.text = data['latin'];
+        statusTernak = data['status'] ? 'Aktif' : 'Tidak Aktif';
+        _descriptionController.text = data['detail'];
+        _imageUrl = {
+          'data': data['gambar'],
+        };
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response['message']),
+        ),
+      );
+    }
+  }
 
   Future<void> _submitForm() async {
     if (_isLoading) return;
@@ -86,7 +115,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
     try {
       if (!_formKey.currentState!.validate()) return;
 
-      if (_imageTernak == null) {
+      if (_imageTernak == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Gambar hewan ternak tidak boleh kosong'),
@@ -99,7 +128,9 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         _isLoading = true;
       });
 
-      final imageUrl = await _imageService.uploadImage(_imageTernak!);
+      if (_imageTernak != null) {
+        _imageUrl = await _imageService.uploadImage(_imageTernak!);
+      }
 
       final data = {
         "nama": _nameController.text,
@@ -107,22 +138,29 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         "tipe": "hewan",
         "status": statusTernak == 'Aktif',
         "detail": _descriptionController.text,
-        "gambar": imageUrl['data'],
+        "gambar": _imageUrl['data'],
       };
 
-      final response = await _jenisBudidayaService.createJenisBudidaya(data);
+      Map<String, dynamic> response;
+
+      if (widget.isEdit) {
+        data['id'] = widget.idTernak;
+        response = await _jenisBudidayaService.updateJenisBudidaya(data);
+      } else {
+        response = await _jenisBudidayaService.createJenisBudidaya(data);
+      }
 
       if (response['status'] == true) {
         if (widget.onTernakAdded != null) {
           widget.onTernakAdded!();
         }
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil menambahkan jenis hewan ternak'),
+          SnackBar(
+            content: Text(widget.isEdit
+                ? 'Berhasil memperbarui jenis hewan ternak'
+                : 'Berhasil menambahkan jenis hewan ternak'),
           ),
         );
-
         Navigator.pop(context);
       } else {
         setState(() {
@@ -145,6 +183,14 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           content: Text('Terjadi kesalahan: $e'),
         ),
       );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isEdit) {
+      _fetchData();
     }
   }
 
