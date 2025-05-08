@@ -10,6 +10,9 @@ class ChartWidget extends StatefulWidget {
   final DateTime firstDate;
   final DateTime lastDate;
   final List<double> data;
+  final int counter;
+  final bool showCounter;
+  final String textCounter;
 
   const ChartWidget({
     super.key,
@@ -18,6 +21,9 @@ class ChartWidget extends StatefulWidget {
     required this.firstDate,
     required this.lastDate,
     required this.data,
+    this.counter = 120,
+    this.showCounter = true,
+    this.textCounter = 'Hasil Panen (Kg)',
   });
 
   @override
@@ -26,10 +32,12 @@ class ChartWidget extends StatefulWidget {
 
 class _ChartWidgetState extends State<ChartWidget> {
   late List<String> xLabels;
+  late bool showCounter;
 
   @override
   void initState() {
     super.initState();
+    showCounter = widget.showCounter;
     generateXLabels();
   }
 
@@ -56,56 +64,162 @@ class _ChartWidgetState extends State<ChartWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (showCounter)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: bold18.copyWith(color: dark1),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Per ${DateFormat('d MMM').format(widget.firstDate)} - ${DateFormat('d MMM yyyy').format(widget.lastDate)}',
+                      style: regular14.copyWith(color: dark1),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {
+                    // open date picker
+                    showDateRangePicker(
+                      context: context,
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 365)),
+                      lastDate: DateTime.now(),
+                      initialDateRange: DateTimeRange(
+                        start: widget.firstDate,
+                        end: widget.lastDate,
+                      ),
+                    ).then((value) {
+                      if (value != null) {
+                        setState(() {
+                          // widget.firstDate = value.start;
+                          // widget.lastDate = value.end;
+                        });
+                        generateXLabels();
+                      }
+                    });
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/calendar.svg',
+                    width: 40,
+                  ),
+                ),
+              ],
+            ),
+          const SizedBox(height: 12),
+          if (showCounter) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 180,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: BorderSide(
+                          color: dark1,
+                          width: 1,
+                        )),
+                    color: green4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: Text(
+                              widget.counter.toString(),
+                              style: bold20.copyWith(
+                                color: dark1,
+                                fontSize: 60,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: green1,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: SvgPicture.asset(
+                                  'assets/icons/other.svg',
+                                  colorFilter: ColorFilter.mode(
+                                    white,
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            child: Text(
+                              widget.textCounter,
+                              style: semibold18.copyWith(
+                                  color: dark1, fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title,
-                    style: bold18.copyWith(color: dark1),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Per ${DateFormat('d MMM').format(widget.firstDate)} - ${DateFormat('d MMM yyyy').format(widget.lastDate)}',
-                    style: regular14.copyWith(color: dark1),
-                  ),
-                ],
+              Text(
+                widget.titleStats,
+                style: bold18.copyWith(color: dark1),
               ),
-              IconButton(
-                onPressed: () {
-                  // open date picker
-                  showDateRangePicker(
-                    context: context,
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now(),
-                    initialDateRange: DateTimeRange(
-                      start: widget.firstDate,
-                      end: widget.lastDate,
-                    ),
-                  ).then((value) {
-                    if (value != null) {
-                      setState(() {
-                        // widget.firstDate = value.start;
-                        // widget.lastDate = value.end;
-                      });
-                      generateXLabels();
-                    }
-                  });
-                },
-                icon: SvgPicture.asset(
-                  'assets/icons/calendar.svg',
-                  width: 40,
+              if (!showCounter) ...[
+                IconButton(
+                  onPressed: () {
+                    // open date picker
+                    showDateRangePicker(
+                      context: context,
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 365)),
+                      lastDate: DateTime.now(),
+                      initialDateRange: DateTimeRange(
+                        start: widget.firstDate,
+                        end: widget.lastDate,
+                      ),
+                    ).then((value) {
+                      if (value != null) {
+                        setState(() {
+                          // widget.firstDate = value.start;
+                          // widget.lastDate = value.end;
+                        });
+                        generateXLabels();
+                      }
+                    });
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/calendar.svg',
+                    width: 40,
+                  ),
                 ),
-              ),
+              ],
             ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            widget.titleStats,
-            style: bold16.copyWith(color: dark1),
           ),
           const SizedBox(height: 36),
           SizedBox(
