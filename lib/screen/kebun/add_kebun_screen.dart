@@ -15,8 +15,10 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 class AddKebunScreen extends StatefulWidget {
   final VoidCallback? onKebunAdded;
   final bool isEdit;
+  final String? idKebun;
 
-  const AddKebunScreen({super.key, this.onKebunAdded, this.isEdit = false});
+  const AddKebunScreen(
+      {super.key, this.onKebunAdded, this.isEdit = false, this.idKebun});
 
   @override
   _AddKebunScreenState createState() => _AddKebunScreenState();
@@ -121,20 +123,47 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _jumlahController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  Map<String, dynamic> imageUrl = {};
+
+  Future<void> _fetchKebun() async {
+    final response =
+        await _unitBudidayaService.getUnitBudidayaById(widget.idKebun!);
+
+    if (response['status'] == true) {
+      final data = response['data']['unitBudidaya'];
+      setState(() {
+        _nameController.text = data['nama'];
+        _locationController.text = data['lokasi'];
+        _sizeController.text = data['luas'].toString();
+        _jumlahController.text = data['jumlah'].toString();
+        statusKebun = data['status'] ? 'Aktif' : 'Tidak Aktif';
+        _descriptionController.text = data['deskripsi'];
+        selectedJenisTanaman = data['JenisBudidayaId'].toString();
+        imageUrl = {'data': data['gambar']};
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _getJenisTanaman();
+    if (widget.isEdit) {
+      _fetchKebun();
+    }
   }
 
   Future<void> _submitKebun() async {
-    try {
-      if (!_formKey.currentState!.validate()) {
-        return;
-      }
+    if (_isLoading) return;
 
-      if (_image == null) {
+    try {
+      if (!_formKey.currentState!.validate()) return;
+
+      if (_image == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Harap unggah gambar kebun')),
         );
@@ -145,7 +174,9 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         _isLoading = true;
       });
 
-      final imageUrl = await _imageService.uploadImage(_image!);
+      if (_image != null) {
+        imageUrl = await _imageService.uploadImage(_image!);
+      }
 
       final data = {
         'jenisBudidayaId': selectedJenisTanaman,
@@ -159,7 +190,14 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         'gambar': imageUrl['data'],
       };
 
-      final response = await _unitBudidayaService.createUnitBudidaya(data);
+      Map<String, dynamic> response;
+
+      if (widget.isEdit) {
+        data['id'] = widget.idKebun;
+        response = await _unitBudidayaService.updateUnitBudidaya(data);
+      } else {
+        response = await _unitBudidayaService.createUnitBudidaya(data);
+      }
 
       if (response['status'] == true) {
         if (widget.onKebunAdded != null) {
@@ -167,7 +205,10 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kebun berhasil ditambahkan')),
+          SnackBar(
+              content: Text(widget.isEdit
+                  ? 'Kebun berhasil diperbarui'
+                  : 'Kebun berhasil ditambahkan')),
         );
         Navigator.pop(context);
       } else {

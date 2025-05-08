@@ -46,6 +46,26 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
     }
   }
 
+  Future<void> _deleteData() async {
+    final response =
+        await _jenisBudidayaService.deleteJenisBudidaya(widget.idTernak ?? '');
+    if (response['status'] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Berhasil menghapus data ternak'),
+        ),
+      );
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response['message']),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -229,23 +249,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                 );
 
                 if (confirm == true) {
-                  final response = await _jenisBudidayaService
-                      .deleteJenisBudidaya(widget.idTernak ?? '');
-                  if (response['status'] == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Berhasil menghapus data ternak'),
-                      ),
-                    );
-                    context.pop();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(response['message']),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                  await _deleteData();
                 }
               },
               buttonText: 'Hapus Data',

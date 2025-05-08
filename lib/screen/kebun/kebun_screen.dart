@@ -140,7 +140,10 @@ class _KebunScreenState extends State<KebunScreen> {
                       .toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
-                    context.push('/detail-kebun');
+                    final id = item['id'] ?? '';
+                    context.push('/detail-kebun/$id').then((_) {
+                      _fetchData();
+                    });
                   },
                 ),
               ],

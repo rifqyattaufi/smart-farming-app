@@ -34,7 +34,6 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
         _ternakList = response['data']['objekBudidaya'];
       });
     } catch (e) {
-      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),
@@ -207,10 +206,6 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                               'id': ternak['id'],
                             })
                         .toList(),
-                    onItemTap: (context, item) {
-                      final name = item['name'] ?? '';
-                      context.push('/detail-laporan/$name');
-                    },
                   ),
                 const SizedBox(height: 80),
               ],
