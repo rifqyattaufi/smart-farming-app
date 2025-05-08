@@ -228,4 +228,35 @@ class UnitBudidayaService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> deleteUnitBudidaya(String id) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/$id');
+
+    try {
+      final response = await http.delete(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': 'success',
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await deleteUnitBudidaya(id);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }

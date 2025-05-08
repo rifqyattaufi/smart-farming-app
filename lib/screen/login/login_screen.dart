@@ -81,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         label: "Email pengguna",
                         hint: "Contoh: example@mail.com",
                         controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Email cannot be empty';
@@ -95,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         label: "Masukkan Password",
                         hint: "Contoh: password",
                         controller: _passwordController,
+                        keyboardType: TextInputType.visiblePassword,
                         obscureText: !_isPasswordVisible,
                         suffixIcon: Icon(
                           _isPasswordVisible

@@ -267,7 +267,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 title: 'Statistik Perkebunan Bulan Ini',
                                 type: DashboardGridType.basic,
                                 onViewAll: () {
-                                  context.push('/report');
+                                  context.push('/report').then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 items: [
                                   DashboardItem(
@@ -368,11 +370,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                               aktivitas['userAvatarUrl'] ?? '-',
                                         })
                                     .toList(),
-                                onViewAll: () =>
-                                    context.push('/riwayat-aktivitas'),
+                                onViewAll: () => context
+                                    .push('/riwayat-aktivitas')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                                 onItemTap: (context, item) {
                                   final name = item['text'] ?? '';
-                                  context.push('/detail-laporan/$name');
+                                  context
+                                      .push('/detail-laporan/$name')
+                                      .then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
@@ -397,10 +406,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-kebun/$id');
+                                  context.push('/detail-kebun/$id').then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 onViewAll: () =>
-                                    context.push('/manajemen-kebun'),
+                                    context.push('/manajemen-kebun').then((_) {
+                                  _fetchData();
+                                }),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -418,10 +431,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-tanaman/$id');
+                                  context.push('/detail-tanaman/$id').then((_) {
+                                    _fetchData();
+                                  });
                                 },
-                                onViewAll: () =>
-                                    context.push('/manajemen-jenis-tanaman'),
+                                onViewAll: () => context
+                                    .push('/manajemen-jenis-tanaman')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -438,11 +456,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onViewAll: () =>
-                                    context.push('/manajemen-komoditas'),
+                                onViewAll: () => context
+                                    .push('/manajemen-komoditas')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-komoditas/$id');
+                                  context
+                                      .push('/detail-komoditas/$id')
+                                      .then((_) {
+                                    _fetchData();
+                                  });
                                 },
                               ),
                             ],
@@ -457,7 +482,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 title: 'Statistik Peternakan Bulan Ini',
                                 type: DashboardGridType.basic,
                                 onViewAll: () {
-                                  context.push('/report');
+                                  context.push('/report').then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 items: [
                                   DashboardItem(
@@ -521,7 +548,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan rutin kondisi ternak setiap hari',
                                             onTap: () {
-                                              context.push('/pilih-kandang');
+                                              context
+                                                  .push('/pilih-kandang')
+                                                  .then((_) => _fetchData());
                                             },
                                           ),
                                         ),
@@ -535,8 +564,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan khusus kondisi ternak seperti sakit, mati, atau panen',
                                             onTap: () {
-                                              context.push(
-                                                  '/pelaporan-khusus-ternak');
+                                              context
+                                                  .push(
+                                                      '/pelaporan-khusus-ternak')
+                                                  .then((_) {
+                                                _fetchData();
+                                              });
                                             },
                                           ),
                                         ),
@@ -559,11 +592,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               aktivitas['userAvatarUrl'] ?? '-',
                                         })
                                     .toList(),
-                                onViewAll: () =>
-                                    context.push('/riwayat-aktivitas'),
+                                onViewAll: () => context
+                                    .push('/riwayat-aktivitas')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-laporan/$id');
+                                  context.push('/detail-laporan/$id').then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 mode: NewestReportsMode.full,
                                 titleTextStyle: bold18.copyWith(color: dark1),
@@ -588,10 +626,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-kandang/$id');
+                                  context.push('/detail-kandang/$id').then((_) {
+                                    _fetchData();
+                                  });
                                 },
-                                onViewAll: () =>
-                                    context.push('/manajemen-kandang'),
+                                onViewAll: () => context
+                                    .push('/manajemen-kandang')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -609,10 +652,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 type: 'basic',
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-ternak/$id');
+                                  context.push('/detail-ternak/$id').then((_) {
+                                    _fetchData();
+                                  });
                                 },
                                 onViewAll: () =>
-                                    context.push('/manajemen-ternak'),
+                                    context.push('/manajemen-ternak').then((_) {
+                                  _fetchData();
+                                }),
                               ),
                               const SizedBox(height: 12),
                               ListItem(
@@ -629,11 +676,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                         })
                                     .toList(),
                                 type: 'basic',
-                                onViewAll: () =>
-                                    context.push('/manajemen-komoditas'),
+                                onViewAll: () => context
+                                    .push('/manajemen-komoditas')
+                                    .then((_) {
+                                  _fetchData();
+                                }),
                                 onItemTap: (context, item) {
                                   final id = item['id'] ?? '';
-                                  context.push('/detail-komoditas/$id');
+                                  context
+                                      .push('/detail-komoditas/$id')
+                                      .then((_) {
+                                    _fetchData();
+                                  });
                                 },
                               ),
                             ],

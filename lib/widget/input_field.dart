@@ -11,6 +11,7 @@ class InputFieldWidget extends StatelessWidget {
   final VoidCallback? onSuffixIconTap;
   final bool obscureText;
   final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
 
   const InputFieldWidget({
     super.key,
@@ -23,6 +24,7 @@ class InputFieldWidget extends StatelessWidget {
     this.onSuffixIconTap,
     this.obscureText = false,
     this.validator,
+    this.keyboardType,
   });
 
   @override
@@ -36,6 +38,7 @@ class InputFieldWidget extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          keyboardType: keyboardType,
           obscureText: obscureText,
           maxLines: obscureText ? 1 : maxLines,
           validator: validator,

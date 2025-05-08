@@ -34,11 +34,40 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
         _ternakList = response['data']['objekBudidaya'];
       });
     } catch (e) {
-      setState(() {
-      });
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteData() async {
+    try {
+      final response =
+          await _unitBudidayaService.deleteUnitBudidaya(widget.idKandang ?? '');
+      if (response['status']) {
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data deleted successfully'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting data: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting data: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -191,19 +220,55 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
-        child: CustomButton(
-          onPressed: () {
-            context.push('/tambah-kandang',
-                extra: AddKandangScreen(
-                  isEdit: true,
-                  idKandang: widget.idKandang,
-                  onKandangAdded: () => _fetchData(),
-                ));
-          },
-          buttonText: 'Ubah Data',
-          backgroundColor: yellow2,
-          textStyle: semibold16,
-          textColor: white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomButton(
+              onPressed: () {
+                context.push('/tambah-kandang',
+                    extra: AddKandangScreen(
+                      isEdit: true,
+                      idKandang: widget.idKandang,
+                      onKandangAdded: () => _fetchData(),
+                    ));
+              },
+              buttonText: 'Ubah Data',
+              backgroundColor: yellow2,
+              textStyle: semibold16,
+              textColor: white,
+            ),
+            const SizedBox(height: 12), // Jarak antara tombol
+            CustomButton(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Konfirmasi'),
+                    content: const Text(
+                        'Apakah Anda yakin ingin menghapus kandang ini?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Hapus'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await _deleteData();
+                }
+              },
+              buttonText: 'Hapus Data',
+              backgroundColor: red,
+              textStyle: semibold16,
+              textColor: white,
+            ),
+          ],
         ),
       ),
     );
