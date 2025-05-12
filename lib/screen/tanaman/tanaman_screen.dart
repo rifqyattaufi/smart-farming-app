@@ -140,8 +140,10 @@ class _TanamanScreenState extends State<TanamanScreen> {
                   }).toList(),
                   type: 'basic',
                   onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
+                    final id = item['id'] ?? '';
+                    context.push('/detail-tanaman/$id').then((_) {
+                      _fetchData();
+                    });
                   },
                 ),
               ],

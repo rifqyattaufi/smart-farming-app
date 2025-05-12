@@ -33,10 +33,9 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
       setState(() {
         _ternak = response['data']['jenisBudidaya'];
         _kandangList = response['data']['unitBudidaya'];
-        _jumlahTernak = response['data']['jumlahTernak'] ?? 0;
+        _jumlahTernak = response['data']['jumlahBudidaya'] ?? 0;
       });
     } catch (e) {
-      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),

@@ -14,11 +14,13 @@ import 'package:smart_farming_app/widget/radio_field.dart';
 class AddTanamanScreen extends StatefulWidget {
   final VoidCallback? onTanamanAdded;
   final bool isEdit;
+  final String? idTanaman;
 
   const AddTanamanScreen({
     super.key,
     this.onTanamanAdded,
     this.isEdit = false,
+    this.idTanaman,
   });
 
   @override
@@ -87,7 +89,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
     try {
       if (!_formKey.currentState!.validate()) return;
 
-      if (_imageTanaman == null) {
+      if (_imageTanaman == null && widget.isEdit == false) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Gambar tanaman tidak boleh kosong')),
         );
@@ -98,18 +100,27 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         _isLoading = true;
       });
 
-      final imageUrl = await _imageService.uploadImage(_imageTanaman!);
+      if (_imageTanaman != null) {
+        _imageUrl = await _imageService.uploadImage(_imageTanaman!);
+      }
 
       final data = {
         'nama': _nameController.text,
         'latin': _latinController.text,
         'detail': _descriptionController.text,
         'tipe': 'tumbuhan',
-        'gambar': imageUrl['data'],
+        'gambar': _imageUrl?['data'],
         'status': statusBudidaya == 'Aktif' ? 1 : 0,
       };
 
-      final response = await _jenisBudidayaService.createJenisBudidaya(data);
+      Map<String, dynamic> response;
+
+      if (widget.isEdit) {
+        data['id'] = widget.idTanaman;
+        response = await _jenisBudidayaService.updateJenisBudidaya(data);
+      } else {
+        response = await _jenisBudidayaService.createJenisBudidaya(data);
+      }
 
       if (response['status'] == true) {
         if (widget.onTanamanAdded != null) {
@@ -117,9 +128,11 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Berhasil menambahkan jenis tanaman')),
+          SnackBar(
+              content: Text(widget.isEdit
+                  ? 'Berhasil memperbarui jenis tanaman'
+                  : 'Berhasil menambahkan jenis tanaman')),
         );
-
         Navigator.pop(context);
       } else {
         setState(() {
@@ -142,6 +155,36 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _latinController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  Map<String, dynamic>? _imageUrl;
+
+  Future<void> _fetchData() async {
+    final response =
+        await _jenisBudidayaService.getJenisBudidayaById(widget.idTanaman!);
+
+    if (response['status'] == true) {
+      final data = response['data']['jenisBudidaya'];
+
+      setState(() {
+        _nameController.text = data['nama'];
+        _latinController.text = data['latin'];
+        _descriptionController.text = data['detail'];
+        statusBudidaya = data['status'] ? 'Aktif' : 'Tidak aktif';
+        _imageUrl = {'data': data['gambar']};
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isEdit) {
+      _fetchData();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
