@@ -73,6 +73,12 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
           widget.onSatuanAdded!();
         }
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(widget.isUpdate
+                  ? 'Berhasil memperbarui data satuan'
+                  : 'Berhasil menambahkan data satuan')),
+        );
         Navigator.pop(context);
       } else {
         setState(() {
@@ -87,6 +93,9 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
       setState(() {
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+      );
     }
   }
 

@@ -53,9 +53,10 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
       };
 
       Map<String, dynamic>? response;
-      
+
       if (widget.isUpdate) {
-        response = await _kategoriInvService.updateKategoriInventaris(widget.id!, data);
+        response = await _kategoriInvService.updateKategoriInventaris(
+            widget.id!, data);
       } else {
         response = await _kategoriInvService.createKategoriInventaris(data);
       }
@@ -64,7 +65,12 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
         if (widget.onKategoriInvAdded != null) {
           widget.onKategoriInvAdded!();
         }
-
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(widget.isUpdate
+                  ? 'Berhasil memperbarui data kategori inventaris'
+                  : 'Berhasil menambahkan data kategori inventaris')),
+        );
         Navigator.pop(context);
       } else {
         setState(() {
@@ -79,6 +85,9 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
       setState(() {
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+      );
     }
   }
 
@@ -97,7 +106,9 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Kategori Inventaris',
-              greeting: widget.isUpdate ? 'Edit Kategori Inventaris' : 'Tambah Kategori Inventaris'),
+              greeting: widget.isUpdate
+                  ? 'Edit Kategori Inventaris'
+                  : 'Tambah Kategori Inventaris'),
         ),
       ),
       body: SafeArea(

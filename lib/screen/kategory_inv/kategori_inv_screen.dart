@@ -20,6 +20,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
   List<dynamic> filteredKategoriInvList = [];
 
   final TextEditingController searchController = TextEditingController();
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -49,6 +50,10 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
   }
 
   Future<void> _fetchKategoriInv() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final response = await _kategoriInvService.getKategoriInventaris();
 
     if (response['status'] == true) {
@@ -58,9 +63,15 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
+        SnackBar(
+            content:
+                Text(response['message']?.toString() ?? 'Terjadi kesalahan')),
       );
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -88,15 +99,13 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push(
-              '/tambah-kategori-inventaris',
-              extra: AddKategoriInvScreen(
-                isUpdate: false,
-                id: '',
-                nama: '',
-                onKategoriInvAdded: _fetchKategoriInv,
-              )
-            );
+            context.push('/tambah-kategori-inventaris',
+                extra: AddKategoriInvScreen(
+                  isUpdate: false,
+                  id: '',
+                  nama: '',
+                  onKategoriInvAdded: _fetchKategoriInv,
+                ));
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
@@ -119,62 +128,98 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
               Text('Daftar Kategori', style: bold18.copyWith(color: dark1)),
               const SizedBox(height: 12),
               Expanded(
-                child: ListView.builder(
-                  itemCount: filteredKategoriInvList.length,
-                  itemBuilder: (context, index) {
-                    final kategoriInv = filteredKategoriInvList[index];
-                    return UnitItem(
-                      unitName: kategoriInv['nama']!,
-                      onEdit: () {
-                        context.push(
-                          '/tambah-kategori-inventaris',
-                          extra: AddKategoriInvScreen(
-                            isUpdate: true,
-                            id: kategoriInv['id']!,
-                            nama: kategoriInv['nama']!,
-                            onKategoriInvAdded: _fetchKategoriInv,
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : filteredKategoriInvList.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Tidak ada data yang ditemukan',
+                              style: medium14.copyWith(color: dark2),
+                            ),
                           )
-                        );
-                      },
-                      onDelete: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Konfirmasi Hapus'),
-                                content: const Text(
-                                    'Apakah Anda yakin ingin menghapus kategori ini?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Batal'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final response = await _kategoriInvService
-                                          .deleteKategoriInventaris(
-                                              kategoriInv['id']!);
-                                      if (response['status'] == true) {
-                                        _fetchKategoriInv();
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(response['message']),
-                                        ));
-                                      }
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Hapus'),
-                                  ),
-                                ],
+                        : ListView.builder(
+                            itemCount: filteredKategoriInvList.length,
+                            itemBuilder: (context, index) {
+                              final kategoriInv =
+                                  filteredKategoriInvList[index];
+
+                              if (kategoriInv is! Map<String, dynamic>) {
+                                return const SizedBox();
+                              }
+
+                              return UnitItem(
+                                unitName: kategoriInv['nama']!,
+                                onEdit: () {
+                                  context.push('/tambah-kategori-inventaris',
+                                      extra: AddKategoriInvScreen(
+                                        isUpdate: true,
+                                        id: kategoriInv['id']!,
+                                        nama: kategoriInv['nama']!,
+                                        onKategoriInvAdded: _fetchKategoriInv,
+                                      ));
+                                },
+                                onDelete: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('Konfirmasi Hapus'),
+                                          content: const Text(
+                                              'Apakah Anda yakin ingin menghapus kategori ini?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('Batal'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                final response =
+                                                    await _kategoriInvService
+                                                        .deleteKategoriInventaris(
+                                                            kategoriInv['id']!);
+                                                if (response['status'] ==
+                                                    true) {
+                                                  setState(() {
+                                                    kategoriInvList.removeWhere(
+                                                        (item) =>
+                                                            item['id'] ==
+                                                            kategoriInv['id']);
+                                                    filteredKategoriInvList
+                                                        .removeWhere((item) =>
+                                                            item['id'] ==
+                                                            kategoriInv['id']);
+                                                  });
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Berhasil menghapus data kategori inventaris'),
+                                                      ),
+                                                    );
+                                                  }
+                                                  await _fetchKategoriInv();
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        response['message']),
+                                                  ));
+                                                }
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('Hapus'),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
                               );
-                            });
-                      },
-                    );
-                  },
-                ),
+                            },
+                          ),
               ),
             ],
           ),

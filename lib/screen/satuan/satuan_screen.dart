@@ -20,6 +20,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
   List<dynamic> filteredSatuanList = [];
 
   final TextEditingController searchController = TextEditingController();
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -48,6 +49,10 @@ class _SatuanScreenState extends State<SatuanScreen> {
   }
 
   Future<void> _fetchSatuan() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final response = await _satuanService.getSatuan();
 
     if (response['status'] == true) {
@@ -57,9 +62,15 @@ class _SatuanScreenState extends State<SatuanScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
+        SnackBar(
+            content:
+                Text(response['message']?.toString() ?? 'Terjadi kesalahan')),
       );
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -117,61 +128,99 @@ class _SatuanScreenState extends State<SatuanScreen> {
               Text('Daftar Satuan', style: bold18.copyWith(color: dark1)),
               const SizedBox(height: 12),
               Expanded(
-                child: ListView.builder(
-                  itemCount: filteredSatuanList.length,
-                  itemBuilder: (context, index) {
-                    final satuan = filteredSatuanList[index];
-                    return UnitItem(
-                      unitName: satuan['nama']!,
-                      unitSymbol: satuan['lambang']!,
-                      onEdit: () {
-                        context.push('/tambah-satuan',
-                            extra: AddSatuanScreen(
-                              isUpdate: true,
-                              id: satuan['id']!,
-                              nama: satuan['nama']!,
-                              lambang: satuan['lambang']!,
-                              onSatuanAdded: _fetchSatuan,
-                            ));
-                      },
-                      onDelete: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Konfirmasi Hapus'),
-                                content: const Text(
-                                    'Apakah Anda yakin ingin menghapus satuan ini?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Batal'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final response = await _satuanService
-                                          .deleteSatuan(satuan['id']!);
-                                      if (response['status'] == true) {
-                                        _fetchSatuan();
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(response['message']),
-                                        ));
-                                      }
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Hapus'),
-                                  ),
-                                ],
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : filteredSatuanList.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Tidak ada data yang ditemukan',
+                              style: medium14.copyWith(color: dark2),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredSatuanList.length,
+                            itemBuilder: (context, index) {
+                              final satuan = filteredSatuanList[index];
+
+                              if (satuan is! Map<String, dynamic>) {
+                                return const SizedBox();
+                              }
+
+                              return UnitItem(
+                                unitName: satuan['nama']!,
+                                unitSymbol: satuan['lambang']!,
+                                onEdit: () {
+                                  context.push('/tambah-satuan',
+                                      extra: AddSatuanScreen(
+                                        isUpdate: true,
+                                        id: satuan['id']!,
+                                        nama: satuan['nama']!,
+                                        lambang: satuan['lambang']!,
+                                        onSatuanAdded: _fetchSatuan,
+                                      ));
+                                },
+                                onDelete: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('Konfirmasi Hapus'),
+                                          content: const Text(
+                                              'Apakah Anda yakin ingin menghapus satuan ini?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('Batal'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                final response =
+                                                    await _satuanService
+                                                        .deleteSatuan(
+                                                            satuan['id']!);
+                                                if (response['status'] ==
+                                                    true) {
+                                                  setState(() {
+                                                    satuanList.removeWhere(
+                                                        (item) =>
+                                                            item['id'] ==
+                                                            satuan['id']);
+                                                    filteredSatuanList
+                                                        .removeWhere((item) =>
+                                                            item['id'] ==
+                                                            satuan['id']);
+                                                  });
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Berhasil menghapus data satuan'),
+                                                      ),
+                                                    );
+                                                  }
+                                                  await _fetchSatuan();
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        response['message']),
+                                                  ));
+                                                }
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('Hapus'),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
                               );
-                            });
-                      },
-                    );
-                  },
-                ),
+                            },
+                          ),
               ),
             ],
           ),
