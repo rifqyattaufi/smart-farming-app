@@ -1,11 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/theme.dart';
 
-class RiwayatPemakaianScreen extends StatelessWidget {
+class RiwayatPemakaianScreen extends StatefulWidget {
   const RiwayatPemakaianScreen({super.key});
+
+  @override
+  State<RiwayatPemakaianScreen> createState() => _RiwayatPemakaianScreenState();
+}
+
+class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
+  final InventarisService _inventarisService = InventarisService();
+
+  Map<String, dynamic>? _inventarisData;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInventarisData();
+  }
+
+  Future<void> _fetchInventarisData() async {
+    try {
+      final data = await _inventarisService.getRiwayatPenggunaanInventaris();
+      setState(() {
+        _inventarisData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,73 +71,65 @@ class RiwayatPemakaianScreen extends StatelessWidget {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListItem(
-                  title: 'Riwayat Pemakaian Terbaru',
-                  type: 'history',
-                  items: const [
-                    {
-                      'name': 'Pupuk NPK',
-                      'category': 'Pupuk',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Pak Budi',
-                      'date': 'Senin, 22 Apr 2025',
-                      'time': '10:45',
-                    },
-                    {
-                      'name': 'Disinfektan A',
-                      'category': 'Disinfektan',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Bu Sari',
-                      'date': '21 Apr 2025',
-                      'time': '14:30',
-                    },
-                  ],
-                  onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
-                  },
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListItem(
+                        title: 'Riwayat Pemakaian Terbaru',
+                        type: 'history',
+                        items: (_inventarisData?['daftarPemakaianTerbaru']
+                                    as List<dynamic>? ??
+                                [])
+                            .map((item) => {
+                                  'id': item['id'],
+                                  'name': item['inventarisNama'],
+                                  'image': item['laporanGambar'],
+                                  'person': item['petugasNama'],
+                                  'date': item['laporanTanggal'],
+                                  'time': item['laporanWaktu'],
+                                })
+                            .toList(),
+                        onItemTap: (context, item) {
+                          final name = item['name'] ?? '';
+                          context.push('/detail-laporan/$name');
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListItem(
+                        title: 'Semua Riwayat Pemakaian',
+                        type: 'history',
+                        items: (_inventarisData?['daftarPemakaian']
+                                    as List<dynamic>? ??
+                                [])
+                            .map((item) => {
+                                  'id': item['id'],
+                                  'name': item['inventarisNama'],
+                                  'image': item['laporanGambar'],
+                                  'person': item['petugasNama'],
+                                  'date': item['laporanTanggal'],
+                                  'time': item['laporanWaktu'],
+                                })
+                            .toList(),
+                        onItemTap: (context, item) {
+                          final name = item['name'] ?? '';
+                          context.push('/detail-laporan/$name');
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                ListItem(
-                  title: 'Semua Riwayat Pemakaian',
-                  type: 'history',
-                  items: const [
-                    {
-                      'name': 'Pupuk NPK',
-                      'category': 'Pupuk',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Pak Budi',
-                      'date': 'Senin, 22 Apr 2025',
-                      'time': '10:45',
-                    },
-                    {
-                      'name': 'Disinfektan A',
-                      'category': 'Disinfektan',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Bu Sari',
-                      'date': '21 Apr 2025',
-                      'time': '14:30',
-                    },
-                  ],
-                  onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

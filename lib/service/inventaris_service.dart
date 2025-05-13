@@ -28,6 +28,24 @@ class InventarisService {
           'Failed to load dashboard inventaris data ${response.statusCode}');
     }
   }
+  
+  Future<Map<String, dynamic>> getRiwayatPenggunaanInventaris() async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/riwayat-penggunaan-inventaris');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      return body['data'];
+    } else if (response.statusCode == 401) {
+      await _authService.refreshToken();
+      return await getRiwayatPenggunaanInventaris();
+    } else {
+      throw Exception(
+          'Failed to load dashboard inventaris data ${response.statusCode}');
+    }
+  }  
 
   Future<Map<String, dynamic>> getInventaris() async {
     final resolvedToken = await _authService.getToken();

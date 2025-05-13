@@ -206,15 +206,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   'time': item['laporanWaktu'],
                                 })
                             .toList(),
-                        // {
-                        //   'name': 'Pupuk NPK',
-                        //   'category': 'Pupuk',
-                        //   'image': 'assets/images/pupuk.jpg',
-                        //   'person': 'Pak Budi',
-                        //   'date': 'Senin, 22 Apr 2025',
-                        //   'time': '10:45',
-                        // },
-
                         onViewAll: () =>
                             context.push('/riwayat-pemakaian-inventaris'),
                         onItemTap: (context, item) {
