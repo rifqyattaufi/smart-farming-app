@@ -135,7 +135,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pilih-ternak',
-      builder: (context, state) => const PilihTernakScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PilihTernakScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/pilih-kebun',
@@ -147,7 +150,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pilih-kandang',
-      builder: (context, state) => const PilihKandangScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PilihKandangScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/pilih-komoditas',
@@ -171,7 +177,10 @@ final _router = GoRouter(
         }),
     GoRoute(
       path: '/pelaporan-harian-ternak',
-      builder: (context, state) => const PelaporanHarianTernakScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanHarianTernakScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-harian-ternak/:id',

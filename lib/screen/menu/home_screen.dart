@@ -4,6 +4,7 @@ import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
@@ -43,13 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _perkebunanData = perkebunanData;
         _peternakanData = peternakanData;
-        _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching data: $e');
+    } finally {
       setState(() {
         _isLoading = false;
       });
-      print('Error fetching data: $e');
     }
   }
 
@@ -554,9 +555,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan rutin kondisi ternak setiap hari',
                                             onTap: () {
-                                              context
-                                                  .push('/pilih-kandang')
-                                                  .then((_) => _fetchData());
+                                              context.push('/pilih-kandang',
+                                                  extra:
+                                                      const PilihKandangScreen(
+                                                    greeting:
+                                                        "Pelaporan Harian",
+                                                    tipe: "harian",
+                                                  ));
                                             },
                                           ),
                                         ),

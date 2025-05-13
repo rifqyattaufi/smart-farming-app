@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
 enum ListItemType { basic, simple }
 
 class ListItemSelectable extends StatefulWidget {
   final String? title;
-  final List<Map<String, String>> items;
+  final List<Map<String, dynamic>> items;
   final ListItemType type;
+
+  final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
 
   const ListItemSelectable({
     super.key,
     this.title,
     required this.items,
     this.type = ListItemType.basic,
+    this.onItemTap,
   });
 
   @override
@@ -104,7 +108,12 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
                 : cardContent;
 
             return GestureDetector(
-              onTap: () => _handleTap(index),
+              onTap: () {
+                if (widget.onItemTap != null) {
+                  widget.onItemTap!(context, item);
+                }
+                _handleTap(index);
+              },
               onLongPress: widget.type == ListItemType.basic
                   ? () => _handleLongPress(index)
                   : null,
@@ -119,7 +128,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
     );
   }
 
-  Widget _buildItemContent(Map<String, String> item, bool isSelected) {
+  Widget _buildItemContent(Map<String, dynamic> item, bool isSelected) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -129,7 +138,14 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
       ),
       child: Row(
         children: [
-          _buildImageOrIcon(item['icon']),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox(
+              width: 60,
+              height: 60,
+              child: ImageBuilder(url: item['icon'], fit: BoxFit.cover),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
