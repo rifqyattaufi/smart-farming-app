@@ -356,7 +356,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-inventaris',
-      builder: (context, state) => const AddInventarisScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddInventarisScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/tambah-satuan',

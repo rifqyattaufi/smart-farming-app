@@ -8,6 +8,26 @@ class InventarisService {
   final AuthService _authService = AuthService();
 
   final String baseUrl = '${dotenv.env['BASE_URL'] ?? ''}/inventaris';
+  final String dashboardUrl = 
+      '${dotenv.env['BASE_URL'] ?? ''}/dashboard/inventaris';
+  
+  Future<Map<String, dynamic>> getDashboardInventaris() async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse(dashboardUrl);
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      return body['data'];
+    } else if (response.statusCode == 401) {
+      await _authService.refreshToken();
+      return await getDashboardInventaris();
+    } else {
+      throw Exception(
+          'Failed to load dashboard inventaris data ${response.statusCode}');
+    }
+  }
 
   Future<Map<String, dynamic>> getInventaris() async {
     final resolvedToken = await _authService.getToken();

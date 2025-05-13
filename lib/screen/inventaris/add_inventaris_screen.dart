@@ -144,6 +144,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         _nameController.text = data['nama'] ?? '';
         selectedLocation = data['kategoriInventarisId'] ?? '';
         _sizeController.text = data['jumlah']?.toString() ?? '';
+        _minimController.text = data['stokMinim'].toString() ?? '';
         selectedSatuan = data['satuanId'] ?? '';
         kondisiInv = data['kondisi'] ?? 'Baik';
         ketersediaanInv = data['ketersediaan'] ?? 'Tersedia';
@@ -161,6 +162,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
+  final TextEditingController _minimController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   Map<String, dynamic> imageUrl = {};
@@ -210,6 +212,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         'kategoriInventarisId': selectedLocation,
         'jumlah': _sizeController.text,
         'satuanId': selectedSatuan,
+        'stokMinim': _minimController.text,
         'tanggalKadaluwarsa': _mysqlDateTime,
         'kondisi': kondisiInv,
         'ketersediaan': ketersediaanInv,
@@ -327,6 +330,19 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         }
                         if (int.tryParse(value) == null) {
                           return 'Jumlah stok harus berupa angka';
+                        }
+                        return null;
+                      }),
+                  InputFieldWidget(
+                      label: "Stok minim (untuk perhitungan stok rendah)",
+                      hint: "Contoh: 5",
+                      controller: _minimController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Stok minimal tidak boleh kosong';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Stok minimal harus berupa angka';
                         }
                         return null;
                       }),
