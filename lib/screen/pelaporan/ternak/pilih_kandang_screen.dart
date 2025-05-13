@@ -29,7 +29,8 @@ class PilihKandangScreen extends StatefulWidget {
 class _PilihKandangScreenState extends State<PilihKandangScreen> {
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
   List<dynamic> _listKandang = [];
-  String? _selectedUnitBudidaya; // Local state to store the selected kandang
+  Map<String, dynamic>?
+      _selectedUnitBudidaya;
 
   Future<void> _fetchData() async {
     try {
@@ -97,7 +98,7 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                   .toList(),
               onItemTap: (context, item) {
                 setState(() {
-                  _selectedUnitBudidaya = item['id']; // Update local state
+                  _selectedUnitBudidaya = item; // Update local state
                 });
               },
             ),
