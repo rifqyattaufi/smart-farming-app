@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -129,6 +130,23 @@ class _PelaporanKematianTernakScreenState
                     label: "Tanggal & waktu kematian",
                     hint: "Contoh: Senin, 17 Februari 2025 10:00",
                     controller: _dateController,
+                    suffixIcon: const Icon(Icons.calendar_today),
+                    onSuffixIconTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      ).then((pickedDate) {
+                        if (pickedDate != null) {
+                          setState(() {
+                            _dateController.text =
+                                DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                    .format(pickedDate);
+                          });
+                        }
+                      });
+                    },
                   ),
                   InputFieldWidget(
                     label: "Penyebab kematian",
