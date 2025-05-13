@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:smart_farming_app/service/image_service.dart';
+import 'package:smart_farming_app/service/inventaris_service.dart';
+import 'package:smart_farming_app/service/kategori_inv_service.dart';
+import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'dart:io';
 
@@ -11,20 +16,40 @@ import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddInventarisScreen extends StatefulWidget {
-  const AddInventarisScreen({super.key});
+  final VoidCallback? onInventarisAdded;
+  final bool isEdit;
+  final String? idInventaris;
+
+  const AddInventarisScreen({
+    super.key,
+    this.onInventarisAdded,
+    this.isEdit = false,
+    this.idInventaris,
+  });
 
   @override
   _AddInventarisScreenState createState() => _AddInventarisScreenState();
 }
 
 class _AddInventarisScreenState extends State<AddInventarisScreen> {
+  final InventarisService _inventarisService = InventarisService();
+  final KategoriInvService _kategoriInvService = KategoriInvService();
+  final SatuanService _satuanService = SatuanService();
+  final _imageService = ImageService();
+  final _formKey = GlobalKey<FormState>();
+
+  String? _mysqlDateTime;
   String? selectedLocation;
   String? selectedSatuan;
-  String? selectedStatus;
+  String ketersediaanInv = 'Tersedia';
   String kondisiInv = 'Baik';
+
+  List<Map<String, dynamic>> kategoriList = [];
+  List<Map<String, dynamic>> satuanList = [];
 
   File? _image;
   final picker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> _pickImage(BuildContext context) async {
     showModalBottomSheet(
@@ -70,9 +95,169 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
     );
   }
 
+  Future<void> _getKategoriInventaris() async {
+    final response = await _kategoriInvService.getKategoriInventaris();
+    if (response['status'] == true) {
+      final List<dynamic> data = response['data'];
+      setState(() {
+        kategoriList = data.map((item) {
+          return {
+            'id': item['id'],
+            'nama': item['nama'],
+          };
+        }).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
+
+  Future<void> _getSatuan() async {
+    final response = await _satuanService.getSatuan();
+    if (response['status'] == true) {
+      final List<dynamic> data = response['data'];
+      setState(() {
+        satuanList = data.map((item) {
+          return {
+            'id': item['id'],
+            'nama': item['nama'],
+          };
+        }).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
+
+  Future<void> _fetchInventarisData() async {
+    final response = await _inventarisService.getInventarisById(
+      widget.idInventaris ?? '',
+    );
+
+    if (response['status'] == true) {
+      final data = response['data']['inventaris'];
+      setState(() {
+        _nameController.text = data['nama'] ?? '';
+        selectedLocation = data['kategoriInventarisId'] ?? '';
+        _sizeController.text = data['jumlah']?.toString() ?? '';
+        selectedSatuan = data['satuanId'] ?? '';
+        kondisiInv = data['kondisi'] ?? 'Baik';
+        ketersediaanInv = data['ketersediaan'] ?? 'Tersedia';
+        _descriptionController.text = data['detail'] ?? '';
+        imageUrl = {
+          'data': data['gambar'],
+        };
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  Map<String, dynamic> imageUrl = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _getKategoriInventaris();
+    _getSatuan();
+
+    if (widget.isEdit) {
+      _fetchInventarisData();
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (_isLoading) return;
+
+    try {
+      if (!_formKey.currentState!.validate()) return;
+
+      if (_image == null && !widget.isEdit) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gambar inventaris tidak boleh kosong')),
+        );
+        return;
+      }
+
+      if (_mysqlDateTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Tanggal kadaluwarsa tidak boleh kosong')),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (_image != null) {
+        imageUrl = await _imageService.uploadImage(_image!);
+      }
+
+      final data = {
+        'nama': _nameController.text,
+        'kategoriInventarisId': selectedLocation,
+        'jumlah': _sizeController.text,
+        'satuanId': selectedSatuan,
+        'tanggalKadaluwarsa': _mysqlDateTime,
+        'kondisi': kondisiInv,
+        'ketersediaan': ketersediaanInv,
+        'gambar': imageUrl['data'],
+        'detail': _descriptionController.text,
+      };
+
+      Map<String, dynamic>? response;
+
+      if (widget.isEdit) {
+        data['id'] = widget.idInventaris;
+        response = await _inventarisService.updateInventaris(data);
+      } else {
+        response = await _inventarisService.createInventaris(data);
+      }
+
+      if (response['status'] == true) {
+        if (widget.onInventarisAdded != null) {
+          widget.onInventarisAdded!();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.isEdit
+                ? 'Inventaris berhasil diperbarui'
+                : 'Inventaris berhasil ditambahkan'),
+          ),
+        );
+
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,96 +271,176 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Inventaris',
-              greeting: 'Tambah Inventaris'),
+              greeting:
+                  widget.isEdit ? 'Edit Inventaris' : 'Tambah Inventaris'),
         ),
       ),
       body: SafeArea(
         child: ListView(children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InputFieldWidget(
-                  label: "Nama inventaris",
-                  hint: "Contoh: Bibit A",
-                  controller: _nameController,
-                ),
-                DropdownFieldWidget(
-                  label: "Kategori inventaris",
-                  hint: "Pilih kategori inventaris",
-                  items: const [
-                    "Bibit tanaman",
-                    "Perlengkapan",
-                    "Nutrisi tanaman"
-                  ],
-                  selectedValue: selectedLocation,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedLocation = value;
-                    });
-                  },
-                ),
-                InputFieldWidget(
-                    label: "Jumlah stok",
-                    hint: "Contoh: 20",
-                    controller: _sizeController),
-                DropdownFieldWidget(
-                  label: "Satuan",
-                  hint: "Pilih satuan",
-                  items: const ["Kg", "Pack", "Ml", "Unit"],
-                  selectedValue: selectedSatuan,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSatuan = value;
-                    });
-                  },
-                ),
-                DropdownFieldWidget(
-                  label: "Status inventaris",
-                  hint: "Pilih status",
-                  items: const ["Tersedia", "Tidak tersedia"],
-                  selectedValue: selectedStatus,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedStatus = value;
-                    });
-                  },
-                ),
-                RadioField(
-                  label: 'Kondisi inventaris',
-                  selectedValue: kondisiInv,
-                  options: const ['Baik', 'Rusak'],
-                  onChanged: (value) {
-                    setState(() {
-                      kondisiInv = value;
-                    });
-                  },
-                ),
-                ImagePickerWidget(
-                  label: "Unggah gambar inventaris",
-                  image: _image,
-                  onPickImage: _pickImage,
-                ),
-                InputFieldWidget(
-                    label: "Deskripsi inventaris",
-                    hint: "Keterangan",
-                    controller: _descriptionController,
-                    maxLines: 10),
-                const SizedBox(height: 16),
-                CustomButton(
-                  onPressed: () {
-                    // Your action here
-                  },
-                  backgroundColor: green1,
-                  textStyle: semibold16,
-                  textColor: white,
-                ),
-                const SizedBox(height: 16),
-              ],
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InputFieldWidget(
+                    label: "Nama inventaris",
+                    hint: "Contoh: Bibit A",
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama inventaris tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  DropdownFieldWidget(
+                    label: "Kategori inventaris",
+                    hint: "Pilih kategori inventaris",
+                    items: kategoriList
+                        .map((item) => item['nama'].toString())
+                        .toList(),
+                    selectedValue: kategoriList.firstWhere(
+                        (item) => item['id'] == selectedLocation,
+                        orElse: () => {'nama': ''})['nama'],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedLocation = kategoriList.firstWhere(
+                          (item) => item['nama'] == value,
+                          orElse: () => {'id': ''},
+                        )['id'];
+                      });
+                    },
+                    isEdit: widget.isEdit,
+                  ),
+                  InputFieldWidget(
+                      label: "Jumlah stok",
+                      hint: "Contoh: 20",
+                      controller: _sizeController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Jumlah stok tidak boleh kosong';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Jumlah stok harus berupa angka';
+                        }
+                        return null;
+                      }),
+                  DropdownFieldWidget(
+                    label: "Satuan",
+                    hint: "Pilih satuan",
+                    items: satuanList
+                        .map((item) => item['nama'].toString())
+                        .toList(),
+                    selectedValue: satuanList.firstWhere(
+                        (item) => item['id'] == selectedSatuan,
+                        orElse: () => {'nama': ''})['nama'],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSatuan = satuanList.firstWhere(
+                          (item) => item['nama'] == value,
+                          orElse: () => {'id': ''},
+                        )['id'];
+                      });
+                    },
+                    isEdit: widget.isEdit,
+                  ),
+                  InputFieldWidget(
+                    label: "Tanggal kadaluwarsa",
+                    hint: "Contoh:  Senin, 17 Februari 2025",
+                    controller: _dateController,
+                    suffixIcon: const Icon(Icons.calendar_today),
+                    onSuffixIconTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+
+                      if (pickedDate != null) {
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+
+                        if (pickedTime != null) {
+                          final DateTime pickedDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+
+                          final String formattedDisplayDateTime =
+                              DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                  .format(pickedDateTime);
+
+                          final String formattedMySQLDateTime =
+                              DateFormat('yyyy-MM-dd HH:mm:ss')
+                                  .format(pickedDateTime);
+
+                          _dateController.text = formattedDisplayDateTime;
+                          _mysqlDateTime = formattedMySQLDateTime;
+                        }
+                      }
+                    },
+                  ),
+                  RadioField(
+                    label: 'Kondisi inventaris',
+                    selectedValue: kondisiInv,
+                    options: const ['Baik', 'Rusak'],
+                    onChanged: (value) {
+                      setState(() {
+                        kondisiInv = value;
+                      });
+                    },
+                  ),
+                  RadioField(
+                    label: 'Ketersediaan',
+                    selectedValue: ketersediaanInv,
+                    options: const [
+                      'Tersedia',
+                      'Tidak Tersedia',
+                      'Kadaluwarsa'
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        ketersediaanInv = value;
+                      });
+                    },
+                  ),
+                  ImagePickerWidget(
+                    label: "Unggah gambar inventaris",
+                    image: _image,
+                    onPickImage: _pickImage,
+                  ),
+                  InputFieldWidget(
+                      label: "Deskripsi inventaris",
+                      hint: "Keterangan",
+                      controller: _descriptionController,
+                      maxLines: 10,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Deskripsi inventaris tidak boleh kosong';
+                        }
+                        return null;
+                      }),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    onPressed: _submitForm,
+                    backgroundColor: green1,
+                    textStyle: semibold16,
+                    textColor: white,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ]),
