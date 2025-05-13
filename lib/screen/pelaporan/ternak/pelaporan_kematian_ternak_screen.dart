@@ -131,21 +131,36 @@ class _PelaporanKematianTernakScreenState
                     hint: "Contoh: Senin, 17 Februari 2025 10:00",
                     controller: _dateController,
                     suffixIcon: const Icon(Icons.calendar_today),
-                    onSuffixIconTap: () {
-                      showDatePicker(
+                    onSuffixIconTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
                         firstDate: DateTime(2000),
                         lastDate: DateTime(2100),
-                      ).then((pickedDate) {
-                        if (pickedDate != null) {
-                          setState(() {
-                            _dateController.text =
-                                DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                    .format(pickedDate);
-                          });
+                      );
+
+                      if (pickedDate != null) {
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+
+                        if (pickedTime != null) {
+                          final DateTime pickedDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+
+                          final String formattedDateTime =
+                              DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                  .format(pickedDateTime);
+
+                          _dateController.text = formattedDateTime;
                         }
-                      });
+                      }
                     },
                   ),
                   InputFieldWidget(
