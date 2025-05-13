@@ -243,10 +243,10 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Kebun',
-              greeting: 'Tambah Kebun'),
+              greeting: widget.isEdit ? 'Edit Kebun' : 'Tambah Kebun'),
         ),
       ),
       body: SafeArea(

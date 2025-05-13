@@ -206,10 +206,12 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Jenis Hewan',
-              greeting: 'Tambah Jenis Hewan'),
+              greeting: widget.isEdit
+                  ? 'Edit Jenis Hewan'
+                  : 'Tambah Jenis Hewan'),
         ),
       ),
       body: SafeArea(
