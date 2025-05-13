@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
+import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/ringkasan_inv.dart';
 
-class InventoryScreen extends StatelessWidget {
+class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
+
+  @override
+  State<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends State<InventoryScreen> {
+  final InventarisService _inventarisService = InventarisService();
+  Map<String, dynamic>? _inventarisData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInventarisData();
+  }
+
+  Future<void> _fetchInventarisData() async {
+    try {
+      final data = await _inventarisService.getDashboardInventaris();
+      setState(() {
+        _inventarisData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +101,13 @@ class InventoryScreen extends StatelessWidget {
                         leading: Icon(Icons.pets_outlined, color: green1),
                         title: const Text("Tambah Inventaris"),
                         onTap: () {
-                          context.push('/tambah-inventaris');
+                          context.push(
+                            '/tambah-inventaris',
+                            extra: AddInventarisScreen(
+                              isEdit: false,
+                              onInventarisAdded: _fetchInventarisData,
+                            ),
+                          );
                         },
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
@@ -94,110 +131,123 @@ class InventoryScreen extends StatelessWidget {
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DashboardGrid(
+                        title: 'Statistik Inventaris Bulan Ini',
+                        items: [
+                          DashboardItem(
+                              title: 'Total Item',
+                              value: _inventarisData?['totalItem'].toString() ??
+                                  '0',
+                              icon: 'other',
+                              bgColor: green3,
+                              iconColor: yellow),
+                          DashboardItem(
+                              title: 'Stok Rendah',
+                              value:
+                                  _inventarisData?['stokRendah'].toString() ??
+                                      '0',
+                              icon: 'other',
+                              bgColor: red2,
+                              iconColor: red),
+                          DashboardItem(
+                              title: 'Item Baru',
+                              value: _inventarisData?['itemBaru'].toString() ??
+                                  '0',
+                              icon: 'other',
+                              bgColor: green4,
+                              iconColor: green2),
+                        ],
+                        crossAxisCount: 3,
+                        valueFontSize: 32,
+                        titleFontSize: 14,
+                        paddingSize: 10,
+                        iconsWidth: 36,
+                      ),
+                      const SizedBox(height: 12),
+                      RingkasanInv(
+                        totalItem: _inventarisData?['totalItem'] ?? 0,
+                        kategoriInventaris:
+                            _inventarisData?['totalKategori'] ?? 0,
+                        seringDigunakan:
+                            _inventarisData?['seringDigunakanCount'] ?? 0,
+                        jarangDigunakan:
+                            _inventarisData?['jarangDigunakanCount'] ?? 0,
+                        itemTersedia: _inventarisData?['itemTersedia'] ?? 0,
+                        stokRendah: _inventarisData?['stokRendah'] ?? 0,
+                        itemBaru: _inventarisData?['itemBaru'] ?? 0,
+                        tanggal: DateTime.now(),
+                      ),
+                      const SizedBox(height: 12),
+                      ListItem(
+                        title: 'Riwayat Pemakaian Terbaru',
+                        type: 'history',
+                        items: (_inventarisData?['daftarPemakaianTerbaru']
+                                    as List<dynamic>? ??
+                                [])
+                            .map((item) => {
+                                  'id': item['id'],
+                                  'name': item['inventarisNama'],
+                                  'image': item['laporanGambar'],
+                                  'person': item['petugasNama'],
+                                  'date': item['laporanTanggal'],
+                                  'time': item['laporanWaktu'],
+                                })
+                            .toList(),
+                        // {
+                        //   'name': 'Pupuk NPK',
+                        //   'category': 'Pupuk',
+                        //   'image': 'assets/images/pupuk.jpg',
+                        //   'person': 'Pak Budi',
+                        //   'date': 'Senin, 22 Apr 2025',
+                        //   'time': '10:45',
+                        // },
+
+                        onViewAll: () =>
+                            context.push('/riwayat-pemakaian-inventaris'),
+                        onItemTap: (context, item) {
+                          final name = item['name'] ?? '';
+                          context.push('/detail-laporan/$name');
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListItem(
+                        title: 'Daftar Inventaris',
+                        items: (_inventarisData?['daftarInventaris']
+                                    as List<dynamic>? ??
+                                [])
+                            .map((item) => {
+                                  'id': item['id'],
+                                  'name': item['nama'],
+                                  'icon': item['gambar'],
+                                  'category':
+                                      'Stok: ${item['jumlah']} ${item['lambangSatuan']}',
+                                })
+                            .toList(),
+                        type: 'basic',
+                        onViewAll: () => context.push('/inventaris'),
+                        onItemTap: (context, item) {
+                          final name = item['name'] ?? '';
+                          context.push('/detail-laporan/$name');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DashboardGrid(
-                  title: 'Statistik Inventaris Bulan Ini',
-                  items: [
-                    DashboardItem(
-                        title: 'Total Item',
-                        value: '33',
-                        icon: 'other',
-                        bgColor: green3,
-                        iconColor: yellow),
-                    DashboardItem(
-                        title: 'Stok Rendah',
-                        value: '3',
-                        icon: 'other',
-                        bgColor: red2,
-                        iconColor: red),
-                    DashboardItem(
-                        title: 'Item Baru',
-                        value: '3',
-                        icon: 'other',
-                        bgColor: green4,
-                        iconColor: green2),
-                  ],
-                  crossAxisCount: 3,
-                  valueFontSize: 32,
-                  titleFontSize: 14,
-                  paddingSize: 10,
-                  iconsWidth: 36,
-                ),
-                const SizedBox(height: 12),
-                RingkasanInv(
-                  totalItem: 33,
-                  kategoriInventaris: 4,
-                  seringDigunakan: 2,
-                  jarangDigunakan: 2,
-                  itemTersedia: 28,
-                  stokRendah: 3,
-                  itemBaru: 2,
-                  tanggal: DateTime(2025, 2, 17, 8, 20),
-                ),
-                const SizedBox(height: 12),
-                ListItem(
-                  title: 'Riwayat Pemakaian Terbaru',
-                  type: 'history',
-                  items: const [
-                    {
-                      'name': 'Pupuk NPK',
-                      'category': 'Pupuk',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Pak Budi',
-                      'date': 'Senin, 22 Apr 2025',
-                      'time': '10:45',
-                    },
-                    {
-                      'name': 'Disinfektan A',
-                      'category': 'Disinfektan',
-                      'image': 'assets/images/pupuk.jpg',
-                      'person': 'Bu Sari',
-                      'date': '21 Apr 2025',
-                      'time': '14:30',
-                    },
-                  ],
-                  onViewAll: () =>
-                      context.push('/riwayat-pemakaian-inventaris'),
-                  onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
-                  },
-                ),
-                const SizedBox(height: 12),
-                ListItem(
-                  title: 'Daftar Inventaris',
-                  items: const [
-                    {
-                      'name': 'Bibit Melon',
-                      'category': 'Stok: 20 Pack',
-                      'icon': 'assets/icons/goclub.svg',
-                    },
-                    {
-                      'name': 'Pupuk A',
-                      'category': 'Stok: 10 Kg',
-                      'icon': 'assets/icons/goclub.svg',
-                    }
-                  ],
-                  type: 'basic',
-                  onViewAll: () => context.push('/inventaris'),
-                  onItemTap: (context, item) {
-                    final name = item['name'] ?? '';
-                    context.push('/detail-laporan/$name');
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

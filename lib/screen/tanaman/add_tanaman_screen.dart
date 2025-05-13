@@ -198,10 +198,12 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Jenis Tanaman',
-              greeting: 'Tambah Jenis Tanaman'),
+              greeting: widget.isEdit
+                  ? 'Edit Jenis Tanaman'
+                  : 'Tambah Jenis Tanaman'),
         ),
       ),
       body: SafeArea(

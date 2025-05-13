@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -129,6 +130,38 @@ class _PelaporanKematianTernakScreenState
                     label: "Tanggal & waktu kematian",
                     hint: "Contoh: Senin, 17 Februari 2025 10:00",
                     controller: _dateController,
+                    suffixIcon: const Icon(Icons.calendar_today),
+                    onSuffixIconTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+
+                      if (pickedDate != null) {
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+
+                        if (pickedTime != null) {
+                          final DateTime pickedDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+
+                          final String formattedDateTime =
+                              DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                  .format(pickedDateTime);
+
+                          _dateController.text = formattedDateTime;
+                        }
+                      }
+                    },
                   ),
                   InputFieldWidget(
                     label: "Penyebab kematian",

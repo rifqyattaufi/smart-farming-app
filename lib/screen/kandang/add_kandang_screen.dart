@@ -237,10 +237,12 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Kandang',
-              greeting: 'Tambah Kandang'),
+              greeting: widget.isEdit
+                  ? 'Edit Kandang'
+                  : 'Tambah Kandang'),
         ),
       ),
       body: SafeArea(
