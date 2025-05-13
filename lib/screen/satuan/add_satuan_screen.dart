@@ -102,10 +102,10 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Satuan',
-              greeting: 'Tambah Satuan'),
+              greeting: widget.isUpdate ? 'Edit Satuan' : 'Tambah Satuan'),
         ),
       ),
       body: SafeArea(

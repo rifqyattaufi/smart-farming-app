@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
+import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
@@ -14,52 +15,53 @@ class KategoriInvScreen extends StatefulWidget {
 }
 
 class _KategoriInvScreenState extends State<KategoriInvScreen> {
-  // final KategoriInvService _kategoriInvService = KategoriInvService();
-  // List<dynamic> kategoriInvList = [];
-  // List<dynamic> filteredKategoriInvList = [];
+  final KategoriInvService _kategoriInvService = KategoriInvService();
+  List<dynamic> kategoriInvList = [];
+  List<dynamic> filteredKategoriInvList = [];
 
   final TextEditingController searchController = TextEditingController();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _fetchKategoriInv();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _fetchKategoriInv();
+  }
 
-  // void _searchKategoriInv(String query) async {
-  //   if (query.isEmpty) {
-  //     setState(() {
-  //       filteredKategoriInvList = kategoriInvList;
-  //     });
-  //   } else {
-  //     final response = await _kategoriInvService.getKategoriInvSearch(query);
+  void _searchKategoriInv(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        filteredKategoriInvList = kategoriInvList;
+      });
+    } else {
+      final response =
+          await _kategoriInvService.getKategoriInventarisSearch(query);
 
-  //     if (response['status'] == true) {
-  //       setState(() {
-  //         filteredKategoriInvList = response['data'];
-  //       });
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(response['message'])),
-  //       );
-  //     }
-  //   }
-  // }
+      if (response['status'] == true) {
+        setState(() {
+          filteredKategoriInvList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
 
-  // Future<void> _fetchKategoriInv() async {
-  //   final response = await _kategoriInvService.getKategoriInv();
+  Future<void> _fetchKategoriInv() async {
+    final response = await _kategoriInvService.getKategoriInventaris();
 
-  //   if (response['status'] == true) {
-  //     setState(() {
-  //       kategoriInvList = response['data'];
-  //       filteredKategoriInvList = kategoriInvList;
-  //     });
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text(response['message'])),
-  //     );
-  //   }
-  // }
+    if (response['status'] == true) {
+      setState(() {
+        kategoriInvList = response['data'];
+        filteredKategoriInvList = kategoriInvList;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +90,12 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
           onPressed: () {
             context.push(
               '/tambah-kategori-inventaris',
-              // extra: AddKategoriInvScreen(
-              //   isUpdate: false,
-              //   id: '',
-              //   nama: '',
-              //   lambang: '',
-              //   onKategoriInvAdded: _fetchKategoriInv,
-              // )
+              extra: AddKategoriInvScreen(
+                isUpdate: false,
+                id: '',
+                nama: '',
+                onKategoriInvAdded: _fetchKategoriInv,
+              )
             );
           },
           backgroundColor: green1,
@@ -112,28 +113,27 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
             children: [
               SearchField(
                 controller: searchController,
-                // onChanged: _searchKategoriInv,
+                onChanged: _searchKategoriInv,
               ),
               const SizedBox(height: 12),
               Text('Daftar Kategori', style: bold18.copyWith(color: dark1)),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.builder(
-                  // itemCount: filteredKategoriInvList.length,
+                  itemCount: filteredKategoriInvList.length,
                   itemBuilder: (context, index) {
-                    // final kategoriInv = filteredKategoriInvList[index];
+                    final kategoriInv = filteredKategoriInvList[index];
                     return UnitItem(
-                      // unitName: kategoriInv['nama']!,
-                      unitName: 'Nutrisi Tanaman',
+                      unitName: kategoriInv['nama']!,
                       onEdit: () {
                         context.push(
                           '/tambah-kategori-inventaris',
-                          // extra: AddKategoriInvScreen(
-                          //   isUpdate: true,
-                          //   id: kategori['id']!,
-                          //   nama: kategori['nama']!,
-                          //   onKategoriInvAdded: _fetchKategoriInv,
-                          // )
+                          extra: AddKategoriInvScreen(
+                            isUpdate: true,
+                            id: kategoriInv['id']!,
+                            nama: kategoriInv['nama']!,
+                            onKategoriInvAdded: _fetchKategoriInv,
+                          )
                         );
                       },
                       onDelete: () {
@@ -153,17 +153,17 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                   ),
                                   TextButton(
                                     onPressed: () async {
-                                      // final response = await _kategoriInvService
-                                      //     .deleteKategoriInv(
-                                      //         kategoriInv['id']!);
-                                      // if (response['status'] == true) {
-                                      //   _fetchKategoriInv();
-                                      // } else {
-                                      //   ScaffoldMessenger.of(context)
-                                      //       .showSnackBar(SnackBar(
-                                      //     content: Text(response['message']),
-                                      //   ));
-                                      // }
+                                      final response = await _kategoriInvService
+                                          .deleteKategoriInventaris(
+                                              kategoriInv['id']!);
+                                      if (response['status'] == true) {
+                                        _fetchKategoriInv();
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(response['message']),
+                                        ));
+                                      }
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Hapus'),

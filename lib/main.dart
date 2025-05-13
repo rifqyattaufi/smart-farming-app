@@ -345,7 +345,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-kategori-inventaris',
-      builder: (context, state) => const AddKategoriInvScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddKategoriInvScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/kategori-inventaris',
