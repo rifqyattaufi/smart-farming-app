@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -10,7 +11,18 @@ import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
 class PelaporanHarianTernakScreen extends StatefulWidget {
-  const PelaporanHarianTernakScreen({super.key});
+  final Map<String, dynamic>? data;
+  final String greeting;
+  final String tipe;
+  final int step;
+
+  const PelaporanHarianTernakScreen({
+    super.key,
+    this.data = const {},
+    required this.greeting,
+    required this.tipe,
+    this.step = 1,
+  });
 
   @override
   State<PelaporanHarianTernakScreen> createState() =>
@@ -19,6 +31,9 @@ class PelaporanHarianTernakScreen extends StatefulWidget {
 
 class _PelaporanHarianTernakScreenState
     extends State<PelaporanHarianTernakScreen> {
+  final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final LaporanService _laporanService = LaporanService();
+
   String statusPakan = '';
   String statusKandang = '';
 
@@ -91,8 +106,8 @@ class _PelaporanHarianTernakScreenState
         child: ListView(
           padding: const EdgeInsets.only(bottom: 100),
           children: [
-            const BannerWidget(
-              title: 'Step 3 - Isi Form Pelaporan',
+            BannerWidget(
+              title: 'Step ${widget.step} - Isi Form Pelaporan',
               subtitle:
                   'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
               showDate: true,
