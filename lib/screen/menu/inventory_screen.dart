@@ -230,8 +230,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         type: 'basic',
                         onViewAll: () => context.push('/inventaris'),
                         onItemTap: (context, item) {
-                          final name = item['name'] ?? '';
-                          context.push('/detail-laporan/$name');
+                          final id = item['id'] ?? '';
+                          context.push('/detail-inventaris/$id').then((_) {
+                            _fetchInventarisData();
+                          });
                         },
                       ),
                     ],
