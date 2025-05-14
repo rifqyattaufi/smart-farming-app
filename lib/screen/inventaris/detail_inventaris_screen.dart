@@ -9,6 +9,7 @@ import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:smart_farming_app/widget/chart.dart';
 
 class DetailInventarisScreen extends StatefulWidget {
   final String? idInventaris;
@@ -24,6 +25,10 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
 
   Map<String, dynamic>? _inventaris = {};
   List<dynamic> _riwayatPemakaianList = [];
+  List<DateTime> firstDates = [];
+  List<DateTime> lastDates = [];
+  List<int> datas = [];
+  List<String> pemakaianLabels = [];
 
   Future<void> _fetchData() async {
     try {
@@ -34,6 +39,36 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         setState(() {
           _inventaris = response['data']['data'] ?? {};
           _riwayatPemakaianList = response['data']['daftarPemakaian'] ?? [];
+
+          final pemakaianList = response['data']['pemakaianPerMinggu'] ?? [];
+
+          if (pemakaianList.isNotEmpty) {
+            pemakaianList.sort((a, b) => DateTime.parse(a['mingguAwal'])
+                .compareTo(DateTime.parse(b['mingguAwal'])));
+
+            firstDates = pemakaianList.map<DateTime>((e) {
+              return DateTime.parse(e['mingguAwal']);
+            }).toList();
+
+            lastDates = pemakaianList.map<DateTime>((e) {
+              final awal = DateTime.parse(e['mingguAwal']);
+              return awal
+                  .add(const Duration(days: 6)); // akhir minggu (Senin–Minggu)
+            }).toList();
+
+            datas = pemakaianList
+                .map<int>((e) => e['stokPemakaian'] as int)
+                .toList();
+
+            pemakaianLabels = pemakaianList.map<String>((e) {
+              final date = DateTime.parse(e['mingguAwal']);
+              return DateFormat('dd MMM').format(date); // Misal: "30 Apr"
+            }).toList();
+          } else {
+            // Jika data kosong
+            datas = [];
+            pemakaianLabels = [];
+          }
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -192,6 +227,40 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                   ],
                 ),
               ),
+              datas.isNotEmpty && pemakaianLabels.isNotEmpty
+                  ? ChartWidget(
+                      firstDate: firstDates.isNotEmpty
+                          ? firstDates.first
+                          : DateTime.now(),
+                      lastDate: lastDates.isNotEmpty
+                          ? lastDates.last
+                          : DateTime.now(),
+                      data: datas.map((e) => e.toDouble()).toList(),
+                      xLabels: pemakaianLabels,
+                      titleStats: 'Statistik Pemakaian Inventaris',
+                      showCounter: false,
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Statistik Pemakaian Inventaris',
+                            style: bold18.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Center(
+                            child: Text(
+                              'Tidak ada statistik data untuk ditampilkan.',
+                              style: medium14.copyWith(color: dark2),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              const SizedBox(height: 16),
               ListItem(
                 title: 'Riwayat Pemakaian Inventaris',
                 type: 'history',

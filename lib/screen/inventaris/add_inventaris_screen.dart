@@ -227,17 +227,29 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         imageUrl = await _imageService.uploadImage(_image!);
       }
 
+      final formattedKadaluwarsaDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(
+        DateTime.parse(_mysqlDateTime!).add(const Duration(hours: 7)),
+      );
+
+      final formattedDate =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+      final formattedUpdatedAtDate = DateFormat('yyyy-MM-dd HH:mm:ss')
+          .format(DateTime.now().add(const Duration(hours: 7)));
+
       final data = {
         'nama': _nameController.text,
         'kategoriInventarisId': selectedLocation,
         'jumlah': _sizeController.text,
         'satuanId': selectedSatuan,
         'stokMinim': _minimController.text,
-        'tanggalKadaluwarsa': _mysqlDateTime,
+        'tanggalKadaluwarsa': formattedKadaluwarsaDate,
+        if (widget.isEdit) 'updatedAt': formattedUpdatedAtDate,
         'kondisi': kondisiInv,
         'ketersediaan': ketersediaanInv,
         'gambar': imageUrl['data'],
         'detail': _descriptionController.text,
+        if (!widget.isEdit) 'createdAt': formattedDate,
       };
 
       Map<String, dynamic>? response;
