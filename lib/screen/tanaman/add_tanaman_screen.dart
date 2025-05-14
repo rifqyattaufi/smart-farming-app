@@ -249,6 +249,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                   ImagePickerWidget(
                     label: "Unggah gambar tanaman",
                     image: _imageTanaman,
+                    imageUrl: _imageUrl?['data'],
                     onPickImage: _pickImageTanaman,
                   ),
                   InputFieldWidget(

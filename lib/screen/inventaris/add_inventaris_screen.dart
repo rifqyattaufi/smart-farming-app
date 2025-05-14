@@ -338,7 +338,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         )['id'];
                       });
                     },
-                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                       label: "Jumlah stok",
@@ -374,16 +373,15 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         .toList(),
                     selectedValue: satuanList.firstWhere(
                         (item) => item['id'] == selectedSatuan,
-                        orElse: () => {'nama': ''})['nama'],
+                        orElse: () => {'nama': null})['nama'],
                     onChanged: (value) {
                       setState(() {
                         selectedSatuan = satuanList.firstWhere(
                           (item) => item['nama'] == value,
-                          orElse: () => {'id': ''},
+                          orElse: () => {'id': null},
                         )['id'];
                       });
                     },
-                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                     label: "Tanggal kadaluwarsa",
@@ -454,6 +452,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                   ImagePickerWidget(
                     label: "Unggah gambar inventaris",
                     image: _image,
+                    imageUrl: imageUrl['data'],
                     onPickImage: _pickImage,
                   ),
                   InputFieldWidget(
