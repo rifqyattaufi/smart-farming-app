@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/service/image_service.dart';
+import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
@@ -31,7 +33,7 @@ class PelaporanHarianTernakScreen extends StatefulWidget {
 
 class _PelaporanHarianTernakScreenState
     extends State<PelaporanHarianTernakScreen> {
-  final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final ImageService _imageService = ImageService();
   final LaporanService _laporanService = LaporanService();
 
   String statusPakan = '';
@@ -39,6 +41,7 @@ class _PelaporanHarianTernakScreenState
 
   File? _imageTernak;
   final picker = ImagePicker();
+  final formKey = GlobalKey<FormState>();
 
   Future<void> _pickImage(
       BuildContext context, Function(File) onImagePicked) async {
@@ -83,6 +86,80 @@ class _PelaporanHarianTernakScreenState
 
   final TextEditingController _catatanController = TextEditingController();
 
+  Future<void> _submitForm() async {
+    try {
+      if (!formKey.currentState!.validate()) return;
+
+      if (statusPakan.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Silakan pilih status pakan'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+      if (statusKandang.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Silakan pilih status kandang'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      if (_imageTernak == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Silakan unggah bukti kondisi ternak'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      formKey.currentState!.save();
+
+      final imageUrl = await _imageService.uploadImage(_imageTernak!);
+
+      // Prepare data
+      final data = {
+        'unitBudidayaId': widget.data?['unitBudidaya']['id'],
+        "judul": "Laporan Harian ${widget.data?['unitBudidaya']['name']}",
+        "tipe": widget.tipe,
+        "gambar": imageUrl['data'],
+        "catatan": _catatanController.text,
+        "harianTernak": {
+          "pakan": statusPakan == 'Ya',
+          "cekKandang": statusKandang == 'Ya',
+        }
+      };
+
+      await _laporanService.createLaporanHarianTernak(data);
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Pelaporan berhasil dikirim'),
+          backgroundColor: green1,
+        ),
+      );
+
+      for (int i = 0; i < widget.step; i++) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,59 +200,68 @@ class _PelaporanHarianTernakScreenState
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Ayam',
+                    widget.data?['unitBudidaya']['category'] ?? 'unknown',
                     style: bold20.copyWith(color: dark1),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Kandang A',
+                    widget.data?['unitBudidaya']['name'] ?? 'unknown',
                     style: semibold16.copyWith(color: dark1),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RadioField(
-                    label: 'Dilakukan pemberian pakan?',
-                    selectedValue: statusPakan,
-                    options: const ['Ya', 'Belum'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusPakan = value;
-                      });
-                    },
-                  ),
-                  RadioField(
-                    label: 'Dilakukan pengecekan kandang?',
-                    selectedValue: statusKandang,
-                    options: const ['Ya', 'Tidak'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusKandang = value;
-                      });
-                    },
-                  ),
-                  ImagePickerWidget(
-                    label: "Unggah bukti kondisi ternak",
-                    image: _imageTernak,
-                    onPickImage: (context) {
-                      _pickImage(context, (file) {
+            Form(
+              key: formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RadioField(
+                      label: 'Dilakukan pemberian pakan?',
+                      selectedValue: statusPakan,
+                      options: const ['Ya', 'Belum'],
+                      onChanged: (value) {
                         setState(() {
-                          _imageTernak = file;
+                          statusPakan = value;
                         });
-                      });
-                    },
-                  ),
-                  InputFieldWidget(
-                      label: "Catatan/jurnal pelaporan",
-                      hint: "Keterangan",
-                      controller: _catatanController,
-                      maxLines: 10),
-                ],
+                      },
+                    ),
+                    RadioField(
+                      label: 'Dilakukan pengecekan kandang?',
+                      selectedValue: statusKandang,
+                      options: const ['Ya', 'Tidak'],
+                      onChanged: (value) {
+                        setState(() {
+                          statusKandang = value;
+                        });
+                      },
+                    ),
+                    ImagePickerWidget(
+                      label: "Unggah bukti kondisi ternak",
+                      image: _imageTernak,
+                      onPickImage: (context) {
+                        _pickImage(context, (file) {
+                          setState(() {
+                            _imageTernak = file;
+                          });
+                        });
+                      },
+                    ),
+                    InputFieldWidget(
+                        label: "Catatan/jurnal pelaporan",
+                        hint: "Keterangan",
+                        controller: _catatanController,
+                        maxLines: 10,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Catatan tidak boleh kosong';
+                          }
+                          return null;
+                        }),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -186,7 +272,7 @@ class _PelaporanHarianTernakScreenState
         padding: const EdgeInsets.all(16),
         child: CustomButton(
           onPressed: () {
-            // Your action here
+            _submitForm();
           },
           backgroundColor: green1,
           textStyle: semibold16,
