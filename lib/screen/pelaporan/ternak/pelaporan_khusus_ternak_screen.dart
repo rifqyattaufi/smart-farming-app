@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_komoditas_screen.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
@@ -17,12 +18,18 @@ class PelaporanKhususTernakScreen extends StatefulWidget {
 
 class _PelaporanKhususTernakScreenState
     extends State<PelaporanKhususTernakScreen> {
+  final _step = 1;
   String? selectedReport;
 
   void navigateBasedOnSelection() {
     switch (selectedReport) {
       case 'Pelaporan Panen Ternak':
-        context.push('/pelaporan-panen-ternak');
+        context.push('/pilih-komoditas',
+            extra: PilihKomoditasScreen(
+              step: _step + 1,
+              tipe: 'panen',
+              greeting: 'Pelaporan Panen Ternak',
+            ));
         break;
       case 'Pelaporan Ternak Sakit':
         context.push('/pelaporan-ternak-sakit');
@@ -45,25 +52,21 @@ class _PelaporanKhususTernakScreenState
         'title': 'Pelaporan Panen Ternak',
         'description':
             'Catat hasil panen ternak untuk evaluasi dan perencanaan produksi yang lebih baik.',
-        'route': '/pelaporan-panen-ternak',
       },
       {
         'title': 'Pelaporan Ternak Sakit',
         'description':
             'Catat gejala dan kondisi ternak yang mengalami gangguan kesehatan.',
-        'route': '/pelaporan-ternak-sakit',
       },
       {
         'title': 'Pelaporan Kematian Ternak',
         'description':
             'Dokumentasikan ternak yang tidak bertahan sebagai bagian dari evaluasi perawatan.',
-        'route': '/pelaporan-kematian-ternak',
       },
       {
         'title': 'Pelaporan Pemberian Nutrisi',
         'description':
             'Laporkan aktivitas pemberian vitamin untuk memastikan kesehatan ternak.',
-        'route': '/pelaporan-nutrisi-ternak',
       },
     ];
 
@@ -87,8 +90,8 @@ class _PelaporanKhususTernakScreenState
         child: ListView(
           padding: const EdgeInsets.only(bottom: 100),
           children: [
-            const BannerWidget(
-              title: 'Apa yang ingin kamu laporkan?',
+            BannerWidget(
+              title: 'Step $_step - Apa yang ingin kamu laporkan?',
               subtitle: 'Pilih jenis pelaporan yang akan dilakukan!',
               showDate: true,
             ),

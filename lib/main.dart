@@ -157,7 +157,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pilih-komoditas',
-      builder: (context, state) => const PilihKomoditasScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PilihKomoditasScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/manajemen-komoditas',
@@ -266,7 +269,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-panen-ternak',
-      builder: (context, state) => const PelaporanTernakPanenScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTernakPanenScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-panen-ternak/:id',

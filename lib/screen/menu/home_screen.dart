@@ -555,13 +555,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan rutin kondisi ternak setiap hari',
                                             onTap: () {
-                                              context.push('/pilih-kandang',
-                                                  extra:
-                                                      const PilihKandangScreen(
-                                                    greeting:
-                                                        "Pelaporan Harian",
-                                                    tipe: "harian",
-                                                  ));
+                                              context
+                                                  .push('/pilih-kandang',
+                                                      extra:
+                                                          const PilihKandangScreen(
+                                                        greeting:
+                                                            "Pelaporan Harian",
+                                                        tipe: "harian",
+                                                      ))
+                                                  .then((_) {
+                                                _fetchData();
+                                              });
                                             },
                                           ),
                                         ),

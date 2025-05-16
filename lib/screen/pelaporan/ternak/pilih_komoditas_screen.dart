@@ -1,29 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
+import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_item_selectable.dart';
 
-class PilihKomoditasScreen extends StatelessWidget {
-  const PilihKomoditasScreen({super.key});
+class PilihKomoditasScreen extends StatefulWidget {
+  final int step;
+  final String tipe;
+  final String greeting;
+  final Map<String, dynamic> data;
+
+  const PilihKomoditasScreen(
+      {super.key,
+      this.step = 1,
+      this.data = const {},
+      required this.tipe,
+      required this.greeting});
+
+  @override
+  State<PilihKomoditasScreen> createState() => _PilihKomoditasScreenState();
+}
+
+class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
+  final KomoditasService _komoditasService = KomoditasService();
+  Map<String, dynamic>? selectedKomoditas;
+
+  List<dynamic> _listKomoditas = [];
+
+  Future<void> _fetchData() async {
+    try {
+      final response = await _komoditasService.getKomoditasByTipe('hewan');
+      if (response['status']) {
+        setState(() {
+          _listKomoditas = response['data'];
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (selectedKomoditas == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan pilih komoditas terlebih dahulu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final updatedData = Map<String, dynamic>.from(widget.data);
+    updatedData['komoditas'] = selectedKomoditas;
+
+    context.push('/pilih-kandang',
+        extra: PilihKandangScreen(
+            greeting: widget.greeting,
+            tipe: widget.tipe,
+            step: widget.step + 1,
+            data: updatedData));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> listKomoditas = [
-      {
-        'name': 'Telur',
-        'category': 'Ayam',
-        'icon': 'assets/icons/goclub.svg',
-      },
-      {
-        'name': 'Daging',
-        'category': 'Ayam',
-        'icon': 'assets/icons/goclub.svg',
-      }
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -34,10 +89,10 @@ class PilihKomoditasScreen extends StatelessWidget {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
             headerType: HeaderType.back,
             title: 'Pelaporan Khusus',
-            greeting: 'Pelaporan Panen Ternak',
+            greeting: widget.greeting,
           ),
         ),
       ),
@@ -45,15 +100,30 @@ class PilihKomoditasScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(bottom: 100),
           children: [
-            const BannerWidget(
-              title: 'Step 2 - Pilih Komoditas',
+            BannerWidget(
+              title: 'Step ${widget.step} - Pilih Komoditas',
               subtitle: 'Pilih komoditas yang akan dilakukan pelaporan!',
               showDate: true,
             ),
             ListItemSelectable(
               title: 'Daftar Komoditas',
               type: ListItemType.simple,
-              items: listKomoditas,
+              items: _listKomoditas
+                  .map((item) => {
+                        'name': item['nama'],
+                        'category': item['JenisBudidaya']['nama'],
+                        'icon': item['gambar'],
+                        'id': item['id'],
+                        'jenisBudidayaId': item['JenisBudidaya']['id'],
+                        'jenisBudidayaLatin': item['JenisBudidaya']['latin'],
+                        'satuan': item['SatuanId']
+                      })
+                  .toList(),
+              onItemTap: (context, item) {
+                setState(() {
+                  selectedKomoditas = item;
+                });
+              },
             ),
             const SizedBox(height: 16),
           ],
@@ -63,7 +133,7 @@ class PilihKomoditasScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: CustomButton(
           onPressed: () {
-            context.push('/pelaporan-panen-ternak');
+            _submitForm();
           },
           buttonText: 'Selanjutnya',
           backgroundColor: green1,

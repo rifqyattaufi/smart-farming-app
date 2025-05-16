@@ -10,8 +10,9 @@ class ListItemSelectable extends StatefulWidget {
   final String? title;
   final List<Map<String, dynamic>> items;
   final ListItemType type;
-
   final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
+  final void Function(List<Map<String, dynamic>> selectedItems)?
+      onSelectionChanged; // Tambahkan ini
 
   const ListItemSelectable({
     super.key,
@@ -19,6 +20,7 @@ class ListItemSelectable extends StatefulWidget {
     required this.items,
     this.type = ListItemType.basic,
     this.onItemTap,
+    this.onSelectionChanged, // Tambahkan ini
   });
 
   @override
@@ -34,21 +36,29 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
       isBatchMode = enable;
       if (!enable) selectedIndexes.clear();
     });
+    _notifySelectionChanged();
   }
 
   void _handleTap(int index) {
-    if (widget.type == ListItemType.basic && isBatchMode) {
-      setState(() {
+    setState(() {
+      if (isBatchMode) {
         if (selectedIndexes.contains(index)) {
           selectedIndexes.remove(index);
         } else {
           selectedIndexes.add(index);
         }
-      });
-    } else {
-      setState(() {
-        selectedIndexes = {index}; // hanya satu aktif di simple
-      });
+      } else {
+        selectedIndexes = {index}; // Hanya satu item yang dipilih
+      }
+    });
+    _notifySelectionChanged();
+  }
+
+  void _notifySelectionChanged() {
+    if (widget.onSelectionChanged != null) {
+      final selectedItems =
+          selectedIndexes.map((index) => widget.items[index]).toList();
+      widget.onSelectionChanged!(selectedItems);
     }
   }
 
