@@ -339,6 +339,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                   ImagePickerWidget(
                     label: "Unggah gambar kebun",
                     image: _image,
+                    imageUrl: imageUrl['data'],
                     onPickImage: _pickImage,
                   ),
                   InputFieldWidget(

@@ -41,8 +41,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
   String? _mysqlDateTime;
   String? selectedLocation;
   String? selectedSatuan;
-  String ketersediaanInv = 'Tersedia';
-  String kondisiInv = 'Baik';
+  String ketersediaanInv = 'tersedia';
+  String kondisiInv = 'baik';
 
   List<Map<String, dynamic>> kategoriList = [];
   List<Map<String, dynamic>> satuanList = [];
@@ -133,33 +133,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
     }
   }
 
-  Future<void> _fetchInventarisData() async {
-    final response = await _inventarisService.getInventarisById(
-      widget.idInventaris ?? '',
-    );
-
-    if (response['status'] == true) {
-      final data = response['data']['inventaris'];
-      setState(() {
-        _nameController.text = data['nama'] ?? '';
-        selectedLocation = data['kategoriInventarisId'] ?? '';
-        _sizeController.text = data['jumlah']?.toString() ?? '';
-        _minimController.text = data['stokMinim'].toString() ?? '';
-        selectedSatuan = data['satuanId'] ?? '';
-        kondisiInv = data['kondisi'] ?? 'Baik';
-        ketersediaanInv = data['ketersediaan'] ?? 'Tersedia';
-        _descriptionController.text = data['detail'] ?? '';
-        imageUrl = {
-          'data': data['gambar'],
-        };
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
-      );
-    }
-  }
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _minimController = TextEditingController();
@@ -176,6 +149,53 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
     if (widget.isEdit) {
       _fetchInventarisData();
     }
+  }
+
+  Future<void> _fetchInventarisData() async {
+    try {
+      final response =
+          await _inventarisService.getInventarisById(widget.idInventaris ?? '');
+      if (response['status'] == true) {
+        final data = response['data']['data'];
+        setState(() {
+          _nameController.text = data['nama'] ?? '';
+          selectedLocation = data['kategoriInventarisId'];
+          _sizeController.text = data['jumlah']?.toString() ?? '';
+          _minimController.text = data['stokMinim']?.toString() ?? '';
+          selectedSatuan = data['SatuanId'];
+          kondisiInv = data['kondisi'] ?? 'baik';
+          ketersediaanInv = data['ketersediaan'] ?? 'tersedia';
+          _descriptionController.text = data['detail'] ?? '';
+          imageUrl = {'data': data['gambar']};
+
+          // Handle date formatting
+          final DateTime expiryDate =
+              DateTime.parse(data['tanggalKadaluwarsa']);
+          _dateController.text =
+              DateFormat('EEEE, dd MMMM yyyy HH:mm').format(expiryDate);
+          _mysqlDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(expiryDate);
+        });
+      } else {
+        _showError(response['message']);
+      }
+    } catch (e) {
+      _showError('Failed to fetch inventaris data: $e');
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _sizeController.dispose();
+    _minimController.dispose();
+    _dateController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   Future<void> _submitForm() async {
@@ -207,17 +227,29 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         imageUrl = await _imageService.uploadImage(_image!);
       }
 
+      final formattedKadaluwarsaDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(
+        DateTime.parse(_mysqlDateTime!).add(const Duration(hours: 7)),
+      );
+
+      final formattedDate =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+      final formattedUpdatedAtDate = DateFormat('yyyy-MM-dd HH:mm:ss')
+          .format(DateTime.now().add(const Duration(hours: 7)));
+
       final data = {
         'nama': _nameController.text,
         'kategoriInventarisId': selectedLocation,
         'jumlah': _sizeController.text,
         'satuanId': selectedSatuan,
         'stokMinim': _minimController.text,
-        'tanggalKadaluwarsa': _mysqlDateTime,
+        'tanggalKadaluwarsa': formattedKadaluwarsaDate,
+        if (widget.isEdit) 'updatedAt': formattedUpdatedAtDate,
         'kondisi': kondisiInv,
         'ketersediaan': ketersediaanInv,
         'gambar': imageUrl['data'],
         'detail': _descriptionController.text,
+        if (!widget.isEdit) 'createdAt': formattedDate,
       };
 
       Map<String, dynamic>? response;
@@ -318,7 +350,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         )['id'];
                       });
                     },
-                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                       label: "Jumlah stok",
@@ -354,16 +385,15 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         .toList(),
                     selectedValue: satuanList.firstWhere(
                         (item) => item['id'] == selectedSatuan,
-                        orElse: () => {'nama': ''})['nama'],
+                        orElse: () => {'nama': null})['nama'],
                     onChanged: (value) {
                       setState(() {
                         selectedSatuan = satuanList.firstWhere(
                           (item) => item['nama'] == value,
-                          orElse: () => {'id': ''},
+                          orElse: () => {'id': null},
                         )['id'];
                       });
                     },
-                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                     label: "Tanggal kadaluwarsa",
@@ -410,7 +440,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                   RadioField(
                     label: 'Kondisi inventaris',
                     selectedValue: kondisiInv,
-                    options: const ['Baik', 'Rusak'],
+                    options: const ['baik', 'rusak'],
                     onChanged: (value) {
                       setState(() {
                         kondisiInv = value;
@@ -421,9 +451,9 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                     label: 'Ketersediaan',
                     selectedValue: ketersediaanInv,
                     options: const [
-                      'Tersedia',
-                      'Tidak Tersedia',
-                      'Kadaluwarsa'
+                      'tersedia',
+                      'tidak tersedia',
+                      'kadaluwarsa'
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -434,6 +464,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                   ImagePickerWidget(
                     label: "Unggah gambar inventaris",
                     image: _image,
+                    imageUrl: imageUrl['data'],
                     onPickImage: _pickImage,
                   ),
                   InputFieldWidget(

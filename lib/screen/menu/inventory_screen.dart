@@ -206,15 +206,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   'time': item['laporanWaktu'],
                                 })
                             .toList(),
-                        // {
-                        //   'name': 'Pupuk NPK',
-                        //   'category': 'Pupuk',
-                        //   'image': 'assets/images/pupuk.jpg',
-                        //   'person': 'Pak Budi',
-                        //   'date': 'Senin, 22 Apr 2025',
-                        //   'time': '10:45',
-                        // },
-
                         onViewAll: () =>
                             context.push('/riwayat-pemakaian-inventaris'),
                         onItemTap: (context, item) {
@@ -239,8 +230,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         type: 'basic',
                         onViewAll: () => context.push('/inventaris'),
                         onItemTap: (context, item) {
-                          final name = item['name'] ?? '';
-                          context.push('/detail-laporan/$name');
+                          final id = item['id'] ?? '';
+                          context.push('/detail-inventaris/$id').then((_) {
+                            _fetchInventarisData();
+                          });
                         },
                       ),
                     ],

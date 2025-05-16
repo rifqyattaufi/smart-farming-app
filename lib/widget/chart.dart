@@ -13,6 +13,7 @@ class ChartWidget extends StatefulWidget {
   final int counter;
   final bool showCounter;
   final String textCounter;
+  final List<String> xLabels;
 
   const ChartWidget({
     super.key,
@@ -24,6 +25,7 @@ class ChartWidget extends StatefulWidget {
     this.counter = 120,
     this.showCounter = true,
     this.textCounter = 'Hasil Panen (Kg)',
+    this.xLabels = const [],
   });
 
   @override
@@ -42,19 +44,23 @@ class _ChartWidgetState extends State<ChartWidget> {
   }
 
   void generateXLabels() {
-    xLabels = [];
-    DateTime currentDate = widget.firstDate;
-
-    while (!currentDate.isAfter(widget.lastDate)) {
-      xLabels.add(DateFormat('d').format(currentDate)); // "1", "2", dst
-      currentDate = currentDate.add(const Duration(days: 1));
-    }
+    setState(() {
+      if (widget.xLabels.isNotEmpty) {
+        xLabels = widget.xLabels;
+      } else {
+        xLabels = List.generate(
+            widget.data.length, (index) => (index + 1).toString());
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final maxY = (widget.data.reduce((a, b) => a > b ? a : b) / 5).ceil() * 5;
+    final maxY = (widget.data.isNotEmpty
+        ? (widget.data.reduce((a, b) => a > b ? a : b) / 5).ceil() * 5
+        : 0);
 
+    final interval = maxY > 0 ? maxY / 4 : 1;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -233,13 +239,13 @@ class _ChartWidgetState extends State<ChartWidget> {
                   final isMax = widget.data[index] ==
                       widget.data.reduce((a, b) => a > b ? a : b);
                   return BarChartGroupData(
-                    x: index,
+                    x: index, // Pastikan ini sinkron dengan indeks xLabels
                     barRods: [
                       BarChartRodData(
                         toY: widget.data[index],
                         width: 20,
                         borderRadius: BorderRadius.circular(6),
-                        color: isMax ? green1 : green2.withValues(alpha: 0.4),
+                        color: isMax ? green1 : green2.withOpacity(0.4),
                       ),
                     ],
                   );
@@ -249,7 +255,7 @@ class _ChartWidgetState extends State<ChartWidget> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 28,
-                      interval: maxY / 4,
+                      interval: interval.toDouble(),
                       getTitlesWidget: (value, _) => Text(
                         value.toInt().toString(),
                         style: medium12.copyWith(color: dark1),
@@ -265,11 +271,11 @@ class _ChartWidgetState extends State<ChartWidget> {
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         int index = value.toInt();
-                        if (index >= 0 && index < xLabels.length) {
+                        if (index >= 0 && index < widget.xLabels.length) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              xLabels[index],
+                              widget.xLabels[index],
                               style: medium12.copyWith(color: dark1),
                             ),
                           );
@@ -282,7 +288,7 @@ class _ChartWidgetState extends State<ChartWidget> {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  horizontalInterval: maxY / 4,
+                  horizontalInterval: interval.toDouble(),
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
                       color: grey,
@@ -291,6 +297,28 @@ class _ChartWidgetState extends State<ChartWidget> {
                   },
                 ),
                 borderData: FlBorderData(show: false),
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipPadding: const EdgeInsets.all(8),
+                    tooltipMargin: 8,
+                    getTooltipColor: (group) {
+                      final isMax = widget.data[group.x.toInt()] ==
+                          widget.data.reduce((a, b) => a > b ? a : b);
+                      return isMax ? green1 : green2.withValues(alpha: 0.4);
+                    },
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        rod.toY.toStringAsFixed(1),
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),

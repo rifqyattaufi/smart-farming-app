@@ -49,7 +49,7 @@ class ListItem extends StatelessWidget {
           if (items.isEmpty)
             Center(
               child: Text(
-                "No data found",
+                "Tidak ada data yang ditemukan",
                 style: regular14.copyWith(color: dark2),
               ),
             )
