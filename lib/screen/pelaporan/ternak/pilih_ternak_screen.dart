@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_panen_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_sakit_screen.dart';
 import 'package:smart_farming_app/service/objek_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
@@ -67,13 +68,23 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
     final updatedData = Map<String, dynamic>.from(widget.data ?? {});
     updatedData['objekBudidaya'] = _selectedTernak;
 
-    context.push('/pelaporan-panen-ternak',
-        extra: PelaporanTernakPanenScreen(
-          greeting: widget.greeting,
-          data: updatedData,
-          tipe: widget.tipe,
-          step: widget.step + 1,
-        ));
+    if (widget.tipe == "panen") {
+      context.push('/pelaporan-panen-ternak',
+          extra: PelaporanTernakPanenScreen(
+            greeting: widget.greeting,
+            data: updatedData,
+            tipe: widget.tipe,
+            step: widget.step + 1,
+          ));
+    } else if (widget.tipe == "sakit") {
+      context.push('/pelaporan-ternak-sakit',
+          extra: PelaporanTernakSakitScreen(
+            greeting: widget.greeting,
+            data: updatedData,
+            tipe: widget.tipe,
+            step: widget.step + 1,
+          ));
+    }
   }
 
   @override

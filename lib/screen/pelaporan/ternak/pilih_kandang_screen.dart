@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_panen_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_ternak_screen.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -89,6 +90,29 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                   tipe: widget.tipe,
                   step: widget.step + 1));
         }
+      } else if (widget.tipe == "sakit") {
+        if (_selectedUnitBudidaya!['tipe'] == "individu") {
+          context.push('/pilih-ternak',
+              extra: PilihTernakScreen(
+                  greeting: widget.greeting,
+                  data: updatedData,
+                  tipe: widget.tipe,
+                  step: widget.step + 1));
+        } else {
+          context.push('/pelaporan-ternak-sakit',
+              extra: PelaporanTernakSakitScreen(
+                  greeting: widget.greeting,
+                  data: updatedData,
+                  tipe: widget.tipe,
+                  step: widget.step + 1));
+        }
+      } else if (widget.tipe == "kematian") {
+        context.push('/pelaporan-kematian-ternak',
+            extra: PelaporanHarianTernakScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -144,6 +168,7 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                         'icon': item['gambar'],
                         'category': item['JenisBudidaya']['nama'],
                         'tipe': item['tipe'],
+                        'latin': item['JenisBudidaya']['latin']
                       })
                   .toList(),
               onItemTap: (context, item) {

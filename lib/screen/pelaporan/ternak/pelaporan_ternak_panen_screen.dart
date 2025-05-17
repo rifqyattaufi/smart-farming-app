@@ -133,6 +133,7 @@ class _PelaporanTernakPanenScreenState
   }
 
   Future<void> _submitForm() async {
+    if (isLoading) return; 
     setState(() {
       isLoading = true;
     });
@@ -148,7 +149,7 @@ class _PelaporanTernakPanenScreenState
         allValid = false;
       }
 
-      if (imageList[i] == null) {
+      if (imageList[i] == null && allValid == true) {
         allValid = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -157,7 +158,6 @@ class _PelaporanTernakPanenScreenState
             backgroundColor: Colors.red,
           ),
         );
-        break;
       }
     }
     if (!allValid) {

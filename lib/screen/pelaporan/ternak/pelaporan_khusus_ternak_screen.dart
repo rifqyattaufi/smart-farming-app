@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_komoditas_screen.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -32,7 +33,12 @@ class _PelaporanKhususTernakScreenState
             ));
         break;
       case 'Pelaporan Ternak Sakit':
-        context.push('/pelaporan-ternak-sakit');
+        context.push('/pilih-kandang',
+            extra: PilihKandangScreen(
+              step: _step + 1,
+              tipe: 'sakit',
+              greeting: 'Pelaporan Ternak Sakit',
+            ));
         break;
       case 'Pelaporan Kematian Ternak':
         context.push('/pelaporan-kematian-ternak');

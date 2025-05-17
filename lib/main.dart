@@ -298,7 +298,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-ternak-sakit',
-      builder: (context, state) => const PelaporanTernakSakitScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTernakSakitScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-sakit-ternak/:id',
