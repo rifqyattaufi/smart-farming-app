@@ -24,6 +24,12 @@ class SatuanService {
           'message': 'success',
           'data': body['data'],
         };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': 'Data not found',
+          'data': [],
+        };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await getSatuan();
