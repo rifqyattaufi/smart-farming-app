@@ -38,6 +38,7 @@ class _PelaporanHarianTernakScreenState
   String statusPakan = '';
   String statusKandang = '';
 
+  bool isLoading = false;
   File? _imageTernak;
   final picker = ImagePicker();
   final formKey = GlobalKey<FormState>();
@@ -86,6 +87,10 @@ class _PelaporanHarianTernakScreenState
   final TextEditingController _catatanController = TextEditingController();
 
   Future<void> _submitForm() async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
     try {
       if (!formKey.currentState!.validate()) return;
 
@@ -156,6 +161,10 @@ class _PelaporanHarianTernakScreenState
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -276,6 +285,7 @@ class _PelaporanHarianTernakScreenState
           backgroundColor: green1,
           textStyle: semibold16,
           textColor: white,
+          isLoading: isLoading,
         ),
       ),
     );
