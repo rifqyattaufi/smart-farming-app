@@ -36,7 +36,7 @@ class _PelaporanTernakSakitScreenState
   bool _isLoading = false;
   File? _image;
   final picker = ImagePicker();
-  List<GlobalKey<FormState>> _formKeys = [];
+  final List<GlobalKey<FormState>> _formKeys = [];
 
   List<TextEditingController> _catatanController = [];
   List<TextEditingController> _nameController = [];

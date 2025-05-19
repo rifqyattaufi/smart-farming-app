@@ -46,7 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _peternakanData = peternakanData;
       });
     } catch (e) {
-      print('Error fetching data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       setState(() {
         _isLoading = false;

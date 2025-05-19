@@ -41,7 +41,12 @@ class _PelaporanKhususTernakScreenState
             ));
         break;
       case 'Pelaporan Kematian Ternak':
-        context.push('/pelaporan-kematian-ternak');
+        context.push('/pilih-kandang',
+            extra: PilihKandangScreen(
+              step: _step + 1,
+              tipe: 'kematian',
+              greeting: 'Pelaporan Kematian Ternak',
+            ));
         break;
       case 'Pelaporan Pemberian Nutrisi':
         context.push('/pelaporan-nutrisi-ternak');
