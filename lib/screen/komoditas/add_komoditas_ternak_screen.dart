@@ -262,6 +262,12 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                             orElse: () => {'id': null})['id'];
                       });
                     },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis ternak tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
                   DropdownFieldWidget(
                     label: "Satuan",
@@ -278,6 +284,12 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                             (item) => item['nama'] == value,
                             orElse: () => {'id': null})['id'];
                       });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Satuan tidak boleh kosong';
+                      }
+                      return null;
                     },
                   ),
                   ImagePickerWidget(

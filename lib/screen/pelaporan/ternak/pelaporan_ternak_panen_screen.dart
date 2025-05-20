@@ -133,7 +133,7 @@ class _PelaporanTernakPanenScreenState
   }
 
   Future<void> _submitForm() async {
-    if (isLoading) return; 
+    if (isLoading) return;
     setState(() {
       isLoading = true;
     });
@@ -305,6 +305,12 @@ class _PelaporanTernakPanenScreenState
                         selectedValue: satuanList?['nama'] ?? '-',
                         onChanged: (value) => {},
                         isEdit: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Satuan panen wajib diisi';
+                          }
+                          return null;
+                        },
                       ),
                       ImagePickerWidget(
                         label: "Unggah bukti hasil panen",

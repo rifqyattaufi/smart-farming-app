@@ -240,9 +240,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
           title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Kandang',
-              greeting: widget.isEdit
-                  ? 'Edit Kandang'
-                  : 'Tambah Kandang'),
+              greeting: widget.isEdit ? 'Edit Kandang' : 'Tambah Kandang'),
         ),
       ),
       body: SafeArea(
@@ -304,6 +302,12 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           orElse: () => {'id': null},
                         )['id'];
                       });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis hewan tidak boleh kosong';
+                      }
+                      return null;
                     },
                     isEdit: widget.isEdit,
                   ),

@@ -146,7 +146,7 @@ class _PelaporanTernakSakitScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Laporan panen ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')} berhasil dikirim'),
+                  'Laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')} berhasil dikirim'),
               backgroundColor: Colors.green,
             ),
           );
@@ -154,7 +154,7 @@ class _PelaporanTernakSakitScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}'),
+                  'Gagal mengirim laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}'),
               backgroundColor: Colors.red,
             ),
           );

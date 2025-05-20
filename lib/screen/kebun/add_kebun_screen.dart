@@ -311,6 +311,12 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                         )['id']; // Simpan id dari item yang dipilih
                       });
                     },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis tanaman tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
                   InputFieldWidget(
                     label: "Jumlah tanaman",

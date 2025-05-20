@@ -350,6 +350,12 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         )['id'];
                       });
                     },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kategori inventaris tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
                   InputFieldWidget(
                       label: "Jumlah stok",
@@ -393,6 +399,12 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                           orElse: () => {'id': null},
                         )['id'];
                       });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Satuan tidak boleh kosong';
+                      }
+                      return null;
                     },
                   ),
                   InputFieldWidget(

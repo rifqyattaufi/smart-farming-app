@@ -94,25 +94,6 @@ class _PelaporanHarianTernakScreenState
     try {
       if (!formKey.currentState!.validate()) return;
 
-      if (statusPakan.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan pilih status pakan'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      if (statusKandang.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan pilih status kandang'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
       if (_imageTernak == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -140,15 +121,23 @@ class _PelaporanHarianTernakScreenState
         }
       };
 
-      await _laporanService.createLaporanHarianTernak(data);
+      final response = await _laporanService.createLaporanHarianTernak(data);
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Pelaporan berhasil dikirim'),
-          backgroundColor: green1,
-        ),
-      );
+      if (response['status']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Pelaporan Harian berhasil dikirim'),
+            backgroundColor: green1,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
 
       for (int i = 0; i < widget.step; i++) {
         Navigator.pop(context);

@@ -264,6 +264,12 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                         )['id'];
                       });
                     },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis tanaman tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
                   DropdownFieldWidget(
                     label: "Satuan",
@@ -281,6 +287,12 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                           orElse: () => {'id': null},
                         )['id'];
                       });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Satuan tidak boleh kosong';
+                      }
+                      return null;
                     },
                   ),
                   ImagePickerWidget(
