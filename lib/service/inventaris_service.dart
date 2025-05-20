@@ -8,9 +8,9 @@ class InventarisService {
   final AuthService _authService = AuthService();
 
   final String baseUrl = '${dotenv.env['BASE_URL'] ?? ''}/inventaris';
-  final String dashboardUrl = 
+  final String dashboardUrl =
       '${dotenv.env['BASE_URL'] ?? ''}/dashboard/inventaris';
-  
+
   Future<Map<String, dynamic>> getDashboardInventaris() async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
@@ -28,7 +28,7 @@ class InventarisService {
           'Failed to load dashboard inventaris data ${response.statusCode}');
     }
   }
-  
+
   Future<Map<String, dynamic>> getRiwayatPenggunaanInventaris() async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
@@ -45,7 +45,7 @@ class InventarisService {
       throw Exception(
           'Failed to load dashboard inventaris data ${response.statusCode}');
     }
-  }  
+  }
 
   Future<Map<String, dynamic>> getInventaris() async {
     final resolvedToken = await _authService.getToken();
@@ -97,6 +97,45 @@ class InventarisService {
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await getInventarisById(id);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getInventarisByKategoriName(String name) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/kategori/name/$name');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': 'Inventaris not found',
+          'data': [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getInventarisByKategoriName(name);
       } else {
         final body = response.body;
         return {

@@ -217,7 +217,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-nutrisi-ternak',
-      builder: (context, state) => const PelaporanNutrisiTernakScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanNutrisiTernakScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-nutrisi-ternak/:id',

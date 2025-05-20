@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_kematian_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_nutrisi_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_ternak_screen.dart';
@@ -75,54 +76,41 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                 data: updatedData,
                 tipe: widget.tipe,
                 step: widget.step + 1));
+      } else if (_selectedUnitBudidaya!['tipe'] == "individu") {
+        context.push('/pilih-ternak',
+            extra: PilihTernakScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
       } else if (widget.tipe == "panen") {
-        if (_selectedUnitBudidaya!['tipe'] == "individu") {
-          context.push('/pilih-ternak',
-              extra: PilihTernakScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        } else {
-          context.push('/pelaporan-panen-ternak',
-              extra: PelaporanTernakPanenScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        }
+        context.push('/pelaporan-panen-ternak',
+            extra: PelaporanTernakPanenScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
       } else if (widget.tipe == "sakit") {
-        if (_selectedUnitBudidaya!['tipe'] == "individu") {
-          context.push('/pilih-ternak',
-              extra: PilihTernakScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        } else {
-          context.push('/pelaporan-ternak-sakit',
-              extra: PelaporanTernakSakitScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        }
+        context.push('/pelaporan-ternak-sakit',
+            extra: PelaporanTernakSakitScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
       } else if (widget.tipe == "kematian") {
-        if (_selectedUnitBudidaya!['tipe'] == "individu") {
-          context.push('/pilih-ternak',
-              extra: PilihTernakScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        } else {
-          context.push('/pelaporan-kematian-ternak',
-              extra: PelaporanKematianTernakScreen(
-                  greeting: widget.greeting,
-                  data: updatedData,
-                  tipe: widget.tipe,
-                  step: widget.step + 1));
-        }
+        context.push('/pelaporan-kematian-ternak',
+            extra: PelaporanKematianTernakScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
+      } else if (widget.tipe == "vitamin") {
+        context.push('/pelaporan-nutrisi-ternak',
+            extra: PelaporanNutrisiTernakScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

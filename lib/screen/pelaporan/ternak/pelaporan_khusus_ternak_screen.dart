@@ -49,7 +49,12 @@ class _PelaporanKhususTernakScreenState
             ));
         break;
       case 'Pelaporan Pemberian Nutrisi':
-        context.push('/pelaporan-nutrisi-ternak');
+        context.push('/pilih-kandang',
+            extra: PilihKandangScreen(
+              step: _step + 1,
+              tipe: 'vitamin',
+              greeting: 'Pelaporan Pemberian Nutrisi',
+            ));
         break;
       default:
         break;

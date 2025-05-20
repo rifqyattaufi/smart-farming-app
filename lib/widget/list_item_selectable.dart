@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 
 enum ListItemType { basic, simple }
@@ -189,30 +188,5 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
         ],
       ),
     );
-  }
-
-  Widget _buildImageOrIcon(String? path) {
-    if (path == null || path.isEmpty) {
-      return Container(width: 60, height: 60, color: Colors.grey[300]);
-    }
-
-    if (path.endsWith('.svg')) {
-      return Container(
-        width: 60,
-        height: 60,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.green,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SvgPicture.asset(path,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
-      );
-    } else {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(path, width: 60, height: 60, fit: BoxFit.cover),
-      );
-    }
   }
 }

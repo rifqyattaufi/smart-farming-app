@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_kematian_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_nutrisi_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_ternak_sakit_screen.dart';
 import 'package:smart_farming_app/service/objek_budidaya_service.dart';
@@ -88,6 +89,14 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
     } else if (widget.tipe == "kematian") {
       context.push('/pelaporan-kematian-ternak',
           extra: PelaporanKematianTernakScreen(
+            greeting: widget.greeting,
+            data: updatedData,
+            tipe: widget.tipe,
+            step: widget.step + 1,
+          ));
+    } else if (widget.tipe == "vitamin") {
+      context.push('/pelaporan-nutrisi-ternak',
+          extra: PelaporanNutrisiTernakScreen(
             greeting: widget.greeting,
             data: updatedData,
             tipe: widget.tipe,

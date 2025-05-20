@@ -7,6 +7,7 @@ class DropdownFieldWidget extends StatelessWidget {
   final List<String> items;
   final String? selectedValue;
   final ValueChanged<String?> onChanged;
+  final String? Function(String?)? validator;
   final bool isEdit;
 
   const DropdownFieldWidget({
@@ -17,6 +18,7 @@ class DropdownFieldWidget extends StatelessWidget {
     required this.selectedValue,
     required this.onChanged,
     this.isEdit = false,
+    this.validator,
   });
 
   @override
@@ -56,7 +58,8 @@ class DropdownFieldWidget extends StatelessWidget {
                     ),
                   ))
               .toList(),
-          onChanged: isEdit ? null : onChanged, // Disable if isEdit is true
+          onChanged: isEdit ? null : onChanged,
+          validator: validator, // Disable if isEdit is true
         ),
         const SizedBox(height: 12),
       ],
