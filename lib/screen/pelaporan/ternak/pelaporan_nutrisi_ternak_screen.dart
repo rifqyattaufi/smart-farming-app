@@ -154,7 +154,7 @@ class _PelaporanNutrisiTernakScreenState
         allValid = false;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Unggah bukti pemberian dosis ke tanaman'),
+            content: Text('Unggah bukti pemberian dosis ke ternak'),
             backgroundColor: Colors.red,
           ),
         );
@@ -418,7 +418,7 @@ class _PelaporanNutrisiTernakScreenState
                         },
                       ),
                       ImagePickerWidget(
-                        label: "Unggah bukti pemberian dosis ke tanaman",
+                        label: "Unggah bukti pemberian dosis ke ternak",
                         image: _imageList[i],
                         onPickImage: (ctx) {
                           _pickImageDosis(context, i);

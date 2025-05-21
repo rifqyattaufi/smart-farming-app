@@ -74,7 +74,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${response['message']}'),
-            // backgroundColor: Colors.red,
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -82,7 +82,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),
-          // backgroundColor: Colors.red,
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -95,7 +95,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Berhasil menghapus data inventaris'),
-          // backgroundColor: Colors.green,
+          backgroundColor: Colors.green,
         ),
       );
       context.pop();
@@ -103,7 +103,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error deleting data: ${response['message']}'),
-          // backgroundColor: Colors.red,
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -239,6 +239,32 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                       xLabels: pemakaianLabels,
                       titleStats: 'Statistik Pemakaian Inventaris',
                       showCounter: false,
+                      onDateRangeChanged: (start, end) {
+                        setState(() {
+                          // Filter data berdasarkan rentang tanggal
+                          final filteredData =
+                              _riwayatPemakaianList.where((item) {
+                            final itemDate = DateTime.parse(item['createdAt']);
+                            return itemDate.isAfter(
+                                    start.subtract(const Duration(days: 1))) &&
+                                itemDate
+                                    .isBefore(end.add(const Duration(days: 1)));
+                          }).toList();
+
+                          // Perbarui data dan label
+                          datas = filteredData
+                              .map<int>((e) => (e['stokPemakaian'] ?? 0) as int)
+                              .toList();
+                          pemakaianLabels = filteredData.map<String>((e) {
+                            final date = DateTime.parse(e['createdAt']);
+                            return DateFormat('dd MMM').format(date);
+                          }).toList();
+
+                          // Perbarui firstDates dan lastDates
+                          firstDates = [start];
+                          lastDates = [end];
+                        });
+                      },
                     )
                   : Padding(
                       padding: const EdgeInsets.all(16),

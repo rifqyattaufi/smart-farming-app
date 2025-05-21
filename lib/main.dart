@@ -131,7 +131,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pilih-tanaman',
-      builder: (context, state) => const PilihTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PilihTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/pilih-ternak',
@@ -142,7 +145,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pilih-kebun',
-      builder: (context, state) => const PilihKebunScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PilihKebunScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/pilih-kebun-jenis',
@@ -168,7 +174,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-harian-tanaman',
-      builder: (context, state) => const PelaporanHarianTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanHarianTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
         path: '/detail-laporan-harian-tanaman/:id',
@@ -204,7 +213,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-nutrisi-tanaman',
-      builder: (context, state) => const PelaporanNutrisiTanamanScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanNutrisiTanamanScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-nutrisi-tanaman/:id',
@@ -249,7 +261,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-tanaman-mati',
-      builder: (context, state) => const PelaporanTanamanMatiScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTanamanMatiScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-mati-tanaman/:id',
@@ -262,7 +277,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-panen-tanaman',
-      builder: (context, state) => const PelaporanTanamanPanenScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTanamanPanenScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-panen-tanaman/:id',
@@ -291,7 +309,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/pelaporan-tanaman-sakit',
-      builder: (context, state) => const PelaporanTanamanSakitScreen(),
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTanamanSakitScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/detail-laporan-sakit-tanaman/:id',

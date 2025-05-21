@@ -14,6 +14,8 @@ class ChartWidget extends StatefulWidget {
   final bool showCounter;
   final String textCounter;
   final List<String> xLabels;
+  final Function(DateTime start, DateTime end)?
+      onDateRangeChanged;
 
   const ChartWidget({
     super.key,
@@ -26,6 +28,7 @@ class ChartWidget extends StatefulWidget {
     this.showCounter = true,
     this.textCounter = 'Hasil Panen (Kg)',
     this.xLabels = const [],
+    this.onDateRangeChanged,
   });
 
   @override
@@ -89,9 +92,9 @@ class _ChartWidgetState extends State<ChartWidget> {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {
-                    // open date picker
-                    showDateRangePicker(
+                  onPressed: () async {
+                    final DateTimeRange? pickedRange =
+                        await showDateRangePicker(
                       context: context,
                       firstDate:
                           DateTime.now().subtract(const Duration(days: 365)),
@@ -100,15 +103,12 @@ class _ChartWidgetState extends State<ChartWidget> {
                         start: widget.firstDate,
                         end: widget.lastDate,
                       ),
-                    ).then((value) {
-                      if (value != null) {
-                        setState(() {
-                          // widget.firstDate = value.start;
-                          // widget.lastDate = value.end;
-                        });
-                        generateXLabels();
-                      }
-                    });
+                    );
+
+                    if (pickedRange != null) {
+                      widget.onDateRangeChanged
+                          ?.call(pickedRange.start, pickedRange.end);
+                    }
                   },
                   icon: SvgPicture.asset(
                     'assets/icons/calendar.svg',
@@ -198,26 +198,32 @@ class _ChartWidgetState extends State<ChartWidget> {
               ),
               if (!showCounter) ...[
                 IconButton(
-                  onPressed: () {
-                    // open date picker
-                    showDateRangePicker(
+                  onPressed: () async {
+                    final DateTime initialStart =
+                        widget.firstDate.isBefore(DateTime.now())
+                            ? widget.firstDate
+                            : DateTime.now().subtract(const Duration(days: 1));
+                    final DateTime initialEnd =
+                        widget.lastDate.isBefore(DateTime.now())
+                            ? widget.lastDate
+                            : DateTime.now();
+
+                    final DateTimeRange? pickedRange =
+                        await showDateRangePicker(
                       context: context,
                       firstDate:
                           DateTime.now().subtract(const Duration(days: 365)),
                       lastDate: DateTime.now(),
                       initialDateRange: DateTimeRange(
-                        start: widget.firstDate,
-                        end: widget.lastDate,
+                        start: initialStart,
+                        end: initialEnd,
                       ),
-                    ).then((value) {
-                      if (value != null) {
-                        setState(() {
-                          // widget.firstDate = value.start;
-                          // widget.lastDate = value.end;
-                        });
-                        generateXLabels();
-                      }
-                    });
+                    );
+
+                    if (pickedRange != null) {
+                      widget.onDateRangeChanged
+                          ?.call(pickedRange.start, pickedRange.end);
+                    }
                   },
                   icon: SvgPicture.asset(
                     'assets/icons/calendar.svg',
@@ -239,13 +245,13 @@ class _ChartWidgetState extends State<ChartWidget> {
                   final isMax = widget.data[index] ==
                       widget.data.reduce((a, b) => a > b ? a : b);
                   return BarChartGroupData(
-                    x: index, // Pastikan ini sinkron dengan indeks xLabels
+                    x: index,
                     barRods: [
                       BarChartRodData(
                         toY: widget.data[index],
                         width: 20,
                         borderRadius: BorderRadius.circular(6),
-                        color: isMax ? green1 : green2.withOpacity(0.4),
+                        color: isMax ? green1 : green2.withValues(alpha: .4),
                       ),
                     ],
                   );
