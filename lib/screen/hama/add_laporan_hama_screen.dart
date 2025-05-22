@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/service/hama_service.dart';
+import 'package:smart_farming_app/service/image_service.dart';
+import 'package:smart_farming_app/service/laporan_service.dart';
+import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -8,19 +12,31 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/button.dart';
-import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddLaporanHamaScreen extends StatefulWidget {
-  const AddLaporanHamaScreen({super.key});
+  final Map<String, dynamic>? data;
+
+  const AddLaporanHamaScreen({super.key, this.data = const {}});
 
   @override
   _AddLaporanHamaScreenState createState() => _AddLaporanHamaScreenState();
 }
 
 class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
+  final HamaService _hamaService = HamaService();
+  final ImageService _imageService = ImageService();
+  final LaporanService _laporanService = LaporanService();
+  final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
+
+  List<Map<String, dynamic>> hamaList = [];
+  List<Map<String, dynamic>> unitList = [];
+
   String? selectedHama;
   String? selectedLocation;
-  String hamaStatus = 'Ada';
+  String hamaStatus = '';
 
   File? _image;
   final picker = ImagePicker();
@@ -69,9 +85,156 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
     );
   }
 
+  Future<void> _getJenisHama() async {
+    final response = await _hamaService.getJenisHama();
+    if (response['status'] == true) {
+      final List<dynamic> data = response['data'];
+      setState(() {
+        hamaList = data.map((item) {
+          return {
+            'id': item['id'],
+            'nama': item['nama'],
+          };
+        }).toList();
+
+        hamaList.add({'id': 'lainnya', 'nama': 'Lainnya'});
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _getUnitBudidaya() async {
+    final response = await _unitBudidayaService.getUnitBudidaya();
+    if (response['status'] == true) {
+      final List<dynamic> data = response['data'];
+      setState(() {
+        unitList = data.map((item) {
+          return {
+            'id': item['id'],
+            'nama': item['nama'],
+          };
+        }).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   final TextEditingController _namaHamaController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _catatanController = TextEditingController();
+  Map<String, dynamic> imageUrl = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _getJenisHama();
+    _getUnitBudidaya();
+  }
+
+  Future<void> _submitForm() async {
+    if (_isLoading) return;
+
+    try {
+      if (!_formKey.currentState!.validate()) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (_image == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Silakan unggah bukti adanya hama'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      _formKey.currentState!.save();
+
+      String? newCreatedHamaId;
+
+      if (selectedHama == 'lainnya') {
+        final newHamaResponse = await _hamaService.createJenisHama({
+          'nama': _namaHamaController.text,
+        });
+
+        if (newHamaResponse['status'] == true) {
+          newCreatedHamaId = newHamaResponse['data']['id'];
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(newHamaResponse['message'] ??
+                    'Gagal menambahkan jenis hama baru'),
+                backgroundColor: Colors.red),
+          );
+          return;
+        }
+
+      }
+
+      // Menggunakan id baru jika ada
+      final selectedNamaHama = hamaList.firstWhere(
+        (item) => item['id'] == selectedHama,
+        orElse: () => {'nama': ''},
+      )['nama'];
+
+
+      final imageUrl = await _imageService.uploadImage(_image!);
+
+      final data = {
+        'unitBudidayaId': selectedLocation,
+        'tipe': 'hama',
+        'judul':
+            "Laporan Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama}",
+        'gambar': imageUrl.isNotEmpty ? imageUrl['data'] : '',
+        'catatan': _catatanController.text,
+        'hama': {
+          'jenisHamaId':
+              newCreatedHamaId ?? selectedHama, // Gunakan id baru jika ada
+          'jumlah': int.parse(_sizeController.text),
+          'status': 1
+        }
+      };
+
+      final response = await _laporanService.createLaporanHama(data);
+
+      if (response['status'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama} berhasil ditambahkan'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Terjadi kesalahan saat menambahkan: $e'),
+            backgroundColor: Colors.red),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,74 +262,116 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                 'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
             showDate: true,
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RadioField(
-                  label: 'Status hama',
-                  selectedValue: hamaStatus,
-                  options: const ['Ada', 'Tidak ada'],
-                  onChanged: (value) {
-                    setState(() {
-                      hamaStatus = value;
-                    });
-                  },
-                ),
-                DropdownFieldWidget(
-                  label: "Jenis hama",
-                  hint: "Pilih jenis hama",
-                  items: const ["Tikus", "Ulat Bulu", "Lainnya"],
-                  selectedValue: selectedHama,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedHama = value;
-                    });
-                  },
-                ),
-                if (selectedHama == "Lainnya")
-                  InputFieldWidget(
-                    label: "Nama hama",
-                    hint: "Masukkan nama hama",
-                    controller: _namaHamaController,
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownFieldWidget(
+                    label: "Jenis hama",
+                    hint: "Pilih jenis hama",
+                    items: hamaList
+                        .map((item) => item['nama'].toString())
+                        .toList(),
+                    selectedValue: hamaList.firstWhere(
+                      (item) => item['id'] == selectedHama,
+                      orElse: () => {'nama': ''},
+                    )['nama'],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedHama = hamaList.firstWhere(
+                          (item) => item['nama'] == value,
+                          orElse: () => {'id': null},
+                        )['id'];
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis hama tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
-                DropdownFieldWidget(
-                  label: "Terlihat di",
-                  hint: "Pilih lokasi",
-                  items: const ["Kebun A", "Kebun B"],
-                  selectedValue: selectedLocation,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedLocation = value;
-                    });
-                  },
-                ),
-                InputFieldWidget(
-                    label: "Jumlah hama",
-                    hint: "Contoh: 5 (ekor)",
-                    controller: _sizeController),
-                ImagePickerWidget(
-                  label: "Unggah bukti adanya hama",
-                  image: _image,
-                  onPickImage: _pickImage,
-                ),
-                InputFieldWidget(
-                    label: "Catatan/jurnal pelaporan",
-                    hint: "Keterangan",
-                    controller: _descriptionController,
-                    maxLines: 10),
-                const SizedBox(height: 16),
-                CustomButton(
-                  onPressed: () {
-                    // Your action here
-                  },
-                  backgroundColor: green1,
-                  textStyle: semibold16,
-                  textColor: white,
-                ),
-                const SizedBox(height: 16),
-              ],
+                  Text('selectedHama: $selectedHama'),
+                  if (selectedHama == "lainnya")
+                    InputFieldWidget(
+                      label: "Nama hama",
+                      hint: "Masukkan nama hama",
+                      controller: _namaHamaController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama Hama tidak boleh kosong';
+                        }
+                        return null;
+                      },
+                    ),
+                  DropdownFieldWidget(
+                    label: "Terlihat di",
+                    hint: "Pilih lokasi",
+                    items: unitList
+                        .map((item) => item['nama'].toString())
+                        .toList(),
+                    selectedValue: unitList.firstWhere(
+                      (item) => item['id'] == selectedLocation,
+                      orElse: () => {'nama': ''},
+                    )['nama'],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedLocation = unitList.firstWhere(
+                          (item) => item['nama'] == value,
+                          orElse: () => {'id': null},
+                        )['id'];
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Lokasi tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  InputFieldWidget(
+                      label: "Jumlah hama",
+                      hint: "Contoh: 5 (ekor)",
+                      controller: _sizeController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Jumlah hama tidak boleh kosong';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Jumlah hama harus berupa angka';
+                        }
+                        return null;
+                      }),
+                  ImagePickerWidget(
+                    label: "Unggah bukti adanya hama",
+                    image: _image,
+                    onPickImage: _pickImage,
+                  ),
+                  InputFieldWidget(
+                      label: "Catatan/jurnal pelaporan",
+                      hint: "Keterangan",
+                      controller: _catatanController,
+                      maxLines: 10,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Masukkkan catatan pelaporan';
+                        }
+                        return null;
+                      }),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    onPressed: _submitForm,
+                    backgroundColor: green1,
+                    textStyle: semibold16,
+                    textColor: white,
+                    isLoading: _isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ]),

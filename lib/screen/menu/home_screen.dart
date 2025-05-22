@@ -4,6 +4,7 @@ import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
@@ -348,7 +349,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan rutin kondisi tanaman setiap hari',
                                             onTap: () {
-                                              context.push('/pilih-kebun');
+                                              context
+                                                  .push('/pilih-kebun',
+                                                      extra:
+                                                          const PilihKebunScreen(
+                                                        greeting:
+                                                            "Pelaporan Harian",
+                                                        tipe: "harian",
+                                                      ))
+                                                  .then((_) {
+                                                _fetchData();
+                                              });
                                             },
                                           ),
                                         ),
@@ -362,8 +373,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             subtitle:
                                                 'Pelaporan khusus kondisi tanaman seperti sakit, mati, atau panen',
                                             onTap: () {
-                                              context.push(
-                                                  '/pelaporan-khusus-tanaman');
+                                              context
+                                                  .push(
+                                                      '/pelaporan-khusus-tanaman')
+                                                  .then((_) {
+                                                _fetchData();
+                                              });
                                             },
                                           ),
                                         ),

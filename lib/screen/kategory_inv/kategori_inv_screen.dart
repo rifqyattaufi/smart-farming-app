@@ -43,7 +43,10 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+            content: Text(response['message']),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -64,8 +67,9 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(response['message']?.toString() ?? 'Terjadi kesalahan')),
+          content: Text(response['message']?.toString() ?? 'Terjadi kesalahan'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
 
@@ -198,6 +202,8 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                       const SnackBar(
                                                         content: Text(
                                                             'Berhasil menghapus data kategori inventaris'),
+                                                        backgroundColor:
+                                                            Colors.green,
                                                       ),
                                                     );
                                                   }
@@ -207,6 +213,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                       .showSnackBar(SnackBar(
                                                     content: Text(
                                                         response['message']),
+                                                    backgroundColor: Colors.red,
                                                   ));
                                                 }
                                                 Navigator.of(context).pop();

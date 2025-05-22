@@ -75,9 +75,11 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(widget.isUpdate
-                  ? 'Berhasil memperbarui data satuan'
-                  : 'Berhasil menambahkan data satuan')),
+            content: Text(widget.isUpdate
+                ? 'Berhasil memperbarui data satuan'
+                : 'Berhasil menambahkan data satuan'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context);
       } else {
@@ -86,7 +88,8 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -94,7 +97,9 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+        SnackBar(
+            content: Text('Terjadi kesalahan saat menambahkan: $e'),
+            backgroundColor: Colors.red),
       );
     }
   }

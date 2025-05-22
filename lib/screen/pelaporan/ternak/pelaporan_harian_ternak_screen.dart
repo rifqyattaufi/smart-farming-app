@@ -183,7 +183,7 @@ class _PelaporanHarianTernakScreenState
             BannerWidget(
               title: 'Step ${widget.step} - Isi Form Pelaporan',
               subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+                  'Harap mengisi form dengan data yang benar sesuai kondisi lapangan!',
               showDate: true,
             ),
             Padding(
