@@ -52,6 +52,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Berhasil menghapus data ternak'),
+          backgroundColor: Colors.green,
         ),
       );
       context.pop();

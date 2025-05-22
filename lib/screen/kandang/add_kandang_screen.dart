@@ -100,6 +100,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(response['message']),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -128,6 +129,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(response['message']),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -157,7 +159,9 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
 
       if (_image == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gambar kandang tidak boleh kosong')),
+          const SnackBar(
+              content: Text('Gambar kandang tidak boleh kosong'),
+              backgroundColor: Colors.red),
         );
         return;
       }
@@ -203,6 +207,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                   ? 'Kandang berhasil diperbarui'
                   : 'Kandang berhasil ditambahkan',
             ),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context);
@@ -212,7 +217,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -220,7 +226,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
       );
     }
   }

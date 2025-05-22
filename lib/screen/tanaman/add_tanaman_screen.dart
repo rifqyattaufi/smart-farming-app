@@ -91,7 +91,8 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
 
       if (_imageTanaman == null && widget.isEdit == false) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gambar tanaman tidak boleh kosong')),
+          const SnackBar(content: Text('Gambar tanaman tidak boleh kosong'), 
+              backgroundColor: Colors.red),
         );
         return;
       }
@@ -131,7 +132,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           SnackBar(
               content: Text(widget.isEdit
                   ? 'Berhasil memperbarui jenis tanaman'
-                  : 'Berhasil menambahkan jenis tanaman')),
+                  : 'Berhasil menambahkan jenis tanaman'), backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       } else {
@@ -139,7 +140,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -147,7 +148,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -173,7 +174,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
+        SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
   }

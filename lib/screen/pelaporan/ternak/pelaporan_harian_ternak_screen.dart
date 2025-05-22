@@ -125,9 +125,9 @@ class _PelaporanHarianTernakScreenState
 
       if (response['status']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Pelaporan Harian berhasil dikirim'),
-            backgroundColor: green1,
+          const SnackBar(
+            content: Text('Pelaporan Harian berhasil dikirim'),
+            backgroundColor: Colors.green,
           ),
         );
       } else {

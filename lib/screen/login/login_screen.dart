@@ -41,13 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go('/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       // Handle unexpected errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: $e')),
+        SnackBar(content: Text('An unexpected error occurred: $e'), backgroundColor: Colors.red),
       );
     } finally {
       setState(() {

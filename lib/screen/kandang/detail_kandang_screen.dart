@@ -52,6 +52,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Data deleted successfully'),
+            backgroundColor: Colors.green,
           ),
         );
       } else {

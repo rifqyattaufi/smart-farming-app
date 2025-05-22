@@ -52,6 +52,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Data deleted successfully'),
+            backgroundColor: Colors.green,
           ),
         );
       } else {

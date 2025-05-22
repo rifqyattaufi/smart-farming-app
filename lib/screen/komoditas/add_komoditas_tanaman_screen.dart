@@ -178,6 +178,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Komoditas Berhasil ditambahkan'),
+              backgroundColor: Colors.green,
             ),
           );
           Navigator.pop(context);

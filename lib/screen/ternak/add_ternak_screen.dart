@@ -104,6 +104,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(response['message']),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -119,6 +120,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Gambar hewan ternak tidak boleh kosong'),
+            backgroundColor: Colors.red,
           ),
         );
         return;
@@ -159,6 +161,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
             content: Text(widget.isEdit
                 ? 'Berhasil memperbarui jenis hewan ternak'
                 : 'Berhasil menambahkan jenis hewan ternak'),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context);
@@ -170,6 +173,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response['message']),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -181,6 +185,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Terjadi kesalahan: $e'),
+          backgroundColor: Colors.red,
         ),
       );
     }

@@ -69,7 +69,8 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           SnackBar(
               content: Text(widget.isUpdate
                   ? 'Berhasil memperbarui data kategori inventaris'
-                  : 'Berhasil menambahkan data kategori inventaris')),
+                  : 'Berhasil menambahkan data kategori inventaris'),
+              backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       } else {
@@ -78,7 +79,8 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -86,7 +88,9 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat menambahkan: $e')),
+        SnackBar(
+            content: Text('Terjadi kesalahan saat menambahkan: $e'),
+            backgroundColor: Colors.red),
       );
     }
   }

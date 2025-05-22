@@ -208,7 +208,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
 
       if (_image == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gambar inventaris tidak boleh kosong')),
+          const SnackBar(content: Text('Gambar inventaris tidak boleh kosong'), backgroundColor: Colors.red),
         );
         return;
       }
@@ -216,7 +216,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
       if (_mysqlDateTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Tanggal kadaluwarsa tidak boleh kosong')),
+              content: Text('Tanggal kadaluwarsa tidak boleh kosong'), backgroundColor: Colors.red),
         );
         return;
       }
