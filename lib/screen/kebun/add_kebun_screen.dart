@@ -322,6 +322,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     label: "Jumlah tanaman",
                     hint: "Contoh: 20 (satuan tanaman)",
                     controller: _jumlahController,
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Jumlah tanaman tidak boleh kosong';

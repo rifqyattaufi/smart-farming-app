@@ -41,11 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
       final perkebunanData = await _dashboardService.getDashboardPerkebunan();
       final peternakanData = await _dashboardService.getDashboardPeternakan();
 
+      if (!mounted) return;
       setState(() {
         _perkebunanData = perkebunanData;
         _peternakanData = peternakanData;
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),
@@ -53,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

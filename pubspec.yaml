@@ -48,6 +48,7 @@ dependencies:
   dotted_border: ^2.1.0
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.2.2
+  connectivity_plus: ^6.1.4
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
