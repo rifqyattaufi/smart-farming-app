@@ -46,6 +46,8 @@ class _PelaporanHarianTanamanScreenState
 
   List<Map<String, dynamic>> listBahanVitamin = [];
   List<Map<String, dynamic>> listBahanVaksin = [];
+  List<Map<String, dynamic>> listBahanPupuk = [];
+  List<Map<String, dynamic>> listBahanDisinfektan = [];
 
   bool _isLoading = false;
   File? _imageTanaman;
@@ -70,6 +72,10 @@ class _PelaporanHarianTanamanScreenState
           await _inventarisService.getInventarisByKategoriName('Vitamin');
       final responseVaksin =
           await _inventarisService.getInventarisByKategoriName('Vaksin');
+      final responsePupuk =
+          await _inventarisService.getInventarisByKategoriName('Pupuk');
+      final responseDisinfektan =
+          await _inventarisService.getInventarisByKategoriName('Disinfektan');
 
       if (responseVitamin['status']) {
         setState(() {
@@ -106,6 +112,46 @@ class _PelaporanHarianTanamanScreenState
           SnackBar(
             content: Text(
                 'Error fetching vaksin data: ${responseVaksin['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      if (responsePupuk['status']) {
+        setState(() {
+          listBahanPupuk = responsePupuk['data']
+              .map<Map<String, dynamic>>((item) => {
+                    'name': item['nama'],
+                    'id': item['id'],
+                    'satuanId': item['SatuanId'],
+                  })
+              .toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Error fetching vaksin data: ${responsePupuk['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      if (responseDisinfektan['status']) {
+        setState(() {
+          listBahanDisinfektan = responseDisinfektan['data']
+              .map<Map<String, dynamic>>((item) => {
+                    'name': item['nama'],
+                    'id': item['id'],
+                    'satuanId': item['SatuanId'],
+                  })
+              .toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error fetching vaksin data: ${responseDisinfektan['message']}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -544,19 +590,59 @@ class _PelaporanHarianTanamanScreenState
                         DropdownFieldWidget(
                           label: "Nama bahan",
                           hint: "Pilih jenis bahan",
-                          items: (statusPemberianList[i] == 'Vitamin'
-                                  ? listBahanVitamin
-                                  : listBahanVaksin)
-                              .map((item) => item['name'] as String)
-                              .toList(),
+                          items: (() {
+                            switch (statusPemberianList[i]) {
+                              case 'Vitamin':
+                                return listBahanVitamin
+                                    .map((item) => item['name'] as String)
+                                    .toList()
+                                    .cast<String>();
+                              case 'Pupuk':
+                                return listBahanPupuk
+                                    .map((item) => item['name'] as String)
+                                    .toList()
+                                    .cast<String>();
+                              case 'Vaksin':
+                                return listBahanVaksin
+                                    .map((item) => item['name'] as String)
+                                    .toList()
+                                    .cast<String>();
+                              case 'Disinfektan':
+                                return listBahanDisinfektan
+                                    .map((item) => item['name'] as String)
+                                    .toList()
+                                    .cast<String>();
+                              default:
+                                return <String>[];
+                            }
+                          })(),
                           selectedValue: selectedBahanList[i]['name'] ?? '',
                           onChanged: (value) {
                             setState(() {
-                              selectedBahanList[i] = (statusPemberianList[i] ==
-                                          'Vitamin'
-                                      ? listBahanVitamin
-                                      : listBahanVaksin)
-                                  .firstWhere((item) => item['name'] == value);
+                              switch (statusPemberianList[i]) {
+                                case 'Vitamin':
+                                  selectedBahanList[i] =
+                                      listBahanVitamin.firstWhere(
+                                          (item) => item['name'] == value);
+                                  break;
+                                case 'Pupuk':
+                                  selectedBahanList[i] =
+                                      listBahanPupuk.firstWhere(
+                                          (item) => item['name'] == value);
+                                  break;
+                                case 'Vaksin':
+                                  selectedBahanList[i] =
+                                      listBahanVaksin.firstWhere(
+                                          (item) => item['name'] == value);
+                                  break;
+                                case 'Disinfektan':
+                                  selectedBahanList[i] =
+                                      listBahanDisinfektan.firstWhere(
+                                          (item) => item['name'] == value);
+                                  break;
+                                default:
+                                  selectedBahanList[i] = {};
+                              }
                             });
                             changeSatuan(i);
                           },
