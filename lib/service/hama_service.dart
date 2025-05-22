@@ -118,7 +118,8 @@ class HamaService {
     }
   }
 
-  Future<Map<String, dynamic>> createJenisHama(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> createJenisHama(
+      Map<String, dynamic> data) async {
     final resolvedToken = await _authService.getToken();
     final headers = {
       'Authorization': 'Bearer $resolvedToken',
@@ -134,6 +135,7 @@ class HamaService {
         return {
           'status': true,
           'message': 'success',
+          'data': json.decode(response.body)['data'],
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();

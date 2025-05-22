@@ -310,6 +310,9 @@ class _PelaporanTanamanPanenScreenState
                           if (double.tryParse(value) == null) {
                             return 'Jumlah panen harus berupa angka';
                           }
+                          if (double.parse(value) <= 0) {
+                            return 'Jumlah panen harus lebih dari 0';
+                          }
                           return null;
                         },
                       ),

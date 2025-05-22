@@ -236,16 +236,13 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
       final formattedDate =
           DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
-      final formattedUpdatedAtDate = DateFormat('yyyy-MM-dd HH:mm:ss')
-          .format(DateTime.now().add(const Duration(hours: 7)));
-
       final data = {
         'nama': _nameController.text,
         'kategoriInventarisId': selectedLocation,
         'jumlah': _sizeController.text,
         'satuanId': selectedSatuan,
         'stokMinim': _minimController.text,
-        'tanggalKadaluwarsa': formattedDate,
+        'tanggalKadaluwarsa': formattedKadaluwarsaDate,
         if (widget.isEdit) 'updatedAt': formattedDate,
         'kondisi': kondisiInv,
         'ketersediaan': ketersediaanInv,
@@ -367,12 +364,16 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                       label: "Jumlah stok",
                       hint: "Contoh: 20",
                       controller: _sizeController,
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Jumlah stok tidak boleh kosong';
                         }
                         if (int.tryParse(value) == null) {
                           return 'Jumlah stok harus berupa angka';
+                        }
+                        if (int.parse(value) <= 0) {
+                          return 'Jumlah stok harus lebih dari 0';
                         }
                         return null;
                       }),

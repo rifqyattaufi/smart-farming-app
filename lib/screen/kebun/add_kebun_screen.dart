@@ -283,12 +283,16 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     label: "Luas kebun",
                     hint: "Contoh: 30 m²",
                     controller: _sizeController,
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Luas Kebun tidak boleh kosong';
                       }
                       if (int.tryParse(value) == null) {
                         return 'Luas Kebun harus berupa angka';
+                      }
+                      if (int.parse(value) <= 0) {
+                        return 'Luas Kebun harus lebih besar dari 0';
                       }
                       return null;
                     },
@@ -322,12 +326,16 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     label: "Jumlah tanaman",
                     hint: "Contoh: 20 (satuan tanaman)",
                     controller: _jumlahController,
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Jumlah tanaman tidak boleh kosong';
                       }
                       if (int.tryParse(value) == null) {
                         return 'Jumlah tanaman harus berupa angka';
+                      }
+                      if (int.parse(value) <= 0) {
+                        return 'Jumlah tanaman harus lebih besar dari 0';
                       }
                       return null;
                     },

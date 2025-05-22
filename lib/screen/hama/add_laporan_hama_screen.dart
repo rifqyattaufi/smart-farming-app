@@ -169,6 +169,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         });
 
         if (newHamaResponse['status'] == true) {
+          print(newHamaResponse);
           newCreatedHamaId = newHamaResponse['data']['id'];
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +180,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
           );
           return;
         }
-
       }
 
       // Menggunakan id baru jika ada
@@ -187,7 +187,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         (item) => item['id'] == selectedHama,
         orElse: () => {'nama': ''},
       )['nama'];
-
 
       final imageUrl = await _imageService.uploadImage(_image!);
 
@@ -207,6 +206,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
       };
 
       final response = await _laporanService.createLaporanHama(data);
+      print(response);
 
       if (response['status'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -294,7 +294,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                       return null;
                     },
                   ),
-                  Text('selectedHama: $selectedHama'),
                   if (selectedHama == "lainnya")
                     InputFieldWidget(
                       label: "Nama hama",
@@ -336,12 +335,16 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                       label: "Jumlah hama",
                       hint: "Contoh: 5 (ekor)",
                       controller: _sizeController,
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Jumlah hama tidak boleh kosong';
                         }
                         if (int.tryParse(value) == null) {
                           return 'Jumlah hama harus berupa angka';
+                        }
+                        if (int.parse(value) <= 0) {
+                          return 'Jumlah hama harus lebih dari 0';
                         }
                         return null;
                       }),
