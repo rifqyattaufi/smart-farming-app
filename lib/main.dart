@@ -38,7 +38,6 @@ import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan
 import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_jenis_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_mati_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_nutrisi_ternak_screen.dart';
@@ -150,10 +149,6 @@ final _router = GoRouter(
         final extra = state.extra as PilihKebunScreen;
         return extra;
       },
-    ),
-    GoRoute(
-      path: '/pilih-kebun-jenis',
-      builder: (context, state) => const PilihKebunJenisScreen(),
     ),
     GoRoute(
       path: '/pilih-kandang',

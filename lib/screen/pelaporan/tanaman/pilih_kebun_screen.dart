@@ -72,7 +72,6 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                 data: updatedData,
                 tipe: widget.tipe,
                 step: widget.step + 1));
-      } else if (widget.tipe == "vitamin") {
       } else {
         context.push('/pilih-tanaman',
             extra: PilihTanamanScreen(

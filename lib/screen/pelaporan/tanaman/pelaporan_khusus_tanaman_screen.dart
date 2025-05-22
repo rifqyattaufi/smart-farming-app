@@ -47,7 +47,7 @@ class _PelaporanKhususTanamanScreenState
               greeting: 'Pelaporan Tanaman Mati',
             ));
         break;
-      case 'Pelaporan Pemberian Nutrisi': // kalo nutrisi pakai yg screen kebun jenis, kalo pilih jenis ke tanaman, kalo pilih kebun ke form
+      case 'Pelaporan Pemberian Nutrisi':
         context.push('/pilih-kebun',
             extra: PilihKebunScreen(
               step: _step + 1,
