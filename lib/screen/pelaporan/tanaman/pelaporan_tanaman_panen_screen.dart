@@ -79,7 +79,6 @@ class _PelaporanTanamanPanenScreenState
     _fetchData();
     final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
     final length = objekBudidayaList.length;
-    print('length: $length, Testdata: $objekBudidayaList');
     sizeControllers = List.generate(length, (_) => TextEditingController());
     catatanControllers = List.generate(length, (_) => TextEditingController());
     imageList = List.generate(length, (_) => null);
@@ -257,8 +256,6 @@ class _PelaporanTanamanPanenScreenState
               showDate: true,
             ),
             ...List.generate(objekBudidayaList.length, (i) {
-              final objek = objekBudidayaList[i];
-
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Form(
@@ -272,11 +269,7 @@ class _PelaporanTanamanPanenScreenState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        ((objek?['name'] != null &&
-                                    (objek?['name'] as String).isNotEmpty)
-                                ? '${objek?['name']} - '
-                                : '') +
-                            (widget.data?['komoditas']?['name'] ?? '-'),
+                        (widget.data?['komoditas']?['name'] ?? '-'),
                         style: bold20.copyWith(color: dark1),
                       ),
                       const SizedBox(height: 12),
@@ -291,10 +284,17 @@ class _PelaporanTanamanPanenScreenState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        objek?['createdAt'] != null
-                            ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                .format(DateTime.parse(objek['createdAt']))
-                            : 'Unknown',
+                        (() {
+                          final createdAt =
+                              widget.data?['unitBudidaya']?['createdAt'];
+                          if (createdAt == null) return '-';
+                          try {
+                            return DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                .format(DateTime.parse(createdAt));
+                          } catch (_) {
+                            return 'Unknown';
+                          }
+                        })(),
                         style: regular14.copyWith(color: dark1),
                       ),
                       const SizedBox(height: 12),

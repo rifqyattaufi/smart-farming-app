@@ -404,6 +404,8 @@ class _PelaporanNutrisiTanamanScreenState
                               return 'Masukkan jumlah/dosis';
                             } else if (double.tryParse(value) == null) {
                               return 'Masukkan angka yang valid';
+                            } else if (double.parse(value) <= 0) {
+                              return 'Jumlah/dosis tidak boleh kurang dari 1';
                             }
                             return null;
                           }),

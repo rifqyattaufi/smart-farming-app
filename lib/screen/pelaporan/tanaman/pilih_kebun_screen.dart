@@ -134,7 +134,8 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                         'icon': item['gambar'],
                         'category': item['JenisBudidaya']['nama'],
                         'tipe': item['tipe'],
-                        'latin': item['JenisBudidaya']['latin']
+                        'latin': item['JenisBudidaya']['latin'],
+                        'createdAt': item['createdAt'],
                       })
                   .toList(),
               onItemTap: (context, item) {

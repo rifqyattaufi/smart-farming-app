@@ -105,7 +105,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
             content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
-    print('test: $hamaList');
   }
 
   Future<void> _getUnitBudidaya() async {
@@ -181,7 +180,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
           return;
         }
 
-        print('newCreatedHamaId: $newCreatedHamaId');
       }
 
       // Menggunakan id baru jika ada
@@ -190,7 +188,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         orElse: () => {'nama': ''},
       )['nama'];
 
-      print('selectedNamaHama: $selectedNamaHama');
 
       final imageUrl = await _imageService.uploadImage(_image!);
 

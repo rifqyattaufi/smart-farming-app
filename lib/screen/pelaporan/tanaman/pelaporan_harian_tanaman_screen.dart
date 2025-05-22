@@ -283,9 +283,9 @@ class _PelaporanHarianTanamanScreenState
     try {
       for (int i = 0; i < list.length; i++) {
         final imageUrl = await _imageService.uploadImage(_imageTanamanList[i]!);
-
         final dataTanaman = {
           'unitBudidayaId': widget.data?['unitBudidaya']['id'],
+          "objekBudidayaId": list[i]['id'],
           "judul":
               "Laporan Harian ${widget.data?['unitBudidaya']['name']} - ${list[i]['name']}",
           "tipe": widget.tipe,
@@ -427,178 +427,181 @@ class _PelaporanHarianTanamanScreenState
               final objek = objekBudidayaList[i];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Data Tanaman',
-                      style: semibold16.copyWith(color: dark1),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      ((objek?['name'] != null &&
-                                  (objek?['name'] as String).isNotEmpty)
-                              ? '${objek?['name']} - '
-                              : '') +
-                          (widget.data?['unitBudidaya']?['category'] ?? '-'),
-                      style: bold20.copyWith(color: dark1),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
-                      style: semibold16.copyWith(color: dark1),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Tanggal dan waktu tanam: ',
-                      style: regular14.copyWith(color: dark1),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      objek?['createdAt'] != null
-                          ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                              .format(DateTime.parse(objek['createdAt']))
-                          : 'Unknown',
-                      style: regular14.copyWith(color: dark1),
-                    ),
-                    const SizedBox(height: 12),
-                    RadioField(
-                      label: 'Dilakukan penyiraman?',
-                      selectedValue: statusPenyiraman[i],
-                      options: const ['Ya', 'Tidak'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusPenyiraman[i] = value;
-                        });
-                      },
-                    ),
-                    RadioField(
-                      label: 'Dilakukan pruning?',
-                      selectedValue: statusPruning[i],
-                      options: const ['Ya', 'Tidak'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusPruning[i] = value;
-                        });
-                      },
-                    ),
-                    RadioField(
-                      label: 'Dilakukan pemberian pupuk/vitamin/disinfektan?',
-                      selectedValue: statusNutrisi[i],
-                      options: const ['Ya', 'Tidak'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusNutrisi[i] = value;
-                        });
-                      },
-                    ),
-                    RadioField(
-                      label:
-                          'Dilakukan repotting (pemindahan pot/mengganti media tanam)?',
-                      selectedValue: statusRepotting[i],
-                      options: const ['Ya', 'Tidak'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusRepotting[i] = value;
-                        });
-                      },
-                    ),
-                    ImagePickerWidget(
-                      label: "Unggah bukti kondisi tanaman",
-                      image: _imageTanamanList[i],
-                      onPickImage: (ctx) {
-                        _pickImage(context, i);
-                      },
-                    ),
-                    InputFieldWidget(
-                        label: "Catatan/jurnal pelaporan",
-                        hint: "Keterangan",
-                        controller: _catatanController[i],
-                        maxLines: 10,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Masukkan catatan';
-                          }
-                          return null;
-                        }),
-                    if (statusNutrisi[i] == 'Ya') ...[
+                child: Form(
+                  key: _formKeys[i],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Data Tanaman',
+                        style: semibold16.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        ((objek?['name'] != null &&
+                                    (objek?['name'] as String).isNotEmpty)
+                                ? '${objek?['name']} - '
+                                : '') +
+                            (widget.data?['unitBudidaya']?['category'] ?? '-'),
+                        style: bold20.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
+                        style: semibold16.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tanggal dan waktu tanam: ',
+                        style: regular14.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        objek?['createdAt'] != null
+                            ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                .format(DateTime.parse(objek['createdAt']))
+                            : 'Unknown',
+                        style: regular14.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
                       RadioField(
-                        label: 'Jenis Pemberian',
-                        selectedValue: statusPemberianList[i] ?? 'Vitamin',
-                        options: const [
-                          'Vitamin',
-                          'Pupuk',
-                          'Vaksin',
-                          'Disinfektan',
-                        ],
+                        label: 'Dilakukan penyiraman?',
+                        selectedValue: statusPenyiraman[i],
+                        options: const ['Ya', 'Tidak'],
                         onChanged: (value) {
                           setState(() {
-                            statusPemberianList[i] = value;
-                            selectedBahanList[i] = {};
-                            _satuanController[i].clear();
+                            statusPenyiraman[i] = value;
                           });
                         },
                       ),
-                      DropdownFieldWidget(
-                        label: "Nama bahan",
-                        hint: "Pilih jenis bahan",
-                        items: (statusPemberianList[i] == 'Vitamin'
-                                ? listBahanVitamin
-                                : listBahanVaksin)
-                            .map((item) => item['name'] as String)
-                            .toList(),
-                        selectedValue: selectedBahanList[i]['name'] ?? '',
+                      RadioField(
+                        label: 'Dilakukan pruning?',
+                        selectedValue: statusPruning[i],
+                        options: const ['Ya', 'Tidak'],
                         onChanged: (value) {
                           setState(() {
-                            selectedBahanList[i] = (statusPemberianList[i] ==
-                                        'Vitamin'
-                                    ? listBahanVitamin
-                                    : listBahanVaksin)
-                                .firstWhere((item) => item['name'] == value);
+                            statusPruning[i] = value;
                           });
-                          changeSatuan(i);
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pilih bahan';
-                          }
-                          return null;
                         },
                       ),
-                      InputFieldWidget(
-                          label: "Jumlah/dosis",
-                          hint: "Contoh: 10",
-                          controller: _sizeController[i],
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Masukkan jumlah/dosis';
-                            } else if (double.tryParse(value) == null) {
-                              return 'Masukkan angka yang valid';
-                            }
-                            return null;
-                          }),
-                      InputFieldWidget(
-                        label: "Satuan dosis",
-                        hint: "",
-                        controller: _satuanController[i],
-                        isDisabled: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pilih satuan dosis';
-                          }
-                          return null;
+                      RadioField(
+                        label: 'Dilakukan pemberian pupuk/vitamin/disinfektan?',
+                        selectedValue: statusNutrisi[i],
+                        options: const ['Ya', 'Tidak'],
+                        onChanged: (value) {
+                          setState(() {
+                            statusNutrisi[i] = value;
+                          });
+                        },
+                      ),
+                      RadioField(
+                        label:
+                            'Dilakukan repotting (pemindahan pot/mengganti media tanam)?',
+                        selectedValue: statusRepotting[i],
+                        options: const ['Ya', 'Tidak'],
+                        onChanged: (value) {
+                          setState(() {
+                            statusRepotting[i] = value;
+                          });
                         },
                       ),
                       ImagePickerWidget(
-                        label: "Unggah bukti pemberian dosis ke tanaman",
-                        image: _imageDosisList[i],
+                        label: "Unggah bukti kondisi tanaman",
+                        image: _imageTanamanList[i],
                         onPickImage: (ctx) {
-                          _pickImageDosis(context, i);
+                          _pickImage(context, i);
                         },
                       ),
+                      InputFieldWidget(
+                          label: "Catatan/jurnal pelaporan",
+                          hint: "Keterangan",
+                          controller: _catatanController[i],
+                          maxLines: 10,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Masukkan catatan';
+                            }
+                            return null;
+                          }),
+                      if (statusNutrisi[i] == 'Ya') ...[
+                        RadioField(
+                          label: 'Jenis Pemberian',
+                          selectedValue: statusPemberianList[i] ?? 'Vitamin',
+                          options: const [
+                            'Vitamin',
+                            'Pupuk',
+                            'Vaksin',
+                            'Disinfektan',
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              statusPemberianList[i] = value;
+                              selectedBahanList[i] = {};
+                              _satuanController[i].clear();
+                            });
+                          },
+                        ),
+                        DropdownFieldWidget(
+                          label: "Nama bahan",
+                          hint: "Pilih jenis bahan",
+                          items: (statusPemberianList[i] == 'Vitamin'
+                                  ? listBahanVitamin
+                                  : listBahanVaksin)
+                              .map((item) => item['name'] as String)
+                              .toList(),
+                          selectedValue: selectedBahanList[i]['name'] ?? '',
+                          onChanged: (value) {
+                            setState(() {
+                              selectedBahanList[i] = (statusPemberianList[i] ==
+                                          'Vitamin'
+                                      ? listBahanVitamin
+                                      : listBahanVaksin)
+                                  .firstWhere((item) => item['name'] == value);
+                            });
+                            changeSatuan(i);
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Pilih bahan';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                            label: "Jumlah/dosis",
+                            hint: "Contoh: 10",
+                            controller: _sizeController[i],
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Masukkan jumlah/dosis';
+                              } else if (double.tryParse(value) == null) {
+                                return 'Masukkan angka yang valid';
+                              }
+                              return null;
+                            }),
+                        InputFieldWidget(
+                          label: "Satuan dosis",
+                          hint: "",
+                          controller: _satuanController[i],
+                          isDisabled: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Pilih satuan dosis';
+                            }
+                            return null;
+                          },
+                        ),
+                        ImagePickerWidget(
+                          label: "Unggah bukti pemberian dosis ke tanaman",
+                          image: _imageDosisList[i],
+                          onPickImage: (ctx) {
+                            _pickImageDosis(context, i);
+                          },
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               );
             }),
