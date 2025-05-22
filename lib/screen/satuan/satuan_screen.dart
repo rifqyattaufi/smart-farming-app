@@ -42,7 +42,8 @@ class _SatuanScreenState extends State<SatuanScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     }
@@ -64,7 +65,8 @@ class _SatuanScreenState extends State<SatuanScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content:
-                Text(response['message']?.toString() ?? 'Terjadi kesalahan')),
+                Text(response['message']?.toString() ?? 'Terjadi kesalahan'),
+            backgroundColor: Colors.red),
       );
     }
 
@@ -199,6 +201,8 @@ class _SatuanScreenState extends State<SatuanScreen> {
                                                       const SnackBar(
                                                         content: Text(
                                                             'Berhasil menghapus data satuan'),
+                                                        backgroundColor:
+                                                            Colors.green,
                                                       ),
                                                     );
                                                   }
@@ -208,6 +212,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
                                                       .showSnackBar(SnackBar(
                                                     content: Text(
                                                         response['message']),
+                                                    backgroundColor: Colors.red,
                                                   ));
                                                 }
                                                 Navigator.of(context).pop();
