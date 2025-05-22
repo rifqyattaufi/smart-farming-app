@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
     // } else {
     //   context.go('/home'); // Default halaman
     // }
-    // context.go('/home'); // Atur sesuai role jika diperlukan
+    context.go('/home'); // Atur sesuai role jika diperlukan
   }
 
   @override
