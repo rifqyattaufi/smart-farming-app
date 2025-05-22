@@ -35,7 +35,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
   final InventarisService _inventarisService = InventarisService();
   final KategoriInvService _kategoriInvService = KategoriInvService();
   final SatuanService _satuanService = SatuanService();
-  final _imageService = ImageService();
+  final ImageService _imageService = ImageService();
   final _formKey = GlobalKey<FormState>();
 
   String? _mysqlDateTime;
@@ -109,7 +109,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
   }
@@ -128,7 +129,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
   }
@@ -184,8 +186,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red));
   }
 
   @override
@@ -271,6 +273,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
             content: Text(widget.isEdit
                 ? 'Inventaris berhasil diperbarui'
                 : 'Inventaris berhasil ditambahkan'),
+            backgroundColor: Colors.green,
           ),
         );
 
@@ -281,7 +284,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -289,7 +293,9 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
+        SnackBar(
+            content: Text('Terjadi kesalahan: ${e.toString()}'),
+            backgroundColor: Colors.red),
       );
     }
   }
