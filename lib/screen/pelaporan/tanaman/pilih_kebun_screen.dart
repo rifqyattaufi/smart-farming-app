@@ -124,26 +124,42 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
               subtitle: 'Pilih kebun yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            ListItemSelectable(
-              title: 'Daftar Kandang',
-              type: ListItemType.simple,
-              items: _listKebun
-                  .map((item) => {
-                        'name': item['nama'],
-                        'id': item['id'],
-                        'icon': item['gambar'],
-                        'category': item['JenisBudidaya']['nama'],
-                        'tipe': item['tipe'],
-                        'latin': item['JenisBudidaya']['latin'],
-                        'createdAt': item['createdAt'],
-                      })
-                  .toList(),
-              onItemTap: (context, item) {
-                setState(() {
-                  _selectedUnitBudidaya = item; // Update local state
-                });
-              },
-            ),
+            _listKebun.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Tidak ada data yang tersedia. Harap tambahkan data kebun terlebih dahulu.',
+                            style: medium14.copyWith(color: dark2),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListItemSelectable(
+                    title: 'Daftar Kandang',
+                    type: ListItemType.simple,
+                    items: _listKebun
+                        .map((item) => {
+                              'name': item['nama'],
+                              'id': item['id'],
+                              'icon': item['gambar'],
+                              'category': item['JenisBudidaya']['nama'],
+                              'tipe': item['tipe'],
+                              'latin': item['JenisBudidaya']['latin'],
+                              'createdAt': item['createdAt'],
+                            })
+                        .toList(),
+                    onItemTap: (context, item) {
+                      setState(() {
+                        _selectedUnitBudidaya = item; // Update local state
+                      });
+                    },
+                  ),
             const SizedBox(height: 16),
           ],
         ),

@@ -148,25 +148,42 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
               subtitle: 'Pilih tanaman yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            ListItemSelectable(
-              title: 'Daftar Tanaman', // or 'Pelaporan Per Tanaman'
-              type: ListItemType.basic,
-              items: _listTanaman
-                  .map((item) => {
-                        'name': item['namaId'],
-                        'category': item['UnitBudidaya']['JenisBudidaya']
-                            ['nama'],
-                        'icon': item['UnitBudidaya']['JenisBudidaya']['gambar'],
-                        'id': item['id'],
-                        'createdAt': item['createdAt'],
-                      })
-                  .toList(),
-              onSelectionChanged: (selectedItems) {
-                setState(() {
-                  _selectedTanaman = selectedItems;
-                });
-              },
-            ),
+            _listTanaman.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Tidak ada data yang tersedia. Harap tambahkan data tanaman terlebih dahulu.',
+                            style: medium14.copyWith(color: dark2),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListItemSelectable(
+                    title: 'Daftar Tanaman', // or 'Pelaporan Per Tanaman'
+                    type: ListItemType.basic,
+                    items: _listTanaman
+                        .map((item) => {
+                              'name': item['namaId'],
+                              'category': item['UnitBudidaya']['JenisBudidaya']
+                                  ['nama'],
+                              'icon': item['UnitBudidaya']['JenisBudidaya']
+                                  ['gambar'],
+                              'id': item['id'],
+                              'createdAt': item['createdAt'],
+                            })
+                        .toList(),
+                    onSelectionChanged: (selectedItems) {
+                      setState(() {
+                        _selectedTanaman = selectedItems;
+                      });
+                    },
+                  ),
             const SizedBox(height: 16),
           ],
         ),

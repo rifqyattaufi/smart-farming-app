@@ -22,10 +22,12 @@ class PilihKomoditasTanamanScreen extends StatefulWidget {
       required this.greeting});
 
   @override
-  State<PilihKomoditasTanamanScreen> createState() => _PilihKomoditasTanamanScreenState();
+  State<PilihKomoditasTanamanScreen> createState() =>
+      _PilihKomoditasTanamanScreenState();
 }
 
-class _PilihKomoditasTanamanScreenState extends State<PilihKomoditasTanamanScreen> {
+class _PilihKomoditasTanamanScreenState
+    extends State<PilihKomoditasTanamanScreen> {
   final KomoditasService _komoditasService = KomoditasService();
   Map<String, dynamic>? selectedKomoditas;
 
@@ -105,26 +107,43 @@ class _PilihKomoditasTanamanScreenState extends State<PilihKomoditasTanamanScree
               subtitle: 'Pilih komoditas yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            ListItemSelectable(
-              title: 'Daftar Komoditas',
-              type: ListItemType.simple,
-              items: _listKomoditas
-                  .map((item) => {
-                        'name': item['nama'],
-                        'category': item['JenisBudidaya']['nama'],
-                        'icon': item['gambar'],
-                        'id': item['id'],
-                        'jenisBudidayaId': item['JenisBudidaya']['id'],
-                        'jenisBudidayaLatin': item['JenisBudidaya']['latin'],
-                        'satuan': item['SatuanId']
-                      })
-                  .toList(),
-              onItemTap: (context, item) {
-                setState(() {
-                  selectedKomoditas = item;
-                });
-              },
-            ),
+            _listKomoditas.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Tidak ada data yang tersedia. Harap tambahkan data komoditas terlebih dahulu.',
+                            style: medium14.copyWith(color: dark2),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListItemSelectable(
+                    title: 'Daftar Komoditas',
+                    type: ListItemType.simple,
+                    items: _listKomoditas
+                        .map((item) => {
+                              'name': item['nama'],
+                              'category': item['JenisBudidaya']['nama'],
+                              'icon': item['gambar'],
+                              'id': item['id'],
+                              'jenisBudidayaId': item['JenisBudidaya']['id'],
+                              'jenisBudidayaLatin': item['JenisBudidaya']
+                                  ['latin'],
+                              'satuan': item['SatuanId']
+                            })
+                        .toList(),
+                    onItemTap: (context, item) {
+                      setState(() {
+                        selectedKomoditas = item;
+                      });
+                    },
+                  ),
             const SizedBox(height: 16),
           ],
         ),

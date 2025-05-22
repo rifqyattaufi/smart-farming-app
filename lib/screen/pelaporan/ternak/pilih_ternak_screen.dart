@@ -139,24 +139,41 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
               subtitle: 'Pilih ternak yang akan dilakukan pelaporan!',
               showDate: true,
             ),
-            ListItemSelectable(
-              title: 'Daftar Ternak',
-              type: ListItemType.basic,
-              items: _listTernak
-                  .map((item) => {
-                        'name': item['namaId'],
-                        'category': item['UnitBudidaya']['JenisBudidaya']
-                            ['nama'],
-                        'icon': item['UnitBudidaya']['JenisBudidaya']['gambar'],
-                        'id': item['id'],
-                      })
-                  .toList(),
-              onSelectionChanged: (selectedItems) {
-                setState(() {
-                  _selectedTernak = selectedItems;
-                });
-              },
-            ),
+            _listTernak.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Tidak ada data yang tersedia. Harap tambahkan data ternak terlebih dahulu.',
+                            style: medium14.copyWith(color: dark2),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListItemSelectable(
+                    title: 'Daftar Ternak',
+                    type: ListItemType.basic,
+                    items: _listTernak
+                        .map((item) => {
+                              'name': item['namaId'],
+                              'category': item['UnitBudidaya']['JenisBudidaya']
+                                  ['nama'],
+                              'icon': item['UnitBudidaya']['JenisBudidaya']
+                                  ['gambar'],
+                              'id': item['id'],
+                            })
+                        .toList(),
+                    onSelectionChanged: (selectedItems) {
+                      setState(() {
+                        _selectedTernak = selectedItems;
+                      });
+                    },
+                  ),
             const SizedBox(height: 16),
           ],
         ),

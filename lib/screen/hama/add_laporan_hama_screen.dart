@@ -108,7 +108,8 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
   }
 
   Future<void> _getUnitBudidaya() async {
-    final response = await _unitBudidayaService.getUnitBudidaya();
+    final response =
+        await _unitBudidayaService.getUnitBudidayaByTipe('tumbuhan');
     if (response['status'] == true) {
       final List<dynamic> data = response['data'];
       setState(() {
@@ -169,7 +170,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         });
 
         if (newHamaResponse['status'] == true) {
-          print(newHamaResponse);
           newCreatedHamaId = newHamaResponse['data']['id'];
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -206,7 +206,6 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
       };
 
       final response = await _laporanService.createLaporanHama(data);
-      print(response);
 
       if (response['status'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
