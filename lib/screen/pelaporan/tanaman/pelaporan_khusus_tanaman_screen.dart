@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_jenis_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -47,7 +48,7 @@ class _PelaporanKhususTanamanScreenState
               greeting: 'Pelaporan Tanaman Mati',
             ));
         break;
-      case 'Pelaporan Pemberian Nutrisi': // kalo nutrisi pakai yg screen kebun jenis, kalo pilih jenis ke tanaman, kalo pilih kebun ke form
+      case 'Pelaporan Pemberian Nutrisi':
         context.push('/pilih-kebun',
             extra: PilihKebunScreen(
               step: _step + 1,

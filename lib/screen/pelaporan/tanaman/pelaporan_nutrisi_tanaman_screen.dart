@@ -356,7 +356,9 @@ class _PelaporanNutrisiTanamanScreenState
                         selectedValue: statusPemberianList[i] ?? 'Vitamin',
                         options: const [
                           'Vitamin',
+                          'Pupuk',
                           'Vaksin',
+                          'Disinfektan',
                         ],
                         onChanged: (value) {
                           setState(() {
