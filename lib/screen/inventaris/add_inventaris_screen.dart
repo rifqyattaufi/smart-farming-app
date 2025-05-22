@@ -419,11 +419,12 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                     hint: "Contoh:  Senin, 17 Februari 2025",
                     controller: _dateController,
                     suffixIcon: const Icon(Icons.calendar_today),
+                    isDisabled: true,
                     onSuffixIconTap: () async {
                       final DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
+                        firstDate: DateTime.now(),
                         lastDate: DateTime(2100),
                       );
 
@@ -454,6 +455,12 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                           _mysqlDateTime = formattedMySQLDateTime;
                         }
                       }
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tanggal & waktu kadaluwarsa tidak boleh kosong';
+                      }
+                      return null;
                     },
                   ),
                   RadioField(

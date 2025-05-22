@@ -578,6 +578,9 @@ class _PelaporanHarianTanamanScreenState
                               } else if (double.tryParse(value) == null) {
                                 return 'Masukkan angka yang valid';
                               }
+                              if (double.parse(value) <= 0) {
+                                return 'Jumlah/dosis tidak boleh kurang dari 1';
+                              }
                               return null;
                             }),
                         InputFieldWidget(

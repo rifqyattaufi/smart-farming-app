@@ -34,10 +34,6 @@ class _AccountScreenState extends State<AccountScreen> {
                   'text': 'Data Akun',
                   'onTap': () => context.push('/detail'),
                 },
-                {
-                  'text': 'Pengingat Harian',
-                  'onTap': () => context.push('/detail'),
-                },
               ],
               onItemTap: (context, report) =>
                   context.push('/detail', extra: report),
