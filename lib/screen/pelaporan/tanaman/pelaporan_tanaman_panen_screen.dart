@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
@@ -79,6 +79,7 @@ class _PelaporanTanamanPanenScreenState
     _fetchData();
     final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
     final length = objekBudidayaList.length;
+    print('length: $length, Testdata: $objekBudidayaList');
     sizeControllers = List.generate(length, (_) => TextEditingController());
     catatanControllers = List.generate(length, (_) => TextEditingController());
     imageList = List.generate(length, (_) => null);
@@ -87,6 +88,7 @@ class _PelaporanTanamanPanenScreenState
   }
 
   Future<void> _pickImage(BuildContext context, int index) async {
+    _image = null;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -281,6 +283,19 @@ class _PelaporanTanamanPanenScreenState
                       Text(
                         '${widget.data?['komoditas']?['jenisBudidayaLatin'] ?? '-'} - ${widget.data?['unitBudidaya']?['name'] ?? '-'}',
                         style: semibold16.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tanggal dan waktu tanam: ',
+                        style: regular14.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        objek?['createdAt'] != null
+                            ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                .format(DateTime.parse(objek['createdAt']))
+                            : 'Unknown',
+                        style: regular14.copyWith(color: dark1),
                       ),
                       const SizedBox(height: 12),
                       InputFieldWidget(

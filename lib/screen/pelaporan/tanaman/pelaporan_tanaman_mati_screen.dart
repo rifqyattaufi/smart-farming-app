@@ -262,8 +262,10 @@ class _PelaporanTanamanMatiScreenState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                            .format(DateTime.now()),
+                        objek?['createdAt'] != null
+                            ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                .format(DateTime.parse(objek['createdAt']))
+                            : 'Unknown',
                         style: regular14.copyWith(color: dark1),
                       ),
                       const SizedBox(height: 12),

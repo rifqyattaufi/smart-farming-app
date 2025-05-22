@@ -158,6 +158,7 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
                             ['nama'],
                         'icon': item['UnitBudidaya']['JenisBudidaya']['gambar'],
                         'id': item['id'],
+                        'createdAt': item['createdAt'],
                       })
                   .toList(),
               onSelectionChanged: (selectedItems) {

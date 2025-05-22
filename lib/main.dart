@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/statistik_tanaman_report.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
@@ -158,6 +159,13 @@ final _router = GoRouter(
       path: '/pilih-kandang',
       builder: (context, state) {
         final extra = state.extra as PilihKandangScreen;
+        return extra;
+      },
+    ),
+    GoRoute(
+      path: '/pilih-komoditas-tanaman',
+      builder: (context, state) {
+        final extra = state.extra as PilihKomoditasTanamanScreen;
         return extra;
       },
     ),

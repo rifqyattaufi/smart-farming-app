@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -23,9 +23,9 @@ class _PelaporanKhususTanamanScreenState
 
   void navigateBasedOnSelection() {
     switch (selectedReport) {
-      case 'Pelaporan Hasil Panen': //kalo panen habis dari kebun ke form
-        context.push('/pilih-kebun',
-            extra: PilihKebunScreen(
+      case 'Pelaporan Hasil Panen':
+        context.push('/pilih-komoditas-tanaman',
+            extra: PilihKomoditasTanamanScreen(
               step: _step + 1,
               tipe: 'panen',
               greeting: 'Pelaporan Hasil Panen',
