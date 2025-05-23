@@ -124,6 +124,7 @@ class KategoriInvService {
     try {
       final response =
           await http.post(url, headers: headers, body: json.encode(data));
+      final responseData = json.decode(response.body);
 
       if (response.statusCode == 201) {
         return {
@@ -133,6 +134,16 @@ class KategoriInvService {
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await createKategoriInventaris(data);
+      } else if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': 'success',
+        };
+      } else if (response.statusCode == 400) {
+        return {
+          'status': false,
+          'message': responseData['message'],
+        };
       } else {
         final body = response.body;
         return {
