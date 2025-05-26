@@ -1,0 +1,21 @@
+{
+    "flutter":{
+        "platforms":{
+            "android":{
+                "default":{
+                    "projectId":"farmcenter-61683",
+                    "appId":"1:15806207070:android:c20294c413fd95498950cf",
+                    "fileOutput":"android/app/google-services.json"
+                    }
+                },
+                "dart":{
+                    "lib/firebase_options.dart":{
+                        "projectId":"farmcenter-61683",
+                        "configurations":{
+                            "android":"1:15806207070:android:c20294c413fd95498950cf"
+                        }
+                    }
+                }
+            }
+        }
+    }

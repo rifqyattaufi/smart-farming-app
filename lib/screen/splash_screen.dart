@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_farming_app/service/fcm_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    _initializeFCMService();
 
     _controller = AnimationController(
       vsync: this,
@@ -38,6 +40,15 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Mulai navigasi setelah animasi
     _navigateToNextScreen();
+  }
+
+  Future<void> _initializeFCMService() async {
+    final fcmService = FcmService();
+    await fcmService.initFCM();
+
+    await fcmService.checkInitialMessage();
+
+    print("App Services Initialized, FCM service setup process started.");
   }
 
   Future<bool> hasRealInternet() async {

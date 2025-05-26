@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/screen/blank_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
@@ -83,10 +87,98 @@ import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  print("Handling a background message ID: ${message.messageId}");
+  print('Message data: ${message.data}');
+  if (message.notification != null) {
+    print(
+        'Message also contained a notification: ${message.notification?.title}');
+  }
+}
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> _requestNotificationPermissions() async {
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    announcement: false,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'smart_farming_default_channel_id', 'Smart Farming Notifications',
+      description: 'Channel untuk notifikasi umum aplikasi Smart Farming.',
+      importance: Importance.high);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+}
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/launcher_icon');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse:
+        (NotificationResponse notificationResponse) async {
+      print(
+          'Foreground Local Notification Tapped - Payload: ${notificationResponse.payload}');
+      if (notificationResponse.payload != null &&
+          notificationResponse.payload!.isNotEmpty) {
+        // Di sini Anda akan memanggil fungsi global atau fungsi dari FcmService/NavigationService
+        // untuk menangani navigasi berdasarkan payload.
+        // Contoh: handleNotificationTap(jsonDecode(notificationResponse.payload!));
+      }
+      // Callback ketika notifikasi (yang di-tap dari background) di-handle oleh plugin ini
+      // (biasanya FCM `onMessageOpenedApp` lebih umum digunakan untuk ini)
+      // onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+    },
+  );
+
+  await _requestNotificationPermissions();
+
   await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
+
+// (Opsional) Handler untuk tap notifikasi lokal dari background jika menggunakan flutter_local_notifications
+// @pragma('vm:entry-point')
+// void notificationTapBackground(NotificationResponse notificationResponse) {
+//   print('Background Local Notification Tapped (via flutter_local_notifications): ${notificationResponse.payload}');
+//   // Logic serupa dengan onDidReceiveNotificationResponse
+// }
 
 final _router = GoRouter(
   initialLocation: '/splash',
