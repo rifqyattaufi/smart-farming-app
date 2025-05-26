@@ -177,92 +177,96 @@ class _PelaporanHarianTernakScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step ${widget.step} - Isi Form Pelaporan',
-              subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai kondisi lapangan!',
-              showDate: true,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Data Ternak',
-                    style: semibold16.copyWith(color: dark1),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.data?['unitBudidaya']['category'] ?? 'unknown',
-                    style: bold20.copyWith(color: dark1),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.data?['unitBudidaya']['name'] ?? 'unknown',
-                    style: semibold16.copyWith(color: dark1),
-                  ),
-                ],
-              ),
-            ),
-            Form(
-              key: formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RadioField(
-                      label: 'Dilakukan pemberian pakan?',
-                      selectedValue: statusPakan,
-                      options: const ['Ya', 'Belum'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusPakan = value;
-                        });
-                      },
-                    ),
-                    RadioField(
-                      label: 'Dilakukan pengecekan kandang?',
-                      selectedValue: statusKandang,
-                      options: const ['Ya', 'Tidak'],
-                      onChanged: (value) {
-                        setState(() {
-                          statusKandang = value;
-                        });
-                      },
-                    ),
-                    ImagePickerWidget(
-                      label: "Unggah bukti kondisi ternak",
-                      image: _imageTernak,
-                      onPickImage: (context) {
-                        _pickImage(context, (file) {
-                          setState(() {
-                            _imageTernak = file;
-                          });
-                        });
-                      },
-                    ),
-                    InputFieldWidget(
-                        label: "Catatan/jurnal pelaporan",
-                        hint: "Keterangan",
-                        controller: _catatanController,
-                        maxLines: 10,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Catatan tidak boleh kosong';
-                          }
-                          return null;
-                        }),
-                  ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                BannerWidget(
+                  title: 'Step ${widget.step} - Isi Form Pelaporan',
+                  subtitle:
+                      'Harap mengisi form dengan data yang benar sesuai kondisi lapangan!',
+                  showDate: true,
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Data Ternak',
+                        style: semibold16.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        widget.data?['unitBudidaya']['category'] ?? 'unknown',
+                        style: bold20.copyWith(color: dark1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        widget.data?['unitBudidaya']['name'] ?? 'unknown',
+                        style: semibold16.copyWith(color: dark1),
+                      ),
+                    ],
+                  ),
+                ),
+                Form(
+                  key: formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RadioField(
+                          label: 'Dilakukan pemberian pakan?',
+                          selectedValue: statusPakan,
+                          options: const ['Ya', 'Belum'],
+                          onChanged: (value) {
+                            setState(() {
+                              statusPakan = value;
+                            });
+                          },
+                        ),
+                        RadioField(
+                          label: 'Dilakukan pengecekan kandang?',
+                          selectedValue: statusKandang,
+                          options: const ['Ya', 'Tidak'],
+                          onChanged: (value) {
+                            setState(() {
+                              statusKandang = value;
+                            });
+                          },
+                        ),
+                        ImagePickerWidget(
+                          label: "Unggah bukti kondisi ternak",
+                          image: _imageTernak,
+                          onPickImage: (context) {
+                            _pickImage(context, (file) {
+                              setState(() {
+                                _imageTernak = file;
+                              });
+                            });
+                          },
+                        ),
+                        InputFieldWidget(
+                            label: "Catatan/jurnal pelaporan",
+                            hint: "Keterangan",
+                            controller: _catatanController,
+                            maxLines: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Catatan tidak boleh kosong';
+                              }
+                              return null;
+                            }),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(

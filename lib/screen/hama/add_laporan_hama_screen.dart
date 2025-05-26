@@ -254,129 +254,131 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(children: [
-          const BannerWidget(
-            title: 'Isi Form Pelaporan Hama Tanaman',
-            subtitle:
-                'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-            showDate: true,
-          ),
-          Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DropdownFieldWidget(
-                    label: "Jenis hama",
-                    hint: "Pilih jenis hama",
-                    items: hamaList
-                        .map((item) => item['nama'].toString())
-                        .toList(),
-                    selectedValue: hamaList.firstWhere(
-                      (item) => item['id'] == selectedHama,
-                      orElse: () => {'nama': ''},
-                    )['nama'],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedHama = hamaList.firstWhere(
-                          (item) => item['nama'] == value,
-                          orElse: () => {'id': null},
-                        )['id'];
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Jenis hama tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  if (selectedHama == "lainnya")
-                    InputFieldWidget(
-                      label: "Nama hama",
-                      hint: "Masukkan nama hama",
-                      controller: _namaHamaController,
+        child: SingleChildScrollView(
+          child: Column(children: [
+            const BannerWidget(
+              title: 'Isi Form Pelaporan Hama Tanaman',
+              subtitle:
+                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+              showDate: true,
+            ),
+            Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownFieldWidget(
+                      label: "Jenis hama",
+                      hint: "Pilih jenis hama",
+                      items: hamaList
+                          .map((item) => item['nama'].toString())
+                          .toList(),
+                      selectedValue: hamaList.firstWhere(
+                        (item) => item['id'] == selectedHama,
+                        orElse: () => {'nama': ''},
+                      )['nama'],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedHama = hamaList.firstWhere(
+                            (item) => item['nama'] == value,
+                            orElse: () => {'id': null},
+                          )['id'];
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Nama Hama tidak boleh kosong';
+                          return 'Jenis hama tidak boleh kosong';
                         }
                         return null;
                       },
                     ),
-                  DropdownFieldWidget(
-                    label: "Terlihat di",
-                    hint: "Pilih lokasi",
-                    items: unitList
-                        .map((item) => item['nama'].toString())
-                        .toList(),
-                    selectedValue: unitList.firstWhere(
-                      (item) => item['id'] == selectedLocation,
-                      orElse: () => {'nama': ''},
-                    )['nama'],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedLocation = unitList.firstWhere(
-                          (item) => item['nama'] == value,
-                          orElse: () => {'id': null},
-                        )['id'];
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Lokasi tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  InputFieldWidget(
-                      label: "Jumlah hama",
-                      hint: "Contoh: 5 (ekor)",
-                      controller: _sizeController,
-                      keyboardType: TextInputType.number,
+                    if (selectedHama == "lainnya")
+                      InputFieldWidget(
+                        label: "Nama hama",
+                        hint: "Masukkan nama hama",
+                        controller: _namaHamaController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama Hama tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      ),
+                    DropdownFieldWidget(
+                      label: "Terlihat di",
+                      hint: "Pilih lokasi",
+                      items: unitList
+                          .map((item) => item['nama'].toString())
+                          .toList(),
+                      selectedValue: unitList.firstWhere(
+                        (item) => item['id'] == selectedLocation,
+                        orElse: () => {'nama': ''},
+                      )['nama'],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedLocation = unitList.firstWhere(
+                            (item) => item['nama'] == value,
+                            orElse: () => {'id': null},
+                          )['id'];
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Jumlah hama tidak boleh kosong';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Jumlah hama harus berupa angka';
-                        }
-                        if (int.parse(value) <= 0) {
-                          return 'Jumlah hama harus lebih dari 0';
+                          return 'Lokasi tidak boleh kosong';
                         }
                         return null;
-                      }),
-                  ImagePickerWidget(
-                    label: "Unggah bukti adanya hama",
-                    image: _image,
-                    onPickImage: _pickImage,
-                  ),
-                  InputFieldWidget(
-                      label: "Catatan/jurnal pelaporan",
-                      hint: "Keterangan",
-                      controller: _catatanController,
-                      maxLines: 10,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Masukkkan catatan pelaporan';
-                        }
-                        return null;
-                      }),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                      },
+                    ),
+                    InputFieldWidget(
+                        label: "Jumlah hama",
+                        hint: "Contoh: 5 (ekor)",
+                        controller: _sizeController,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Jumlah hama tidak boleh kosong';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Jumlah hama harus berupa angka';
+                          }
+                          if (int.parse(value) <= 0) {
+                            return 'Jumlah hama harus lebih dari 0';
+                          }
+                          return null;
+                        }),
+                    ImagePickerWidget(
+                      label: "Unggah bukti adanya hama",
+                      image: _image,
+                      onPickImage: _pickImage,
+                    ),
+                    InputFieldWidget(
+                        label: "Catatan/jurnal pelaporan",
+                        hint: "Keterangan",
+                        controller: _catatanController,
+                        maxLines: 10,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Masukkkan catatan pelaporan';
+                          }
+                          return null;
+                        }),
+                    const SizedBox(height: 16),
+                    CustomButton(
+                      onPressed: _submitForm,
+                      backgroundColor: green1,
+                      textStyle: semibold16,
+                      textColor: white,
+                      isLoading: _isLoading,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
-          ),
-        ]),
+          ]),
+        ),
       ),
     );
   }

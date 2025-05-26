@@ -57,8 +57,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(children: [
-          Padding(
+        child: SingleChildScrollView(
+          child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +106,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   suffixIcon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                     color: Colors.grey,
                   ),
                   onSuffixIconTap: () {
@@ -144,7 +146,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
               ],
             ),
           ),
-        ]),
+        ),
       ),
     );
   }

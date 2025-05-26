@@ -228,8 +228,8 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(children: [
-          Form(
+        child: SingleChildScrollView(
+          child: Form(
             key: _formKey,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -310,7 +310,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
               ),
             ),
           ),
-        ]),
+        ),
       ),
     );
   }

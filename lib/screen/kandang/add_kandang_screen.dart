@@ -226,7 +226,9 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red),
       );
     }
   }
@@ -250,8 +252,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(children: [
-          Form(
+        child: SingleChildScrollView(
+          child: Form(
             key: _formKey,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -379,7 +381,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
               ),
             ),
           ),
-        ]),
+        ),
       ),
     );
   }

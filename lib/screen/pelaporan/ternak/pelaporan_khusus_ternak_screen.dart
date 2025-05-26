@@ -102,38 +102,42 @@ class _PelaporanKhususTernakScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step $_step - Apa yang ingin kamu laporkan?',
-              subtitle: 'Pilih jenis pelaporan yang akan dilakukan!',
-              showDate: true,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                BannerWidget(
+                  title: 'Step $_step - Apa yang ingin kamu laporkan?',
+                  subtitle: 'Pilih jenis pelaporan yang akan dilakukan!',
+                  showDate: true,
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Jenis Pelaporan Khusus',
+                    style: bold18.copyWith(color: dark1),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                for (var item in reports)
+                  MenuButton(
+                    title: item['title'],
+                    subtext: item['description'],
+                    icon: Icons.shopping_bag_outlined,
+                    backgroundColor: Colors.grey.shade200,
+                    iconColor: green1,
+                    isSelected: selectedReport == item['title'],
+                    onTap: () {
+                      setState(() {
+                        selectedReport = item['title'];
+                      });
+                    },
+                  ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Jenis Pelaporan Khusus',
-                style: bold18.copyWith(color: dark1),
-              ),
-            ),
-            const SizedBox(height: 12),
-            for (var item in reports)
-              MenuButton(
-                title: item['title'],
-                subtext: item['description'],
-                icon: Icons.shopping_bag_outlined,
-                backgroundColor: Colors.grey.shade200,
-                iconColor: green1,
-                isSelected: selectedReport == item['title'],
-                onTap: () {
-                  setState(() {
-                    selectedReport = item['title'];
-                  });
-                },
-              ),
-          ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(

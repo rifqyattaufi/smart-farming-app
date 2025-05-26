@@ -213,94 +213,99 @@ class _PelaporanTanamanSakitScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step ${widget.step} - Isi Form Pelaporan',
-              subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-              showDate: true,
-            ),
-            ...List.generate(objekBudidayaList.length, (i) {
-              final objek = objekBudidayaList[i];
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Form(
-                  key: _formKeys[i],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Data Tanaman',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        ((objek?['name'] != null &&
-                                    (objek?['name'] as String).isNotEmpty)
-                                ? '${objek?['name']} - '
-                                : '') +
-                            (widget.data['unitBudidaya']?['category'] ?? '-'),
-                        style: bold20.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '${widget.data['unitBudidaya']['latin']} - ${widget.data['unitBudidaya']['name']}',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Tanggal dan waktu tanam: ',
-                        style: regular14.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        objek?['createdAt'] != null
-                            ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                .format(DateTime.parse(objek['createdAt']))
-                            : 'Unknown',
-                        style: regular14.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      InputFieldWidget(
-                        label: "Nama penyakit tanaman",
-                        hint: "Contoh: Embun tepung",
-                        controller: _nameController[i],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Nama penyakit tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      ImagePickerWidget(
-                          label: "Unggah bukti kondisi tanaman",
-                          image: _imageList[i],
-                          onPickImage: (ctx) async {
-                            _pickImageTanaman(context, i);
-                          }),
-                      InputFieldWidget(
-                        label: "Catatan/jurnal pelaporan",
-                        hint: "Keterangan",
-                        controller: _catatanController[i],
-                        maxLines: 10,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Catatan tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      const Divider()
-                    ],
-                  ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                BannerWidget(
+                  title: 'Step ${widget.step} - Isi Form Pelaporan',
+                  subtitle:
+                      'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+                  showDate: true,
                 ),
-              );
-            }),
-            const SizedBox(height: 16),
-          ],
+                ...List.generate(objekBudidayaList.length, (i) {
+                  final objek = objekBudidayaList[i];
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Form(
+                      key: _formKeys[i],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Data Tanaman',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            ((objek?['name'] != null &&
+                                        (objek?['name'] as String).isNotEmpty)
+                                    ? '${objek?['name']} - '
+                                    : '') +
+                                (widget.data['unitBudidaya']?['category'] ??
+                                    '-'),
+                            style: bold20.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '${widget.data['unitBudidaya']['latin']} - ${widget.data['unitBudidaya']['name']}',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Tanggal dan waktu tanam: ',
+                            style: regular14.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            objek?['createdAt'] != null
+                                ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                    .format(DateTime.parse(objek['createdAt']))
+                                : 'Unknown',
+                            style: regular14.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          InputFieldWidget(
+                            label: "Nama penyakit tanaman",
+                            hint: "Contoh: Embun tepung",
+                            controller: _nameController[i],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Nama penyakit tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          ImagePickerWidget(
+                              label: "Unggah bukti kondisi tanaman",
+                              image: _imageList[i],
+                              onPickImage: (ctx) async {
+                                _pickImageTanaman(context, i);
+                              }),
+                          InputFieldWidget(
+                            label: "Catatan/jurnal pelaporan",
+                            hint: "Keterangan",
+                            controller: _catatanController[i],
+                            maxLines: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Catatan tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          const Divider()
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: Padding(

@@ -218,140 +218,143 @@ class _PelaporanKematianTernakScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step ${widget.step} - Isi Form Pelaporan',
-              subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-              showDate: true,
-            ),
-            ...List.generate(objekBudidayaList.length, (i) {
-              final objek = objekBudidayaList[i];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Form(
-                  key: _formKeys[i],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Data Ternak',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        ((objek?['name'] != null &&
-                                    (objek?['name'] as String).isNotEmpty)
-                                ? '${objek?['name']} - '
-                                : '') +
-                            (widget.data?['unitBudidaya']?['category'] ?? '-'),
-                        style: bold20.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      InputFieldWidget(
-                        label: "Tanggal & waktu kematian",
-                        hint: "Contoh: Senin, 17 Februari 2025 10:00",
-                        controller: _dateController[i],
-                        suffixIcon: const Icon(Icons.calendar_today),
-                        isDisabled: true,
-                        onSuffixIconTap: () async {
-                          final DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2010),
-                            lastDate: DateTime.now(),
-                          );
-
-                          if (pickedDate != null) {
-                            final TimeOfDay? pickedTime = await showTimePicker(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              BannerWidget(
+                title: 'Step ${widget.step} - Isi Form Pelaporan',
+                subtitle:
+                    'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+                showDate: true,
+              ),
+              ...List.generate(objekBudidayaList.length, (i) {
+                final objek = objekBudidayaList[i];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: _formKeys[i],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Data Ternak',
+                          style: semibold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          ((objek?['name'] != null &&
+                                      (objek?['name'] as String).isNotEmpty)
+                                  ? '${objek?['name']} - '
+                                  : '') +
+                              (widget.data?['unitBudidaya']?['category'] ??
+                                  '-'),
+                          style: bold20.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
+                          style: semibold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        InputFieldWidget(
+                          label: "Tanggal & waktu kematian",
+                          hint: "Contoh: Senin, 17 Februari 2025 10:00",
+                          controller: _dateController[i],
+                          suffixIcon: const Icon(Icons.calendar_today),
+                          isDisabled: true,
+                          onSuffixIconTap: () async {
+                            final DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialTime: TimeOfDay.now(),
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2010),
+                              lastDate: DateTime.now(),
                             );
 
-                            if (pickedTime != null) {
-                              final DateTime pickedDateTime = DateTime(
-                                pickedDate.year,
-                                pickedDate.month,
-                                pickedDate.day,
-                                pickedTime.hour,
-                                pickedTime.minute,
+                            if (pickedDate != null) {
+                              final TimeOfDay? pickedTime =
+                                  await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
                               );
 
-                              final String formattedDateTime =
-                                  DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                      .format(pickedDateTime);
+                              if (pickedTime != null) {
+                                final DateTime pickedDateTime = DateTime(
+                                  pickedDate.year,
+                                  pickedDate.month,
+                                  pickedDate.day,
+                                  pickedTime.hour,
+                                  pickedTime.minute,
+                                );
 
-                              _dateController[i].text = formattedDateTime;
+                                final String formattedDateTime =
+                                    DateFormat('EEEE, dd MMMM yyyy HH:mm')
+                                        .format(pickedDateTime);
+
+                                _dateController[i].text = formattedDateTime;
+                              }
                             }
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Tanggal & waktu kematian tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      if (objekBudidayaList.length == 1)
-                        InputFieldWidget(
-                          label: "Jumlah Kematian",
-                          hint: "Contoh: 2",
-                          controller: _jumlahController,
-                          keyboardType: TextInputType.number,
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Jumlah kematian tidak boleh kosong';
-                            }
-                            if (int.tryParse(value) == null) {  
-                              return 'Jumlah kematian harus berupa angka';
+                              return 'Tanggal & waktu kematian tidak boleh kosong';
                             }
                             return null;
                           },
                         ),
-                      InputFieldWidget(
-                        label: "Penyebab kematian",
-                        hint: "Contoh: Sakit",
-                        controller: _nameController[i],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Penyebab kematian tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      ImagePickerWidget(
-                          label: "Unggah bukti kondisi ternak",
-                          image: _imageList[i],
-                          onPickImage: (ctx) async {
-                            _pickImageTernak(context, i);
-                          }),
-                      InputFieldWidget(
-                        label: "Catatan/jurnal pelaporan",
-                        hint: "Keterangan",
-                        controller: _catatanController[i],
-                        maxLines: 10,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Catatan tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      const Divider()
-                    ],
+                        if (objekBudidayaList.length == 1)
+                          InputFieldWidget(
+                            label: "Jumlah Kematian",
+                            hint: "Contoh: 2",
+                            controller: _jumlahController,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Jumlah kematian tidak boleh kosong';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Jumlah kematian harus berupa angka';
+                              }
+                              return null;
+                            },
+                          ),
+                        InputFieldWidget(
+                          label: "Penyebab kematian",
+                          hint: "Contoh: Sakit",
+                          controller: _nameController[i],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Penyebab kematian tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        ImagePickerWidget(
+                            label: "Unggah bukti kondisi ternak",
+                            image: _imageList[i],
+                            onPickImage: (ctx) async {
+                              _pickImageTernak(context, i);
+                            }),
+                        InputFieldWidget(
+                          label: "Catatan/jurnal pelaporan",
+                          hint: "Keterangan",
+                          controller: _catatanController[i],
+                          maxLines: 10,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Catatan tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        const Divider()
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }),
-            const SizedBox(height: 16),
-          ],
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
