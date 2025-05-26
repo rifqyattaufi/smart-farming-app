@@ -6,7 +6,7 @@ class DropdownFieldWidget extends StatelessWidget {
   final String hint;
   final List<String> items;
   final String? selectedValue;
-  final ValueChanged<String?> onChanged;
+  final ValueChanged<String?>? onChanged;
   final String? Function(String?)? validator;
   final bool isEdit;
 

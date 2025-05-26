@@ -201,9 +201,6 @@ class LaporanService {
       'Content-Type': 'application/json'
     };
     final url = Uri.parse('$baseUrl/vitamin');
-    final response =
-        await http.post(url, headers: headers, body: json.encode(data));
-    final responseData = json.decode(response.body);
 
     try {
       final response =
@@ -220,7 +217,7 @@ class LaporanService {
         await _authService.refreshToken();
         return await createLaporanNutrisi(data);
       } else if (response.statusCode == 400) {
-        return {'status': false, 'message': responseData['message']};
+        return {'status': false, 'message': body['message']};
       } else {
         return {
           'status': false,
@@ -279,9 +276,6 @@ class LaporanService {
       'Content-Type': 'application/json'
     };
     final url = Uri.parse('$baseUrl/penggunaan-inventaris');
-    final response =
-        await http.post(url, headers: headers, body: json.encode(data));
-    final responseData = json.decode(response.body);
 
     try {
       final response =
@@ -298,7 +292,7 @@ class LaporanService {
         await _authService.refreshToken();
         return await createLaporanPenggunaanInventaris(data);
       } else if (response.statusCode == 400) {
-        return {'status': false, 'message': responseData['message']};
+        return {'status': false, 'message': body['message']};
       } else {
         return {
           'status': false,

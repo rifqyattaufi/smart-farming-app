@@ -27,16 +27,35 @@ class _AddPemakaianInventarisScreenState
   final InventarisService _inventarisService = InventarisService();
   final KategoriInvService _kategoriInvService = KategoriInvService();
 
-  String? selectedKategori;
-  String? selectedInv;
+  String? selectedKategoriId;
+  String? selectedKategoriNama;
+  String? selectedInvId;
+  String? selectedInvNama;
 
   bool _isLoading = false;
+
   File? _image;
   final picker = ImagePicker();
   final formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> _kategoriList = [];
   List<Map<String, dynamic>> _inventarisList = [];
+
+  final TextEditingController _sizeController = TextEditingController();
+  final TextEditingController _catatanController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchKategori();
+  }
+
+  @override
+  void dispose() {
+    _sizeController.dispose();
+    _catatanController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage(BuildContext context) async {
     showModalBottomSheet(
@@ -86,79 +105,106 @@ class _AddPemakaianInventarisScreenState
     try {
       final kategoriResponse =
           await _kategoriInvService.getKategoriInventarisOnly();
-      if (kategoriResponse['status']) {
+      if (kategoriResponse['status'] && kategoriResponse['data'] != null) {
         setState(() {
           _kategoriList =
               List<Map<String, dynamic>>.from(kategoriResponse['data']);
         });
+      } else {
+        _showErrorSnackbar(
+            'Gagal memuat kategori: ${kategoriResponse['message'] ?? 'Data tidak valid'}');
       }
     } catch (e) {
+      _showErrorSnackbar('Error memuat kategori: $e');
+    }
+  }
+
+  Future<void> _fetchInventarisByKategori(String kategoriId) async {
+    setState(() {
+      _inventarisList = [];
+      selectedInvId = null;
+      selectedInvNama = null;
+    });
+    try {
+      final inventarisResponse =
+          await _inventarisService.getInventarisByKategoriId(kategoriId);
+      if (inventarisResponse['status'] && inventarisResponse['data'] != null) {
+        setState(() {
+          _inventarisList =
+              List<Map<String, dynamic>>.from(inventarisResponse['data']);
+        });
+      } else {
+        _showErrorSnackbar(
+            'Gagal memuat inventaris: ${inventarisResponse['message'] ?? 'Data tidak valid'}');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Error memuat inventaris: $e');
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error loading data: $e'),
+          content: Text(message),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  final TextEditingController _sizeController = TextEditingController();
-  final TextEditingController _catatanController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchKategori();
-  }
-
   Future<void> _submitForm() async {
-    if (_isLoading) return;
+    if (_isLoading) {
+      return;
+    }
+
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_image == null) {
+      _showErrorSnackbar('Silakan unggah bukti pemakaian inventaris');
+      return;
+    }
+
+    if (selectedInvId == null) {
+      _showErrorSnackbar('Silakan pilih inventaris terlebih dahulu');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
-      if (!formKey.currentState!.validate()) return;
-
-      if (_image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan unggah bukti pemakaian inventaris'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      if (selectedInv == null || _inventarisList.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan pilih inventaris terlebih dahulu'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      print('Selected Inventaris ID: $selectedInv');
-
       formKey.currentState!.save();
 
-      final imageUrl = await _imageService.uploadImage(_image!);
+      final imageUrlResponse = await _imageService.uploadImage(_image!);
+      if (!(imageUrlResponse['status'] ?? false) ||
+          imageUrlResponse['data'] == null) {
+        _showErrorSnackbar(
+            'Gagal mengunggah gambar: ${imageUrlResponse['message'] ?? 'URL tidak valid'}');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      final imageUrl = imageUrlResponse['data'];
 
-      final inventarisNama = _inventarisList.firstWhere(
-        (item) => item['id'] == selectedInv,
-        orElse: () => {'nama': ''},
-      )['nama'];
+      final inventarisYangDipilih = _inventarisList.firstWhere(
+        (item) => item['id'] == selectedInvId,
+        orElse: () => {'nama': 'Tidak Diketahui'},
+      );
+      final inventarisNama = inventarisYangDipilih['nama'];
 
-      // Prepare data
       final data = {
         "judul": "Laporan Pemakaian Inventaris $inventarisNama",
         "tipe": "inventaris",
-        "gambar": imageUrl['data'],
+        "gambar": imageUrl,
         "catatan": _catatanController.text,
         "penggunaanInv": {
-          "inventarisId": selectedInv,
-          "jumlah": double.tryParse(_sizeController.text) ?? 0,
+          "inventarisId": selectedInvId,
+          "jumlah": double.tryParse(_sizeController.text) ?? 0.0,
         }
       };
 
@@ -172,32 +218,43 @@ class _AddPemakaianInventarisScreenState
             backgroundColor: Colors.green,
           ),
         );
+        _resetForm();
+        if (mounted) {
+          Navigator.pop(context);
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message']),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showErrorSnackbar(
+            'Gagal mengirim laporan: ${response['message'] ?? 'Kesalahan tidak diketahui'}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Terjadi kesalahan saat menambahkan: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorSnackbar('Terjadi kesalahan saat menambahkan: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  void _resetForm() {
+    setState(() {
+      _image = null;
+      selectedKategoriId = null;
+      selectedKategoriNama = null;
+      selectedInvId = null;
+      selectedInvNama = null;
+      _inventarisList = [];
+      _sizeController.clear();
+      _catatanController.clear();
+      formKey.currentState?.reset();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
@@ -216,88 +273,128 @@ class _AddPemakaianInventarisScreenState
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DropdownFieldWidget(
-                  label: "Kategori Inventaris",
-                  hint: "Pilih kategori",
-                  items: _kategoriList
-                      .map((item) => item['nama'].toString())
-                      .toList(),
-                  selectedValue: selectedKategori,
-                  onChanged: (value) async {
-                    setState(() {
-                      selectedKategori = value;
-                    });
-                    // Ambil inventaris sesuai kategori yang dipilih
-                    final inventarisResponse = await _inventarisService
-                        .getInventarisByKategoriName(value!);
-                    if (inventarisResponse['status']) {
-                      setState(() {
-                        _inventarisList = List<Map<String, dynamic>>.from(
-                            inventarisResponse['data']);
-                        selectedInv = _inventarisList.isNotEmpty
-                            ? _inventarisList.first['id']
-                            : null;
-                      });
-                    }
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Silakan pilih kategori';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownFieldWidget(
-                  label: "Nama inventaris",
-                  hint: "Pilih inventaris",
-                  items: _inventarisList
-                      .map((item) => item['nama'].toString())
-                      .toList(),
-                  selectedValue: _inventarisList.firstWhere(
-                    (item) => item['id'] == selectedInv,
-                    orElse: () => {'nama': ''},
-                  )['nama'],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedInv = _inventarisList.firstWhere(
-                        (item) => item['nama'] == value,
-                        orElse: () => {'id': null},
-                      )['id'];
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Silakan pilih inventaris';
-                    }
-                    return null;
-                  },
-                ),
-                InputFieldWidget(
-                    label: "Jumlah digunakan",
-                    hint: "Contoh: 20",
-                    controller: _sizeController),
-                ImagePickerWidget(
-                  label: "Unggah bukti pemakaian",
-                  image: _image,
-                  onPickImage: _pickImage,
-                ),
-                InputFieldWidget(
-                    label: "Deskripsi keperluan pemakaian",
-                    hint: "Keterangan",
-                    controller: _catatanController,
-                    maxLines: 10),
-                const SizedBox(height: 16),
-                CustomButton(
-                  onPressed: _submitForm,
-                  backgroundColor: green1,
-                  textStyle: semibold16,
-                  textColor: white,
-                ),
-                const SizedBox(height: 16),
-              ],
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownFieldWidget(
+                    label: "Kategori Inventaris",
+                    hint: "Pilih kategori",
+                    items: _kategoriList
+                        .map((item) => item['nama']?.toString() ?? '')
+                        .toList(),
+                    selectedValue: selectedKategoriNama,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      final selected = _kategoriList.firstWhere(
+                          (item) => item['nama'] == value,
+                          orElse: () => {});
+
+                      if (selected.isNotEmpty && selected['id'] != null) {
+                        setState(() {
+                          selectedKategoriId = selected['id'].toString();
+                          selectedKategoriNama = selected['nama'].toString();
+
+                          selectedInvId = null;
+                          selectedInvNama = null;
+                          _inventarisList = [];
+                        });
+                        _fetchInventarisByKategori(selectedKategoriId!);
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Silakan pilih kategori';
+                      }
+                      return null;
+                    },
+                  ),
+                  DropdownFieldWidget(
+                    label: "Nama inventaris",
+                    hint: selectedKategoriId == null
+                        ? "Pilih kategori terlebih dahulu"
+                        : (_inventarisList.isEmpty && selectedKategoriId != null
+                            ? "Tidak ada inventaris pada kategori ini"
+                            : "Pilih inventaris"),
+                    items: _inventarisList
+                        .map((item) => item['nama']?.toString() ?? '')
+                        .toList(),
+                    selectedValue: selectedInvNama,
+                    onChanged: (selectedKategoriId == null ||
+                            _inventarisList.isEmpty)
+                        ? null
+                        : (value) {
+                            if (value == null) {
+                              setState(() {
+                                selectedInvId = null;
+                                selectedInvNama = null;
+                              });
+                              return;
+                            }
+                            final selected = _inventarisList.firstWhere(
+                                (item) => item['nama'] == value,
+                                orElse: () => {});
+                            if (selected.isNotEmpty && selected['id'] != null) {
+                              setState(() {
+                                selectedInvId = selected['id'].toString();
+                                selectedInvNama = value;
+                              });
+                            }
+                          },
+                    validator: (value) {
+                      if (selectedKategoriId != null &&
+                          _inventarisList.isNotEmpty &&
+                          (value == null || value.isEmpty)) {
+                        return 'Silakan pilih inventaris';
+                      }
+                      return null;
+                    },
+                  ),
+                  InputFieldWidget(
+                      label: "Jumlah digunakan",
+                      hint: "Contoh: 20",
+                      controller: _sizeController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Jumlah tidak boleh kosong';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Jumlah harus berupa angka';
+                        }
+                        if (double.parse(value) <= 0) {
+                          return 'Jumlah harus lebih dari 0';
+                        }
+                        return null;
+                      }),
+                  ImagePickerWidget(
+                    label: "Unggah bukti pemakaian",
+                    image: _image,
+                    onPickImage: _pickImage,
+                  ),
+                  InputFieldWidget(
+                      label: "Deskripsi keperluan pemakaian",
+                      hint: "Keterangan",
+                      controller: _catatanController,
+                      maxLines: 10,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Deskripsi tidak boleh kosong';
+                        }
+                        return null;
+                      }),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    onPressed: _submitForm,
+                    backgroundColor: green1,
+                    textStyle: semibold16,
+                    textColor: white,
+                    isLoading: _isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),
