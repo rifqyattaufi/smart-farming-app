@@ -41,9 +41,15 @@ class _PelaporanHarianTanamanScreenState
   final LaporanService _laporanService = LaporanService();
   final SatuanService _satuanService = SatuanService();
 
+  List<String> statusPenyiraman = [];
+  List<String> statusPruning = [];
+  List<String> statusRepotting = [];
+  List<String> statusNutrisi = [];
   List<String?> statusPemberianList = [];
-  List<Map<String, dynamic>> selectedBahanList = [];
+  List<String> kondisiDaun = [];
+  List<String> statusTumbuh = [];
 
+  List<Map<String, dynamic>> selectedBahanList = [];
   List<Map<String, dynamic>> listBahanVitamin = [];
   List<Map<String, dynamic>> listBahanVaksin = [];
   List<Map<String, dynamic>> listBahanPupuk = [];
@@ -53,12 +59,6 @@ class _PelaporanHarianTanamanScreenState
   File? _imageTanaman;
   File? _imageDosis;
   final picker = ImagePicker();
-  List<String> statusPenyiraman = [];
-  List<String> statusPruning = [];
-  List<String> statusRepotting = [];
-  List<String> statusNutrisi = [];
-  List<String> kondisiDaun = [];
-  List<String> statusTumbuh = [];
 
   final List<GlobalKey<FormState>> _formKeys = [];
 
@@ -331,10 +331,6 @@ class _PelaporanHarianTanamanScreenState
 
     try {
       for (int i = 0; i < list.length; i++) {
-        print("Tinggi tanaman ke-$i: ${_heightController[i].text}");
-        print("Status tumbuh ke-$i: ${statusTumbuh[i]}");
-        print("Kondisi daun ke-$i: ${kondisiDaun[i]}");
-
         final double? tinggiTanaman =
             double.tryParse(_heightController[i].text);
         final String kondisi = kondisiDaun[i];
@@ -435,7 +431,6 @@ class _PelaporanHarianTanamanScreenState
   void initState() {
     super.initState();
     final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
-    // final objekBudidayaList = (widget.data?['objekBudidaya'] as List<dynamic>?) ?? [];
 
     for (int i = 0; i < objekBudidayaList.length; i++) {
       _formKeys.add(GlobalKey<FormState>());
