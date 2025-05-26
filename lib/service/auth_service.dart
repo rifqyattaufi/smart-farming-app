@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_farming_app/main.dart';
 import 'package:smart_farming_app/service/fcm_service.dart';
 
 class AuthService {
@@ -10,7 +11,6 @@ class AuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final FcmService fcmService = FcmService();
     final url = Uri.parse('$baseUrl/auth/login');
     try {
       final response = await http.post(
@@ -24,8 +24,6 @@ class AuthService {
         }),
       );
 
-      fcmService.getTokenAndSendToServer();
-
       final body = json.decode(response.body);
       if (response.statusCode == 200) {
         await _secureStorage.write(key: 'token', value: body['token']);
@@ -33,6 +31,9 @@ class AuthService {
             key: 'refreshToken', value: body['refreshToken']);
         await _secureStorage.write(
             key: 'user', value: json.encode(body['data']));
+
+        await fcmService.getTokenAndSendToServer();
+
         return body;
       } else {
         final body = json.decode(response.body);
@@ -50,8 +51,6 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    final FcmService fcmService = FcmService();
-
     await fcmService.deleteToken();
     await _secureStorage.deleteAll();
   }

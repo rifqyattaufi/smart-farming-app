@@ -4,11 +4,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 
-external final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-
 class FcmService {
   final AuthService _authService = AuthService();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+
+  FcmService(this._flutterLocalNotificationsPlugin);
 
   Future<void> getTokenAndSendToServer() async {
     try {
@@ -78,7 +79,7 @@ class FcmService {
       int id, String title, String body, String payload) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-            'smart_farming_default_channel_id', 'Smart Farming Default Channel',
+            'smart_farming_default_channel_id', 'Smart Farming Notifications',
             channelDescription:
                 'Default channel for Smart Farming notifications',
             importance: Importance.high,
@@ -89,7 +90,7 @@ class FcmService {
       android: androidDetails,
     );
 
-    await flutterLocalNotificationsPlugin.show(
+    await _flutterLocalNotificationsPlugin.show(
       id,
       title,
       body,

@@ -86,6 +86,7 @@ import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
+import 'package:smart_farming_app/service/fcm_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -134,6 +135,8 @@ Future<void> _requestNotificationPermissions() async {
       ?.createNotificationChannel(channel);
 }
 
+late FcmService fcmService;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -167,8 +170,10 @@ void main() async {
   );
 
   await _requestNotificationPermissions();
-
   await dotenv.load(fileName: ".env");
+
+  fcmService = FcmService(flutterLocalNotificationsPlugin);
+  await fcmService.initFCM();
 
   runApp(const MyApp());
 }

@@ -25,8 +25,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    _initializeFCMService();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
@@ -40,15 +38,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Mulai navigasi setelah animasi
     _navigateToNextScreen();
-  }
-
-  Future<void> _initializeFCMService() async {
-    final fcmService = FcmService();
-    await fcmService.initFCM();
-
-    await fcmService.checkInitialMessage();
-
-    print("App Services Initialized, FCM service setup process started.");
   }
 
   Future<bool> hasRealInternet() async {
