@@ -75,9 +75,11 @@ class _AddPemakaianInventarisScreenState
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.camera);
                 if (pickedFile != null) {
-                  setState(() {
-                    _image = File(pickedFile.path);
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _image = File(pickedFile.path);
+                    });
+                  }
                 }
               },
             ),
@@ -89,9 +91,11 @@ class _AddPemakaianInventarisScreenState
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.gallery);
                 if (pickedFile != null) {
-                  setState(() {
-                    _image = File(pickedFile.path);
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _image = File(pickedFile.path);
+                    });
+                  }
                 }
               },
             ),
@@ -371,13 +375,15 @@ class _AddPemakaianInventarisScreenState
                   ImagePickerWidget(
                     label: "Unggah bukti pemakaian",
                     image: _image,
-                    onPickImage: _pickImage,
+                    onPickImage: (BuildContext imagePickerContext) {
+                      _pickImage(context);
+                    },
                   ),
                   InputFieldWidget(
                       label: "Deskripsi keperluan pemakaian",
                       hint: "Keterangan",
                       controller: _catatanController,
-                      maxLines: 10,
+                      maxLines: 5,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Deskripsi tidak boleh kosong';
