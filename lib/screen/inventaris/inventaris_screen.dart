@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
+import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/chip_filter.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
@@ -16,6 +18,30 @@ class InventarisScreen extends StatefulWidget {
 }
 
 class _InventarisScreenState extends State<InventarisScreen> {
+  final InventarisService _inventarisService = InventarisService();
+  Map<String, dynamic>? _inventarisData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInventarisData();
+  }
+
+  Future<void> _fetchInventarisData() async {
+    try {
+      final data = await _inventarisService.getDashboardInventaris();
+      setState(() {
+        _inventarisData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   int selectedTab = 0;
   TextEditingController searchController = TextEditingController();
 
@@ -97,7 +123,13 @@ class _InventarisScreenState extends State<InventarisScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-inventaris');
+            context.push(
+              '/tambah-inventaris',
+              extra: AddInventarisScreen(
+                isEdit: false,
+                onInventarisAdded: _fetchInventarisData,
+              ),
+            );
           },
           backgroundColor: green1,
           shape: RoundedRectangleBorder(
