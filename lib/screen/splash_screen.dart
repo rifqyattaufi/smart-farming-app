@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:smart_farming_app/service/fcm_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

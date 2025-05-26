@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_farming_app/main.dart';
-import 'package:smart_farming_app/service/fcm_service.dart';
 
 class AuthService {
   final String baseUrl = dotenv.env['AUTH_BASE_URL'] ?? '';
