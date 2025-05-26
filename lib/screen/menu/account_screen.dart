@@ -55,6 +55,10 @@ class _AccountScreenState extends State<AccountScreen> {
                   'onTap': () => context.push('/manajemen-satuan'),
                 },
                 {
+                  'text': 'Manajemen Grade Hasil Panen',
+                  'onTap': () => context.push('/manajemen-satuan'),
+                },
+                {
                   'text': 'Ubah Password',
                   'onTap': () => context.push('/lupa-password'),
                 },
