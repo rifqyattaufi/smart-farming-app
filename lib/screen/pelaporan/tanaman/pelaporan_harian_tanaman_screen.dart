@@ -57,9 +57,12 @@ class _PelaporanHarianTanamanScreenState
   List<String> statusPruning = [];
   List<String> statusRepotting = [];
   List<String> statusNutrisi = [];
+  List<String> kondisiDaun = [];
+  List<String> statusTumbuh = [];
 
   final List<GlobalKey<FormState>> _formKeys = [];
 
+  final List<TextEditingController> _heightController = [];
   final List<TextEditingController> _catatanController = [];
   final List<TextEditingController> _sizeController = [];
   final List<TextEditingController> _satuanController = [];
@@ -328,6 +331,15 @@ class _PelaporanHarianTanamanScreenState
 
     try {
       for (int i = 0; i < list.length; i++) {
+        print("Tinggi tanaman ke-$i: ${_heightController[i].text}");
+        print("Status tumbuh ke-$i: ${statusTumbuh[i]}");
+        print("Kondisi daun ke-$i: ${kondisiDaun[i]}");
+
+        final double? tinggiTanaman =
+            double.tryParse(_heightController[i].text);
+        final String kondisi = kondisiDaun[i];
+        final String status = statusTumbuh[i];
+
         final imageUrl = await _imageService.uploadImage(_imageTanamanList[i]!);
         final dataTanaman = {
           'unitBudidayaId': widget.data?['unitBudidaya']['id'],
@@ -341,6 +353,9 @@ class _PelaporanHarianTanamanScreenState
             "penyiraman": statusPenyiraman[i] == 'Ya',
             "pruning": statusPruning[i] == 'Ya',
             "repotting": statusRepotting[i] == 'Ya',
+            "tinggiTanaman": tinggiTanaman,
+            "kondisiDaun": kondisi,
+            "statusTumbuh": status,
           }
         };
         final responseTanaman =
@@ -427,6 +442,7 @@ class _PelaporanHarianTanamanScreenState
       _catatanController.add(TextEditingController());
       _sizeController.add(TextEditingController());
       _satuanController.add(TextEditingController());
+      _heightController.add(TextEditingController());
       _imageTanamanList.add(null);
       _imageDosisList.add(null);
       selectedBahanList.add({});
@@ -435,6 +451,8 @@ class _PelaporanHarianTanamanScreenState
       statusPruning.add('Ya');
       statusRepotting.add('Ya');
       statusNutrisi.add('Ya');
+      kondisiDaun.add('sehat');
+      statusTumbuh.add('bibit');
     }
     _fetchData();
   }
@@ -549,6 +567,68 @@ class _PelaporanHarianTanamanScreenState
                           setState(() {
                             statusRepotting[i] = value;
                           });
+                        },
+                      ),
+                      InputFieldWidget(
+                          label: "Pertumbuhan tinggi tanaman (cm)",
+                          hint: "Contoh: 30",
+                          controller: _heightController[i],
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Masukkan pertumbuhan tinggi tanaman';
+                            }
+                            return null;
+                          }),
+                      DropdownFieldWidget(
+                        label: "Kondisi daun",
+                        hint: "Pilih kondisi daun",
+                        items: const [
+                          'sehat',
+                          'kering',
+                          'layu',
+                          'kuning',
+                          'keriting',
+                          'bercak',
+                          'rusak'
+                        ],
+                        selectedValue: kondisiDaun[i],
+                        onChanged: (value) {
+                          setState(() {
+                            kondisiDaun[i] = value!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pilih kondisi daun';
+                          }
+                          return null;
+                        },
+                      ),
+                      DropdownFieldWidget(
+                        label: "Status pertumbuhan tanaman",
+                        hint: "Pilih status tumbuh",
+                        items: const [
+                          'bibit',
+                          'perkecambahan',
+                          'vegetatifAwal',
+                          'vegetatifLanjut',
+                          'generatifAwal',
+                          'generatifLanjut',
+                          'panen',
+                          'dormansi'
+                        ],
+                        selectedValue: statusTumbuh[i],
+                        onChanged: (value) {
+                          setState(() {
+                            statusTumbuh[i] = value!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pilih status tumbuh';
+                          }
+                          return null;
                         },
                       ),
                       ImagePickerWidget(

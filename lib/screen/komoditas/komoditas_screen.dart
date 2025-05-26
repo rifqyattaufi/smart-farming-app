@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
 import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
@@ -111,9 +113,17 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
         child: FloatingActionButton(
           onPressed: () {
             if (selectedTab == 0) {
-              context.push('/tambah-komoditas-tanaman');
+              context.push('/tambah-komoditas-tanaman',
+                  extra: AddKomoditasTanamanScreen(
+                    isEdit: false,
+                    onKomoditasTanamanAdded: () => _fetchData(),
+                  ));
             } else {
-              context.push('/tambah-komoditas-ternak');
+              context.push('/tambah-komoditas-ternak',
+                  extra: AddKomoditasTernakScreen(
+                    isEdit: false,
+                    onKomoditasAdded: () => _fetchData(),
+                  ));
             }
           },
           backgroundColor: green1,
