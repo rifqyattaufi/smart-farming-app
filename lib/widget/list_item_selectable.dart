@@ -84,21 +84,52 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
             ),
           if (widget.type == ListItemType.basic) const SizedBox(height: 8),
           if (widget.type == ListItemType.basic)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
                 Text(
                   "Tekan dan tahan untuk mengaktifkan mode pelaporan batch.",
                   style: medium12.copyWith(color: green1),
                 ),
                 if (isBatchMode)
-                  GestureDetector(
-                    onTap: () => _toggleBatchMode(false),
-                    child: Icon(Icons.close, size: 20, color: red),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value:
+                                selectedIndexes.length == widget.items.length,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedIndexes = Set.from(List.generate(
+                                      widget.items.length, (i) => i));
+                                } else {
+                                  selectedIndexes.clear();
+                                }
+                              });
+                              _notifySelectionChanged();
+                            },
+                            activeColor: green1,
+                            side: BorderSide(color: green1),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          Text("Pilih semua",
+                              style: medium12.copyWith(color: dark2)),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () => _toggleBatchMode(false),
+                        child: Icon(Icons.close, size: 20, color: red),
+                      )
+                    ],
                   )
               ],
             ),
-          const SizedBox(height: 10),
+          if (!isBatchMode) const SizedBox(height: 10),
           ...widget.items.asMap().entries.map((entry) {
             int index = entry.key;
             var item = entry.value;

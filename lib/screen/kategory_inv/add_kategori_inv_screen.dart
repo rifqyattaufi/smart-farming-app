@@ -116,8 +116,8 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(children: [
-          Form(
+        child: SingleChildScrollView(
+          child: Form(
             key: _formKey,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -148,7 +148,7 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
               ),
             ),
           ),
-        ]),
+        ),
       ),
     );
   }

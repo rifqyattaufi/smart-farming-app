@@ -89,7 +89,9 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memilih gambar: $e'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Gagal memilih gambar: $e'),
+            backgroundColor: Colors.red),
       );
     } finally {
       setState(() {
@@ -113,7 +115,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
   }
@@ -143,7 +146,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text(response['message']), backgroundColor: Colors.red),
       );
     }
   }
@@ -165,7 +169,9 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
 
       if (_image == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Harap unggah gambar kebun'), backgroundColor: Colors.red),
+          const SnackBar(
+              content: Text('Harap unggah gambar kebun'),
+              backgroundColor: Colors.red),
         );
         return;
       }
@@ -208,7 +214,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
           SnackBar(
               content: Text(widget.isEdit
                   ? 'Kebun berhasil diperbarui'
-                  : 'Kebun berhasil ditambahkan'), backgroundColor: Colors.green),
+                  : 'Kebun berhasil ditambahkan'),
+              backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       } else {
@@ -217,7 +224,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -226,7 +234,9 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red),
       );
     }
   }
@@ -252,8 +262,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: ListView(children: [
-            Padding(
+          child: SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,7 +390,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                 ],
               ),
             ),
-          ]),
+          ),
         ),
       ),
     );

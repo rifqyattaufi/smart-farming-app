@@ -314,139 +314,145 @@ class _PelaporanNutrisiTanamanScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step ${widget.step}  - Isi Form Pelaporan',
-              subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-              showDate: true,
-            ),
-            ...List.generate(objekBudidayaList.length, (i) {
-              final objek = objekBudidayaList[i];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Form(
-                  key: _formKeys[i],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Data Tanaman',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        ((objek?['name'] != null &&
-                                    (objek?['name'] as String).isNotEmpty)
-                                ? '${objek?['name']} - '
-                                : '') +
-                            (widget.data?['unitBudidaya']?['category'] ?? '-'),
-                        style: bold20.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      RadioField(
-                        label: 'Jenis Pemberian',
-                        selectedValue: statusPemberianList[i] ?? 'Vitamin',
-                        options: const [
-                          'Vitamin',
-                          'Pupuk',
-                          'Vaksin',
-                          'Disinfektan',
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            statusPemberianList[i] = value;
-                            selectedBahanList[i] = {};
-                            _satuanController[i].clear();
-                          });
-                        },
-                      ),
-                      DropdownFieldWidget(
-                        label: "Nama bahan",
-                        hint: "Pilih jenis bahan",
-                        items: (statusPemberianList[i] == 'Vitamin'
-                                ? listBahanVitamin
-                                : listBahanVaksin)
-                            .map((item) => item['name'] as String)
-                            .toList(),
-                        selectedValue: selectedBahanList[i]['name'] ?? '',
-                        onChanged: (value) {
-                          setState(() {
-                            selectedBahanList[i] = (statusPemberianList[i] ==
-                                        'Vitamin'
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                BannerWidget(
+                  title: 'Step ${widget.step}  - Isi Form Pelaporan',
+                  subtitle:
+                      'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+                  showDate: true,
+                ),
+                ...List.generate(objekBudidayaList.length, (i) {
+                  final objek = objekBudidayaList[i];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Form(
+                      key: _formKeys[i],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Data Tanaman',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            ((objek?['name'] != null &&
+                                        (objek?['name'] as String).isNotEmpty)
+                                    ? '${objek?['name']} - '
+                                    : '') +
+                                (widget.data?['unitBudidaya']?['category'] ??
+                                    '-'),
+                            style: bold20.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '${widget.data?['unitBudidaya']['latin']} - ${widget.data?['unitBudidaya']['name']}',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          RadioField(
+                            label: 'Jenis Pemberian',
+                            selectedValue: statusPemberianList[i] ?? 'Vitamin',
+                            options: const [
+                              'Vitamin',
+                              'Pupuk',
+                              'Vaksin',
+                              'Disinfektan',
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                statusPemberianList[i] = value;
+                                selectedBahanList[i] = {};
+                                _satuanController[i].clear();
+                              });
+                            },
+                          ),
+                          DropdownFieldWidget(
+                            label: "Nama bahan",
+                            hint: "Pilih jenis bahan",
+                            items: (statusPemberianList[i] == 'Vitamin'
                                     ? listBahanVitamin
                                     : listBahanVaksin)
-                                .firstWhere((item) => item['name'] == value);
-                          });
-                          changeSatuan(i);
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pilih bahan';
-                          }
-                          return null;
-                        },
+                                .map((item) => item['name'] as String)
+                                .toList(),
+                            selectedValue: selectedBahanList[i]['name'] ?? '',
+                            onChanged: (value) {
+                              setState(() {
+                                selectedBahanList[i] =
+                                    (statusPemberianList[i] == 'Vitamin'
+                                            ? listBahanVitamin
+                                            : listBahanVaksin)
+                                        .firstWhere(
+                                            (item) => item['name'] == value);
+                              });
+                              changeSatuan(i);
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Pilih bahan';
+                              }
+                              return null;
+                            },
+                          ),
+                          InputFieldWidget(
+                              label: "Jumlah/dosis",
+                              hint: "Contoh: 10",
+                              controller: _sizeController[i],
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Masukkan jumlah/dosis';
+                                } else if (double.tryParse(value) == null) {
+                                  return 'Masukkan angka yang valid';
+                                } else if (double.parse(value) <= 0) {
+                                  return 'Jumlah/dosis tidak boleh kurang dari 1';
+                                }
+                                return null;
+                              }),
+                          InputFieldWidget(
+                            label: "Satuan dosis",
+                            hint: "",
+                            controller: _satuanController[i],
+                            isDisabled: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Pilih satuan dosis';
+                              }
+                              return null;
+                            },
+                          ),
+                          ImagePickerWidget(
+                            label: "Unggah bukti pemberian dosis ke tanaman",
+                            image: _imageList[i],
+                            onPickImage: (context) {
+                              _pickImageDosis(context, i);
+                            },
+                          ),
+                          InputFieldWidget(
+                              label: "Catatan/jurnal pelaporan",
+                              hint: "Keterangan",
+                              controller: _catatanController[i],
+                              maxLines: 10,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Masukkan catatan';
+                                }
+                                return null;
+                              }),
+                          const Divider()
+                        ],
                       ),
-                      InputFieldWidget(
-                          label: "Jumlah/dosis",
-                          hint: "Contoh: 10",
-                          controller: _sizeController[i],
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Masukkan jumlah/dosis';
-                            } else if (double.tryParse(value) == null) {
-                              return 'Masukkan angka yang valid';
-                            } else if (double.parse(value) <= 0) {
-                              return 'Jumlah/dosis tidak boleh kurang dari 1';
-                            }
-                            return null;
-                          }),
-                      InputFieldWidget(
-                        label: "Satuan dosis",
-                        hint: "",
-                        controller: _satuanController[i],
-                        isDisabled: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pilih satuan dosis';
-                          }
-                          return null;
-                        },
-                      ),
-                      ImagePickerWidget(
-                        label: "Unggah bukti pemberian dosis ke tanaman",
-                        image: _imageList[i],
-                        onPickImage: (context) {
-                          _pickImageDosis(context, i);
-                        },
-                      ),
-                      InputFieldWidget(
-                          label: "Catatan/jurnal pelaporan",
-                          hint: "Keterangan",
-                          controller: _catatanController[i],
-                          maxLines: 10,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Masukkan catatan';
-                            }
-                            return null;
-                          }),
-                      const Divider()
-                    ],
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 16),
-          ],
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: Padding(

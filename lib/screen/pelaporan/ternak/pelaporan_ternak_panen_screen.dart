@@ -245,100 +245,104 @@ class _PelaporanTernakPanenScreenState
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            BannerWidget(
-              title: 'Step ${widget.step} - Isi Form Pelaporan',
-              subtitle:
-                  'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
-              showDate: true,
-            ),
-            ...List.generate(objekBudidayaList.length, (i) {
-              final objek = objekBudidayaList[i];
-              return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Form(
-                  key: formKeys[i],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Data Komoditas Ternak',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        ((objek?['name'] != null &&
-                                    (objek?['name'] as String).isNotEmpty)
-                                ? '${objek?['name']} - '
-                                : '') +
-                            (widget.data?['komoditas']?['name'] ?? '-'),
-                        style: bold20.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '${widget.data?['komoditas']?['jenisBudidayaLatin'] ?? '-'} - ${widget.data?['unitBudidaya']?['name'] ?? '-'}',
-                        style: semibold16.copyWith(color: dark1),
-                      ),
-                      const SizedBox(height: 12),
-                      InputFieldWidget(
-                        label: "Jumlah panen",
-                        hint: "Contoh: 20",
-                        controller: sizeControllers[i],
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Jumlah panen wajib diisi';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Jumlah panen harus berupa angka';
-                          }
-                          return null;
-                        },
-                      ),
-                      DropdownFieldWidget(
-                        label: "Satuan panen",
-                        hint: "Pilih satuan panen",
-                        items: [satuanList?['nama'] ?? '-'],
-                        selectedValue: satuanList?['nama'] ?? '-',
-                        onChanged: (value) => {},
-                        isEdit: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Satuan panen wajib diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                      ImagePickerWidget(
-                        label: "Unggah bukti hasil panen",
-                        image: imageList[i],
-                        onPickImage: (ctx) async {
-                          await _pickImage(ctx, i);
-                        },
-                      ),
-                      InputFieldWidget(
-                        label: "Catatan/jurnal pelaporan",
-                        hint: "Keterangan",
-                        controller: catatanControllers[i],
-                        maxLines: 10,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Catatan wajib diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                      const Divider(),
-                    ],
-                  ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                BannerWidget(
+                  title: 'Step ${widget.step} - Isi Form Pelaporan',
+                  subtitle:
+                      'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
+                  showDate: true,
                 ),
-              );
-            }),
-            const SizedBox(height: 16),
-          ],
+                ...List.generate(objekBudidayaList.length, (i) {
+                  final objek = objekBudidayaList[i];
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Form(
+                      key: formKeys[i],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Data Komoditas Ternak',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            ((objek?['name'] != null &&
+                                        (objek?['name'] as String).isNotEmpty)
+                                    ? '${objek?['name']} - '
+                                    : '') +
+                                (widget.data?['komoditas']?['name'] ?? '-'),
+                            style: bold20.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '${widget.data?['komoditas']?['jenisBudidayaLatin'] ?? '-'} - ${widget.data?['unitBudidaya']?['name'] ?? '-'}',
+                            style: semibold16.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 12),
+                          InputFieldWidget(
+                            label: "Jumlah panen",
+                            hint: "Contoh: 20",
+                            controller: sizeControllers[i],
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Jumlah panen wajib diisi';
+                              }
+                              if (double.tryParse(value) == null) {
+                                return 'Jumlah panen harus berupa angka';
+                              }
+                              return null;
+                            },
+                          ),
+                          DropdownFieldWidget(
+                            label: "Satuan panen",
+                            hint: "Pilih satuan panen",
+                            items: [satuanList?['nama'] ?? '-'],
+                            selectedValue: satuanList?['nama'] ?? '-',
+                            onChanged: (value) => {},
+                            isEdit: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Satuan panen wajib diisi';
+                              }
+                              return null;
+                            },
+                          ),
+                          ImagePickerWidget(
+                            label: "Unggah bukti hasil panen",
+                            image: imageList[i],
+                            onPickImage: (ctx) async {
+                              await _pickImage(ctx, i);
+                            },
+                          ),
+                          InputFieldWidget(
+                            label: "Catatan/jurnal pelaporan",
+                            hint: "Keterangan",
+                            controller: catatanControllers[i],
+                            maxLines: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Catatan wajib diisi';
+                              }
+                              return null;
+                            },
+                          ),
+                          const Divider(),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
