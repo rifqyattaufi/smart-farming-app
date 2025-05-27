@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/firebase_options.dart';
+import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/screen/blank_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
@@ -86,6 +89,7 @@ import 'package:smart_farming_app/screen/ternak/ternak_screen.dart';
 import 'package:smart_farming_app/screen/users/add_user_screen.dart';
 import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
+import 'package:smart_farming_app/service/database_helper.dart';
 import 'package:smart_farming_app/service/fcm_service.dart';
 
 @pragma('vm:entry-point')
@@ -97,6 +101,29 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
     print(
         'Message also contained a notification: ${message.notification?.title}');
+  }
+
+  final DatabaseHelper dbHelper = DatabaseHelper.instance;
+  if (message.messageId != null && message.notification != null) {
+    final notifikasi = NotifikasiModel(
+      id: message.messageId!,
+      title: message.notification?.title ?? 'Tanpa Judul',
+      message: message.notification?.body ?? 'Tidak ada pesan',
+      receivedAt: message.sentTime ?? DateTime.now(),
+      isRead: false,
+      notificationType: message.data['notificationType'] as String?,
+      payload: jsonEncode(message.data),
+    );
+    try {
+      await dbHelper.insertNotification(notifikasi);
+      print(
+          'Background Notifikasi berhasil disimpan ke database lokal: ${notifikasi.id}');
+    } catch (e) {
+      print('Background Gagal menyimpan notifikasi ke database lokal: $e');
+    }
+  } else {
+    print(
+        'Background Pesan FCM tidak memiliki messageId atau notification body, tidak disimpan.');
   }
 }
 
