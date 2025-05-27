@@ -125,4 +125,14 @@ class DatabaseHelper {
 
     return await db.delete(_tableName);
   }
+
+  Future<int> deleteReadNotifications() async {
+    Database db = await instance.database;
+
+    return await db.delete(
+      _tableName,
+      where: 'isRead = ?',
+      whereArgs: [1],
+    );
+  }
 }
