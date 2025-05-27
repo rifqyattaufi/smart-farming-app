@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
+import 'package:smart_farming_app/service/database_helper.dart';
 
 class FcmService {
   final AuthService _authService = AuthService();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   FcmService(this._flutterLocalNotificationsPlugin);
 
@@ -38,10 +41,43 @@ class FcmService {
     }
   }
 
+  Future<void> _saveNotificationToDatabase(RemoteMessage message) async {
+    if (message.messageId == null) {
+      print("Pesan FCM tidak memiliki messageId, tidak disimpan.");
+      return;
+    }
+
+    if (message.notification == null) {
+      print(
+          "Pesan FCM tidak memiliki notification body, tidak disimpan sebagai notifikasi umum.");
+      return;
+    }
+
+    final notifikasi = NotifikasiModel(
+      id: message.messageId!,
+      title: message.notification?.title ?? 'Notifikasi Baru',
+      message: message.notification?.body ?? 'Anda memiliki pesan baru',
+      receivedAt: message.sentTime ?? DateTime.now(),
+      isRead: false,
+      notificationType: message.data['notificationType'] as String?,
+      payload: jsonEncode(message.data),
+    );
+
+    try {
+      await _dbHelper.insertNotification(notifikasi);
+      print("Notifikasi disimpan ke database: ${notifikasi.message}");
+    } catch (e) {
+      print("Error saving notification to database: $e");
+    }
+  }
+
   void _setupFCMListeners() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('Foreground message received!');
       print('Message Id: ${message.messageId} data: ${message.data}');
+
+      await _saveNotificationToDatabase(message);
+
       RemoteNotification? notification = message.notification;
 
       if (notification != null) {
