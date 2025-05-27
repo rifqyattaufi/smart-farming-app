@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +7,7 @@ class InventarisService {
   final AuthService _authService = AuthService();
 
   final String baseUrl = '${dotenv.env['BASE_URL'] ?? ''}/inventaris';
+
   final String dashboardUrl =
       '${dotenv.env['BASE_URL'] ?? ''}/dashboard/inventaris';
 
@@ -44,6 +44,76 @@ class InventarisService {
     } else {
       throw Exception(
           'Failed to load dashboard inventaris data ${response.statusCode}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getPagedInventaris({
+    int page = 1,
+    int limit = 20,
+    String? kategoriId, // Untuk filter berdasarkan ID Kategori
+    String? searchQuery, // Untuk filter berdasarkan nama (pencarian)
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (kategoriId != null &&
+        kategoriId.isNotEmpty &&
+        kategoriId.toLowerCase() != 'all') {
+      queryParams['kategoriId'] = kategoriId;
+    }
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['nama'] = searchQuery;
+    }
+
+    final url = Uri.parse(baseUrl).replace(queryParameters: queryParams);
+    print('Fetching Inventaris from URL: $url');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getPagedInventaris(
+            page: page,
+            limit: limit,
+            kategoriId: kategoriId,
+            searchQuery: searchQuery);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to load inventaris'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
+      };
     }
   }
 
