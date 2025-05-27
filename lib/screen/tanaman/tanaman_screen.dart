@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
@@ -20,54 +21,234 @@ class _TanamanScreenState extends State<TanamanScreen> {
   List<dynamic> _tanamanList = [];
   List<dynamic> _filteredTanamanList = [];
 
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  final ScrollController _scrollController = ScrollController();
+  bool _isInitialLoading = true;
+  bool _isSearching = false;
 
-  Future<void> _fetchData() async {
-    try {
-      final response =
-          await _jenisBudidayaService.getJenisBudidayaByTipe('tumbuhan');
-      setState(() {
-        _tanamanList = response['data'];
-        _filteredTanamanList = _tanamanList;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasNextPage = true;
 
-  void _searchTanaman(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _filteredTanamanList = _tanamanList;
-      });
-    } else {
-      final response =
-          await _jenisBudidayaService.getJenisBudidayaSearch(query, 'tumbuhan');
+  int _currentSearchPage = 1;
+  bool _isLoadingMoreSearch = false;
+  bool _hasNextSearchPage = true;
 
-      if (response['status']) {
-        setState(() {
-          _filteredTanamanList = response['data'];
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error searching data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+  final int _pageSize = 20;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _loadInitialData();
+    _scrollController.addListener(_onScroll);
+    _searchController.addListener(() {
+      if (_searchController.text.isEmpty && (_debounce?.isActive ?? false)) {
+        _debounce!.cancel();
+        _onSearchChanged("");
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadInitialData({bool isRefresh = false}) async {
+    if (!mounted) return;
+    if (!isRefresh) {
+      setState(() {
+        _isInitialLoading = true;
+      });
+    }
+
+    _currentPage = 1;
+    _hasNextPage = true;
+    if (isRefresh) {
+      _tanamanList.clear();
+      _filteredTanamanList.clear();
+    }
+
+    await _fetchDataPage(page: 1, isInitialSetupOrRefresh: true);
+
+    if (mounted) {
+      setState(() {
+        _isInitialLoading = false;
+        if (_searchController.text.isEmpty) {
+          _filteredTanamanList = List.from(_tanamanList);
+        }
+      });
+    }
+  }
+
+  Future<void> _fetchDataPage(
+      {required int page, bool isInitialSetupOrRefresh = false}) async {
+    if (!mounted) return;
+    if (_isLoadingMore && !isInitialSetupOrRefresh) return;
+
+    if (mounted && !isInitialSetupOrRefresh) {
+      setState(() {
+        _isLoadingMore = true;
+      });
+    }
+
+    Map<String, dynamic> response;
+    try {
+      response = await _jenisBudidayaService.getJenisBudidayaByTipe(
+        'tumbuhan',
+        page: page,
+        limit: _pageSize,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+          if (isInitialSetupOrRefresh) _isInitialLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Gagal memuat data: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        final List<dynamic> fetchedData =
+            List<dynamic>.from(response['data'] ?? []);
+        final int totalPages = response['totalPages'] ?? 0;
+        final int currentPageFromServer = response['currentPage'] ?? page;
+
+        if (isInitialSetupOrRefresh || page == 1) _tanamanList.clear();
+        _tanamanList.addAll(fetchedData);
+        _hasNextPage = currentPageFromServer < totalPages;
+        _isLoadingMore = false;
+
+        if (_searchController.text.isEmpty) {
+          _filteredTanamanList = List.from(_tanamanList);
+        }
+        if (isInitialSetupOrRefresh) _isInitialLoading = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 300 &&
+        !_isInitialLoading &&
+        !_isSearching) {
+      if (_searchController.text.isNotEmpty) {
+        if (_hasNextSearchPage && !_isLoadingMoreSearch) {
+          _currentSearchPage++;
+          _fetchMoreSearchResults(page: _currentSearchPage);
+        }
+      } else {
+        if (_hasNextPage && !_isLoadingMore) {
+          _currentPage++;
+          _fetchDataPage(page: _currentPage);
+        }
+      }
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      _searchTanaman(query, isNewSearch: true);
+    });
+  }
+
+  Future<void> _searchTanaman(String query, {bool isNewSearch = false}) async {
+    final String normalizedQuery = query.toLowerCase().trim();
+
+    if (isNewSearch) {
+      if (normalizedQuery.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _isSearching = false;
+            _filteredTanamanList = List.from(_tanamanList);
+            _currentSearchPage = 1;
+            _hasNextSearchPage = true;
+          });
+        }
+        return;
+      }
+      setState(() {
+        _isSearching = true;
+        _filteredTanamanList.clear();
+        _currentSearchPage = 1;
+        _hasNextSearchPage = true;
+      });
+    } else {
+      setState(() {
+        _isLoadingMoreSearch = true;
+      });
+    }
+
+    Map<String, dynamic> response;
+    try {
+      response = await _jenisBudidayaService.getJenisBudidayaSearch(
+        normalizedQuery,
+        'tumbuhan',
+        page: _currentSearchPage,
+        limit: _pageSize,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSearching = false;
+          _isLoadingMoreSearch = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Gagal melakukan pencarian: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isSearching = false;
+        _isLoadingMoreSearch = false;
+        final List<dynamic> fetchedData =
+            List<dynamic>.from(response['data'] ?? []);
+        final int totalPages = response['totalPages'] ?? 0;
+        final int currentPageFromServer =
+            response['currentPage'] ?? _currentSearchPage;
+
+        if (response['status'] == true) {
+          _filteredTanamanList.addAll(fetchedData);
+          _hasNextSearchPage = currentPageFromServer < totalPages;
+        } else {
+          if (isNewSearch) _filteredTanamanList.clear();
+          _hasNextSearchPage = false;
+        }
+      });
+    }
+  }
+
+  Future<void> _fetchMoreSearchResults({required int page}) async {
+    if (_searchController.text.isNotEmpty) {
+      await _searchTanaman(_searchController.text, isNewSearch: false);
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    if (mounted) {
+      setState(() {
+        _searchController.clear();
+      });
+    }
+    await _loadInitialData(isRefresh: true);
   }
 
   @override
@@ -94,63 +275,142 @@ class _TanamanScreenState extends State<TanamanScreen> {
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
+            void handleTanamanUpdate() {
+              _handleRefresh();
+            }
+
             context.push('/tambah-tanaman',
                 extra: AddTanamanScreen(
                   isEdit: false,
-                  onTanamanAdded: () => _fetchData(),
+                  onTanamanAdded: handleTanamanUpdate,
                 ));
           },
           backgroundColor: green1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
           child: const Icon(Icons.add, size: 30, color: Colors.white),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: SearchField(
+                  hintText: 'Cari jenis tanaman berdasarkan nama',
+                  controller: _searchController,
+                  onChanged: _onSearchChanged),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SearchField(
-                        controller: searchController,
-                        onChanged: _searchTanaman,
+            const SizedBox(height: 10),
+            if (_isInitialLoading &&
+                _filteredTanamanList.isEmpty &&
+                !_isSearching)
+              const Expanded(child: Center(child: CircularProgressIndicator()))
+            else if (_isSearching && _filteredTanamanList.isEmpty)
+              const Expanded(
+                  child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.orange))))
+            else
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 80.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildContent(),
+                          _buildPaginationLoadingIndicator(),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                ListItem(
-                  title: 'Daftar Jenis Tanaman',
-                  items: _filteredTanamanList.map((item) {
-                    return {
-                      'name': item['nama'],
-                      'icon': item['gambar'],
-                      'id': item['id'],
-                      'isActive': item['status'],
-                    };
-                  }).toList(),
-                  type: 'basic',
-                  onItemTap: (context, item) {
-                    final id = item['id'] ?? '';
-                    context.push('/detail-tanaman/$id').then((_) {
-                      _fetchData();
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
+              ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPaginationLoadingIndicator() {
+    bool isLoading = _isLoadingMore || _isLoadingMoreSearch;
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildContent() {
+    bool isCurrentlySearching = _searchController.text.isNotEmpty;
+
+    if (isCurrentlySearching &&
+        _filteredTanamanList.isEmpty &&
+        !_isSearching &&
+        !_isLoadingMoreSearch) {
+      return const Center(
+          child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text("Jenis tanaman tidak ditemukan.")));
+    }
+
+    if (!isCurrentlySearching &&
+        _tanamanList.isEmpty &&
+        !_isInitialLoading &&
+        !_isLoadingMore &&
+        !_hasNextPage) {
+      return const Center(
+          child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text("Tidak ada jenis tanaman yang tersedia.")));
+    }
+
+    if (_filteredTanamanList.isEmpty &&
+        (_isInitialLoading ||
+            _isLoadingMore ||
+            _isLoadingMoreSearch ||
+            _isSearching)) {
+      return const SizedBox(
+          height: 200, child: Center(child: Text("Memuat data...")));
+    }
+
+    if (_filteredTanamanList.isEmpty &&
+        !isCurrentlySearching &&
+        !_isInitialLoading &&
+        !_isLoadingMore) {
+      return const Center(
+          child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text("Tidak ada jenis tanaman.")));
+    }
+
+    return ListItem(
+      title: 'Daftar Jenis Tanaman',
+      items: _filteredTanamanList.map((item) {
+        return {
+          'name': item['nama'] ?? 'N/A',
+          'icon': item['gambar'] as String? ?? '',
+          'id': item['id'],
+          'isActive': item['status'] ?? true,
+        };
+      }).toList(),
+      type: 'basic',
+      onItemTap: (context, item) {
+        final id = item['id'] as String?;
+        if (id != null && id.isNotEmpty) {
+          context.push('/detail-tanaman/$id').then((_) {
+            _loadInitialData(isRefresh: true);
+          });
+        }
+      },
     );
   }
 }

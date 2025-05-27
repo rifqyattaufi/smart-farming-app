@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/theme.dart';
+
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
 class AddHamaScreen extends StatefulWidget {
   final VoidCallback? onHamaAdded;
-  final bool isUpdate;
+  final bool isEdit;
   final String? id;
   final String? nama;
 
   const AddHamaScreen({
     super.key,
     this.onHamaAdded,
-    this.isUpdate = false,
+    this.isEdit = false,
     this.id,
     this.nama,
   });
@@ -33,44 +34,56 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.isUpdate) {
-      _nameController.text = widget.nama ?? '';
+    if (widget.isEdit && widget.nama != null) {
+      _nameController.text = widget.nama!;
     }
   }
 
   Future<void> _submitForm() async {
     if (_isLoading) return;
 
-    try {
-      if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
+    if (mounted) {
       setState(() {
         _isLoading = true;
       });
+    }
 
-      final data = {
-        'nama': _nameController.text,
-      };
+    final dataPayload = {
+      'nama': _nameController.text,
+    };
 
-      Map<String, dynamic>? response;
+    Map<String, dynamic> response;
 
-      if (widget.isUpdate) {
-        response = await _hamaService.updateJenisHama(
-          widget.id!,
-          data,
-        );
+    try {
+      if (widget.isEdit) {
+        if (widget.id == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('ID Jenis Hama tidak valid untuk update.'),
+                  backgroundColor: Colors.red),
+            );
+            setState(() => _isLoading = false);
+          }
+          return;
+        }
+        response = await _hamaService.updateJenisHama(widget.id!, dataPayload);
       } else {
-        response = await _hamaService.createJenisHama(data);
+        response = await _hamaService.createJenisHama(dataPayload);
       }
 
+      if (!mounted) return;
+
       if (response['status'] == true) {
-        if (widget.onHamaAdded != null) {
-          widget.onHamaAdded!();
-        }
+        widget.onHamaAdded?.call();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(widget.isUpdate
+              content: Text(widget.isEdit
                   ? 'Berhasil memperbarui data jenis hama'
                   : 'Berhasil menambahkan data jenis hama'),
               backgroundColor: Colors.green),
@@ -80,24 +93,30 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
         setState(() {
           _isLoading = false;
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message']),
-            backgroundColor: Colors.red,
-          ),
+              content: Text(response['message'] ?? 'Gagal menyimpan data.'),
+              backgroundColor: Colors.red),
         );
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Terjadi kesalahan saat menambahkan: $e'),
-            backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Terjadi kesalahan: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -112,10 +131,11 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
           titleSpacing: 0,
           elevation: 0,
           toolbarHeight: 80,
-          title: const Header(
+          title: Header(
               headerType: HeaderType.back,
-              title: 'Laporan Hama',
-              greeting: 'Tambah Hama'),
+              title: 'Manajemen Jenis Hama',
+              greeting:
+                  widget.isEdit ? 'Edit Jenis Hama' : 'Tambah Jenis Hama'),
         ),
       ),
       body: SafeArea(
@@ -125,10 +145,10 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   InputFieldWidget(
-                    label: "Nama hama",
+                    label: "Nama Jenis Hama",
                     hint: "Contoh: Tikus",
                     controller: _nameController,
                     validator: (value) {
@@ -138,19 +158,21 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 520),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
                   const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomButton(
+          onPressed: _submitForm,
+          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Jenis Hama',
+          backgroundColor: green1,
+          textStyle: semibold16.copyWith(color: white),
+          isLoading: _isLoading,
         ),
       ),
     );

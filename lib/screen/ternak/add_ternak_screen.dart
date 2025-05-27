@@ -25,15 +25,88 @@ class AddTernakScreen extends StatefulWidget {
 
 class _AddTernakScreenState extends State<AddTernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
-
   final ImageService _imageService = ImageService();
+
   final _formKey = GlobalKey<FormState>();
-  String? selectedLocation;
+
   String statusTernak = 'Aktif';
 
   File? _imageTernak;
   final picker = ImagePicker();
   bool _isLoading = false;
+  bool _isFetchingEditData = false;
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _latinController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String? _imageUrlFromApi;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isEdit && widget.idTernak != null) {
+      _fetchEditData();
+    }
+  }
+
+  Future<void> _fetchEditData() async {
+    if (!mounted) return;
+    setState(() {
+      _isFetchingEditData = true;
+    });
+    try {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaById(widget.idTernak!);
+
+      if (mounted && response['status'] == true) {
+        final dataJenisBudidaya = response['data']?['jenisBudidaya'];
+
+        if (dataJenisBudidaya != null) {
+          setState(() {
+            _nameController.text = dataJenisBudidaya['nama'] ?? '';
+            _latinController.text = dataJenisBudidaya['latin'] ?? '';
+            _descriptionController.text = dataJenisBudidaya['detail'] ?? '';
+            statusTernak = (dataJenisBudidaya['status'] == 1 ||
+                    dataJenisBudidaya['status'] == true)
+                ? 'Aktif'
+                : 'Tidak Aktif';
+            if (dataJenisBudidaya['gambar'] != null &&
+                dataJenisBudidaya['gambar'].toString().isNotEmpty) {
+              _imageUrlFromApi = dataJenisBudidaya['gambar'];
+            }
+          });
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Format data jenis budidaya tidak sesuai.'),
+                  backgroundColor: Colors.orange),
+            );
+          }
+        }
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(response['message'] ?? 'Gagal memuat data ternak'),
+              backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isFetchingEditData = false;
+        });
+      }
+    }
+  }
 
   Future<void> _pickImageTernak(BuildContext context) async {
     showModalBottomSheet(
@@ -79,123 +152,105 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
     );
   }
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _latinController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  Map<String, dynamic> _imageUrl = {};
-
-  Future<void> _fetchData() async {
-    final response =
-        await _jenisBudidayaService.getJenisBudidayaById(widget.idTernak!);
-
-    if (response['status'] == true) {
-      final data = response['data']['jenisBudidaya'];
-
-      setState(() {
-        _nameController.text = data['nama'];
-        _latinController.text = data['latin'];
-        statusTernak = data['status'] ? 'Aktif' : 'Tidak Aktif';
-        _descriptionController.text = data['detail'];
-        _imageUrl = {
-          'data': data['gambar'],
-        };
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   Future<void> _submitForm() async {
     if (_isLoading) return;
 
     try {
-      if (!_formKey.currentState!.validate()) return;
+      if (!_formKey.currentState!.validate()) {
+        return;
+      }
 
       if (_imageTernak == null && !widget.isEdit) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Gambar hewan ternak tidak boleh kosong'),
-            backgroundColor: Colors.red,
-          ),
+              content: Text('Gambar hewan ternak tidak boleh kosong'),
+              backgroundColor: Colors.red),
         );
         return;
       }
 
-      setState(() {
-        _isLoading = true;
-      });
-
-      if (_imageTernak != null) {
-        _imageUrl = await _imageService.uploadImage(_imageTernak!);
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
       }
 
-      final data = {
+      String? finalImageUrl;
+      if (_imageTernak != null) {
+        final imageUploadResponse =
+            await _imageService.uploadImage(_imageTernak!);
+        if (imageUploadResponse['status'] == true &&
+            imageUploadResponse['data'] != null) {
+          finalImageUrl = imageUploadResponse['data'];
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(
+                      'Gagal mengunggah gambar: ${imageUploadResponse['message']}'),
+                  backgroundColor: Colors.red),
+            );
+            setState(() {
+              _isLoading = false;
+            });
+          }
+          return;
+        }
+      } else if (widget.isEdit && _imageUrlFromApi != null) {
+        finalImageUrl = _imageUrlFromApi;
+      }
+
+      final dataPayload = {
         "nama": _nameController.text,
         "latin": _latinController.text,
         "tipe": "hewan",
         "status": statusTernak == 'Aktif',
         "detail": _descriptionController.text,
-        "gambar": _imageUrl['data'],
+        if (finalImageUrl != null) "gambar": finalImageUrl,
       };
 
       Map<String, dynamic> response;
 
-      if (widget.isEdit) {
-        data['id'] = widget.idTernak;
-        response = await _jenisBudidayaService.updateJenisBudidaya(data);
+      if (widget.isEdit && widget.idTernak != null) {
+        response = await _jenisBudidayaService.updateJenisBudidaya(
+            dataPayload, widget.idTernak!);
       } else {
-        response = await _jenisBudidayaService.createJenisBudidaya(data);
+        response = await _jenisBudidayaService.createJenisBudidaya(dataPayload);
       }
 
+      if (!mounted) return;
+
       if (response['status'] == true) {
-        if (widget.onTernakAdded != null) {
-          widget.onTernakAdded!();
-        }
+        widget.onTernakAdded?.call();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.isEdit
-                ? 'Berhasil memperbarui jenis hewan ternak'
-                : 'Berhasil menambahkan jenis hewan ternak'),
-            backgroundColor: Colors.green,
-          ),
+              content: Text(widget.isEdit
+                  ? 'Berhasil memperbarui jenis hewan ternak'
+                  : 'Berhasil menambahkan jenis hewan ternak'),
+              backgroundColor: Colors.green),
         );
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
       } else {
         setState(() {
           _isLoading = false;
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message']),
-            backgroundColor: Colors.red,
-          ),
+              content: Text(response['message'] ?? 'Gagal menyimpan data'),
+              backgroundColor: Colors.red),
         );
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Terjadi kesalahan: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.isEdit) {
-      _fetchData();
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Terjadi kesalahan: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -214,81 +269,86 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           title: Header(
               headerType: HeaderType.back,
               title: 'Manajemen Jenis Hewan',
-              greeting: widget.isEdit
-                  ? 'Edit Jenis Hewan'
-                  : 'Tambah Jenis Hewan'),
+              greeting:
+                  widget.isEdit ? 'Edit Jenis Hewan' : 'Tambah Jenis Hewan'),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InputFieldWidget(
-                    label: "Nama hewan ternak",
-                    hint: "Contoh: Ayam",
-                    controller: _nameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama hewan ternak tidak boleh kosong';
-                      }
-                      return null;
-                    },
+        child: _isFetchingEditData
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InputFieldWidget(
+                          label: "Nama hewan ternak",
+                          hint: "Contoh: Ayam Kampung",
+                          controller: _nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama hewan ternak tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                            label: "Nama latin",
+                            hint: "Contoh: Gallus gallus domesticus",
+                            controller: _latinController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Nama latin tidak boleh kosong';
+                              }
+                              return null;
+                            }),
+                        RadioField(
+                          label: 'Status ternak',
+                          selectedValue: statusTernak,
+                          options: const ['Aktif', 'Tidak Aktif'],
+                          onChanged: (value) {
+                            setState(() {
+                              statusTernak = value;
+                            });
+                          },
+                        ),
+                        ImagePickerWidget(
+                          label: "Unggah gambar hewan ternak",
+                          image: _imageTernak,
+                          imageUrl: _imageUrlFromApi,
+                          onPickImage: (ctx) => _pickImageTernak(ctx),
+                        ),
+                        InputFieldWidget(
+                            label: "Deskripsi hewan ternak",
+                            hint:
+                                "Keterangan umum mengenai jenis hewan ternak ini",
+                            controller: _descriptionController,
+                            maxLines: 5,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Deskripsi tidak boleh kosong';
+                              }
+                              return null;
+                            }),
+                        const SizedBox(height: 24),
+                        CustomButton(
+                          onPressed: _submitForm,
+                          buttonText: widget.isEdit
+                              ? 'Simpan Perubahan'
+                              : 'Tambah Ternak',
+                          backgroundColor: green1,
+                          textStyle: semibold16.copyWith(color: white),
+                          isLoading: _isLoading,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
-                  InputFieldWidget(
-                      label: "Nama latin",
-                      hint: "Contoh: Gallus gallus domesticus",
-                      controller: _latinController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Nama latin tidak boleh kosong';
-                        }
-                        return null;
-                      }),
-                  RadioField(
-                    label: 'Status ternak',
-                    selectedValue: statusTernak,
-                    options: const ['Aktif', 'Tidak Aktif'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusTernak = value;
-                      });
-                    },
-                  ),
-                  ImagePickerWidget(
-                    label: "Unggah gambar hewan ternak",
-                    image: _imageTernak,
-                    onPickImage: _pickImageTernak,
-                  ),
-                  InputFieldWidget(
-                      label: "Deskripsi hewan ternak",
-                      hint: "Keterangan",
-                      controller: _descriptionController,
-                      maxLines: 10,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Deskripsi tidak boleh kosong';
-                        }
-                        return null;
-                      }),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

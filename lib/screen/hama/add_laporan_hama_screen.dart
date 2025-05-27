@@ -86,7 +86,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
   }
 
   Future<void> _getJenisHama() async {
-    final response = await _hamaService.getJenisHama();
+    final response = await _hamaService.getDaftarHama();
     if (response['status'] == true) {
       final List<dynamic> data = response['data'];
       setState(() {
@@ -194,7 +194,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         'unitBudidayaId': selectedLocation,
         'tipe': 'hama',
         'judul':
-            "Laporan Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama}",
+            "Laporan Hama ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama}",
         'gambar': imageUrl.isNotEmpty ? imageUrl['data'] : '',
         'catatan': _catatanController.text,
         'hama': {

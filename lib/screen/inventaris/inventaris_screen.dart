@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
+import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/chip_filter.dart';
@@ -21,11 +22,13 @@ class InventarisScreen extends StatefulWidget {
 class _InventarisScreenState extends State<InventarisScreen> {
   final InventarisService _inventarisService = InventarisService();
   final KomoditasService _komoditasService = KomoditasService();
+  final KategoriInvService _kategoriInvService = KategoriInvService();
 
   List<dynamic> allInventarisList = [];
   List<dynamic> allInventarisListFiltered = [];
   List<dynamic> allKomoditasList = [];
   List<dynamic> allKomoditasListFiltered = [];
+  List<dynamic> KategoriInvList = [];
 
   @override
   void initState() {
@@ -36,6 +39,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
   Future<void> _fetchData() async {
     final inventarisResponse = await _inventarisService.getInventaris();
     final komoditasResponse = await _komoditasService.getKomoditas();
+    final kategoriInvResponse =
+        await _kategoriInvService.getKategoriInventaris();
 
     if (mounted) {
       setState(() {
@@ -43,7 +48,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
             List<dynamic>.from(inventarisResponse['data'] ?? []);
         allInventarisListFiltered = List.from(allInventarisList);
         allKomoditasList = List<dynamic>.from(komoditasResponse['data'] ?? []);
-        allKomoditasListFiltered  = List.from(allKomoditasList);
+        allKomoditasListFiltered = List.from(allKomoditasList);
+        KategoriInvList = List<dynamic>.from(kategoriInvResponse['data'] ?? []);
       });
     }
   }
@@ -180,14 +186,17 @@ class _InventarisScreenState extends State<InventarisScreen> {
     }
 
     final now = DateTime.now();
-    final itemBaru = allInventarisListFiltered.where((inventaris) {
-      if (inventaris['createdAt'] == null) return false;
-      final createdAt = DateTime.tryParse(
-        inventaris['createdAt'].replaceFirst(' ', 'T'),
-      );
-      if (createdAt == null) return false;
-      return now.difference(createdAt).inDays <= 7;
-    }).toList();
+    final itemBaru = allInventarisListFiltered
+        .where((inventaris) {
+          if (inventaris['createdAt'] == null) return false;
+          final createdAt = DateTime.tryParse(
+            inventaris['createdAt'].replaceFirst(' ', 'T'),
+          );
+          if (createdAt == null) return false;
+          return now.difference(createdAt).inDays <= 7;
+        })
+        .take(3)
+        .toList();
 
     final stokRendah = allInventarisListFiltered.where((inventaris) {
       final jumlah = inventaris['jumlah'] ?? 0;
@@ -205,49 +214,64 @@ class _InventarisScreenState extends State<InventarisScreen> {
       children: [
         if (itemBaru.isNotEmpty)
           ListItem(
-            title: 'Item Baru',
-            type: 'history',
-            items: itemBaru
-                .map((inventaris) => {
-                      'name': inventaris['nama'] ?? 'N/A',
-                      'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
-                      'icon': inventaris['gambar'],
-                      'id': inventaris['id'],
-                    })
-                .toList(),
-            onItemTap: (context, item) {
-              final id = item['id'];
-              if (id != null) {
-                context.push('/detail-laporan/$id');
-              }
-            },
-          ),
+              title: 'Item Baru',
+              type: 'history',
+              items: itemBaru
+                  .map((inventaris) => {
+                        'name': inventaris['nama'] ?? 'N/A',
+                        'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
+                        'icon': inventaris['gambar'],
+                        'id': inventaris['id'],
+                      })
+                  .toList(),
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/detail-inventaris/$id').then((_) {
+                  _fetchData();
+                });
+              }),
         if (stokHabis.isNotEmpty) const SizedBox(height: 12),
         if (stokHabis.isNotEmpty)
           ListItem(
-            title: 'Stok Habis',
-            type: 'history',
-            items: stokHabis
-                .map((inventaris) => {
-                      'name': inventaris['nama'] ?? 'N/A',
-                      'category': 'Stok: 0',
-                      'icon': inventaris['gambar'],
-                      'id': inventaris['id'],
-                    })
-                .toList(),
-            onItemTap: (context, item) {
-              final id = item['id'];
-              if (id != null) {
-                context.push('/detail-laporan/$id');
-              }
-            },
-          ),
+              title: 'Stok Habis',
+              type: 'history',
+              items: stokHabis
+                  .map((inventaris) => {
+                        'name': inventaris['nama'] ?? 'N/A',
+                        'category': 'Stok: 0',
+                        'icon': inventaris['gambar'],
+                        'id': inventaris['id'],
+                      })
+                  .toList(),
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/detail-inventaris/$id').then((_) {
+                  _fetchData();
+                });
+              }),
         if (stokRendah.isNotEmpty) const SizedBox(height: 12),
         if (stokRendah.isNotEmpty)
           ListItem(
-            title: 'Stok Rendah',
-            type: 'history',
-            items: stokRendah
+              title: 'Stok Rendah',
+              type: 'history',
+              items: stokRendah
+                  .map((inventaris) => {
+                        'name': inventaris['nama'] ?? 'N/A',
+                        'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
+                        'icon': inventaris['gambar'],
+                        'id': inventaris['id'],
+                      })
+                  .toList(),
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/detail-inventaris/$id').then((_) {
+                  _fetchData();
+                });
+              }),
+        const SizedBox(height: 12),
+        ListItem(
+            title: 'Semua Inventaris',
+            items: allInventarisListFiltered
                 .map((inventaris) => {
                       'name': inventaris['nama'] ?? 'N/A',
                       'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
@@ -255,123 +279,16 @@ class _InventarisScreenState extends State<InventarisScreen> {
                       'id': inventaris['id'],
                     })
                 .toList(),
+            type: 'basic',
             onItemTap: (context, item) {
-              final id = item['id'];
-              if (id != null) {
-                context.push('/detail-laporan/$id');
-              }
-            },
-          ),
-        const SizedBox(height: 12),
-        ListItem(
-          title: 'Semua Inventaris',
-          items: allInventarisListFiltered
-              .map((inventaris) => {
-                    'name': inventaris['nama'] ?? 'N/A',
-                    'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
-                    'icon': inventaris['gambar'],
-                    'id': inventaris['id'],
-                  })
-              .toList(),
-          type: 'basic',
-          onItemTap: (context, item) {
-            final id = item['id'];
-            if (id != null) {
-              context.push('/detail-laporan/$id');
-            } else {
-              final name = item['name'] ?? '';
-              context.push('/detail-laporan/$name');
-            }
-          },
-        ),
+              final id = item['id'] ?? '';
+              context.push('/detail-inventaris/$id').then((_) {
+                _fetchData();
+              });
+            }),
       ],
     );
   }
-  // ...existing code...
-  // final filteredItems = items.where((item) {
-  //   bool matchCategory = selectedInventarisCategory == 'Semua Item' ||
-  //       item['category'] == selectedInventarisCategory;
-  //   bool matchSearch = item['name']!
-  //       .toLowerCase()
-  //       .contains(searchController.text.toLowerCase());
-  //   return matchCategory && matchSearch;
-  // }).toList();
-
-  // ChipFilter(
-  //   categories: const [
-  //     'Semua Item',
-  //     'Bibit Tanaman',
-  //     'Peralatan',
-  //     'Nutrisi'
-  //   ],
-  //   selectedCategory: selectedInventarisCategory,
-  //   onCategorySelected: (category) {
-  //     setState(() {
-  //       selectedInventarisCategory = category;
-  //     });
-  //   },
-  // ),
-  //     const SizedBox(height: 12),
-  //     filteredItems.isEmpty
-  //         ? Center(
-  //             child: Padding(
-  //             padding: const EdgeInsets.all(20),
-  //             child: Column(
-  //               children: [
-  //                 SvgPicture.asset(
-  //                   'assets/images/nodata.svg',
-  //                   height: 300,
-  //                 ),
-  //                 Text('Oops, Data Kosong!',
-  //                     style: bold20.copyWith(color: grey)),
-  //               ],
-  //             ),
-  //           ))
-  //         : Column(
-  //             children: [
-  //               ListItem(
-  //                 title: 'Item Baru',
-  //                 type: 'history',
-  //                 items: filteredItems,
-  //                 onItemTap: (context, item) {
-  //                   final name = item['name'] ?? '';
-  //                   context.push('/detail-laporan/$name');
-  //                 },
-  //               ),
-  //               const SizedBox(height: 12),
-  //               ListItem(
-  //                 title: 'Stok Habis',
-  //                 type: 'history',
-  //                 items: filteredItems,
-  //                 onItemTap: (context, item) {
-  //                   final name = item['name'] ?? '';
-  //                   context.push('/detail-laporan/$name');
-  //                 },
-  //               ),
-  //               const SizedBox(height: 12),
-  //               ListItem(
-  //                 title: 'Stok Rendah',
-  //                 type: 'history',
-  //                 items: filteredItems,
-  //                 onItemTap: (context, item) {
-  //                   final name = item['name'] ?? '';
-  //                   context.push('/detail-laporan/$name');
-  //                 },
-  //               ),
-  //               const SizedBox(height: 12),
-  //               ListItem(
-  //                 title: 'Semua Item',
-  //                 type: 'history',
-  //                 items: filteredItems,
-  //                 onItemTap: (context, item) {
-  //                   final name = item['name'] ?? '';
-  //                   context.push('/detail-laporan/$name');
-  //                 },
-  //               ),
-  //             ],
-  //           ),
-  //   ],
-  // );
 }
 
 Widget _buildHarvestContent() {
@@ -380,114 +297,4 @@ Widget _buildHarvestContent() {
     padding: EdgeInsets.all(16.0),
     child: Text("Tidak ada data inventaris yang ditemukan."),
   ));
-  // if (allKomoditasListFiltered.isEmpty && searchController.text.isNotEmpty) {
-  //   return const Center(
-  //       child: Padding(
-  //     padding: EdgeInsets.all(16.0),
-  //     child: Text("Tidak ada data inventaris yang ditemukan."),
-  //   ));
-  // }
-  // if (allInventarisList.isEmpty && searchController.text.isEmpty) {
-  //   return const Center(
-  //       child: Padding(
-  //     padding: EdgeInsets.all(16.0),
-  //     child: Text("Tidak ada data inventaris yang tersedia."),
-  //   ));
-  // }
-  // return ListItem(
-  //   title: 'Semua Inventaris',
-  //   items: allKomoditasListFiltered
-  //       .map((inventaris) => {
-  //             'name': inventaris['nama'] ?? 'N/A',
-  //             'category': 'Stok: ${inventaris['jumlah'] ?? 0}',
-  //             'icon': inventaris['gambar'],
-  //             'id': inventaris['id'],
-  //           })
-  //       .toList(),
-  //   type: 'basic',
-  //   onItemTap: (context, item) {
-  //     final id = item['id'];
-  //     if (id != null) {
-  //       context.push('/detail-laporan/$id');
-  //     } else {
-  //       final name = item['name'] ?? '';
-  //       context.push('/detail-laporan/$name');
-  //     }
-  //   },
-  // );
-  // final filteredHarvestItems = harvestItems.where((item) {
-  //   bool matchCategory = selectedHarvestCategory == 'Semua Hasil Panen' ||
-  //       item['category'] == selectedHarvestCategory;
-  //   bool matchSearch = item['name']!
-  //       .toLowerCase()
-  //       .contains(searchController.text.toLowerCase());
-  //   return matchCategory && matchSearch;
-  // }).toList();
-
-  // return Column(
-  //   children: [
-  //     ChipFilter(
-  //       categories: const ['Semua Hasil Panen', 'Perkebunan', 'Peternakan'],
-  //       selectedCategory: selectedHarvestCategory,
-  //       onCategorySelected: (category) {
-  //         setState(() {
-  //           selectedHarvestCategory = category;
-  //         });
-  //       },
-  //     ),
-  //     const SizedBox(height: 12),
-  //     filteredHarvestItems.isEmpty
-  //         ? Center(
-  //             child: Padding(
-  //             padding: const EdgeInsets.all(20),
-  //             child: Column(
-  //               children: [
-  //                 SvgPicture.asset(
-  //                   'assets/images/nodata.svg',
-  //                   height: 300,
-  //                 ),
-  //                 Text('Oops, Data Kosong!',
-  //                     style: bold20.copyWith(color: grey)),
-  //               ],
-  //             ),
-  //           ))
-  //         : Column(
-  //             children: [
-  //               if (filteredHarvestItems.any((item) =>
-  //                   item['category'] == 'Perkebunan' ||
-  //                   item['category'] == 'Semua Hasil Panen'))
-  //                 ListItem(
-  //                   title: 'Perkebunan',
-  //                   type: 'history',
-  //                   items: filteredHarvestItems
-  //                       .where((item) =>
-  //                           item['category'] == 'Perkebunan' ||
-  //                           item['category'] == 'Semua Hasil Panen')
-  //                       .toList(),
-  //                   onItemTap: (context, item) {
-  //                     final name = item['name'] ?? '';
-  //                     context.push('/detail-laporan/$name');
-  //                   },
-  //                 ),
-  //               const SizedBox(height: 12),
-  //               if (filteredHarvestItems.any((item) =>
-  //                   item['category'] == 'Peternakan' ||
-  //                   item['category'] == 'Semua Hasil Panen'))
-  //                 ListItem(
-  //                   title: 'Peternakan',
-  //                   type: 'history',
-  //                   items: filteredHarvestItems
-  //                       .where((item) =>
-  //                           item['category'] == 'Peternakan' ||
-  //                           item['category'] == 'Semua Hasil Panen')
-  //                       .toList(),
-  //                   onItemTap: (context, item) {
-  //                     final name = item['name'] ?? '';
-  //                     context.push('/detail-laporan/$name');
-  //                   },
-  //                 ),
-  //             ],
-  //           ),
-  //   ],
-  //   );
 }

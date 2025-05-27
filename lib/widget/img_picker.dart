@@ -62,7 +62,7 @@ class ImagePickerWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               "Ketuk di sini untuk memilih file dari perangkat Anda atau buka kamera.",
-              style: medium14.copyWith(color: green1.withOpacity(0.6)),
+              style: medium14.copyWith(color: green1.withValues(alpha: .6)),
               textAlign: TextAlign.center,
             ),
           ),
