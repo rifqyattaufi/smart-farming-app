@@ -91,7 +91,7 @@ class ListItem extends StatelessWidget {
             width: 60,
             height: 60,
             child: ImageBuilder(
-              url: item['icon'],
+              url: (item['icon'] ?? '') as String,
               fit: BoxFit.cover,
             ),
           ),
@@ -149,7 +149,7 @@ class ListItem extends StatelessWidget {
             width: 60,
             height: 60,
             child: ImageBuilder(
-              url: item['image'],
+              url: (item['icon'] ?? item['image'] ?? '') as String,
               fit: BoxFit.cover,
             ),
           ),

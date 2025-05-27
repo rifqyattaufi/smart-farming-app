@@ -1,73 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/theme.dart';
 
 class CustomTabBar extends StatefulWidget {
   final List<String> tabs;
+  final Function(int) onTabSelected;
   final Color activeColor;
   final double underlineWidth;
   final double spacing;
-  final Function(int)? onTabSelected;
+  final int activeIndex;
 
   const CustomTabBar({
     super.key,
     required this.tabs,
+    required this.onTabSelected,
     this.activeColor = Colors.green,
-    this.underlineWidth = 60,
-    this.spacing = 40,
-    this.onTabSelected,
+    this.underlineWidth = 100,
+    this.spacing = 0,
+    this.activeIndex = 0,
   });
 
   @override
-  _CustomTabBarState createState() => _CustomTabBarState();
+  State<CustomTabBar> createState() => _CustomTabBarState();
 }
 
 class _CustomTabBarState extends State<CustomTabBar> {
-  int selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(widget.tabs.length, (index) {
-        return Row(
-          children: [
-            _buildTabItem(title: widget.tabs[index], index: index),
-            if (index != widget.tabs.length - 1)
-              SizedBox(width: widget.spacing),
-          ],
-        );
-      }),
-    );
-  }
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: widget.tabs.asMap().entries.map((entry) {
+        int index = entry.key;
+        String tabName = entry.value;
+        bool isActive = widget.activeIndex == index;
 
-  Widget _buildTabItem({required String title, required int index}) {
-    bool isSelected = selectedIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-        if (widget.onTabSelected != null) {
-          widget.onTabSelected!(index);
-        }
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: semibold14.copyWith(
-              color: isSelected ? widget.activeColor : green1,
+        return GestureDetector(
+          onTap: () => widget.onTabSelected(index),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isActive ? widget.activeColor : Colors.transparent,
+                  width: 3,
+                ),
+              ),
+            ),
+            child: Text(
+              tabName,
+              style: TextStyle(
+                color: isActive ? widget.activeColor : Colors.grey,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          Container(
-            height: 3,
-            width: widget.underlineWidth,
-            color: isSelected ? widget.activeColor : Colors.transparent,
-          ),
-        ],
-      ),
+        );
+      }).toList(),
     );
   }
 }

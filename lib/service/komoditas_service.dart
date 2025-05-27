@@ -5,14 +5,17 @@ import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 
 class KomoditasService {
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
 
-  String baseUrl = '${dotenv.env['BASE_URL']}/komoditas';
+  final String baseUrl = '${dotenv.env['BASE_URL']}/komoditas';
 
-  Future<Map<String, dynamic>> getKomoditas() async {
+  Future<Map<String, dynamic>> getKomoditas({
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse(baseUrl);
+    final url = Uri.parse('$baseUrl?page=$page&limit=$limit');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -21,22 +24,34 @@ class KomoditasService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKomoditas();
+
+        return await getKomoditas(page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ?? 'Failed to load data',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
         'message': 'An error occurred: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
@@ -48,12 +63,12 @@ class KomoditasService {
 
     try {
       final response = await http.get(url, headers: headers);
-
       final body = json.decode(response.body);
+
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
+          'message': body['message'] ?? 'success',
           'data': body['data'],
         };
       } else if (response.statusCode == 401) {
@@ -62,7 +77,7 @@ class KomoditasService {
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ?? 'Failed to load data by ID',
         };
       }
     } catch (e) {
@@ -73,10 +88,17 @@ class KomoditasService {
     }
   }
 
-  Future<Map<String, dynamic>> getKomoditasByTipe(String tipe) async {
+  Future<Map<String, dynamic>> getKomoditasByTipe(
+    String tipe, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/tipe/$tipe');
+
+    final url = Uri.parse('$baseUrl/tipe/$tipe?page=$page&limit=$limit');
+
+    print('Fetching URL (getKomoditasByTipe): $url'); // Untuk debugging
 
     try {
       final response = await http.get(url, headers: headers);
@@ -85,31 +107,52 @@ class KomoditasService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKomoditasByTipe(tipe);
+        return await getKomoditasByTipe(tipe, page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ?? 'Failed to load data by tipe',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
         'message': 'An error occurred: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
 
   Future<Map<String, dynamic>> getKomoditasSearch(
-      String query, String tipe) async {
+    String query,
+    String tipe, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/search/$tipe?query=$query');
+
+    final encodedQuery = Uri.encodeComponent(query);
+    final encodedTipe = Uri.encodeComponent(tipe);
+    final url = Uri.parse(
+        '$baseUrl/search/$encodedQuery/$encodedTipe?page=$page&limit=$limit');
+
+    print('Fetching URL (getKomoditasSearch): $url'); // Untuk debugging
 
     try {
       final response = await http.get(url, headers: headers);
@@ -118,28 +161,42 @@ class KomoditasService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 404) {
         return {
           'status': true,
-          'message': 'Data not found',
+          'message': body['message'] ?? 'Data not found',
           'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKomoditasSearch(query, tipe);
+        return await getKomoditasSearch(query, tipe, page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ?? 'Failed to search data',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
         'message': 'An error occurred: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
@@ -161,7 +218,7 @@ class KomoditasService {
       if (response.statusCode == 201) {
         return {
           'status': true,
-          'message': 'success',
+          'message': body['message'] ?? 'success',
           'data': body['data'],
         };
       } else if (response.statusCode == 401) {
@@ -170,7 +227,7 @@ class KomoditasService {
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ?? 'Failed to create data',
         };
       }
     } catch (e) {
