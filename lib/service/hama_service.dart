@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:http/http.dart' as http;
@@ -7,12 +6,18 @@ import 'package:http/http.dart' as http;
 class HamaService {
   final AuthService _authService = AuthService();
 
-  final String baseUrl = '${dotenv.env['BASE_URL']}/jenis-hama';
+  final String _jenisHamaBaseUrl = '${dotenv.env['BASE_URL']}/jenis-hama';
 
-  Future<Map<String, dynamic>> getJenisHama() async {
+  final String _BaseUrl = '${dotenv.env['BASE_URL']}';
+
+  Future<Map<String, dynamic>> getDaftarHama({
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse(baseUrl);
+    final url = Uri.parse('$_jenisHamaBaseUrl?page=$page&limit=$limit');
+    print('Fetching URL (getDaftarHama): $url');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -21,28 +26,98 @@ class HamaService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
-        };
-      } else if (response.statusCode == 404) {
-        return {
-          'status': true,
-          'message': 'Data not found',
-          'data': [],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getJenisHama();
+        return await getDaftarHama(page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to load daftar hama'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> searchDaftarHama(
+    String query, {
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final encodedQuery = Uri.encodeComponent(query);
+    final url = Uri.parse(
+        '$_jenisHamaBaseUrl/search/$encodedQuery?page=$page&limit=$limit');
+    print('Fetching URL (searchDaftarHama): $url');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Data not found',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await searchDaftarHama(query, page: page, limit: limit);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to search daftar hama'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
@@ -50,71 +125,25 @@ class HamaService {
   Future<Map<String, dynamic>> getJenisHamaById(String id) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/$id');
+    final url = Uri.parse('$_jenisHamaBaseUrl/$id');
 
     try {
       final response = await http.get(url, headers: headers);
-
+      final body = json.decode(response.body);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
         return {
           'status': true,
-          'message': 'success',
+          'message': body['message'] ?? 'success',
           'data': body['data'],
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await getJenisHamaById(id);
       } else {
-        final body = response.body;
-        return {
-          'status': false,
-          'message': body,
-        };
+        return {'status': false, 'message': body['message'] ?? response.body};
       }
     } catch (e) {
-      return {
-        'status': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
-    }
-  }
-
-  Future<Map<String, dynamic>> getJenisHamaSearch(String query) async {
-    final resolvedToken = await _authService.getToken();
-    final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/search/$query');
-
-    try {
-      final response = await http.get(url, headers: headers);
-      final body = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        return {
-          'status': true,
-          'message': 'success',
-          'data': body['data'],
-        };
-      } else if (response.statusCode == 404) {
-        return {
-          'status': true,
-          'message': 'Data not found',
-          'data': [],
-        };
-      } else if (response.statusCode == 401) {
-        await _authService.refreshToken();
-        return await getJenisHamaSearch(query);
-      } else {
-        return {
-          'status': false,
-          'message': body,
-        };
-      }
-    } catch (e) {
-      return {
-        'status': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
     }
   }
 
@@ -125,44 +154,29 @@ class HamaService {
       'Authorization': 'Bearer $resolvedToken',
       'Content-Type': 'application/json'
     };
-    final url = Uri.parse(baseUrl);
+    final url = Uri.parse(_jenisHamaBaseUrl);
 
     try {
       final response =
           await http.post(url, headers: headers, body: json.encode(data));
       final responseData = json.decode(response.body);
-
       if (response.statusCode == 201) {
         return {
           'status': true,
-          'message': 'success',
-          'data': json.decode(response.body)['data'],
+          'message': responseData['message'] ?? 'success',
+          'data': responseData['data'],
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await createJenisHama(data);
-      } else if (response.statusCode == 200) {
-        return {
-          'status': true,
-          'message': 'success',
-        };
-      } else if (response.statusCode == 400) {
-        return {
-          'status': false,
-          'message': responseData['message'],
-        };
       } else {
-        final body = response.body;
         return {
           'status': false,
-          'message': body,
+          'message': responseData['message'] ?? response.body
         };
       }
     } catch (e) {
-      return {
-        'status': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
     }
   }
 
@@ -173,62 +187,168 @@ class HamaService {
       'Authorization': 'Bearer $resolvedToken',
       'Content-Type': 'application/json'
     };
-    final url = Uri.parse('$baseUrl/$id');
+    final url = Uri.parse('$_jenisHamaBaseUrl/$id');
 
     try {
       final response =
           await http.put(url, headers: headers, body: json.encode(data));
-
+      final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
+          'message': responseData['message'] ?? 'success',
+          'data': responseData['data']
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await updateJenisHama(id, data);
       } else {
-        final body = response.body;
         return {
           'status': false,
-          'message': body,
+          'message': responseData['message'] ?? response.body
         };
       }
     } catch (e) {
-      return {
-        'status': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
     }
   }
 
   Future<Map<String, dynamic>> deleteJenisHama(String id) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/$id');
+    final url = Uri.parse('$_jenisHamaBaseUrl/$id');
 
     try {
       final response = await http.delete(url, headers: headers);
+      Map<String, dynamic>? body;
+      if (response.body.isNotEmpty) body = json.decode(response.body);
 
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
+          'message': body?['message'] ?? 'success',
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
         return await deleteJenisHama(id);
       } else {
-        final body = response.body;
+        return {'status': false, 'message': body?['message'] ?? response.body};
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getLaporanHama({
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+
+    final url = Uri.parse('$_BaseUrl/hama?page=$page&limit=$limit');
+    print('Fetching URL (getLaporanHama): $url');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getLaporanHama(page: page, limit: limit);
+      } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to load laporan hama'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> searchLaporanHama(
+    String query, {
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final encodedQuery = Uri.encodeComponent(query);
+
+    final url = Uri.parse(
+        '$_BaseUrl/hama/search/$encodedQuery?page=$page&limit=$limit');
+    print('Fetching URL (searchLaporanHama): $url');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Data not found',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await searchLaporanHama(query, page: page, limit: limit);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to search laporan hama'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }

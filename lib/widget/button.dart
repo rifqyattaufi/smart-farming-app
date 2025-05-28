@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 
 class CustomButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String buttonText;
   final Color? backgroundColor;
   final TextStyle? textStyle;
@@ -13,7 +13,7 @@ class CustomButton extends StatelessWidget {
 
   const CustomButton({
     super.key,
-    required this.onPressed,
+    this.onPressed,
     this.buttonText = "Simpan",
     this.backgroundColor,
     this.textStyle,

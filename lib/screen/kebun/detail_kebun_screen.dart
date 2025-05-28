@@ -184,8 +184,8 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: _kebun?['status'] == true
-                                    ? green2.withOpacity(0.1)
-                                    : red.withOpacity(0.1),
+                                    ? green2.withValues(alpha: .1)
+                                    : red.withValues(alpha: .1),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Text(

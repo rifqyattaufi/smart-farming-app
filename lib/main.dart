@@ -705,7 +705,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-hama',
-      builder: (context, state) => const AddHamaScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddHamaScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/riwayat-aktivitas',

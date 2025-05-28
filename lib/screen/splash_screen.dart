@@ -55,7 +55,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Cek status jaringan dulu
     await Future.delayed(const Duration(seconds: 2));
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResult
+        .every((result) => result == ConnectivityResult.none)) {
       setState(() {
         _noInternet = true;
       });

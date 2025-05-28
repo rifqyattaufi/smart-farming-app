@@ -23,53 +23,179 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
 
   Map<String, dynamic>? _ternak;
-  List<dynamic>? _kandangList;
+  List<dynamic> _kandangList = [];
   int _jumlahTernak = 0;
-
-  Future<void> _fetchData() async {
-    try {
-      final response = await _jenisBudidayaService
-          .getJenisBudidayaById(widget.idTernak ?? '');
-      setState(() {
-        _ternak = response['data']['jenisBudidaya'];
-        _kandangList = response['data']['unitBudidaya'];
-        _jumlahTernak = response['data']['jumlahBudidaya'] ?? 0;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  Future<void> _deleteData() async {
-    final response =
-        await _jenisBudidayaService.deleteJenisBudidaya(widget.idTernak ?? '');
-    if (response['status'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Berhasil menghapus data ternak'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      context.pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  bool _isLoading = true;
+  bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    if (widget.idTernak == null || widget.idTernak!.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ID Ternak tidak valid.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          context.pop();
+        }
+      });
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      _fetchData();
+    }
+  }
+
+  Future<void> _fetchData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response =
+          await _jenisBudidayaService.getJenisBudidayaById(widget.idTernak!);
+
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          setState(() {
+            _ternak = response['data']['jenisBudidaya'];
+            _kandangList =
+                List<dynamic>.from(response['data']['unitBudidaya'] ?? []);
+            _jumlahTernak = response['data']['jumlahBudidaya'] as int? ?? 0;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+            _ternak = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  response['message'] ?? 'Gagal memuat data detail ternak'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _ternak = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching data: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleDeleteConfirmation() async {
+    if (_isDeleting || !mounted) return;
+
+    final bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text(
+              'Apakah Anda yakin ingin menghapus data jenis ternak ini beserta data terkait (unit budidaya/kandang dan objek budidaya)? Tindakan ini tidak dapat dibatalkan.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      _deleteData();
+    }
+  }
+
+  Future<void> _deleteData() async {
+    if (!mounted || widget.idTernak == null || _isDeleting) return;
+    setState(() {
+      _isDeleting = true;
+    });
+    try {
+      final response =
+          await _jenisBudidayaService.deleteJenisBudidaya(widget.idTernak!);
+      if (!mounted) return;
+
+      if (response['status'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data berhasil dihapus'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Gagal menghapus data'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error saat menghapus: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
+  String _formatTanggal(String? tanggalString) {
+    if (tanggalString == null || tanggalString.isEmpty) {
+      return 'Tidak diketahui';
+    }
+    try {
+      final dateTime = DateTime.tryParse(tanggalString);
+      if (dateTime == null) return 'Format tanggal tidak valid';
+      return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
+    } catch (e) {
+      return 'Error format tanggal';
+    }
+  }
+
+  String _formatWaktu(String? tanggalString) {
+    if (tanggalString == null || tanggalString.isEmpty) {
+      return 'Tidak diketahui';
+    }
+    try {
+      final dateTime = DateTime.tryParse(tanggalString);
+      if (dateTime == null) return 'Format waktu tidak valid';
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return 'Error format waktu';
+    }
   }
 
   @override
@@ -86,180 +212,194 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Daftar Jenis Ternak',
+            title: 'Manajemen Jenis Ternak',
             greeting: 'Detail Jenis Ternak',
           ),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DottedBorder(
-                    color: green1,
-                    strokeWidth: 1.5,
-                    dashPattern: const [6, 4],
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ImageBuilder(
-                          url: _ternak?['gambar'] ?? '',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 200),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _ternak == null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Gagal memuat detail ternak.'),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                              onPressed: _fetchData,
+                              child: const Text('Coba Lagi'))
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Informasi Jenis Ternak",
-                          style: bold18.copyWith(color: dark1)),
-                      const SizedBox(height: 12),
-                      infoItem("Nama jenis ternak", _ternak?['nama'] ?? ''),
-                      infoItem("Nama latin", _ternak?['latin'] ?? ''),
-                      infoItem("Jumlah ternak", "$_jumlahTernak ekor"),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Status ternak",
-                                style: medium14.copyWith(color: dark1)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: _ternak?['status'] == true
-                                    ? green2.withOpacity(0.1)
-                                    : red.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Text(
-                                _ternak?['status'] == true
-                                    ? 'Aktif'
-                                    : 'Tidak Aktif',
-                                style: _ternak?['status'] == true
-                                    ? regular12.copyWith(color: green2)
-                                    : regular12.copyWith(color: red),
+                  )
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: DottedBorder(
+                            color: green1,
+                            strokeWidth: 1.5,
+                            dashPattern: const [6, 4],
+                            borderType: BorderType.RRect,
+                            radius: const Radius.circular(12),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: ImageBuilder(
+                                url: _ternak?['gambar'] as String? ?? '',
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      infoItem(
-                          "Tanggal didaftarkan",
-                          _ternak?['createdAt'] != null
-                              ? DateFormat('EEEE, dd MMMM yyyy').format(
-                                  DateTime.tryParse(_ternak?['createdAt']) ??
-                                      DateTime(0))
-                              : 'Unknown time'),
-                      infoItem(
-                          "Waktu didaftarkan",
-                          _ternak?['createdAt'] != null
-                              ? DateFormat('HH:mm').format(
-                                  DateTime.tryParse(_ternak?['createdAt']) ??
-                                      DateTime(0))
-                              : 'Unknown time'),
-                      const SizedBox(height: 8),
-                      Text("Deskripsi ternak",
-                          style: medium14.copyWith(color: dark1)),
-                      const SizedBox(height: 8),
-                      Text(
-                        _ternak?['detail'] ?? 'Tidak ada deskripsi',
-                        style: regular14.copyWith(color: dark2),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Informasi Jenis Ternak",
+                                  style: bold18.copyWith(color: dark1)),
+                              const SizedBox(height: 12),
+                              infoItem("Nama jenis ternak",
+                                  _ternak?['nama'] ?? 'N/A'),
+                              infoItem(
+                                  "Nama latin", _ternak?['latin'] ?? 'N/A'),
+                              infoItem("Jumlah ternak", '$_jumlahTernak ekor'),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Status ternak",
+                                        style: medium14.copyWith(color: dark1)),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: (_ternak?['status'] == true ||
+                                                _ternak?['status'] == 1)
+                                            ? green2.withValues(alpha: .1)
+                                            : red.withValues(alpha: .1),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                      ),
+                                      child: Text(
+                                        (_ternak?['status'] == true ||
+                                                _ternak?['status'] == 1)
+                                            ? 'Aktif'
+                                            : 'Tidak Aktif',
+                                        style: (_ternak?['status'] == true ||
+                                                _ternak?['status'] == 1)
+                                            ? regular12.copyWith(color: green2)
+                                            : regular12.copyWith(color: red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              infoItem(
+                                  "Tanggal didaftarkan",
+                                  _formatTanggal(
+                                      _ternak?['createdAt'] as String?)),
+                              infoItem(
+                                  "Waktu didaftarkan",
+                                  _formatWaktu(
+                                      _ternak?['createdAt'] as String?)),
+                              const SizedBox(height: 8),
+                              Text("Deskripsi ternak",
+                                  style: medium14.copyWith(color: dark1)),
+                              const SizedBox(height: 8),
+                              Text(
+                                _ternak?['detail'] ?? 'Tidak ada deskripsi',
+                                style: regular14.copyWith(color: dark2),
+                                textAlign: TextAlign.justify,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_kandangList.isNotEmpty)
+                          ListItem(
+                            title: 'Terdaftar pada kandang',
+                            type: 'basic',
+                            items: _kandangList.map((item) {
+                              return {
+                                'name': item['nama'] ?? 'N/A',
+                                'icon': item['gambar'] as String? ?? '',
+                                'id': item['id'],
+                                'category':
+                                    'Jumlah: ${item['jumlah'] ?? 0} ekor',
+                              };
+                            }).toList(),
+                            onItemTap: (context, item) {
+                              final id = item['id'] as String?;
+                              if (id != null && id.isNotEmpty) {
+                                print("Tapped Unit Budidaya (Kandang) ID: $id");
+                              }
+                            },
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            child: Text("Tidak terdaftar pada kandang manapun.",
+                                style: regular14.copyWith(color: dark2)),
+                          ),
+                        const SizedBox(height: 90),
+                      ],
+                    ),
                   ),
-                ),
-                ListItem(
-                  title: 'Daftar Kandang',
-                  type: 'basic',
-                  items: _kandangList
-                          ?.map((kandang) => {
-                                'name': kandang['nama'],
-                                'isActive': kandang['status'],
-                                'icon': kandang['gambar'],
-                                'id': kandang['id'],
-                              })
-                          .toList() ??
-                      [],
-                  onItemTap: (context, item) {
-                    final id = item['id'] ?? '';
-                    context.push('/detail-kandang/$id').then((_) {
-                      _fetchData();
-                    });
-                  },
-                ),
-                const SizedBox(height: 80),
-              ],
-            ),
-          ),
-        ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomButton(
-              onPressed: () {
-                context.push('/tambah-ternak',
-                    extra: AddTernakScreen(
-                      isEdit: true,
-                      idTernak: widget.idTernak,
-                      onTernakAdded: () => _fetchData(),
-                    ));
-              },
-              buttonText: 'Ubah Data',
-              backgroundColor: yellow2,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-            const SizedBox(height: 12),
-            CustomButton(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Konfirmasi'),
-                    content: const Text(
-                        'Apakah Anda yakin ingin menghapus Ternak ini?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Hapus'),
-                      ),
-                    ],
+      bottomNavigationBar: _isLoading || _ternak == null
+          ? null
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomButton(
+                    onPressed: () {
+                      if (widget.idTernak != null) {
+                        context.push(
+                          '/tambah-ternak',
+                          extra: AddTernakScreen(
+                            onTernakAdded: () {
+                              _fetchData();
+                            },
+                            isEdit: true,
+                            idTernak: widget.idTernak,
+                          ),
+                        );
+                      }
+                    },
+                    buttonText: 'Ubah Data',
+                    backgroundColor: yellow2,
+                    textStyle: semibold16.copyWith(color: white),
                   ),
-                );
-
-                if (confirm == true) {
-                  await _deleteData();
-                }
-              },
-              buttonText: 'Hapus Data',
-              backgroundColor: red,
-              textStyle: semibold16,
-              textColor: white,
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    onPressed: _isDeleting
+                        ? null
+                        : () {
+                            _handleDeleteConfirmation();
+                          },
+                    buttonText: 'Hapus Data',
+                    backgroundColor: red,
+                    textStyle: semibold16.copyWith(color: white),
+                    isLoading: _isDeleting,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -267,10 +407,21 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: medium14.copyWith(color: dark1)),
-          Text(value, style: regular14.copyWith(color: dark2)),
+          Expanded(
+            flex: 2,
+            child: Text(label, style: medium14.copyWith(color: dark1)),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: regular14.copyWith(color: dark2),
+              textAlign: TextAlign.end,
+            ),
+          ),
         ],
       ),
     );

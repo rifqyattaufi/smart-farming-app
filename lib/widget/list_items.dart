@@ -113,8 +113,8 @@ class ListItem extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: item['isActive'] == false
-                        ? red.withOpacity(0.1)
-                        : green2.withOpacity(0.1),
+                        ? red.withValues(alpha: 0.1)
+                        : green2.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: item['category'] != null
@@ -176,7 +176,7 @@ class ListItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: green2.withOpacity(0.1),
+                  color: green2.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
