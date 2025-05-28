@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/service/schedule_unit_notification.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -20,10 +21,28 @@ class DetailKandangScreen extends StatefulWidget {
 }
 
 class _DetailKandangScreenState extends State<DetailKandangScreen> {
-  UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final _unitBudidayaService = UnitBudidayaService();
+  final ScheduleUnitNotification _scheduleUnitNotification =
+      ScheduleUnitNotification();
 
   Map<String, dynamic> _kandang = {};
   List<dynamic> _ternakList = [];
+  Map<String, dynamic> _notificationPanen = {};
+  Map<String, dynamic> _notificationNutrisi = {};
+  final Map<String, String?> dayToInt = {
+    '1': 'Senin',
+    '2': 'Selasa',
+    '3': 'Rabu',
+    '4': 'Kamis',
+    '5': 'Jumat',
+    '6': 'Sabtu',
+    '7': 'Minggu',
+  };
+  final Map<String, String> notificationType = {
+    'daily': 'Harian',
+    'weekly': 'Mingguan',
+    'monthly': 'Bulanan',
+  };
 
   Future<void> _fetchData() async {
     try {
@@ -32,6 +51,21 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
       setState(() {
         _kandang = response['data']['unitBudidaya'];
         _ternakList = response['data']['objekBudidaya'];
+      });
+
+      final notification = await _scheduleUnitNotification
+          .getScheduleUnitNotificationByUnitBudidaya(widget.idKandang ?? '');
+      setState(() {
+        _notificationPanen = (notification['data'] as List).firstWhere(
+              (item) => item['tipeLaporan'] == 'panen',
+              orElse: () => null,
+            ) ??
+            {};
+        _notificationNutrisi = (notification['data'] as List).firstWhere(
+              (item) => item['tipeLaporan'] == 'vitamin',
+              orElse: () => null,
+            ) ??
+            {};
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -190,6 +224,79 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                         _kandang['deskripsi'] ?? 'Tidak ada deskripsi',
                         style: regular14.copyWith(color: dark2),
                       ),
+                      const SizedBox(height: 16),
+                      if (_notificationPanen.isNotEmpty ||
+                          _notificationNutrisi.isNotEmpty) ...[
+                        Text("Pengaturan Notifikasi",
+                            style: bold18.copyWith(color: dark1)),
+                        const SizedBox(height: 12),
+                        if (_notificationPanen.isNotEmpty) ...[
+                          Text(
+                            "Notifikasi Panen",
+                            style: bold16.copyWith(color: dark1),
+                          ),
+                          infoItem("Jadwal Pengiriman",
+                              _notificationPanen['notificationType']),
+                          infoItem(
+                            "Waktu Pengiriman",
+                            _notificationPanen['scheduledTime'] != null
+                                ? DateFormat('HH:mm').format(
+                                    DateFormat('HH:mm:ss').parse(
+                                      _notificationPanen['scheduledTime'],
+                                    ),
+                                  )
+                                : '',
+                          ),
+                          if (_notificationPanen['notificationType'] ==
+                              'weekly')
+                            infoItem(
+                                "Hari Pengiriman",
+                                dayToInt[_notificationPanen['dayOfWeek']
+                                            ?.toString() ??
+                                        ''] ??
+                                    ''),
+                          if (_notificationPanen['notificationType'] ==
+                              'monthly')
+                            infoItem(
+                                "Tanggal Pengiriman",
+                                _notificationPanen['dayOfMonth']?.toString() ??
+                                    ''),
+                        ],
+                        if (_notificationNutrisi.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            "Notifikasi Nutrisi",
+                            style: bold16.copyWith(color: dark1),
+                          ),
+                          infoItem("Jadwal Pengiriman",
+                              _notificationNutrisi['notificationType']),
+                          infoItem(
+                            "Waktu Pengiriman",
+                            _notificationNutrisi['scheduledTime'] != null
+                                ? DateFormat('HH:mm').format(
+                                    DateFormat('HH:mm:ss').parse(
+                                      _notificationNutrisi['scheduledTime'],
+                                    ),
+                                  )
+                                : '',
+                          ),
+                          if (_notificationNutrisi['notificationType'] ==
+                              'weekly')
+                            infoItem(
+                                "Hari Pengiriman",
+                                dayToInt[_notificationNutrisi['dayOfWeek']
+                                            ?.toString() ??
+                                        ''] ??
+                                    ''),
+                          if (_notificationNutrisi['notificationType'] ==
+                              'monthly')
+                            infoItem(
+                                "Tanggal Pengiriman",
+                                _notificationNutrisi['dayOfMonth']
+                                        ?.toString() ??
+                                    ''),
+                        ],
+                      ]
                     ],
                   ),
                 ),

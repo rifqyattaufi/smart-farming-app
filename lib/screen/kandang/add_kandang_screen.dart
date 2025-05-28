@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
+import 'package:smart_farming_app/service/schedule_unit_notification.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:smart_farming_app/widget/button.dart';
+import 'package:smart_farming_app/widget/day_of_month_picker.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
@@ -28,16 +30,57 @@ class AddKandangScreen extends StatefulWidget {
 class _AddKandangScreenState extends State<AddKandangScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final ScheduleUnitNotification _scheduleUnitNotification =
+      ScheduleUnitNotification();
   final ImageService _imageService = ImageService();
+  
   final _formKey = GlobalKey<FormState>();
   String? selectedJenisHewan;
   String statusKandang = 'Aktif';
   String jenisPencatatan = 'Individu';
+  String notifikasiPanen = 'Tidak Aktif';
+  String notifikasiNutrisi = 'Tidak Aktif';
+  String? selectedHariPanen;
+  String? selectedHariNutrisi;
   List<Map<String, dynamic>> jenisHewanList = [];
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _sizeController = TextEditingController();
+  final TextEditingController _jumlahController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _waktuNotifikasiPanenController =
+      TextEditingController();
+  final TextEditingController _waktuNotifikasiNutrisiController =
+      TextEditingController();
+  final TextEditingController _tanggalNotifikasiNutrisiController =
+      TextEditingController();
+  final TextEditingController _tanggalNotifikasiPanenController =
+      TextEditingController();
+  Map<String, dynamic> imageUrl = {};
+  String selectedTipePanen = '';
+  String selectedTipeNutrisi = '';
+
+  final Map<String, int?> dayToInt = {
+    'Senin': 1,
+    'Selasa': 2,
+    'Rabu': 3,
+    'Kamis': 4,
+    'Jumat': 5,
+    'Sabtu': 6,
+    'Minggu': 7,
+  };
+  final Map<String, String> notificationType = {
+    'Harian': 'daily',
+    'Mingguan': 'weekly',
+    'Bulanan': 'monthly',
+  };
   File? _image;
   final picker = ImagePicker();
   bool _isLoading = false;
+
+  String? panenId;
+  String? nutrisiId;
 
   Future<void> _pickImage(BuildContext context) async {
     showModalBottomSheet(
@@ -125,6 +168,81 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
           'data': data['gambar'],
         };
       });
+
+      final notifikasi = await _scheduleUnitNotification
+          .getScheduleUnitNotificationByUnitBudidaya(widget.idKandang ?? '');
+      if (notifikasi['status'] == true) {
+        final dataPanen = (notifikasi['data'] as List).firstWhere(
+            (item) => item['tipeLaporan'] == 'panen',
+            orElse: () => null);
+        final dataNutrisi = (notifikasi['data'] as List).firstWhere(
+            (item) => item['tipeLaporan'] == 'vitamin',
+            orElse: () => null);
+
+        if (dataPanen != null) {
+          setState(() {
+            panenId = dataPanen['id'];
+            notifikasiPanen = 'Aktif';
+            selectedTipePanen = notificationType.entries
+                .firstWhere(
+                    (entry) => entry.value == dataPanen['notificationType'],
+                    orElse: () => const MapEntry('', ''))
+                .key;
+            if (dataPanen['scheduledTime'] != null &&
+                dataPanen['scheduledTime'].toString().isNotEmpty) {
+              final timeParts =
+                  dataPanen['scheduledTime'].toString().split(':');
+              if (timeParts.length >= 2) {
+                _waktuNotifikasiPanenController.text =
+                    '${timeParts[0].padLeft(2, '0')}:${timeParts[1].padLeft(2, '0')}';
+              } else {
+                _waktuNotifikasiPanenController.text =
+                    dataPanen['scheduledTime'];
+              }
+            } else {
+              _waktuNotifikasiPanenController.text = '';
+            }
+            _tanggalNotifikasiPanenController.text =
+                dataPanen['dayOfMonth']?.toString() ?? '';
+            selectedHariPanen = dayToInt.entries
+                .firstWhere((entry) => entry.value == dataPanen['dayOfWeek'],
+                    orElse: () => const MapEntry('', null))
+                .key;
+          });
+        }
+
+        if (dataNutrisi != null) {
+          setState(() {
+            nutrisiId = dataNutrisi['id'];
+            notifikasiNutrisi = 'Aktif';
+            selectedTipeNutrisi = notificationType.entries
+                .firstWhere(
+                    (entry) => entry.value == dataNutrisi['notificationType'],
+                    orElse: () => const MapEntry('', ''))
+                .key;
+            if (dataNutrisi['scheduledTime'] != null &&
+                dataNutrisi['scheduledTime'].toString().isNotEmpty) {
+              final timeParts =
+                  dataNutrisi['scheduledTime'].toString().split(':');
+              if (timeParts.length >= 2) {
+                _waktuNotifikasiNutrisiController.text =
+                    '${timeParts[0].padLeft(2, '0')}:${timeParts[1].padLeft(2, '0')}';
+              } else {
+                _waktuNotifikasiNutrisiController.text =
+                    dataNutrisi['scheduledTime'];
+              }
+            } else {
+              _waktuNotifikasiNutrisiController.text = '';
+            }
+            _tanggalNotifikasiNutrisiController.text =
+                dataNutrisi['dayOfMonth']?.toString() ?? '';
+            selectedHariNutrisi = dayToInt.entries
+                .firstWhere((entry) => entry.value == dataNutrisi['dayOfWeek'],
+                    orElse: () => const MapEntry('', null))
+                .key;
+          });
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -134,13 +252,6 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       );
     }
   }
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _sizeController = TextEditingController();
-  final TextEditingController _jumlahController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  Map<String, dynamic> imageUrl = {};
 
   @override
   void initState() {
@@ -184,12 +295,38 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         'status': statusKandang == 'Aktif',
         'deskripsi': _descriptionController.text,
         'gambar': imageUrl['data'],
+        'notifikasi': {
+          'panen': notifikasiPanen == 'Aktif'
+              ? {
+                  'isActive': true,
+                  'notificationType': notificationType[selectedTipePanen],
+                  'scheduledTime': _waktuNotifikasiPanenController.text,
+                  'dayOfMonth': _tanggalNotifikasiPanenController.text,
+                  'dayOfWeek': dayToInt[selectedHariPanen],
+                }
+              : null,
+          'vitamin': notifikasiNutrisi == 'Aktif'
+              ? {
+                  'isActive': true,
+                  'notificationType': notificationType[selectedTipeNutrisi],
+                  'scheduledTime': _waktuNotifikasiNutrisiController.text,
+                  'dayOfMonth': _tanggalNotifikasiNutrisiController.text,
+                  'dayOfWeek': dayToInt[selectedHariNutrisi],
+                }
+              : null,
+        }
       };
 
       Map<String, dynamic>? response;
 
       if (widget.isEdit) {
         data['id'] = widget.idKandang;
+        if (notifikasiPanen == 'Aktif') {
+          data['notifikasi']['panen']['id'] = panenId;
+        }
+        if (notifikasiNutrisi == 'Aktif') {
+          data['notifikasi']['vitamin']['id'] = nutrisiId;
+        }
         response = await _unitBudidayaService.updateUnitBudidaya(data);
       } else {
         response = await _unitBudidayaService.createUnitBudidaya(data);
@@ -212,25 +349,63 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         );
         Navigator.pop(context);
       } else {
-        setState(() {
-          _isLoading = false;
-        });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  Future<int?> _showDayOfMonthPicker(
+      BuildContext context, int? selectedDay) async {
+    final int? pickedDay = await showDialog<int>(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          int? tempPickedDay = selectedDay;
+          return AlertDialog(
+            title: const Text('Pilih Tanggal Notifikasi'),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: DayOfMonthPicker(
+                    initialSelectedDay: tempPickedDay,
+                    onDaySelected: (day) {
+                      tempPickedDay = day;
+                    }),
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Batal'),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Pilih'),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(tempPickedDay);
+                },
+              ),
+            ],
+          );
+        });
+
+    return pickedDay;
   }
 
   @override
@@ -252,135 +427,415 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InputFieldWidget(
-                    label: "Nama kandang",
-                    hint: "Contoh: kandang A",
-                    controller: _nameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama kandang tidak boleh kosong';
-                      }
-                      return null;
-                    },
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Informasi Kandang",
+                            style: bold18.copyWith(color: dark1)),
+                        const SizedBox(height: 16),
+                        InputFieldWidget(
+                          label: "Nama kandang",
+                          hint: "Contoh: kandang A",
+                          controller: _nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama kandang tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                            label: "Lokasi kandang",
+                            hint: "Contoh: Rooftop",
+                            controller: _locationController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Lokasi kandang tidak boleh kosong';
+                              }
+                              return null;
+                            }),
+                        InputFieldWidget(
+                            label: "Luas kandang",
+                            hint: "Contoh: 30m²",
+                            controller: _sizeController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Luas kandang tidak boleh kosong';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Luas kandang harus berupa angka';
+                              }
+                              return null;
+                            }),
+                        DropdownFieldWidget(
+                          label: "Pilih jenis hewan yang diternak",
+                          hint: "Pilih jenis hewan ternak",
+                          items: jenisHewanList
+                              .map((item) => item['nama'] as String)
+                              .toList(),
+                          selectedValue: jenisHewanList.firstWhere(
+                              (item) => item['id'] == selectedJenisHewan,
+                              orElse: () => {'nama': null})['nama'],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedJenisHewan = jenisHewanList.firstWhere(
+                                (item) => item['nama'] == value,
+                                orElse: () => {'id': null},
+                              )['id'];
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Jenis hewan tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          isEdit: widget.isEdit,
+                        ),
+                        InputFieldWidget(
+                            label: "Jumlah hewan ternak",
+                            hint: "Contoh: 20 (satuan ekor)",
+                            controller: _jumlahController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Jumlah hewan tidak boleh kosong';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Jumlah hewan harus berupa angka';
+                              }
+                              return null;
+                            }),
+                        RadioField(
+                          label: 'Status kandang',
+                          selectedValue: statusKandang,
+                          options: const ['Aktif', 'Tidak aktif'],
+                          onChanged: (value) {
+                            setState(() {
+                              statusKandang = value;
+                            });
+                          },
+                        ),
+                        RadioField(
+                          label: 'Jenis Pencatatan',
+                          selectedValue: jenisPencatatan,
+                          options: const ['Individu', 'Kolektif'],
+                          onChanged: (value) {
+                            setState(() {
+                              jenisPencatatan = value;
+                            });
+                          },
+                        ),
+                        ImagePickerWidget(
+                          label: "Unggah gambar kandang",
+                          image: _image,
+                          onPickImage: _pickImage,
+                        ),
+                        InputFieldWidget(
+                            label: "Deskripsi kandang",
+                            hint: "Keterangan",
+                            controller: _descriptionController,
+                            maxLines: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Deskripsi kandang tidak boleh kosong';
+                              }
+                              return null;
+                            }),
+                        const SizedBox(height: 16),
+                        Text("Pengaturan Notifikasi",
+                            style: bold18.copyWith(color: dark1)),
+                        const SizedBox(height: 16),
+                        RadioField(
+                          label: 'Notifikasi Pengingat Panen',
+                          selectedValue: notifikasiPanen,
+                          options: const ['Aktif', 'Tidak Aktif'],
+                          onChanged: (value) {
+                            setState(() {
+                              notifikasiPanen = value;
+                              selectedTipePanen = '';
+                              selectedHariPanen = null;
+                              _tanggalNotifikasiPanenController.clear();
+                              _waktuNotifikasiPanenController.clear();
+                            });
+                          },
+                        ),
+                        if (notifikasiPanen == 'Aktif') ...[
+                          DropdownFieldWidget(
+                            label: "Tipe Notifikasi",
+                            hint: "Pilih Tipe Notifikasi",
+                            items: notificationType.keys.toList(),
+                            selectedValue: selectedTipePanen,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTipePanen = value!;
+                                selectedHariPanen = null;
+                                _tanggalNotifikasiPanenController.clear();
+                              });
+                            },
+                            validator: (value) {
+                              if (notifikasiPanen == 'Aktif' &&
+                                  (value == null || value.isEmpty)) {
+                                return 'Tipe notifikasi tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          InputFieldWidget(
+                            label: "Waktu Notifikasi",
+                            hint: "Contoh: 08:00",
+                            controller: _waktuNotifikasiPanenController,
+                            isDisabled: true,
+                            suffixIcon: const Icon(Icons.access_time),
+                            onSuffixIconTap: () async {
+                              TimeOfDay initialTime = TimeOfDay.now();
+                              if (_waktuNotifikasiPanenController
+                                  .text.isNotEmpty) {
+                                final parts = _waktuNotifikasiPanenController
+                                    .text
+                                    .split(':');
+                                if (parts.length == 2) {
+                                  final hour = int.tryParse(parts[0]) ?? 0;
+                                  final minute = int.tryParse(parts[1]) ?? 0;
+                                  initialTime =
+                                      TimeOfDay(hour: hour, minute: minute);
+                                }
+                              }
+                              TimeOfDay? pickedTime = await showTimePicker(
+                                context: context,
+                                initialTime: initialTime,
+                              );
+                              if (pickedTime != null) {
+                                setState(() {
+                                  final hour = pickedTime.hour
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  final minute = pickedTime.minute
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  _waktuNotifikasiPanenController.text =
+                                      '$hour:$minute';
+                                });
+                              }
+                            },
+                            validator: (value) {
+                              if (notifikasiPanen == 'Aktif' &&
+                                  (value == null || value.isEmpty)) {
+                                return 'Waktu notifikasi tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          if (selectedTipePanen == 'Mingguan')
+                            DropdownFieldWidget(
+                              label: "Hari Notifikasi",
+                              hint: "Pilih Hari Notifikasi",
+                              items: dayToInt.keys.toList(),
+                              selectedValue: selectedHariPanen,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedHariPanen = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (notifikasiPanen == 'Aktif' &&
+                                    selectedTipePanen == 'Mingguan' &&
+                                    (value == null || value.isEmpty)) {
+                                  return 'Hari notifikasi tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
+                          if (selectedTipePanen == 'Bulanan') ...[
+                            InputFieldWidget(
+                              label: "Tanggal Notifikasi",
+                              hint: "Contoh: 1 (tanggal dalam bulan)",
+                              controller: _tanggalNotifikasiPanenController,
+                              isDisabled: true,
+                              suffixIcon: const Icon(Icons.calendar_today),
+                              onSuffixIconTap: () async {
+                                _showDayOfMonthPicker(
+                                        context,
+                                        int.tryParse(
+                                            _waktuNotifikasiPanenController
+                                                .text))
+                                    .then((pickedDay) {
+                                  if (pickedDay != null) {
+                                    setState(() {
+                                      _tanggalNotifikasiPanenController.text =
+                                          pickedDay.toString();
+                                    });
+                                  }
+                                });
+                              },
+                              validator: (value) {
+                                if (notifikasiPanen == 'Aktif' &&
+                                    selectedTipePanen == 'Bulanan' &&
+                                    (value == null || value.isEmpty)) {
+                                  return 'Tanggal notifikasi tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            )
+                          ]
+                        ],
+                        RadioField(
+                          label: 'Notifikasi Pengingat Pemberian Nutrisi',
+                          selectedValue: notifikasiNutrisi,
+                          options: const ['Aktif', 'Tidak Aktif'],
+                          onChanged: (value) {
+                            setState(() {
+                              notifikasiNutrisi = value;
+                              selectedTipeNutrisi = '';
+                              selectedHariNutrisi = null;
+                              _tanggalNotifikasiNutrisiController.clear();
+                              _waktuNotifikasiNutrisiController.clear();
+                            });
+                          },
+                        ),
+                        if (notifikasiNutrisi == 'Aktif') ...[
+                          DropdownFieldWidget(
+                            label: "Tipe Notifikasi",
+                            hint: "Pilih Tipe Notifikasi",
+                            items: notificationType.keys.toList(),
+                            selectedValue: selectedTipeNutrisi,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTipeNutrisi = value!;
+                                selectedHariNutrisi = null;
+                                _tanggalNotifikasiNutrisiController.clear();
+                              });
+                            },
+                            validator: (value) {
+                              if (notifikasiNutrisi == 'Aktif' &&
+                                  (value == null || value.isEmpty)) {
+                                return 'Tipe notifikasi tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          InputFieldWidget(
+                            label: "Waktu Notifikasi",
+                            hint: "Contoh: 08:00",
+                            controller: _waktuNotifikasiNutrisiController,
+                            isDisabled: true,
+                            suffixIcon: const Icon(Icons.access_time),
+                            onSuffixIconTap: () async {
+                              TimeOfDay initialTime = TimeOfDay.now();
+                              if (_waktuNotifikasiNutrisiController
+                                  .text.isNotEmpty) {
+                                final parts = _waktuNotifikasiNutrisiController
+                                    .text
+                                    .split(':');
+                                if (parts.length == 2) {
+                                  final hour = int.tryParse(parts[0]) ?? 0;
+                                  final minute = int.tryParse(parts[1]) ?? 0;
+                                  initialTime =
+                                      TimeOfDay(hour: hour, minute: minute);
+                                }
+                              }
+                              TimeOfDay? pickedTime = await showTimePicker(
+                                context: context,
+                                initialTime: initialTime,
+                              );
+                              if (pickedTime != null) {
+                                setState(() {
+                                  final hour = pickedTime.hour
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  final minute = pickedTime.minute
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  _waktuNotifikasiNutrisiController.text =
+                                      '$hour:$minute';
+                                });
+                              }
+                            },
+                            validator: (value) {
+                              if (notifikasiNutrisi == 'Aktif' &&
+                                  (value == null || value.isEmpty)) {
+                                return 'Waktu notifikasi tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          if (selectedTipeNutrisi == 'Mingguan')
+                            DropdownFieldWidget(
+                              label: "Hari Notifikasi",
+                              hint: "Pilih Hari Notifikasi",
+                              items: dayToInt.keys.toList(),
+                              selectedValue: selectedHariNutrisi,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedHariNutrisi = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (notifikasiNutrisi == 'Aktif' &&
+                                    selectedTipeNutrisi == 'Mingguan' &&
+                                    (value == null || value.isEmpty)) {
+                                  return 'Hari notifikasi tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
+                          if (selectedTipeNutrisi == 'Bulanan')
+                            InputFieldWidget(
+                              label: "Tanggal Notifikasi",
+                              hint: "Contoh: 1 (tanggal dalam bulan)",
+                              controller: _tanggalNotifikasiNutrisiController,
+                              isDisabled: true,
+                              suffixIcon: const Icon(Icons.calendar_today),
+                              onSuffixIconTap: () async {
+                                _showDayOfMonthPicker(
+                                        context,
+                                        int.tryParse(
+                                            _waktuNotifikasiNutrisiController
+                                                .text))
+                                    .then((pickedDay) {
+                                  if (pickedDay != null) {
+                                    setState(() {
+                                      _tanggalNotifikasiNutrisiController.text =
+                                          pickedDay.toString();
+                                    });
+                                  }
+                                });
+                              },
+                              validator: (value) {
+                                if (notifikasiNutrisi == 'Aktif' &&
+                                    selectedTipeNutrisi == 'Bulanan' &&
+                                    (value == null || value.isEmpty)) {
+                                  return 'Tanggal notifikasi tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            )
+                        ],
+                      ],
+                    ),
                   ),
-                  InputFieldWidget(
-                      label: "Lokasi kandang",
-                      hint: "Contoh: Rooftop",
-                      controller: _locationController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Lokasi kandang tidak boleh kosong';
-                        }
-                        return null;
-                      }),
-                  InputFieldWidget(
-                      label: "Luas kandang",
-                      hint: "Contoh: 30m²",
-                      controller: _sizeController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Luas kandang tidak boleh kosong';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Luas kandang harus berupa angka';
-                        }
-                        return null;
-                      }),
-                  DropdownFieldWidget(
-                    label: "Pilih jenis hewan yang diternak",
-                    hint: "Pilih jenis hewan ternak",
-                    items: jenisHewanList
-                        .map((item) => item['nama'] as String)
-                        .toList(),
-                    selectedValue: jenisHewanList.firstWhere(
-                        (item) => item['id'] == selectedJenisHewan,
-                        orElse: () => {'nama': null})['nama'],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedJenisHewan = jenisHewanList.firstWhere(
-                          (item) => item['nama'] == value,
-                          orElse: () => {'id': null},
-                        )['id'];
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Jenis hewan tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                    isEdit: widget.isEdit,
-                  ),
-                  InputFieldWidget(
-                      label: "Jumlah hewan ternak",
-                      hint: "Contoh: 20 (satuan ekor)",
-                      controller: _jumlahController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Jumlah hewan tidak boleh kosong';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Jumlah hewan harus berupa angka';
-                        }
-                        return null;
-                      }),
-                  RadioField(
-                    label: 'Status kandang',
-                    selectedValue: statusKandang,
-                    options: const ['Aktif', 'Tidak aktif'],
-                    onChanged: (value) {
-                      setState(() {
-                        statusKandang = value;
-                      });
-                    },
-                  ),
-                  RadioField(
-                    label: 'Jenis Pencatatan',
-                    selectedValue: jenisPencatatan,
-                    options: const ['Individu', 'Kolektif'],
-                    onChanged: (value) {
-                      setState(() {
-                        jenisPencatatan = value;
-                      });
-                    },
-                  ),
-                  ImagePickerWidget(
-                    label: "Unggah gambar kandang",
-                    image: _image,
-                    onPickImage: _pickImage,
-                  ),
-                  InputFieldWidget(
-                      label: "Deskripsi kandang",
-                      hint: "Keterangan",
-                      controller: _descriptionController,
-                      maxLines: 10,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Deskripsi kandang tidak boleh kosong';
-                        }
-                        return null;
-                      }),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
             ),
-          ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: CustomButton(
+                onPressed: _submitForm,
+                backgroundColor: green1,
+                textStyle: semibold16,
+                textColor: white,
+                isLoading: _isLoading,
+              ),
+            ),
+          ],
         ),
       ),
     );
