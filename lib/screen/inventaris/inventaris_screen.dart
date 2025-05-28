@@ -586,7 +586,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                             isEdit: false,
                             onInventarisAdded: _handleRefresh,
                           ))
-                      .then((_) {/* Opsional: _handleRefresh(); */});
+                      .then((_) {/* _handleRefresh(); */});
                 },
                 backgroundColor: green1,
                 shape: RoundedRectangleBorder(

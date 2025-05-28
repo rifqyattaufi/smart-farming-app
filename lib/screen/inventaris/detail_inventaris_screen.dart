@@ -34,6 +34,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   bool _isLoadingRiwayat = false;
   bool _isLoadingInitialData = true;
   bool _isLoadingChart = false;
+  bool _isUpdatingStock = false;
 
   ChartFilterType _selectedChartFilterType = ChartFilterType.weekly;
   DateTimeRange? _selectedChartDateRange;
@@ -264,10 +265,58 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     }
   }
 
-  void _showErrorSnackbar(String message) {
+  Future<void> _updateStock(int change) async {
+    if (_inventarisDetails == null || widget.idInventaris == null) return;
+    num currentStockNum = _inventarisDetails!['jumlah'] ?? 0;
+    num newStockNum = currentStockNum + change;
+
+    if (newStockNum < 0) {
+      _showErrorSnackbar("Jumlah stok tidak boleh kurang dari 0.");
+      return;
+    }
+
+    setState(() {
+      _isUpdatingStock = true;
+    });
+
+    try {
+      final Map<String, dynamic> payload = {
+        'id': widget.idInventaris!,
+        'jumlah': newStockNum,
+      };
+
+      final response = await _inventarisService.updateInventaris(payload);
+
+      if (response['status'] == true) {
+        setState(() {
+          if (response['data'] != null && response['data']['jumlah'] != null) {
+            _inventarisDetails!['jumlah'] = response['data']['jumlah'];
+          } else {
+            _inventarisDetails!['jumlah'] = newStockNum;
+          }
+          _showErrorSnackbar("Stok berhasil diperbarui.", isError: false);
+        });
+      } else {
+        _showErrorSnackbar(response['message'] ?? "Gagal memperbarui stok.");
+      }
+    } catch (e) {
+      _showErrorSnackbar("Error saat memperbarui stok: ${e.toString()}");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingStock = false;
+        });
+      }
+    }
+  }
+
+  void _showErrorSnackbar(String message, {bool isError = true}) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : Colors.green,
+        ),
       );
     }
   }
@@ -383,7 +432,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     final String kondisi = _inventarisDetails?['kondisi'] ?? 'Unknown';
     final String satuanNama = satuan?['nama'] ?? '';
     final String satuanLambang = satuan?['lambang'] ?? '';
-    final int jumlah = _inventarisDetails?['jumlah'] ?? 0;
+    final num jumlah = _inventarisDetails?['jumlah'] ?? 0;
 
     if (_isLoadingInitialData) {
       return Scaffold(
@@ -413,7 +462,6 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     return Scaffold(
       backgroundColor: white,
       appBar: PreferredSize(
-        /* ... appBar remains same ... */
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
           backgroundColor: white,
@@ -465,8 +513,58 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                         _inventarisDetails?['nama'] ?? 'Unknown'),
                     infoItem(
                         "Kategori inventaris", kategori?['nama'] ?? 'Unknown'),
-                    infoItem("Jumlah Stok",
-                        '$jumlah ${satuanLambang.isNotEmpty ? satuanLambang : ""}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Jumlah Stok",
+                            style: medium14.copyWith(color: dark1)),
+                        _isUpdatingStock
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2))
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove_circle_outline,
+                                        color: red, size: 28),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => _updateStock(-1),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Text(
+                                      jumlah is int
+                                          ? jumlah.toString()
+                                          : jumlah.toStringAsFixed(
+                                              jumlah.truncateToDouble() ==
+                                                      jumlah
+                                                  ? 0
+                                                  : 1),
+                                      style: semibold16.copyWith(color: dark2),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.add_circle_outline,
+                                        color: green1, size: 28),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => _updateStock(1),
+                                  ),
+                                  if (satuanLambang.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Text(satuanLambang,
+                                        style:
+                                            regular14.copyWith(color: dark2)),
+                                  ]
+                                ],
+                              ),
+                      ],
+                    ),
                     infoItem("Satuan", satuanNama.isNotEmpty ? satuanNama : ""),
                     _buildKetersediaan("Ketersediaan inventaris", ketersediaan),
                     _buildKondisi("Kondisi inventaris", kondisi),
