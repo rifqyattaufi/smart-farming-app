@@ -9,10 +9,23 @@ class SatuanService {
 
   final String baseUrl = '${dotenv.env['BASE_URL']}/satuan';
 
-  Future<Map<String, dynamic>> getSatuan() async {
+  Future<Map<String, dynamic>> getSatuan({
+    int page = 1,
+    int limit = 20,
+    String? searchQuery,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse(baseUrl);
+
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['nama'] = searchQuery;
+    }
+
+    final url = Uri.parse(baseUrl).replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -21,28 +34,37 @@ class SatuanService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
-        };
-      } else if (response.statusCode == 404) {
-        return {
-          'status': true,
-          'message': 'Data not found',
-          'data': [],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getSatuan();
+        return await getSatuan(
+            page: page, limit: limit, searchQuery: searchQuery);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to load satuan'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
@@ -80,10 +102,22 @@ class SatuanService {
     }
   }
 
-  Future<Map<String, dynamic>> getSatuanSearch(String query) async {
+  Future<Map<String, dynamic>> getSatuanSearch(
+    String query, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/search/$query');
+    final encodedQuery = Uri.encodeComponent(query);
+
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+
+    final url = Uri.parse('$baseUrl/search/$encodedQuery')
+        .replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -92,28 +126,45 @@ class SatuanService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 404) {
         return {
           'status': true,
-          'message': 'Data not found',
+          'message': body['message'] ?? 'Data not found',
           'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getSatuanSearch(query);
+        return await getSatuanSearch(query, page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to search satuan'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }

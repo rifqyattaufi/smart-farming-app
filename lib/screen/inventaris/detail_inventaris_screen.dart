@@ -35,6 +35,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   bool _isLoadingInitialData = true;
   bool _isLoadingChart = false;
   bool _isUpdatingStock = false;
+  bool _isDeleting = false;
 
   ChartFilterType _selectedChartFilterType = ChartFilterType.weekly;
   DateTimeRange? _selectedChartDateRange;
@@ -88,6 +89,36 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       setState(() {
         _isLoadingInitialData = false;
       });
+    }
+  }
+
+  Future<void> _handleDeleteConfirmation() async {
+    if (_isDeleting || !mounted) return;
+
+    final bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text(
+              'Apakah Anda yakin ingin menghapus data inventaris ini? Tindakan ini tidak dapat dibatalkan.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      _deleteData();
     }
   }
 
@@ -716,27 +747,11 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
             ),
             const SizedBox(height: 12),
             CustomButton(
-              onPressed: () async {
-                final shouldDelete = await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text('Konfirmasi'),
-                      content: const Text(
-                          'Apakah Anda yakin ingin menghapus data ini?'),
-                      actions: [
-                        TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Batal')),
-                        TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Hapus')),
-                      ],
-                    );
-                  },
-                );
-                if (shouldDelete == true) await _deleteData();
-              },
+              onPressed: _isDeleting
+                  ? null
+                  : () {
+                      _handleDeleteConfirmation();
+                    },
               buttonText: 'Hapus Data',
               backgroundColor: red,
               textStyle: semibold16,

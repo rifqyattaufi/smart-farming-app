@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/service/database_helper.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
-import 'package:smart_farming_app/widget/search_field.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -123,7 +121,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                     child: Expanded(
                       child: RefreshIndicator(
                         onRefresh: _fetchNotifications,
-                        color: green2,
+                        color: green1,
                         backgroundColor: white,
                         child: SingleChildScrollView(
                           child: ConstrainedBox(

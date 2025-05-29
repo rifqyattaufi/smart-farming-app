@@ -15,18 +15,52 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   final AuthService _authService = AuthService();
 
+  Future<void> _showLogoutConfirmation() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Keluar Akun'),
+        content: const Text('Apakah Anda yakin ingin keluar dari akun?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Keluar'),
+          ),
+        ],
+      ),
+    );
+    if (shouldLogout == true) {
+      await _authService.logout();
+      if (mounted) context.go('/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Header(headerType: HeaderType.basic),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leadingWidth: 0,
+              titleSpacing: 0,
+              toolbarHeight: 80,
+              title: const Header(headerType: HeaderType.basic)),
+        ),
       ),
       body: SafeArea(
         child: ListView(
           children: [
+            const SizedBox(height: 16),
             NewestReports(
               title: 'Pengaturan Utama',
               reports: [
@@ -60,7 +94,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 },
                 {
                   'text': 'Manajemen Grade Hasil Panen',
-                  'onTap': () => context.push('/manajemen-satuan'),
+                  'onTap': () => context.push('/manajemen-grade'),
                 },
                 {
                   'text': 'Ubah Password',
@@ -92,13 +126,7 @@ class _AccountScreenState extends State<AccountScreen> {
             NewestReports(
               title: 'Keluar',
               reports: [
-                {
-                  'text': 'Keluar Akun',
-                  'onTap': () async {
-                    await _authService.logout();
-                    context.go('/login');
-                  }
-                },
+                {'text': 'Keluar Akun', 'onTap': _showLogoutConfirmation},
               ],
               onItemTap: (context, item) {
                 final name = item['name'] ?? '';
@@ -109,6 +137,7 @@ class _AccountScreenState extends State<AccountScreen> {
               titleTextStyle: bold18.copyWith(color: dark1),
               reportTextStyle: medium14.copyWith(color: dark1),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),

@@ -17,7 +17,6 @@ class HamaService {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
     final url = Uri.parse('$_jenisHamaBaseUrl?page=$page&limit=$limit');
-    print('Fetching URL (getDaftarHama): $url');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -70,7 +69,6 @@ class HamaService {
     final encodedQuery = Uri.encodeComponent(query);
     final url = Uri.parse(
         '$_jenisHamaBaseUrl/search/$encodedQuery?page=$page&limit=$limit');
-    print('Fetching URL (searchDaftarHama): $url');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -246,8 +244,7 @@ class HamaService {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
 
-    final url = Uri.parse('$_BaseUrl/hama?page=$page&limit=$limit');
-    print('Fetching URL (getLaporanHama): $url');
+    final url = Uri.parse('$_BaseUrl/laporan-hama?page=$page&limit=$limit');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -301,7 +298,6 @@ class HamaService {
 
     final url = Uri.parse(
         '$_BaseUrl/hama/search/$encodedQuery?page=$page&limit=$limit');
-    print('Fetching URL (searchLaporanHama): $url');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -350,6 +346,31 @@ class HamaService {
         'currentPage': page,
         'totalItems': 0,
       };
+    }
+  }
+
+  Future<Map<String, dynamic>> getLaporanHamaById(String id) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$_BaseUrl/laporan-hama/$id');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getLaporanHamaById(id);
+      } else {
+        return {'status': false, 'message': body['message'] ?? response.body};
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
     }
   }
 }

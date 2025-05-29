@@ -1,13 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:smart_farming_app/widget/image_builder.dart';
 
-class DetailHamaScreen extends StatelessWidget {
+class DetailHamaScreen extends StatefulWidget {
   final String? idLaporanHama;
 
   const DetailHamaScreen({super.key, this.idLaporanHama});
+
+  @override
+  State<DetailHamaScreen> createState() => _DetailHamaScreenState();
+}
+
+class _DetailHamaScreenState extends State<DetailHamaScreen> {
+  final HamaService _hamaService = HamaService();
+
+  Map<String, dynamic>? _laporanHama;
+  int _jumlahHama = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.idLaporanHama == null || widget.idLaporanHama!.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ID Laporan Hama tidak valid.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          context.pop();
+        }
+      });
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      _fetchData();
+    }
+  }
+
+  Future<void> _fetchData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response =
+          await _hamaService.getLaporanHamaById(widget.idLaporanHama!);
+
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          setState(() {
+            _laporanHama = response['data'];
+            final hamaData = _laporanHama?['Hama'] as Map<String, dynamic>?;
+            final String? jumlahHamaString = hamaData?['jumlah']?.toString();
+            _jumlahHama = int.tryParse(jumlahHamaString ?? '0') ?? 0;
+
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+            _laporanHama = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ??
+                  'Gagal memuat data detail laporan hama'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _laporanHama = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching data: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  String _formatTanggal(String? tanggalString) {
+    if (tanggalString == null || tanggalString.isEmpty) {
+      return 'Tidak diketahui';
+    }
+    try {
+      final dateTime = DateTime.tryParse(tanggalString);
+      if (dateTime == null) return 'Format tanggal tidak valid';
+      return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
+    } catch (e) {
+      return 'Error format tanggal';
+    }
+  }
+
+  String _formatWaktu(String? tanggalString) {
+    if (tanggalString == null || tanggalString.isEmpty) {
+      return 'Tidak diketahui';
+    }
+    try {
+      final dateTime = DateTime.tryParse(tanggalString);
+      if (dateTime == null) return 'Format waktu tidak valid';
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return 'Error format waktu';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,88 +141,142 @@ class DetailHamaScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DottedBorder(
-                    color: green1,
-                    strokeWidth: 1.5,
-                    dashPattern: const [6, 4],
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/images/pest.jpg',
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _laporanHama == null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Gagal memuat detail laporan hama.'),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                              onPressed: _fetchData,
+                              child: const Text('Coba Lagi'))
+                        ],
+                      ),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: DottedBorder(
+                              color: green1,
+                              strokeWidth: 1.5,
+                              dashPattern: const [6, 4],
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(12),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: ImageBuilder(
+                                  url: _laporanHama?['gambar'] as String? ?? '',
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Informasi Hama",
+                                    style: bold18.copyWith(color: dark1)),
+                                const SizedBox(height: 12),
+                                infoItem("Nama hama",
+                                    "${_laporanHama?['Hama']?['JenisHama']?['nama'] ?? 'Tidak diketahui'}"),
+                                infoItem("Terlihat di",
+                                    "${_laporanHama?['UnitBudidaya']?['nama'] ?? 'Tidak diketahui'}"),
+                                infoItem(
+                                    "Jumlah hama teramati",
+                                    _jumlahHama > 0
+                                        ? "$_jumlahHama ekor"
+                                        : 'Tidak diketahui'),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Status hama",
+                                          style:
+                                              medium14.copyWith(color: dark1)),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: (_laporanHama?['Hama']
+                                                          ?['status'] ==
+                                                      true ||
+                                                  _laporanHama?['Hama']
+                                                          ?['status'] ==
+                                                      1)
+                                              ? green2.withValues(alpha: 0.1)
+                                              : red.withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: Text(
+                                          (_laporanHama?['Hama']?['status'] ==
+                                                      true ||
+                                                  _laporanHama?['Hama']
+                                                          ?['status'] ==
+                                                      1)
+                                              ? 'Ada'
+                                              : 'Tidak Ada',
+                                          style: (_laporanHama?['Hama']
+                                                          ?['status'] ==
+                                                      true ||
+                                                  _laporanHama?['Hama']
+                                                          ?['status'] ==
+                                                      1)
+                                              ? regular12.copyWith(
+                                                  color: green2)
+                                              : regular12.copyWith(color: red),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                infoItem(
+                                    "Tanggal pelaporan",
+                                    _formatTanggal(
+                                        _laporanHama?['createdAt'] as String?)),
+                                infoItem(
+                                    "Waktu pelaporan",
+                                    _formatWaktu(
+                                        _laporanHama?['createdAt'] as String?)),
+                                const SizedBox(height: 8),
+                                infoItem("Dilaporkan oleh",
+                                    "${_laporanHama?['user']?['name'] ?? 'Tidak diketahui'}"),
+                                const SizedBox(height: 8),
+                                Text("Catatan/jurnal pelaporan",
+                                    style: medium14.copyWith(color: dark1)),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _laporanHama?['catatan'] as String? ??
+                                      'Tidak ada catatan',
+                                  style: regular14.copyWith(color: dark2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Informasi Hama",
-                          style: bold18.copyWith(color: dark1)),
-                      const SizedBox(height: 12),
-                      infoItem("Nama hama", "Tikus"),
-                      infoItem("Terlihat di", "Kebun A"),
-                      infoItem("Jumlah hama", "2 ekor"),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Status hama",
-                                style: medium14.copyWith(color: dark1)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: green2.withValues(
-                                    alpha: 0.1), //or red if 'Tidak Ada'
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Text(
-                                'Ada',
-                                style: regular12.copyWith(color: green2),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      infoItem(
-                          "Tanggal pelaporan",
-                          DateFormat('EEEE, dd MMMM yyyy')
-                              .format(DateTime.now())),
-                      infoItem("Waktu pelaporan",
-                          DateFormat('HH:mm').format(DateTime.now())),
-                      const SizedBox(height: 8),
-                      Text("Catatan/jurnal pelaporan",
-                          style: medium14.copyWith(color: dark1)),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Hama tikus terlihat di kebun A, jumlah 2 ekor. Mohon segera ditindaklanjuti.",
-                        style: regular14.copyWith(color: dark2),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

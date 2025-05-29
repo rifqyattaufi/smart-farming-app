@@ -9,10 +9,23 @@ class KategoriInvService {
 
   final String baseUrl = '${dotenv.env['BASE_URL']}/kategori-inventaris';
 
-  Future<Map<String, dynamic>> getKategoriInventaris() async {
+  Future<Map<String, dynamic>> getKategoriInventaris({
+    int page = 1,
+    int limit = 20,
+    String? searchQuery,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse(baseUrl);
+
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['nama'] = searchQuery;
+    }
+
+    final url = Uri.parse(baseUrl).replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -21,26 +34,41 @@ class KategoriInvService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKategoriInventaris();
+        return await getKategoriInventaris(
+            page: page, limit: limit, searchQuery: searchQuery);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to load kategori'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
-  
+
   Future<Map<String, dynamic>> getKategoriInventarisOnly() async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
@@ -106,10 +134,22 @@ class KategoriInvService {
     }
   }
 
-  Future<Map<String, dynamic>> getKategoriInventarisSearch(String query) async {
+  Future<Map<String, dynamic>> getKategoriInventarisSearch(
+    String query, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/search/$query');
+    final encodedQuery = Uri.encodeComponent(query);
+
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+
+    final url = Uri.parse('$baseUrl/search/$encodedQuery')
+        .replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -118,28 +158,37 @@ class KategoriInvService {
       if (response.statusCode == 200) {
         return {
           'status': true,
-          'message': 'success',
-          'data': body['data'],
-        };
-      } else if (response.statusCode == 404) {
-        return {
-          'status': true,
-          'message': 'Data not found',
-          'data': [],
+          'message': body['message'] ?? 'success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKategoriInventarisSearch(query);
+        return await getKategoriInventarisSearch(query,
+            page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to search kategori'),
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
         };
       }
     } catch (e) {
       return {
         'status': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
       };
     }
   }
