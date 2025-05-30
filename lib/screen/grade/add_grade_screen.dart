@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/service/kategori_inv_service.dart';
+import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
-class AddKategoriInvScreen extends StatefulWidget {
-  final VoidCallback? onKategoriInvAdded;
+class AddGradeScreen extends StatefulWidget {
+  final VoidCallback? onGradeAdded;
   final bool isUpdate;
   final String? id;
   final String? nama;
+  final String? deskripsi;
 
-  const AddKategoriInvScreen({
+  const AddGradeScreen({
     super.key,
-    this.onKategoriInvAdded,
+    this.onGradeAdded,
     this.isUpdate = false,
     this.id,
     this.nama,
+    this.deskripsi,
   });
 
   @override
-  _AddKategoriInvScreenState createState() => _AddKategoriInvScreenState();
+  _AddGradeScreenState createState() => _AddGradeScreenState();
 }
 
-class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
-  final KategoriInvService _kategoriInvService = KategoriInvService();
+class _AddGradeScreenState extends State<AddGradeScreen> {
+  final GradeService _gradeService = GradeService();
 
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _deskripsiController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
@@ -35,6 +38,7 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
     super.initState();
     if (widget.isUpdate) {
       _nameController.text = widget.nama ?? '';
+      _deskripsiController.text = widget.deskripsi ?? '';
     }
   }
 
@@ -50,26 +54,26 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
 
       final data = {
         'nama': _nameController.text,
+        'deskripsi': _deskripsiController.text,
       };
 
       Map<String, dynamic>? response;
 
       if (widget.isUpdate) {
-        response = await _kategoriInvService.updateKategoriInventaris(
-            widget.id!, data);
+        response = await _gradeService.updateGrade(widget.id!, data);
       } else {
-        response = await _kategoriInvService.createKategoriInventaris(data);
+        response = await _gradeService.createGrade(data);
       }
 
       if (response['status'] == true) {
-        if (widget.onKategoriInvAdded != null) {
-          widget.onKategoriInvAdded!();
+        if (widget.onGradeAdded != null) {
+          widget.onGradeAdded!();
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(widget.isUpdate
-                  ? 'Berhasil memperbarui data kategori inventaris'
-                  : 'Berhasil menambahkan data kategori inventaris'),
+                  ? 'Berhasil memperbarui data grade hasil panen'
+                  : 'Berhasil menambahkan data grade hasil panen'),
               backgroundColor: Colors.green),
         );
         Navigator.pop(context);
@@ -109,10 +113,10 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           toolbarHeight: 80,
           title: Header(
               headerType: HeaderType.back,
-              title: 'Manajemen Kategori Inventaris',
+              title: 'Manajemen Grade Hasil Panen',
               greeting: widget.isUpdate
-                  ? 'Edit Kategori Inventaris'
-                  : 'Tambah Kategori Inventaris'),
+                  ? 'Edit Grade Hasil Panen'
+                  : 'Tambah Grade Hasil Panen'),
         ),
       ),
       body: SafeArea(
@@ -125,12 +129,25 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
-                    label: "Nama kategori inventaris",
-                    hint: "Contoh: Bibit tanaman",
+                    label: "Nama grade hasil panen",
+                    hint: "Contoh: Grade A",
                     controller: _nameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Nama kategori inventaris tidak boleh kosong';
+                        return 'Nama grade hasil panen tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  InputFieldWidget(
+                    label: "Deskripsi grade hasil panen",
+                    hint: "Keterangan",
+                    controller: _deskripsiController,
+                    maxLines: 5,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Deskripsi grade hasil panen tidak boleh kosong';
                       }
                       return null;
                     },

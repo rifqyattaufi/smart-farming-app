@@ -1,23 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
-import 'package:smart_farming_app/service/kategori_inv_service.dart';
+import 'package:smart_farming_app/screen/grade/add_grade_screen.dart';
+import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/unit_item.dart';
 
-class KategoriInvScreen extends StatefulWidget {
-  const KategoriInvScreen({super.key});
+class GradeScreen extends StatefulWidget {
+  const GradeScreen({super.key});
 
   @override
-  State<KategoriInvScreen> createState() => _KategoriInvScreenState();
+  State<GradeScreen> createState() => _GradeScreenState();
 }
 
-class _KategoriInvScreenState extends State<KategoriInvScreen> {
-  final KategoriInvService _kategoriInvService = KategoriInvService();
-  List<dynamic> kategoriInvList = [];
+class _GradeScreenState extends State<GradeScreen> {
+  final GradeService _gradeService = GradeService();
+  List<dynamic> gradeList = [];
 
   final TextEditingController searchController = TextEditingController();
   String _searchQuery = '';
@@ -34,26 +34,26 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchKategoriInv(page: 1, isRefresh: true);
+    _fetchGradeData(page: 1, isRefresh: true);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           !_isLoadingMore &&
           _currentPage < _totalPages) {
-        _fetchKategoriInv(
+        _fetchGradeData(
             page: _currentPage + 1,
             query: _searchQuery.isEmpty ? null : _searchQuery);
       }
     });
   }
 
-  Future<void> _fetchKategoriInv(
+  Future<void> _fetchGradeData(
       {required int page, bool isRefresh = false, String? query}) async {
     if (isRefresh) {
       setState(() {
         _isLoading = true;
-        kategoriInvList = [];
+        gradeList = [];
         _currentPage = 1;
         _totalPages = 1;
       });
@@ -64,7 +64,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
     }
 
     try {
-      final response = await _kategoriInvService.getKategoriInventaris(
+      final response = await _gradeService.getPagedGrades(
         page: page,
         limit: _limit,
         searchQuery: query,
@@ -76,16 +76,16 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
         final List<dynamic> newItems = response['data'] ?? [];
         setState(() {
           if (isRefresh) {
-            kategoriInvList = newItems;
+            gradeList = newItems;
           } else {
-            kategoriInvList.addAll(newItems);
+            gradeList.addAll(newItems);
           }
           _currentPage = response['currentPage'] ?? 1;
           _totalPages = response['totalPages'] ?? 1;
         });
       } else {
         _showError(response['message']?.toString() ??
-            'Gagal memuat data kategori inventaris');
+            'Gagal memuat data grade hasil panen');
       }
     } catch (e) {
       if (!mounted) return;
@@ -106,7 +106,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
     }
 
     _searchQuery = query;
-    _fetchKategoriInv(
+    _fetchGradeData(
         page: 1,
         isRefresh: true,
         query: _searchQuery.isEmpty ? null : _searchQuery);
@@ -122,7 +122,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
   }
 
   Future<void> _refreshData() async {
-    await _fetchKategoriInv(
+    await _fetchGradeData(
         page: 1,
         isRefresh: true,
         query: _searchQuery.isEmpty ? null : _searchQuery);
@@ -154,29 +154,27 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
-          backgroundColor: white,
-          leadingWidth: 0,
-          titleSpacing: 0,
-          elevation: 0,
-          surfaceTintColor: white,
-          scrolledUnderElevation: 0,
-          toolbarHeight: 80,
-          title: const Header(
-              headerType: HeaderType.back,
-              title: 'Manajemen Inventaris',
-              greeting: 'Daftar Kategori Inventaris'),
-        ),
+            backgroundColor: white,
+            leadingWidth: 0,
+            titleSpacing: 0,
+            elevation: 0,
+            surfaceTintColor: white,
+            scrolledUnderElevation: 0,
+            toolbarHeight: 80,
+            title: const Header(
+                headerType: HeaderType.back,
+                title: 'Manajemen Grade Hasil Panen',
+                greeting: 'Daftar Grade Hasil Panen')),
       ),
       floatingActionButton: SizedBox(
         width: 70,
         height: 70,
         child: FloatingActionButton(
           onPressed: () {
-            context.push('/tambah-kategori-inventaris',
-                extra: AddKategoriInvScreen(
+            context.push('/tambah-grade',
+                extra: AddGradeScreen(
                   isUpdate: false,
-                  onKategoriInvAdded: () =>
-                      _fetchKategoriInv(page: 1, isRefresh: true),
+                  onGradeAdded: () => _fetchGradeData(page: 1, isRefresh: true),
                 ));
           },
           backgroundColor: green1,
@@ -194,32 +192,33 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
             children: [
               SearchField(
                 controller: searchController,
-                hintText: "Cari nama kategori inventaris...",
+                hintText: "Cari nama grade hasil panen...",
                 onChanged: _onSearchQueryChanged,
               ),
               const SizedBox(height: 16),
-              Text('Daftar Kategori', style: bold18.copyWith(color: dark1)),
+              Text('Daftar Grade Hasil Panen',
+                  style: bold18.copyWith(color: dark1)),
               const SizedBox(height: 12),
               Expanded(
-                child: _isLoading && kategoriInvList.isEmpty
+                child: _isLoading && gradeList.isEmpty
                     ? const Center(child: CircularProgressIndicator())
                     : RefreshIndicator(
                         onRefresh: _refreshData,
                         color: green1,
                         backgroundColor: white,
-                        child: kategoriInvList.isEmpty
+                        child: gradeList.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Tidak ada kategori inventaris ditemukan',
+                                  'Tidak ada data grade hasil panen ditemukan',
                                   style: medium14.copyWith(color: dark2),
                                 ),
                               )
                             : ListView.builder(
                                 controller: _scrollController,
-                                itemCount: kategoriInvList.length +
-                                    (_isLoadingMore ? 1 : 0),
+                                itemCount:
+                                    gradeList.length + (_isLoadingMore ? 1 : 0),
                                 itemBuilder: (context, index) {
-                                  if (index >= kategoriInvList.length &&
+                                  if (index >= gradeList.length &&
                                       _isLoadingMore) {
                                     return const Padding(
                                       padding:
@@ -229,12 +228,12 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                     );
                                   }
 
-                                  if (index >= kategoriInvList.length) {
+                                  if (index >= gradeList.length) {
                                     return const SizedBox.shrink();
                                   }
 
-                                  final kategori = kategoriInvList[index];
-                                  if (kategori is! Map<String, dynamic>) {
+                                  final grade = gradeList[index];
+                                  if (grade is! Map<String, dynamic>) {
                                     return const SizedBox.shrink();
                                   }
 
@@ -242,23 +241,26 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                     padding: const EdgeInsets.all(4.0),
                                     child: UnitItem(
                                       unitName:
-                                          kategori['nama']?.toString() ?? 'N/A',
+                                          grade['nama']?.toString() ?? 'N/A',
+                                      unitDescription:
+                                          grade['deskripsi']?.toString() ??
+                                              'Tidak ada deskripsi',
                                       onEdit: () {
-                                        context.push(
-                                            '/tambah-kategori-inventaris',
-                                            extra:
-                                                AddKategoriInvScreen(
-                                                    isUpdate: true,
-                                                    id: kategori['id']
-                                                            ?.toString() ??
+                                        context.push('/tambah-grade',
+                                            extra: AddGradeScreen(
+                                                isUpdate: true,
+                                                id: grade['id']?.toString() ??
+                                                    '',
+                                                nama:
+                                                    grade['nama']?.toString() ??
                                                         '',
-                                                    nama: kategori['nama']
-                                                            ?.toString() ??
-                                                        '',
-                                                    onKategoriInvAdded: () =>
-                                                        _fetchKategoriInv(
-                                                            page: 1,
-                                                            isRefresh: true)));
+                                                deskripsi: grade['deskripsi']
+                                                        ?.toString() ??
+                                                    '',
+                                                onGradeAdded: () =>
+                                                    _fetchGradeData(
+                                                        page: 1,
+                                                        isRefresh: true)));
                                       },
                                       onDelete: () {
                                         showDialog(
@@ -268,7 +270,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                 title: const Text(
                                                     'Konfirmasi Hapus'),
                                                 content: Text(
-                                                    'Apakah Anda yakin ingin menghapus kategori "${kategori['nama']}"?'),
+                                                    'Apakah Anda yakin ingin menghapus grade "${grade['nama']}"?'),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () =>
@@ -281,24 +283,23 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                       Navigator.of(context)
                                                           .pop();
                                                       final response =
-                                                          await _kategoriInvService
-                                                              .deleteKategoriInventaris(
-                                                                  kategori[
-                                                                          'id']!
-                                                                      .toString());
+                                                          await _gradeService
+                                                              .deleteGrade(grade[
+                                                                      'id']!
+                                                                  .toString());
                                                       if (!mounted) return;
                                                       if (response['status'] ==
                                                           true) {
                                                         _showError(
-                                                            "Kategori inventaris berhasil dihapus.",
+                                                            "data grade hasil panen berhasil dihapus",
                                                             isError: false);
-                                                        _fetchKategoriInv(
+                                                        _fetchGradeData(
                                                             page: 1,
                                                             isRefresh: true);
                                                       } else {
                                                         _showError(response[
                                                                 'message'] ??
-                                                            'Gagal menghapus kategori inventaris');
+                                                            'Gagal menghapus data grade hasil panen');
                                                       }
                                                     },
                                                     child: const Text('Hapus',

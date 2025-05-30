@@ -316,6 +316,8 @@ class _TanamanScreenState extends State<TanamanScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
+                  color: green1,
+                  backgroundColor: white,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),

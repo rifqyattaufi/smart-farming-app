@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/screen/blank_screen.dart';
+import 'package:smart_farming_app/screen/grade/add_grade_screen.dart';
+import 'package:smart_farming_app/screen/grade/grade_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
@@ -527,6 +529,17 @@ final _router = GoRouter(
     GoRoute(
       path: '/kategori-inventaris',
       builder: (context, state) => const KategoriInvScreen(),
+    ),
+    GoRoute(
+      path: '/tambah-grade',
+      builder: (context, state) {
+        final extra = state.extra as AddGradeScreen;
+        return extra;
+      },
+    ),
+    GoRoute(
+      path: '/manajemen-grade',
+      builder: (context, state) => const GradeScreen(),
     ),
     GoRoute(
       path: '/tambah-inventaris',

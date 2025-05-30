@@ -407,7 +407,7 @@ class _HamaScreenState extends State<HamaScreen> {
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Laporan Hama & Penyakit',
+            title: 'Manajemen Hama Kebun',
             greeting: 'Riwayat dan Daftar Hama',
           ),
         ),
@@ -488,6 +488,8 @@ class _HamaScreenState extends State<HamaScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
+                  color: green1,
+                  backgroundColor: white,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -613,7 +615,7 @@ class _HamaScreenState extends State<HamaScreen> {
         final waktu = laporan['createdAt'] != null
             ? DateFormat('HH:mm').format(DateTime.parse(laporan['createdAt']))
             : 'N/A';
-        final person = laporan['User']?['name'] ?? 'N/A';
+        final person = laporan['user']?['name'] ?? 'N/A';
 
         String kategori = "Jenis Hama: ${jenisHama?['nama'] ?? 'N/A'}";
         if (unitBudidaya?['nama'] != null) {

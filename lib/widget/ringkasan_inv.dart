@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 
-class RingkasanInv extends StatelessWidget {
+class RingkasanInv extends StatefulWidget {
   final int totalItem;
   final int kategoriInventaris;
   final int seringDigunakan;
@@ -26,9 +26,115 @@ class RingkasanInv extends StatelessWidget {
   });
 
   @override
+  State<RingkasanInv> createState() => _RingkasanInvState();
+}
+
+class _RingkasanInvState extends State<RingkasanInv> {
+  int? _touchedIndex;
+
+  late List<Map<String, dynamic>> _pieData;
+
+  @override
+  void initState() {
+    super.initState();
+    _pieData = [
+      {'color': green2, 'value': widget.itemTersedia, 'title': 'Item Tersedia'},
+      {
+        'color': const Color(0xFFFFD233),
+        'value': widget.seringDigunakan,
+        'title': 'Sering Digunakan'
+      },
+      {
+        'color': const Color(0xFFFF9F0A),
+        'value': widget.jarangDigunakan,
+        'title': 'Jarang Digunakan'
+      },
+      {
+        'color': const Color(0xFFE84BE5),
+        'value': widget.stokRendah,
+        'title': 'Stok Rendah'
+      },
+      {
+        'color': const Color(0xFF2C6CFF),
+        'value': widget.itemBaru,
+        'title': 'Item Baru'
+      },
+    ];
+  }
+
+  @override
+  void didUpdateWidget(covariant RingkasanInv oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.itemTersedia != oldWidget.itemTersedia ||
+        widget.seringDigunakan != oldWidget.seringDigunakan ||
+        false) {
+      _pieData = [
+        {
+          'color': green2,
+          'value': widget.itemTersedia,
+          'title': 'Item Tersedia'
+        },
+        {
+          'color': const Color(0xFFFFD233),
+          'value': widget.seringDigunakan,
+          'title': 'Sering Digunakan'
+        },
+        {
+          'color': const Color(0xFFFF9F0A),
+          'value': widget.jarangDigunakan,
+          'title': 'Jarang Digunakan'
+        },
+        {
+          'color': const Color(0xFFE84BE5),
+          'value': widget.stokRendah,
+          'title': 'Stok Rendah'
+        },
+        {
+          'color': const Color(0xFF2C6CFF),
+          'value': widget.itemBaru,
+          'title': 'Item Baru'
+        },
+      ];
+    }
+  }
+
+  PieChartSectionData _pieSection(Color color, int value, String title,
+      {bool isTouched = false}) {
+    final double radius = isTouched ? 18 : 12;
+    final double fontSize = isTouched ? 10 : 8;
+    final double chartValue = value == 0 ? 0.1 : value.toDouble();
+
+    return PieChartSectionData(
+      color: color,
+      value: chartValue,
+      radius: radius,
+      showTitle: false,
+      title: '$value',
+      titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: white,
+          shadows: const [Shadow(color: Colors.black, blurRadius: 2)]),
+      titlePositionPercentageOffset: 0.55,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('EEEE, d MMMM y').format(tanggal);
-    final timeStr = DateFormat('HH.mm').format(tanggal);
+    final dateStr = DateFormat('EEEE, d MMMM y').format(widget.tanggal);
+    final timeStr = DateFormat('HH.mm').format(widget.tanggal);
+
+    List<PieChartSectionData> sections = [];
+    for (int i = 0; i < _pieData.length; i++) {
+      sections.add(
+        _pieSection(
+          _pieData[i]['color'] as Color,
+          _pieData[i]['value'] as int,
+          _pieData[i]['title'] as String,
+          isTouched: i == _touchedIndex,
+        ),
+      );
+    }
 
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -64,24 +170,25 @@ class RingkasanInv extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  // Kiri: Text Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildRow("Total Item", "$totalItem item"),
+                        _buildRow("Total Item", "${widget.totalItem} item"),
+                        _buildRow("Kategori Inventaris",
+                            "${widget.kategoriInventaris} item"),
+                        _buildRow("Sering Digunakan",
+                            "${widget.seringDigunakan} item"),
+                        _buildRow("Jarang Digunakan",
+                            "${widget.jarangDigunakan} item"),
                         _buildRow(
-                            "Kategori Inventaris", "$kategoriInventaris item"),
-                        _buildRow("Sering Digunakan", "$seringDigunakan item"),
-                        _buildRow("Jarang Digunakan", "$jarangDigunakan item"),
-                        _buildRow("Item Tersedia", "$itemTersedia item"),
-                        _buildRow("Stok Rendah", "$stokRendah item"),
-                        _buildRow("Item Baru", "$itemBaru item"),
+                            "Item Tersedia", "${widget.itemTersedia} item"),
+                        _buildRow("Stok Rendah", "${widget.stokRendah} item"),
+                        _buildRow("Item Baru", "${widget.itemBaru} item"),
                       ],
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Kanan: Chart
                   SizedBox(
                     width: 120,
                     height: 120,
@@ -90,29 +197,57 @@ class RingkasanInv extends StatelessWidget {
                       children: [
                         PieChart(
                           PieChartData(
+                            pieTouchData: PieTouchData(
+                              // TAMBAHKAN INI
+                              touchCallback: (FlTouchEvent event,
+                                  PieTouchResponse? pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null) {
+                                    _touchedIndex =
+                                        -1; // Tidak ada yang disentuh
+                                    return;
+                                  }
+                                  _touchedIndex = pieTouchResponse
+                                      .touchedSection!.touchedSectionIndex;
+                                });
+                              },
+                            ),
                             sectionsSpace: 2,
                             centerSpaceRadius: 35,
-                            sections: [
-                              _pieSection(green2, itemTersedia),
-                              _pieSection(
-                                  const Color(0xFFFFD233), seringDigunakan),
-                              _pieSection(
-                                  const Color(0xFFFF9F0A), jarangDigunakan),
-                              _pieSection(const Color(0xFFE84BE5), stokRendah),
-                              _pieSection(const Color(0xFF2C6CFF), itemBaru),
-                            ],
+                            sections: sections,
                           ),
                         ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text("Total Item",
-                                style: regular10.copyWith(color: dark2)),
-                            const SizedBox(height: 2),
-                            Text("$totalItem",
-                                style: bold20.copyWith(color: dark1)),
-                          ],
-                        )
+                        _touchedIndex != null &&
+                                _touchedIndex != -1 &&
+                                _touchedIndex! < _pieData.length
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _pieData[_touchedIndex!]['title'] as String,
+                                    style: regular10.copyWith(color: dark2),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    (_pieData[_touchedIndex!]['value'] as int)
+                                        .toString(),
+                                    style: bold16.copyWith(color: dark1),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("Total Item",
+                                      style: regular10.copyWith(color: dark2)),
+                                  const SizedBox(height: 2),
+                                  Text("${widget.totalItem}",
+                                      style: bold20.copyWith(color: dark1)),
+                                ],
+                              )
                       ],
                     ),
                   ),
@@ -133,15 +268,6 @@ class RingkasanInv extends StatelessWidget {
           Text(value, style: semibold14.copyWith(color: dark1)),
         ],
       ),
-    );
-  }
-
-  PieChartSectionData _pieSection(Color color, int value) {
-    return PieChartSectionData(
-      color: color,
-      value: value.toDouble(),
-      radius: 12,
-      showTitle: false,
     );
   }
 }

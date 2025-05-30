@@ -298,7 +298,8 @@ class _TernakScreenState extends State<TernakScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
                   hintText: 'Cari ternak berdasarkan nama',
-                  controller: _searchController, onChanged: _onSearchChanged),
+                  controller: _searchController,
+                  onChanged: _onSearchChanged),
             ),
             const SizedBox(height: 10),
             if (_isInitialLoading &&
@@ -315,6 +316,8 @@ class _TernakScreenState extends State<TernakScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
+                  color: green1,
+                  backgroundColor: white,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),

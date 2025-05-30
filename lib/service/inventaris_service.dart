@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 
@@ -50,8 +51,8 @@ class InventarisService {
   Future<Map<String, dynamic>> getPagedInventaris({
     int page = 1,
     int limit = 20,
-    String? kategoriId, // Untuk filter berdasarkan ID Kategori
-    String? searchQuery, // Untuk filter berdasarkan nama (pencarian)
+    String? kategoriId,
+    String? searchQuery,
   }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
@@ -117,6 +118,128 @@ class InventarisService {
     }
   }
 
+  Future<Map<String, dynamic>> getOldRiwayatPenggunaanInventaris() async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/riwayat-penggunaan-inventaris');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      return {'status': true, 'data': body['data']};
+    } else if (response.statusCode == 401) {
+      await _authService.refreshToken();
+      return await getOldRiwayatPenggunaanInventaris();
+    } else {
+      return {
+        'status': false,
+        'message': 'Failed to load old riwayat: ${response.statusCode}'
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getRiwayatPemakaianInventarisPaginated({
+    required String inventarisId,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    final url = Uri.parse('$baseUrl/$inventarisId/riwayat-pemakaian')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+          'totalPages': body['totalPages'] ?? 0,
+          'currentPage': body['currentPage'] ?? page,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getRiwayatPemakaianInventarisPaginated(
+            inventarisId: inventarisId, page: page, limit: limit);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load paginated riwayat',
+          'data': [],
+          'totalPages': 0,
+          'currentPage': page,
+          'totalItems': 0,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+        'totalPages': 0,
+        'currentPage': page,
+        'totalItems': 0,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getStatistikPemakaianInventaris({
+    required String inventarisId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String groupBy,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'startDate': DateFormat('yyyy-MM-dd').format(startDate),
+      'endDate': DateFormat('yyyy-MM-dd').format(endDate),
+      'groupBy': groupBy,
+    };
+    final url = Uri.parse('$baseUrl/$inventarisId/statistik-pemakaian')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getStatistikPemakaianInventaris(
+            inventarisId: inventarisId,
+            startDate: startDate,
+            endDate: endDate,
+            groupBy: groupBy);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load statistics',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> getInventaris() async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
@@ -161,7 +284,7 @@ class InventarisService {
         final body = json.decode(response.body);
         return {
           'status': true,
-          'message': 'success',
+          'message': body['message'] ?? 'success',
           'data': body['data'],
         };
       } else if (response.statusCode == 401) {
@@ -171,13 +294,17 @@ class InventarisService {
         final body = response.body;
         return {
           'status': false,
-          'message': body,
+          'message': body.isNotEmpty
+              ? json.decode(body)['message']
+              : 'Failed to load data',
+          'data': null
         };
       }
     } catch (e) {
       return {
         'status': false,
         'message': 'An error occurred: ${e.toString()}',
+        'data': null
       };
     }
   }

@@ -586,7 +586,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                             isEdit: false,
                             onInventarisAdded: _handleRefresh,
                           ))
-                      .then((_) {/* Opsional: _handleRefresh(); */});
+                      .then((_) {/* _handleRefresh(); */});
                 },
                 backgroundColor: green1,
                 shape: RoundedRectangleBorder(
@@ -698,6 +698,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
+                  color: green1,
+                  backgroundColor: white,
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),

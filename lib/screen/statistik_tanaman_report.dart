@@ -272,15 +272,15 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Hasil Panen',
-            titleStats: 'Statistik Hasil Panen Tanaman',
-            showCounter: true,
-            counter: 120,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Hasil Panen',
+          //   titleStats: 'Statistik Hasil Panen Tanaman',
+          //   showCounter: true,
+          //   counter: 120,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -335,36 +335,36 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Laporan Harian Tanaman',
-            textCounter: 'Data Laporan Harian',
-            counter: 20,
-            showCounter: false,
-          ),
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Penyiraman Tanaman',
-            showCounter: false,
-          ),
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Pemberian Nutrisi Tanaman',
-            showCounter: false,
-          ),
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Repotting Tanaman',
-            showCounter: false,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Laporan Harian Tanaman',
+          //   textCounter: 'Data Laporan Harian',
+          //   counter: 20,
+          //   showCounter: false,
+          // ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Penyiraman Tanaman',
+          //   showCounter: false,
+          // ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Pemberian Nutrisi Tanaman',
+          //   showCounter: false,
+          // ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Repotting Tanaman',
+          //   showCounter: false,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -439,16 +439,16 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Tanaman Sakit',
-            titleStats: 'Statistik Tanaman Sakit',
-            showCounter: true,
-            textCounter: 'Tanaman Sakit',
-            counter: 2,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Tanaman Sakit',
+          //   titleStats: 'Statistik Tanaman Sakit',
+          //   showCounter: true,
+          //   textCounter: 'Tanaman Sakit',
+          //   counter: 2,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -499,16 +499,16 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Tanaman Mati',
-            titleStats: 'Statistik Tanaman Mati',
-            showCounter: true,
-            textCounter: 'Tanaman Mati',
-            counter: 2,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Tanaman Mati',
+          //   titleStats: 'Statistik Tanaman Mati',
+          //   showCounter: true,
+          //   textCounter: 'Tanaman Mati',
+          //   counter: 2,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -559,15 +559,15 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            titleStats: 'Statistik Pemberian Nutrisi Tanaman',
-            showCounter: true,
-            textCounter: 'Data Pemberian Nutrisi',
-            counter: 20,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   titleStats: 'Statistik Pemberian Nutrisi Tanaman',
+          //   showCounter: true,
+          //   textCounter: 'Data Pemberian Nutrisi',
+          //   counter: 20,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

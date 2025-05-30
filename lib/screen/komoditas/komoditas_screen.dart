@@ -467,6 +467,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
             else
               Expanded(
                 child: RefreshIndicator(
+                  color: green1,
+                  backgroundColor: white,
                   onRefresh: _handleRefresh,
                   child: SingleChildScrollView(
                     controller: _scrollController,

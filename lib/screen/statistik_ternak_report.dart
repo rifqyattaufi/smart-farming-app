@@ -272,15 +272,15 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Hasil Panen',
-            titleStats: 'Statistik Hasil Panen Ternak',
-            showCounter: true,
-            counter: 20,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Hasil Panen',
+          //   titleStats: 'Statistik Hasil Panen Ternak',
+          //   showCounter: true,
+          //   counter: 20,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -335,29 +335,29 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Laporan Harian Ternak',
-            textCounter: 'Data Laporan Harian',
-            counter: 20,
-            showCounter: false,
-          ),
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Pemberian Pakan',
-            showCounter: false,
-          ),
-          ChartWidget(
-            firstDate: firstDates,
-            lastDate: lastDates,
-            data: datas,
-            titleStats: 'Statistik Pengecekan Kandang',
-            showCounter: false,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Laporan Harian Ternak',
+          //   textCounter: 'Data Laporan Harian',
+          //   counter: 20,
+          //   showCounter: false,
+          // ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Pemberian Pakan',
+          //   showCounter: false,
+          // ),
+          // ChartWidget(
+          //   firstDate: firstDates,
+          //   lastDate: lastDates,
+          //   data: datas,
+          //   titleStats: 'Statistik Pengecekan Kandang',
+          //   showCounter: false,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -414,16 +414,16 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Ternak Sakit',
-            titleStats: 'Statistik Ternak Sakit',
-            showCounter: true,
-            textCounter: 'Ternak Sakit',
-            counter: 2,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Ternak Sakit',
+          //   titleStats: 'Statistik Ternak Sakit',
+          //   showCounter: true,
+          //   textCounter: 'Ternak Sakit',
+          //   counter: 2,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -474,16 +474,16 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            title: 'Total Kematian Ternak',
-            titleStats: 'Statistik Kematian Ternak',
-            showCounter: true,
-            textCounter: 'Kematian Ternak',
-            counter: 2,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   title: 'Total Kematian Ternak',
+          //   titleStats: 'Statistik Kematian Ternak',
+          //   showCounter: true,
+          //   textCounter: 'Kematian Ternak',
+          //   counter: 2,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -534,15 +534,15 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ChartWidget(
-            firstDate: firstDate,
-            lastDate: lastDate,
-            data: data,
-            titleStats: 'Statistik Pemberian Nutrisi Ternak',
-            showCounter: true,
-            textCounter: 'Data Pemberian Nutrisi',
-            counter: 20,
-          ),
+          // ChartWidget(
+          //   firstDate: firstDate,
+          //   lastDate: lastDate,
+          //   data: data,
+          //   titleStats: 'Statistik Pemberian Nutrisi Ternak',
+          //   showCounter: true,
+          //   textCounter: 'Data Pemberian Nutrisi',
+          //   counter: 20,
+          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
