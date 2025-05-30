@@ -4,6 +4,7 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:toastification/toastification.dart';
 
 class AddGradeScreen extends StatefulWidget {
   final VoidCallback? onGradeAdded;
@@ -48,9 +49,11 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
     try {
       if (!_formKey.currentState!.validate()) return;
 
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
 
       final data = {
         'nama': _nameController.text,
@@ -65,36 +68,57 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
         response = await _gradeService.createGrade(data);
       }
 
+      if (!mounted) return;
+
       if (response['status'] == true) {
         if (widget.onGradeAdded != null) {
           widget.onGradeAdded!();
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isUpdate
-                  ? 'Berhasil memperbarui data grade hasil panen'
-                  : 'Berhasil menambahkan data grade hasil panen'),
-              backgroundColor: Colors.green),
+
+        toastification.show(
+          context: context,
+          title: const Text('Hore! Sukses! 👍'),
+          description: Text(widget.isUpdate
+              ? 'Berhasil memperbarui data grade hasil panen.'
+              : 'Berhasil menambahkan data grade hasil panen.'),
+          type: ToastificationType.success,
+          style: ToastificationStyle.flatColored,
+          autoCloseDuration: const Duration(seconds: 4),
         );
+
+        setState(() {
+          isLoading = false;
+        });
+
         Navigator.pop(context);
       } else {
         setState(() {
           isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
+        toastification.show(
+          context: context,
+          title: const Text('Oops, Ada yang Salah! 👎'),
+          description:
+              Text(response['message'] ?? 'Terjadi kesalahan tidak diketahui'),
+          type: ToastificationType.error,
+          style: ToastificationStyle.flatColored,
+          autoCloseDuration: const Duration(seconds: 5),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Terjadi kesalahan saat menambahkan: $e'),
-            backgroundColor: Colors.red),
+
+      toastification.show(
+        context: context,
+        title: const Text('Error Tidak Terduga 😢'),
+        description: Text('Terjadi kesalahan: $e. Silakan coba lagi.'),
+        type: ToastificationType.error,
+        style: ToastificationStyle.flatColored,
+        autoCloseDuration: const Duration(seconds: 5),
       );
     }
   }
