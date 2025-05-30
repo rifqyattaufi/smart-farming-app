@@ -30,6 +30,16 @@ class NewestReports extends StatelessWidget {
     this.timeTextStyle = const TextStyle(),
   });
 
+  String _formatTime(dynamic time) {
+    if (time == null) return 'Unknown Time';
+    try {
+      return DateFormat('EEEE, d MMMM yyyy | HH:mm')
+          .format(DateTime.parse(time));
+    } catch (e) {
+      return 'Unknown Time';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -106,18 +116,7 @@ class NewestReports extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            () {
-                                              try {
-                                                return report['time'] != null
-                                                    ? DateFormat(
-                                                            'EEEE, d MMMM yyyy | HH:mm')
-                                                        .format(DateTime.parse(
-                                                            report['time']))
-                                                    : 'Unknown Time';
-                                              } catch (e) {
-                                                return 'Unknown Time';
-                                              }
-                                            }(),
+                                            _formatTime(report['time']),
                                             style: timeTextStyle,
                                           ),
                                         ],
@@ -128,53 +127,87 @@ class NewestReports extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Text(
-                                        report['time'] != null
-                                            ? DateFormat(
-                                                    'EEEE, d MMMM yyyy | HH:mm')
-                                                .format(DateTime.parse(
-                                                    report['time']))
-                                            : 'Unknown Time',
+                                        report['subtext'] ?? '',
                                         style: timeTextStyle,
                                       ),
                                     ),
                                   if (mode == NewestReportsMode.log)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 4),
-                                            margin:
-                                                const EdgeInsets.only(right: 8),
-                                            decoration: BoxDecoration(
-                                              color: report['action'] ==
-                                                      'CREATE'
-                                                  ? blue2.withValues(alpha: 0.1)
-                                                  : report['action'] == 'UPDATE'
-                                                      ? yellow.withValues(
-                                                          alpha: 0.1)
-                                                      : red.withValues(
-                                                          alpha: 0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 60,
+                                              alignment: Alignment.center,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                              margin: const EdgeInsets.only(
+                                                  right: 8),
+                                              decoration: BoxDecoration(
+                                                color: report['action'] ==
+                                                            'CREATE' ||
+                                                        report['action'] ==
+                                                            'REPEAT'
+                                                    ? blue2.withOpacity(0.1)
+                                                    : report['action'] ==
+                                                                'UPDATE' ||
+                                                            report['action'] ==
+                                                                'ONCE'
+                                                        ? yellow
+                                                            .withOpacity(0.1)
+                                                        : red.withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  report['action'] ?? 'CREATE',
+                                                  style: regular10.copyWith(
+                                                      color: dark2),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
                                             ),
-                                            child: Text(
-                                              report['action'] ?? 'CREATE',
-                                              style: regular10.copyWith(
-                                                  color: dark2),
+                                            if (report['isActive'] != null)
+                                              Container(
+                                                width: 60,
+                                                alignment: Alignment.center,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4),
+                                                margin: const EdgeInsets.only(
+                                                    right: 8),
+                                                decoration: BoxDecoration(
+                                                  color: report['isActive'] ==
+                                                          true
+                                                      ? green1.withOpacity(0.1)
+                                                      : red.withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    report['isActive'] == true
+                                                        ? 'Aktif'
+                                                        : 'Non aktif',
+                                                    style: regular10.copyWith(
+                                                        color: dark2),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              ),
+                                            Text(
+                                              report['time'] ?? 'Unknown Time',
+                                              style: timeTextStyle,
                                             ),
-                                          ),
-                                          Text(
-                                            report['time'] != null
-                                                ? DateFormat(
-                                                        'EEEE, d MMMM yyyy | HH:mm')
-                                                    .format(DateTime.parse(
-                                                        report['time']))
-                                                : 'Unknown Time',
-                                            style: timeTextStyle,
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                 ],

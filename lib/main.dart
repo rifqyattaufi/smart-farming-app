@@ -12,6 +12,8 @@ import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/add_laporan_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/hama/hama_screen.dart';
+import 'package:smart_farming_app/screen/notifications/add_global_notification.dart';
+import 'package:smart_farming_app/screen/notifications/notification_management_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/statistik_tanaman_report.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
@@ -652,15 +654,22 @@ final _router = GoRouter(
       builder: (context, state) => const NotificationScreen(),
     ),
     GoRoute(
-      path: '/detail-notifikasi',
+      path: '/detail-global-notification',
       builder: (context, state) {
-        final title = state.extra != null ? (state.extra as Map)['title'] : '';
-        final date = state.extra != null ? (state.extra as Map)['date'] : '';
-        final message =
-            state.extra != null ? (state.extra as Map)['message'] : '';
-        return DetailNotifScreen(title: title, date: date, message: message);
+        final extra = state.extra as DetailNotifScreen;
+        return extra;
       },
     ),
+    GoRoute(
+      path: '/manajemen-notifikasi',
+      builder: (context, state) => const NotificationManagementScreen(),
+    ),
+    GoRoute(
+        path: '/add-global-notification',
+        builder: (context, state) {
+          final extra = state.extra as AddGlobalNotification;
+          return extra;
+        }),
     GoRoute(
       path: '/manajemen-pengguna',
       builder: (context, state) => const UsersScreen(),

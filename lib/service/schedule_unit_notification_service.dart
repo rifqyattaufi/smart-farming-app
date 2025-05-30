@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:http/http.dart' as http;
 
-class ScheduleUnitNotification {
+class ScheduleUnitNotificationService {
   final AuthService _authService = AuthService();
 
   final String baseUrl = '${dotenv.env['BASE_URL']}/scheduledUnitNotification';

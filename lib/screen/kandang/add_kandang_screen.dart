@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
-import 'package:smart_farming_app/service/schedule_unit_notification.dart';
+import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,8 +30,8 @@ class AddKandangScreen extends StatefulWidget {
 class _AddKandangScreenState extends State<AddKandangScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
-  final ScheduleUnitNotification _scheduleUnitNotification =
-      ScheduleUnitNotification();
+  final ScheduleUnitNotificationService _scheduleUnitNotification =
+      ScheduleUnitNotificationService();
   final ImageService _imageService = ImageService();
   
   final _formKey = GlobalKey<FormState>();

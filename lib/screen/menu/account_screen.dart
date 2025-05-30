@@ -34,6 +34,10 @@ class _AccountScreenState extends State<AccountScreen> {
                   'text': 'Data Akun',
                   'onTap': () => context.push('/detail'),
                 },
+                {
+                  'text': 'Ubah Password',
+                  'onTap': () => context.push('/lupa-password'),
+                },
               ],
               onItemTap: (context, report) =>
                   context.push('/detail', extra: report),
@@ -59,8 +63,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   'onTap': () => context.push('/manajemen-satuan'),
                 },
                 {
-                  'text': 'Ubah Password',
-                  'onTap': () => context.push('/lupa-password'),
+                  'text': 'Manajemen Notifikasi Global',
+                  'onTap': () => context.push('/manajemen-notifikasi'),
                 },
                 {
                   'text': 'Log Aktivitas',
