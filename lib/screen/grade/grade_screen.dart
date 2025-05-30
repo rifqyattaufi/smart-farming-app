@@ -133,7 +133,10 @@ class _GradeScreenState extends State<GradeScreen> {
     if (mounted) {
       toastification.show(
         context: context,
-        title: Text(message),
+        title: isError
+            ? const Text('Oops, Ada yang Salah! 👎')
+            : const Text('Hore! Sukses! 👍'),
+        description: Text(message),
         type: isError ? ToastificationType.error : ToastificationType.success,
         style: ToastificationStyle.flatColored,
         autoCloseDuration: const Duration(seconds: 4),
@@ -293,7 +296,7 @@ class _GradeScreenState extends State<GradeScreen> {
                                                       if (response['status'] ==
                                                           true) {
                                                         _showError(
-                                                            "data grade hasil panen berhasil dihapus",
+                                                            "Data grade hasil panen berhasil dihapus",
                                                             isError: false);
                                                         _fetchGradeData(
                                                             page: 1,
