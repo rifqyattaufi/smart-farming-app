@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
-import 'package:smart_farming_app/service/schedule_unit_notification.dart';
+import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -22,8 +22,8 @@ class DetailKandangScreen extends StatefulWidget {
 
 class _DetailKandangScreenState extends State<DetailKandangScreen> {
   final _unitBudidayaService = UnitBudidayaService();
-  final ScheduleUnitNotification _scheduleUnitNotification =
-      ScheduleUnitNotification();
+  final ScheduleUnitNotificationService _scheduleUnitNotification =
+      ScheduleUnitNotificationService();
 
   Map<String, dynamic> _kandang = {};
   List<dynamic> _ternakList = [];
