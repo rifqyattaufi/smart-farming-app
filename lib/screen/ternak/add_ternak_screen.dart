@@ -333,22 +333,21 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
                               }
                               return null;
                             }),
-                        const SizedBox(height: 24),
-                        CustomButton(
-                          onPressed: _submitForm,
-                          buttonText: widget.isEdit
-                              ? 'Simpan Perubahan'
-                              : 'Tambah Ternak',
-                          backgroundColor: green1,
-                          textStyle: semibold16.copyWith(color: white),
-                          isLoading: _isLoading,
-                        ),
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
               ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomButton(
+          onPressed: _submitForm,
+          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Ternak',
+          backgroundColor: green1,
+          textStyle: semibold16.copyWith(color: white),
+          isLoading: _isLoading,
+        ),
       ),
     );
   }
