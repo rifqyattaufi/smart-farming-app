@@ -170,14 +170,14 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 DashboardItem(
                   title: 'Tanaman Sehat',
-                  value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
+                  value: _perkebunanData?['jumlahSehat'].toString() ?? '-',
                   icon: 'other',
                   bgColor: green4,
                   iconColor: green2,
                 ),
                 DashboardItem(
                   title: 'Tanaman Sakit',
-                  value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
+                  value: _perkebunanData?['jumlahSakit'].toString() ?? '-',
                   icon: 'other',
                   bgColor: red2,
                   iconColor: red,

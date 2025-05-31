@@ -33,16 +33,38 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
   int _jumlahTanaman = 0;
   bool _isLoadingInitialData = true;
 
+  // State untuk Statistik Harian
   Map<String, dynamic>? _statistikHarianData;
   bool _isLoadingStatistikHarian = true;
   String? _statistikHarianErrorMessage;
 
-  int _riwayatCurrentPage = 1;
-  int _riwayatTotalPages = 1;
-  bool _isLoadingChart = false;
+  // State untuk Statistik Laporan Harian
+  List<Map<String, dynamic>> _laporanHarianChartDataPoints = [];
+  List<String> _laporanHarianChartXLabels = [];
+  bool _isLoadingLaporanHarianChart = true;
+  String? _errorLaporanHarianChart;
 
-  List<dynamic> _chartDataPoints = [];
-  List<String> _chartXLabels = [];
+  // State untuk Statistik Penyiraman
+  List<Map<String, dynamic>> _penyiramanChartDataPoints = [];
+  List<String> _penyiramanChartXLabels = [];
+  bool _isLoadingPenyiramanChart = true;
+  String? _errorPenyiramanChart;
+
+  // State untuk Statistik Pemberian Nutrisi
+  List<Map<String, dynamic>> _nutrisiChartDataPoints = [];
+  List<String> _nutrisiChartXLabels = [];
+  bool _isLoadingNutrisiChart = true;
+  String? _errorNutrisiChart;
+
+  // Riwayat Pelaporan Umum
+  List<Map<String, dynamic>> _riwayatPelaporanUmum = [];
+  bool _isLoadingRiwayatPelaporanUmum = true;
+  String? _errorRiwayatPelaporanUmum;
+
+  // Riwayat Pemberian Pupuk
+  List<Map<String, dynamic>> _riwayatPemberianPupuk = [];
+  bool _isLoadingRiwayatPemberianPupuk = true;
+  String? _errorRiwayatPemberianPupuk;
 
   ChartFilterType _selectedChartFilterType = ChartFilterType.weekly;
   DateTimeRange? _selectedChartDateRange;
@@ -68,7 +90,13 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     final now = DateTime.now();
     _selectedChartDateRange =
         DateTimeRange(start: now.subtract(const Duration(days: 6)), end: now);
-    _fetchInitialData();
+    _fetchInitialData().then((_) {
+      if (widget.idTanaman != null) {
+        _fetchAllReportChartsData();
+        _fetchRiwayatPelaporanUmum();
+        _fetchRiwayatPemberianPupuk();
+      }
+    });
   }
 
   Future<void> _fetchInitialData() async {
@@ -95,11 +123,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         final responseData = response['data'] as Map<String, dynamic>?;
 
         if (responseData != null &&
-            responseData.containsKey(
-                'jenisBudidaya') && // Key utama untuk detail tanaman
+            responseData.containsKey('jenisBudidaya') &&
             responseData.containsKey('unitBudidaya')) {
-          // Key utama untuk daftar unit budidaya
-
           final jenisBudidayaDetailData =
               responseData['jenisBudidaya'] as Map<String, dynamic>?;
           final unitBudidayaRawList =
@@ -108,13 +133,11 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           if (jenisBudidayaDetailData != null && unitBudidayaRawList != null) {
             List<dynamic> objekBudidayaFinalList = [];
 
-            // unitBudidayaRawList sekarang adalah _kebunList
             if (unitBudidayaRawList.isNotEmpty) {
               final firstUnitBudidaya =
                   unitBudidayaRawList[0] as Map<String, dynamic>?;
               if (firstUnitBudidaya != null &&
-                  firstUnitBudidaya.containsKey(
-                      'ObjekBudidayas') && // Lebih aman pakai containsKey
+                  firstUnitBudidaya.containsKey('ObjekBudidayas') &&
                   firstUnitBudidaya['ObjekBudidayas'] != null &&
                   firstUnitBudidaya['ObjekBudidayas'] is List) {
                 objekBudidayaFinalList =
@@ -122,19 +145,12 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               }
             }
 
-            // Asumsi 'defaultChartData' ada di dalam 'jenisBudidayaDetailData'
-            // Jika tidak ada di JSON, defaultChartRawData akan menjadi list kosong.
-            final defaultChartRawData =
-                jenisBudidayaDetailData['defaultChartData'] as List<dynamic>? ??
-                    [];
-
             int totalJumlahObjekBudidayaDariResponse = 0;
             if (responseData.containsKey('jumlahBudidaya') &&
                 responseData['jumlahBudidaya'] is int) {
               totalJumlahObjekBudidayaDariResponse =
                   responseData['jumlahBudidaya'] as int;
             } else {
-              // Fallback jika 'jumlahBudidaya' tidak ada, hitung manual dari list yang diterima
               for (var unitKebun in unitBudidayaRawList) {
                 final kebunMap = unitKebun as Map<String, dynamic>?;
                 if (kebunMap != null &&
@@ -153,9 +169,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                 _objekTanamanList = [];
                 _jumlahTanaman = totalJumlahObjekBudidayaDariResponse;
                 _isLoadingInitialData = false;
-
-                _updateChartDisplayData(
-                    defaultChartRawData, ChartFilterType.weekly);
               });
               await _fetchStatistikHarian();
             }
@@ -186,7 +199,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     }
   }
 
-// Helper method untuk menghindari duplikasi kode
   void _setLoadingFalseAndClearData() {
     setState(() {
       _isLoadingInitialData = false;
@@ -194,7 +206,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       _kebunList = [];
       _objekTanamanList = [];
       _jumlahTanaman = 0;
-      // bersihkan data chart juga di sini
     });
   }
 
@@ -203,7 +214,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
     setState(() {
       _isLoadingStatistikHarian = true;
-      _statistikHarianErrorMessage = null; // Reset error message
+      _statistikHarianErrorMessage = null;
     });
 
     try {
@@ -234,21 +245,17 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     }
   }
 
-  void _updateChartDisplayData(
-      List<dynamic> rawBackendData, ChartFilterType filterType) {
-    if (_selectedChartDateRange == null) {
-      setState(() {
-        _chartDataPoints = [];
-        _chartXLabels = [];
-      });
-      return;
-    }
-
+  Map<String, dynamic> _processBackendChartData({
+    required List<dynamic> rawBackendData,
+    required ChartFilterType filterType,
+    required DateTimeRange selectedDateRange,
+    required String valueKey,
+  }) {
     List<Map<String, dynamic>> processedDataPoints = [];
     List<String> processedXLabels = [];
 
-    DateTime startDate = _selectedChartDateRange!.start;
-    DateTime endDate = _selectedChartDateRange!.end;
+    DateTime startDate = selectedDateRange.start;
+    DateTime endDate = selectedDateRange.end;
 
     Map<String, Map<String, dynamic>> backendDataMap = {};
     for (var item in rawBackendData) {
@@ -260,21 +267,16 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     if (filterType == ChartFilterType.weekly ||
         filterType == ChartFilterType.custom) {
       DateTime currentDate = startDate;
-
       while (!currentDate.isAfter(endDate)) {
         final String periodKey = DateFormat('yyyy-MM-dd').format(currentDate);
         final String displayLabel = DateFormat('dd').format(currentDate);
-
         final backendEntry = backendDataMap[periodKey];
         processedDataPoints.add({
           'period': periodKey,
-          'stokPemakaian':
-              backendEntry != null ? (backendEntry['stokPemakaian'] ?? 0) : 0,
+          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0,
         });
         processedXLabels.add(displayLabel);
-
         currentDate = currentDate.add(const Duration(days: 1));
-
         if (processedXLabels.length > 14 &&
             filterType == ChartFilterType.weekly) {
           break;
@@ -284,19 +286,15 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       DateTime currentDate = DateTime(startDate.year, startDate.month, 1);
       DateTime loopEndDate = DateTime(endDate.year, endDate.month,
           DateTime(endDate.year, endDate.month + 1, 0).day);
-
       while (!currentDate.isAfter(loopEndDate)) {
         final String periodKey = DateFormat('yyyy-MM-01').format(currentDate);
         final String displayLabel = DateFormat('MMM yy').format(currentDate);
         final backendEntry = backendDataMap[periodKey];
-
         processedDataPoints.add({
           'period': periodKey,
-          'stokPemakaian':
-              backendEntry != null ? (backendEntry['stokPemakaian'] ?? 0) : 0,
+          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0,
         });
         processedXLabels.add(displayLabel);
-
         currentDate = (currentDate.month == 12)
             ? DateTime(currentDate.year + 1, 1, 1)
             : DateTime(currentDate.year, currentDate.month + 1, 1);
@@ -305,34 +303,34 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     } else if (filterType == ChartFilterType.yearly) {
       DateTime currentDate = DateTime(startDate.year, 1, 1);
       DateTime loopEndDate = DateTime(endDate.year, 12, 31);
-
       while (!currentDate.isAfter(loopEndDate)) {
         final String periodKey = DateFormat('yyyy-01-01').format(currentDate);
         final String displayLabel = DateFormat('yyyy').format(currentDate);
-
         final backendEntry = backendDataMap[periodKey];
         processedDataPoints.add({
           'period': periodKey,
-          'stokPemakaian':
-              backendEntry != null ? (backendEntry['stokPemakaian'] ?? 0) : 0,
+          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0,
         });
         processedXLabels.add(displayLabel);
         currentDate = DateTime(currentDate.year + 1, 1, 1);
         if (processedXLabels.length > 10) break;
       }
     }
-
-    if (mounted) {
-      setState(() {
-        _chartDataPoints = processedDataPoints;
-        _chartXLabels = processedXLabels;
-      });
-    }
+    return {'points': processedDataPoints, 'labels': processedXLabels};
   }
 
-  Future<void> _fetchFilteredChartData() async {
+  Future<void> _fetchAllReportChartsData() async {
     if (widget.idTanaman == null || _selectedChartDateRange == null) return;
-    setState(() => _isLoadingChart = true);
+
+    // Set loading states for all charts
+    setState(() {
+      _isLoadingLaporanHarianChart = true;
+      _isLoadingPenyiramanChart = true;
+      _isLoadingNutrisiChart = true;
+      _errorLaporanHarianChart = null;
+      _errorPenyiramanChart = null;
+      _errorNutrisiChart = null;
+    });
 
     String groupBy;
     switch (_selectedChartFilterType) {
@@ -349,25 +347,225 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     }
 
     try {
-      final response =
-          await _jenisBudidayaService.getJenisBudidayaById(widget.idTanaman!
-              // startDate: _selectedChartDateRange!.start,
-              // endDate: _selectedChartDateRange!.end,
-              // groupBy: groupBy,
-              );
+      // Fetch Laporan Harian Chart Data
+      try {
+        final responseLaporan = await _reportService.getStatistikLaporanHarian(
+          jenisBudidayaId: widget.idTanaman!,
+          startDate: _selectedChartDateRange!.start,
+          endDate: _selectedChartDateRange!.end,
+          groupBy: groupBy,
+        );
+        if (mounted) {
+          if (responseLaporan['status'] == true) {
+            final processed = _processBackendChartData(
+              rawBackendData: responseLaporan['data'] ?? [],
+              filterType: _selectedChartFilterType,
+              selectedDateRange: _selectedChartDateRange!,
+              valueKey: 'jumlahLaporan',
+            );
+            setState(() {
+              _laporanHarianChartDataPoints = processed['points'];
+              _laporanHarianChartXLabels = processed['labels'];
+            });
+          } else {
+            setState(() {
+              _errorLaporanHarianChart = responseLaporan['message'] ??
+                  'Gagal memuat statistik laporan harian';
+              _laporanHarianChartDataPoints = [];
+              _laporanHarianChartXLabels = [];
+            });
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _errorLaporanHarianChart = 'Error: ${e.toString()}';
+            _laporanHarianChartDataPoints = [];
+            _laporanHarianChartXLabels = [];
+          });
+        }
+      } finally {
+        if (mounted) setState(() => _isLoadingLaporanHarianChart = false);
+      }
 
-      if (response['status']) {
-        final List<dynamic> newChartRawData = response['data'] ?? [];
-        _updateChartDisplayData(newChartRawData, _selectedChartFilterType);
-      } else {
-        _showErrorSnackbar(response['message'] ?? 'Gagal memuat statistik');
-        _updateChartDisplayData([], _selectedChartFilterType);
+      // Fetch Penyiraman Chart Data
+      try {
+        final responsePenyiraman = await _reportService.getStatistikPenyiraman(
+          jenisBudidayaId: widget.idTanaman!,
+          startDate: _selectedChartDateRange!.start,
+          endDate: _selectedChartDateRange!.end,
+          groupBy: groupBy,
+        );
+        if (mounted) {
+          if (responsePenyiraman['status'] == true) {
+            final processed = _processBackendChartData(
+              rawBackendData: responsePenyiraman['data'] ?? [],
+              filterType: _selectedChartFilterType,
+              selectedDateRange: _selectedChartDateRange!,
+              valueKey: 'jumlahPenyiraman',
+            );
+            setState(() {
+              _penyiramanChartDataPoints = processed['points'];
+              if (_laporanHarianChartXLabels.isNotEmpty) {
+                _penyiramanChartXLabels =
+                    List<String>.from(_laporanHarianChartXLabels);
+              } else {
+                _penyiramanChartXLabels = processed['labels'];
+              }
+            });
+          } else {
+            setState(() {
+              _errorPenyiramanChart = responsePenyiraman['message'] ??
+                  'Gagal memuat statistik penyiraman';
+              _penyiramanChartDataPoints = [];
+              _penyiramanChartXLabels = [];
+            });
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _errorPenyiramanChart = 'Error: ${e.toString()}';
+            _penyiramanChartDataPoints = [];
+            _penyiramanChartXLabels = [];
+          });
+        }
+      } finally {
+        if (mounted) setState(() => _isLoadingPenyiramanChart = false);
+      }
+
+      // Fetch Pemberian Nutrisi Chart Data
+      try {
+        final responseNutrisi =
+            await _reportService.getStatistikPemberianNutrisi(
+          jenisBudidayaId: widget.idTanaman!,
+          startDate: _selectedChartDateRange!.start,
+          endDate: _selectedChartDateRange!.end,
+          groupBy: groupBy,
+        );
+        if (mounted) {
+          if (responseNutrisi['status'] == true) {
+            final processed = _processBackendChartData(
+              rawBackendData: responseNutrisi['data'] ?? [],
+              filterType: _selectedChartFilterType,
+              selectedDateRange: _selectedChartDateRange!,
+              valueKey: 'jumlahKejadianPemberianPupuk',
+            );
+            setState(() {
+              _nutrisiChartDataPoints = processed['points'];
+              if (_laporanHarianChartXLabels.isNotEmpty) {
+                _nutrisiChartXLabels =
+                    List<String>.from(_laporanHarianChartXLabels);
+              } else {
+                _nutrisiChartXLabels = processed['labels'];
+              }
+            });
+          } else {
+            setState(() {
+              _errorNutrisiChart = responseNutrisi['message'] ??
+                  'Gagal memuat statistik nutrisi';
+              _nutrisiChartDataPoints = [];
+              _nutrisiChartXLabels = [];
+            });
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _errorNutrisiChart = 'Error: ${e.toString()}';
+            _nutrisiChartDataPoints = [];
+            _nutrisiChartXLabels = [];
+          });
+        }
+      } finally {
+        if (mounted) setState(() => _isLoadingNutrisiChart = false);
+      }
+
+      // Fetch Riwayat Pelaporan Umum
+      await _fetchRiwayatPelaporanUmum();
+      // Fetch Riwayat Pemberian Pupuk
+      await _fetchRiwayatPemberianPupuk();
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackbar(
+            'Terjadi kesalahan saat memuat data chart: ${e.toString()}');
+        setState(() {
+          _isLoadingLaporanHarianChart = false;
+          _isLoadingPenyiramanChart = false;
+          _isLoadingNutrisiChart = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchRiwayatPelaporanUmum() async {
+    if (widget.idTanaman == null || !mounted) return;
+    setState(() {
+      _isLoadingRiwayatPelaporanUmum = true;
+      _errorRiwayatPelaporanUmum = null;
+    });
+    try {
+      final response = await _reportService.getRiwayatLaporanUmumJenisBudidaya(
+        jenisBudidayaId: widget.idTanaman!,
+        limit: 3,
+        page: 1,
+      );
+
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          setState(() {
+            _riwayatPelaporanUmum =
+                List<Map<String, dynamic>>.from(response['data']);
+          });
+        } else {
+          setState(() => _errorRiwayatPelaporanUmum =
+              response['message'] as String? ??
+                  'Gagal memuat riwayat pelaporan');
+        }
       }
     } catch (e) {
-      _showErrorSnackbar('Error: ${e.toString()}');
-      _updateChartDisplayData([], _selectedChartFilterType);
+      if (mounted) {
+        setState(() =>
+            _errorRiwayatPelaporanUmum = 'Terjadi kesalahan: ${e.toString()}');
+      }
     } finally {
-      setState(() => _isLoadingChart = false);
+      if (mounted) setState(() => _isLoadingRiwayatPelaporanUmum = false);
+    }
+  }
+
+  Future<void> _fetchRiwayatPemberianPupuk() async {
+    if (widget.idTanaman == null || !mounted) return;
+    setState(() {
+      _isLoadingRiwayatPemberianPupuk = true;
+      _errorRiwayatPemberianPupuk = null;
+    });
+    try {
+      final response =
+          await _reportService.getRiwayatPemberianNutrisiJenisBudidaya(
+        jenisBudidayaId: widget.idTanaman!,
+        limit: 3,
+        page: 1,
+        tipeNutrisi: 'pupuk',
+      );
+
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          setState(() {
+            _riwayatPemberianPupuk =
+                List<Map<String, dynamic>>.from(response['data']);
+          });
+        } else {
+          setState(() => _errorRiwayatPemberianPupuk =
+              response['message'] as String? ?? 'Gagal memuat riwayat nutrisi');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() =>
+            _errorRiwayatPemberianPupuk = 'Terjadi kesalahan: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingRiwayatPemberianPupuk = false);
     }
   }
 
@@ -418,7 +616,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       setState(() {
         _selectedChartDateRange = newRange;
       });
-      await _fetchFilteredChartData();
+      await _fetchAllReportChartsData();
     }
   }
 
@@ -914,69 +1112,77 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     final double persentaseKritis =
         (_statistikHarianData!['persentaseKritis'] as num?)?.toDouble() ?? 0.0;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      elevation: 2.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ringkasan Kesehatan Tanaman',
-              style: bold16.copyWith(color: dark1),
-            ),
-            const SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Total Tanaman:', style: medium14.copyWith(color: dark2)),
-                Text('$totalTanaman', style: bold14.copyWith(color: dark1)),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Tanaman Sehat:', style: medium14.copyWith(color: green1)),
-                Text('$tanamanSehat (${persentaseSehat.toStringAsFixed(1)}%)',
-                    style: bold14.copyWith(color: green1)),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Perlu Perhatian:',
-                    style: medium14.copyWith(color: Colors.orange)),
-                Text(
-                    '$perluPerhatian (${persentasePerluPerhatian.toStringAsFixed(1)}%)',
-                    style: bold14.copyWith(color: Colors.orange)),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Kritis:', style: medium14.copyWith(color: red)),
-                Text('$kritis (${persentaseKritis.toStringAsFixed(1)}%)',
-                    style: bold14.copyWith(color: red)),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            const Divider(),
-            const SizedBox(height: 8.0),
-            Text(
-              'Rekomendasi:',
-              style: medium14.copyWith(color: dark1),
-            ),
-            const SizedBox(height: 4.0),
-            Text(
-              rekomendasi,
-              style: regular14.copyWith(color: dark2),
-            ),
-          ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: const Color(0xFFE8E8E8)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ringkasan Kesehatan Tanaman',
+                style: bold16.copyWith(color: dark1),
+              ),
+              const SizedBox(height: 12.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Total Tanaman:',
+                      style: medium14.copyWith(color: dark2)),
+                  Text('$totalTanaman', style: bold14.copyWith(color: dark1)),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Tanaman Sehat:',
+                      style: medium14.copyWith(color: green1)),
+                  Text('$tanamanSehat (${persentaseSehat.toStringAsFixed(1)}%)',
+                      style: bold14.copyWith(color: green1)),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Perlu Perhatian:',
+                      style: medium14.copyWith(color: Colors.orange)),
+                  Text(
+                      '$perluPerhatian (${persentasePerluPerhatian.toStringAsFixed(1)}%)',
+                      style: bold14.copyWith(color: Colors.orange)),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Kritis:', style: medium14.copyWith(color: red)),
+                  Text('$kritis (${persentaseKritis.toStringAsFixed(1)}%)',
+                      style: bold14.copyWith(color: red)),
+                ],
+              ),
+              const SizedBox(height: 12.0),
+              const Divider(),
+              const SizedBox(height: 8.0),
+              Text(
+                'Rekomendasi:',
+                style: medium14.copyWith(color: dark1),
+              ),
+              const SizedBox(height: 4.0),
+              Text(
+                rekomendasi,
+                style: regular14.copyWith(color: dark2),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -990,7 +1196,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         _statistikHarianData!['detailTanaman'] == null) {
       return const Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text('Detail skor tanaman tidak tersedia.'),
+        child: Text('Detai tanaman tidak tersedia.'),
       );
     }
 
@@ -1021,7 +1227,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           itemBuilder: (context, index) {
             final tanaman = listTanaman[index] as Map<String, dynamic>;
             final String nama = tanaman['namaId'] as String? ?? 'Tanpa Nama';
-            final int skor = tanaman['skorMasalah'] as int? ?? 0;
             final String status =
                 tanaman['statusKlasifikasi'] as String? ?? 'N/A';
             final String alasan =
@@ -1039,32 +1244,30 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
             String subtitleText = 'Status: $status';
             if (alasan.isNotEmpty) {
-              subtitleText += '\nAlasan: \n $alasan';
+              subtitleText += '\nAlasan: \n$alasan';
             }
 
             return Tooltip(
               message: alasan,
-              child: Card(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                elevation: 1.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-                child: ListTile(
-                  title: Text(nama, style: medium14),
-                  subtitle: Text(subtitleText,
-                      style: regular12.copyWith(color: statusColor)),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('Skor', style: regular10.copyWith(color: dark3)),
-                      Text('$skor', style: bold16.copyWith(color: dark1)),
-                    ],
+              padding: const EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(16.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
                   ),
-                  onTap: () {
-                    print("Tanaman ${tanaman['id']} - $nama di-tap");
-                  },
+                  child: ListTile(
+                    title: Text(nama, style: medium14),
+                    subtitle: Text(subtitleText,
+                        style: regular12.copyWith(color: statusColor)),
+                    onTap: () {
+                      print("Tanaman ${tanaman['id']} - $nama di-tap");
+                    },
+                  ),
                 ),
               ),
             );
@@ -1074,45 +1277,264 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     );
   }
 
+  String _generateStatistikRangkumanText() {
+    if (_selectedChartDateRange == null) {
+      return "Silakan pilih rentang tanggal untuk melihat rangkuman statistik.";
+    }
+
+    // Format tanggal untuk rentang utama
+    final DateFormat rangeFormatter = DateFormat('d MMM yyyy');
+    final String startDateFormatted =
+        rangeFormatter.format(_selectedChartDateRange!.start);
+    final String endDateFormatted =
+        rangeFormatter.format(_selectedChartDateRange!.end);
+    String rangkuman =
+        "Berdasarkan statistik pelaporan pada periode $startDateFormatted hingga $endDateFormatted:\n\n";
+
+    // 1. Rangkuman Laporan Harian
+    if (_isLoadingLaporanHarianChart) {
+      rangkuman += "Statistik laporan harian sedang dimuat...\n\n";
+    } else if (_errorLaporanHarianChart != null) {
+      rangkuman +=
+          "Tidak dapat memuat statistik laporan harian: $_errorLaporanHarianChart\n\n";
+    } else if (_laporanHarianChartDataPoints.isEmpty) {
+      rangkuman += "Tidak ada data laporan harian untuk periode ini.\n\n";
+    } else {
+      num totalLaporan = 0;
+      for (var dataPoint in _laporanHarianChartDataPoints) {
+        totalLaporan += (dataPoint['jumlahLaporan'] as num?) ?? 0;
+      }
+
+      rangkuman += "Telah diterima total $totalLaporan laporan harian. ";
+
+      if (_selectedChartFilterType == ChartFilterType.weekly ||
+          _selectedChartFilterType == ChartFilterType.custom) {
+        if (_laporanHarianChartDataPoints.isNotEmpty) {
+          double rataRataLaporan =
+              totalLaporan / _laporanHarianChartDataPoints.length;
+          rangkuman +=
+              "Dengan rata-rata ${rataRataLaporan.toStringAsFixed(1)} laporan per hari. ";
+
+          // Cari hari min & max laporan
+          Map<String, dynamic> minLaporanItem =
+              _laporanHarianChartDataPoints.reduce((curr, next) =>
+                  ((curr['jumlahLaporan'] as num?) ?? double.infinity) <
+                          ((next['jumlahLaporan'] as num?) ?? double.infinity)
+                      ? curr
+                      : next);
+          Map<String, dynamic> maxLaporanItem =
+              _laporanHarianChartDataPoints.reduce((curr, next) =>
+                  ((curr['jumlahLaporan'] as num?) ?? double.negativeInfinity) >
+                          ((next['jumlahLaporan'] as num?) ??
+                              double.negativeInfinity)
+                      ? curr
+                      : next);
+
+          try {
+            final DateFormat dayMonthFormatter = DateFormat('d MMMM');
+            String minDayFormatted = dayMonthFormatter
+                .format(DateTime.parse(minLaporanItem['period']));
+            String maxDayFormatted = dayMonthFormatter
+                .format(DateTime.parse(maxLaporanItem['period']));
+
+            rangkuman +=
+                "Pelaporan terendah pada tanggal $minDayFormatted (${minLaporanItem['jumlahLaporan']}) dan tertinggi pada tanggal $maxDayFormatted (${maxLaporanItem['jumlahLaporan']}).";
+          } catch (e) {
+            rangkuman +=
+                "Detail hari terendah/tertinggi tidak dapat ditampilkan.";
+          }
+        }
+      }
+      rangkuman += "\n\n";
+    }
+
+    // 2. Rangkuman Penyiraman
+    if (_isLoadingPenyiramanChart) {
+      rangkuman += "Statistik penyiraman sedang dimuat...\n\n";
+    } else if (_errorPenyiramanChart != null) {
+      rangkuman +=
+          "Tidak dapat memuat statistik penyiraman: $_errorPenyiramanChart\n\n";
+    } else if (_penyiramanChartDataPoints.isEmpty) {
+      rangkuman += "Tidak ada data penyiraman untuk periode ini.\n\n";
+    } else {
+      num totalPenyiraman = 0;
+      for (var dataPoint in _penyiramanChartDataPoints) {
+        totalPenyiraman += (dataPoint['jumlahPenyiraman'] as num?) ?? 0;
+      }
+      rangkuman +=
+          "Total frekuensi penyiraman tanaman adalah $totalPenyiraman kali. ";
+      if ((_selectedChartFilterType == ChartFilterType.weekly ||
+              _selectedChartFilterType == ChartFilterType.custom) &&
+          _penyiramanChartDataPoints.isNotEmpty) {
+        double rataRataPenyiraman =
+            totalPenyiraman / _penyiramanChartDataPoints.length;
+        rangkuman +=
+            "Rata-rata ${rataRataPenyiraman.toStringAsFixed(1)} kali per hari.";
+      }
+      rangkuman += "\n\n";
+    }
+
+    // 3. Rangkuman Pemberian Nutrisi (Pupuk)
+    if (_isLoadingNutrisiChart) {
+      rangkuman += "Statistik pemberian nutrisi sedang dimuat...\n\n";
+    } else if (_errorNutrisiChart != null) {
+      rangkuman +=
+          "Tidak dapat memuat statistik pemberian nutrisi: $_errorNutrisiChart\n\n";
+    } else if (_nutrisiChartDataPoints.isEmpty) {
+      rangkuman += "Tidak ada data pemberian pupuk untuk periode ini.\n\n";
+    } else {
+      num totalNutrisi = 0;
+      for (var dataPoint in _nutrisiChartDataPoints) {
+        totalNutrisi +=
+            (dataPoint['jumlahKejadianPemberianPupuk'] as num?) ?? 0;
+      }
+      rangkuman +=
+          "Total frekuensi pemberian pupuk adalah $totalNutrisi kali. ";
+      if ((_selectedChartFilterType == ChartFilterType.weekly ||
+              _selectedChartFilterType == ChartFilterType.custom) &&
+          _nutrisiChartDataPoints.isNotEmpty) {
+        double rataRataNutrisi = totalNutrisi / _nutrisiChartDataPoints.length;
+        rangkuman +=
+            "Rata-rata ${rataRataNutrisi.toStringAsFixed(1)} kali per hari.";
+      }
+      rangkuman += "\n\n";
+    }
+
+    rangkuman +=
+        "Catatan: Statistik detail untuk item lain seperti repotting, vitamin, atau disinfektan spesifik mungkin memerlukan laporan terpisah atau sudah termasuk dalam ringkasan kesehatan tanaman secara umum (jika tersedia).";
+
+    return rangkuman.trim();
+  }
+
   Widget _buildHarian() {
+    // Data untuk Chart Laporan Harian
+    List<double> laporanHarianValues = _laporanHarianChartDataPoints
+        .map<double>((e) => (e['jumlahLaporan'] as num?)?.toDouble() ?? 0.0)
+        .toList();
+
+    // Data untuk Chart Penyiraman
+    List<double> penyiramanValues = _penyiramanChartDataPoints
+        .map<double>((e) => (e['jumlahPenyiraman'] as num?)?.toDouble() ?? 0.0)
+        .toList();
+
+    // Data untuk Chart Nutrisi
+    List<double> nutrisiValues = _nutrisiChartDataPoints
+        .map<double>((e) =>
+            (e['jumlahKejadianPemberianPupuk'] as num?)?.toDouble() ?? 0.0)
+        .toList();
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
+          // Chart untuk Laporan Harian
+          if (_isLoadingLaporanHarianChart)
+            const Center(child: CircularProgressIndicator())
+          else if (_errorLaporanHarianChart != null)
+            Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Error Laporan Harian: $_errorLaporanHarianChart',
+                    style: const TextStyle(color: Colors.red)))
+          else if (laporanHarianValues.isNotEmpty &&
+              _laporanHarianChartXLabels.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ChartWidget(
+                titleStats: 'Statistik Laporan Harian',
+                data: laporanHarianValues,
+                xLabels: _laporanHarianChartXLabels,
+                onDateIconPressed: _showDateFilterDialog,
+                showFilterControls: true,
+                selectedChartFilterType: _selectedChartFilterType,
+                displayedDateRangeText: formattedDisplayedDateRange,
+                onChartFilterTypeChanged: (ChartFilterType? newValue) {
+                  if (newValue != null &&
+                      newValue != _selectedChartFilterType) {
+                    setState(() {
+                      _selectedChartFilterType = newValue;
+                      final DateTime now = DateTime.now();
+                      if (newValue == ChartFilterType.monthly) {
+                        _selectedChartDateRange = DateTimeRange(
+                            start: DateTime(now.year, now.month - 5,
+                                1), // Contoh: 6 bulan terakhir
+                            end: DateTime(now.year, now.month + 1, 0));
+                      } else if (newValue == ChartFilterType.yearly) {
+                        _selectedChartDateRange = DateTimeRange(
+                            start: DateTime(
+                                now.year - 4, 1, 1), // Contoh: 5 tahun terakhir
+                            end: DateTime(now.year, 12, 31));
+                      } else {
+                        // weekly or custom
+                        _selectedChartDateRange = DateTimeRange(
+                            start: now.subtract(const Duration(days: 6)),
+                            end: now);
+                      }
+                    });
+                    _fetchAllReportChartsData(); // Panggil fetch data untuk semua chart
+                  }
+                },
+              ),
+            )
+          else
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Tidak ada data statistik laporan harian.'))),
+
+          // Chart untuk Penyiraman
+          if (_isLoadingPenyiramanChart)
+            const Center(child: CircularProgressIndicator())
+          else if (_errorPenyiramanChart != null)
+            Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Error Penyiraman: $_errorPenyiramanChart',
+                    style: const TextStyle(color: Colors.red)))
+          else if (penyiramanValues.isNotEmpty &&
+              _penyiramanChartXLabels.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ChartWidget(
+                titleStats: 'Statistik Penyiraman Tanaman',
+                data: penyiramanValues,
+                xLabels: _penyiramanChartXLabels,
+                showFilterControls: false,
+              ),
+            )
+          else
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Tidak ada data statistik penyiraman.'))),
+
+          // Chart untuk Pemberian Nutrisi
+          if (_isLoadingNutrisiChart)
+            const Center(child: CircularProgressIndicator())
+          else if (_errorNutrisiChart != null)
+            Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Error Nutrisi: $_errorNutrisiChart',
+                    style: const TextStyle(color: Colors.red)))
+          else if (nutrisiValues.isNotEmpty && _nutrisiChartXLabels.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ChartWidget(
+                titleStats: 'Statistik Pemberian Nutrisi',
+                data: nutrisiValues,
+                xLabels: _nutrisiChartXLabels,
+                showFilterControls: false,
+              ),
+            )
+          else
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child:
+                        Text('Tidak ada data statistik pemberian nutrisi.'))),
+
+          const SizedBox(height: 12),
           _buildStatistikHarianCard(),
           _buildDetailSkorTanamanList(),
-          const SizedBox(height: 12),
-          // ChartWidget(
-          //   firstDate: firstDates,
-          //   lastDate: lastDates,
-          //   data: datas,
-          //   titleStats: 'Statistik Laporan Harian Tanaman',
-          //   textCounter: 'Data Laporan Harian',
-          //   counter: 20,
-          //   showCounter: false,
-          // ),
-          // ChartWidget(
-          //   firstDate: firstDates,
-          //   lastDate: lastDates,
-          //   data: datas,
-          //   titleStats: 'Statistik Penyiraman Tanaman',
-          //   showCounter: false,
-          // ),
-          // ChartWidget(
-          //   firstDate: firstDates,
-          //   lastDate: lastDates,
-          //   data: datas,
-          //   titleStats: 'Statistik Pemberian Nutrisi Tanaman',
-          //   showCounter: false,
-          // ),
-          // ChartWidget(
-          //   firstDate: firstDates,
-          //   lastDate: lastDates,
-          //   data: datas,
-          //   titleStats: 'Statistik Repotting Tanaman',
-          //   showCounter: false,
-          // ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1122,59 +1544,120 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                 Text("Rangkuman Statistik",
                     style: bold18.copyWith(color: dark1)),
                 const SizedBox(height: 12),
-                Text(
-                  "Berdasarkan statistik pelaporan pada tanggal 12-17 Februari 2025, telah dilakukan perawatan dan pelaporan harian dengan rata-rata 18 laporan per hari.\n\nHari dengan pelaporan terendah pada tanggal 13 Februari 2025 dan hari dengan pelaporan terbanyak pada tanggal 14 & 17 Februari 2025.\n\nFrekuensi penyiraman tanaman rata-rata 18 kali per hari. Kemudian, Repotting tanaman terjadi 1 kali pada tanggal 17 Februari 2025.\n\nFrekuensi pemberian nutrisi tanaman berupa pupuk/vitamin/disinfektan rutin dilakukan dengan frekuensi 2 minggu sekali pada 20 tanaman. Bukti pelaporan dapat dilihat pada detail riwayat pelaporan.",
-                  style: regular14.copyWith(color: dark2),
-                )
+                const SizedBox(height: 12),
+
+                // Cek jika salah satu chart sedang loading untuk menampilkan pesan loading rangkuman
+                (_isLoadingLaporanHarianChart ||
+                            _isLoadingPenyiramanChart ||
+                            _isLoadingNutrisiChart) &&
+                        (_laporanHarianChartDataPoints.isEmpty &&
+                            _penyiramanChartDataPoints.isEmpty &&
+                            _nutrisiChartDataPoints.isEmpty)
+                    ? const Center(
+                        child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20.0),
+                        child: Text("Memuat rangkuman statistik..."),
+                      ))
+                    : Text(
+                        _generateStatistikRangkumanText(),
+                        style: regular14.copyWith(color: dark2),
+                      )
               ],
             ),
           ),
           const SizedBox(height: 16),
-          NewestReports(
-            title: 'Riwayat Pelaporan',
-            reports: const [
-              {
-                'text': 'Pak Adi telah melaporkan laporan harian tanaman',
-                'icon': 'assets/icons/goclub.svg',
-                'time': 'unknown',
+          // --- RIWAYAT PELAPORAN UMUM (DINAMIS) ---
+          if (_isLoadingRiwayatPelaporanUmum)
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(strokeWidth: 2)))
+          else if (_errorRiwayatPelaporanUmum != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                  'Error Riwayat Pelaporan: $_errorRiwayatPelaporanUmum',
+                  style: const TextStyle(color: Colors.red)),
+            )
+          else if (_riwayatPelaporanUmum.isNotEmpty)
+            NewestReports(
+              title: 'Riwayat Pelaporan',
+              reports: _riwayatPelaporanUmum.map((item) {
+                return {
+                  'id': item['laporanId'] as String? ?? '',
+                  'text': item['judul'] as String? ??
+                      (item['text'] as String? ?? 'Laporan'),
+                  'subtext': 'Oleh: ${item['petugasNama'] as String? ?? 'N/A'}',
+                  'icon':
+                      item['gambar'] as String? ?? 'assets/images/appIcon.png',
+                  'time': item['time'],
+                };
+              }).toList(),
+              onItemTap: (context, tappedItem) {
+                final laporanId = tappedItem['id']?.toString();
+                if (laporanId != null && laporanId.isNotEmpty) {
+                  context.push('/detail-laporan/$laporanId');
+                } else {
+                  _showErrorSnackbar("Detail laporan tidak tersedia.");
+                }
               },
-              {
-                'text': 'Pak Adi telah melaporkan laporan harian tanaman',
-                'icon': 'assets/icons/goclub.svg',
-                'time': 'unknown',
-              },
-            ],
-            onItemTap: (context, item) {
-              final name = item['text'] ?? '';
-              context.push('/detail-laporan/$name');
-            },
-            onViewAll: () {
-              context.push('/');
-            },
-            mode: NewestReportsMode.full,
-            titleTextStyle: bold18.copyWith(color: dark1),
-            reportTextStyle: medium12.copyWith(color: dark1),
-            timeTextStyle: regular12.copyWith(color: dark2),
-          ),
+              mode: NewestReportsMode.full,
+              titleTextStyle: bold18.copyWith(color: dark1),
+              reportTextStyle: medium12.copyWith(color: dark1),
+              timeTextStyle: regular12.copyWith(color: dark2),
+            )
+          else
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                  'Tidak ada riwayat pelaporan untuk ditampilkan saat ini.'),
+            ),
+
           const SizedBox(height: 12),
-          ListItem(
-            title: 'Riwayat Pemberian Nutrisi',
-            type: 'history',
-            items: const [
-              {
-                'name': 'Pupuk A - Dosis 4 Kg',
-                'category': 'Pupuk',
-                'image': 'assets/images/pupuk.jpg',
-                'person': 'Pak Adi',
-                'date': 'Senin, 22 Apr 2025',
-                'time': '10:45',
+
+          // --- RIWAYAT PEMBERIAN PUPUK (DINAMIS) ---
+          if (_isLoadingRiwayatPemberianPupuk)
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(strokeWidth: 2)))
+          else if (_errorRiwayatPemberianPupuk != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('Error Riwayat Nutrisi: $_errorRiwayatPemberianPupuk',
+                  style: const TextStyle(color: Colors.red)),
+            )
+          else if (_riwayatPemberianPupuk.isNotEmpty)
+            ListItem(
+              title: 'Riwayat Pemberian Pupuk',
+              type: 'history',
+              items: _riwayatPemberianPupuk.map((item) {
+                return {
+                  'id': item['laporanId'] as String? ?? '',
+                  'name': "${item['name'] ?? 'Nutrisi'}",
+                  'category': (item['category'] as String?) ?? 'Nutrisi',
+                  'image': item['gambar'],
+                  'person': item['person'] as String? ?? 'N/A',
+                  'date': _formatDisplayDate(item['date'] as String? ?? ''),
+                  'time': _formatDisplayTime(item['time'] as String? ?? ''),
+                };
+              }).toList(),
+              onItemTap: (context, tappedItem) {
+                final laporanId = tappedItem['id']?.toString();
+                if (laporanId != null && laporanId.isNotEmpty) {
+                  context.push('/detail-laporan/$laporanId');
+                } else {
+                  _showErrorSnackbar("Detail laporan terkait tidak tersedia.");
+                }
               },
-            ],
-            onItemTap: (context, item) {
-              final name = item['name'] ?? '';
-              context.push('/detail-laporan/$name');
-            },
-          ),
+            )
+          else
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                  'Tidak ada riwayat pemberian pupuk untuk ditampilkan saat ini.'),
+            ),
+          const SizedBox(height: 20),
         ],
       ),
     );

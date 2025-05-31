@@ -40,6 +40,43 @@ class NewestReports extends StatelessWidget {
     }
   }
 
+  String _formatTimeAgo(String? isoTimestamp) {
+    if (isoTimestamp == null || isoTimestamp.isEmpty) {
+      return 'Waktu tidak diketahui';
+    }
+    DateTime? reportTime = DateTime.tryParse(isoTimestamp.trim());
+
+    if (reportTime == null) {
+      return isoTimestamp;
+    }
+
+    final now = DateTime.now();
+    final difference = now.difference(reportTime);
+
+    if (difference.isNegative) {
+      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
+    } else if (difference.inDays > 1) {
+      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
+    } else if (difference.inDays == 1) {
+      final yesterday = now.subtract(const Duration(days: 1));
+      if (reportTime.year == yesterday.year &&
+          reportTime.month == yesterday.month &&
+          reportTime.day == yesterday.day) {
+        return 'Kemarin, ${DateFormat('HH:mm').format(reportTime)}';
+      } else {
+        return DateFormat('dd MMM yy, HH:mm').format(reportTime);
+      }
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} jam lalu';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} menit lalu';
+    } else if (difference.inSeconds >= 0) {
+      return 'Baru saja';
+    } else {
+      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -116,7 +153,7 @@ class NewestReports extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                            _formatTime(report['time']),
+                                            '${_formatTime(report['time'])} | ${_formatTimeAgo(report['time'])}',
                                             style: timeTextStyle,
                                           ),
                                         ],
@@ -152,14 +189,16 @@ class NewestReports extends StatelessWidget {
                                                             'CREATE' ||
                                                         report['action'] ==
                                                             'REPEAT'
-                                                    ? blue2.withOpacity(0.1)
+                                                    ? blue2.withValues(
+                                                        alpha: 0.1)
                                                     : report['action'] ==
                                                                 'UPDATE' ||
                                                             report['action'] ==
                                                                 'ONCE'
-                                                        ? yellow
-                                                            .withOpacity(0.1)
-                                                        : red.withOpacity(0.1),
+                                                        ? yellow.withValues(
+                                                            alpha: 0.1)
+                                                        : red.withValues(
+                                                            alpha: 0.1),
                                                 borderRadius:
                                                     BorderRadius.circular(100),
                                               ),
@@ -183,10 +222,12 @@ class NewestReports extends StatelessWidget {
                                                 margin: const EdgeInsets.only(
                                                     right: 8),
                                                 decoration: BoxDecoration(
-                                                  color: report['isActive'] ==
-                                                          true
-                                                      ? green1.withOpacity(0.1)
-                                                      : red.withOpacity(0.1),
+                                                  color:
+                                                      report['isActive'] == true
+                                                          ? green1.withValues(
+                                                              alpha: 0.1)
+                                                          : red.withValues(
+                                                              alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
