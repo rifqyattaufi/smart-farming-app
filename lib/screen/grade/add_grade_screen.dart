@@ -84,6 +84,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           type: ToastificationType.success,
           style: ToastificationStyle.flatColored,
           autoCloseDuration: const Duration(seconds: 4),
+          alignment: Alignment.topCenter,
           showProgressBar: true,
         );
 
@@ -105,6 +106,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           type: ToastificationType.error,
           style: ToastificationStyle.flatColored,
           autoCloseDuration: const Duration(seconds: 5),
+          alignment: Alignment.topCenter,
           showProgressBar: true,
         );
       }
@@ -121,6 +123,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
         type: ToastificationType.error,
         style: ToastificationStyle.flatColored,
         autoCloseDuration: const Duration(seconds: 5),
+        alignment: Alignment.topCenter,
         showProgressBar: true,
       );
     }

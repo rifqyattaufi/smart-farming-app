@@ -6,6 +6,7 @@ import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:toastification/toastification.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -49,21 +50,12 @@ class _ReportScreenState extends State<ReportScreen> {
         _perkebunanData = results[0];
         _peternakanData = results[1];
         if (isRefresh) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: const Text('Data berhasil diperbarui!'),
-                backgroundColor: green1),
-          );
+          _showError("Data berhasil diperbarui", isError: false);
         }
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showError('Terjadi kesalahan: ${e.toString()}');
     } finally {
       // ignore: control_flow_in_finally
       if (!mounted) return;
@@ -72,6 +64,23 @@ class _ReportScreenState extends State<ReportScreen> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  void _showError(String message, {bool isError = true}) {
+    if (mounted) {
+      toastification.show(
+        context: context,
+        title: isError
+            ? const Text('Oops, Ada yang Salah! 👎')
+            : const Text('Hore! Sukses! 👍'),
+        description: Text(message),
+        type: isError ? ToastificationType.error : ToastificationType.success,
+        style: ToastificationStyle.flatColored,
+        autoCloseDuration: const Duration(seconds: 4),
+        alignment: Alignment.topCenter,
+        showProgressBar: true,
+      );
     }
   }
 
