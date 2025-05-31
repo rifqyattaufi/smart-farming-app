@@ -140,6 +140,7 @@ class _GradeScreenState extends State<GradeScreen> {
         type: isError ? ToastificationType.error : ToastificationType.success,
         style: ToastificationStyle.flatColored,
         autoCloseDuration: const Duration(seconds: 4),
+        showProgressBar: true,
       );
     }
   }

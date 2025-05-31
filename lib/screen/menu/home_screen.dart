@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: 'Suhu (°C)',
                   value: _perkebunanData?['suhu'].toString() ?? '-',
                   icon: 'other',
-                  bgColor: green3,
+                  bgColor: yellow1,
                   iconColor: yellow,
                 ),
                 DashboardItem(

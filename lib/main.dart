@@ -487,8 +487,14 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
-        path: '/statistik-laporan-tanaman',
-        builder: (context, state) => const StatistikTanamanReport()),
+      path: '/statistik-laporan-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return StatistikTanamanReport(
+          idTanaman: id,
+        );
+      },
+    ),
     GoRoute(
         path: '/statistik-laporan-ternak',
         builder: (context, state) => const StatistikTernakReport()),

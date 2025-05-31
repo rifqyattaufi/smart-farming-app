@@ -4,7 +4,6 @@ import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
-import 'package:toastification/toastification.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 
@@ -109,7 +108,9 @@ class _ReportScreenState extends State<ReportScreen> {
             const Text("Gagal memuat data perkebunan."),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => _fetchData(isRefresh: true),
+              onPressed: () {
+                _fetchData(isRefresh: true);
+              },
               child: const Text("Coba Lagi"),
             )
           ],
@@ -129,21 +130,20 @@ class _ReportScreenState extends State<ReportScreen> {
           if (_perkebunanData != null) ...[
             DashboardGrid(
               title: 'Statistik Perkebunan Bulan Ini',
-              type: DashboardGridType.none,
               items: [
                 DashboardItem(
                   title: 'Suhu (°C)',
                   value: _perkebunanData?['suhu'].toString() ?? '-',
                   icon: 'other',
-                  bgColor: green3,
+                  bgColor: yellow1,
                   iconColor: yellow,
                 ),
                 DashboardItem(
-                  title: 'Jenis Tanaman',
+                  title: 'Jenis Tanaman Budidaya',
                   value: _perkebunanData?['jenisTanaman'].toString() ?? '-',
                   icon: 'other',
-                  bgColor: green4,
-                  iconColor: green2,
+                  bgColor: blue3,
+                  iconColor: blue1,
                 ),
                 DashboardItem(
                   title: 'Tanaman Mati',
@@ -156,13 +156,50 @@ class _ReportScreenState extends State<ReportScreen> {
                   title: 'Laporan Panen',
                   value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
                   icon: 'other',
-                  bgColor: blue3,
-                  iconColor: blue1,
+                  bgColor: yellow1,
+                  iconColor: yellow,
+                ),
+                DashboardItem(
+                  title: 'Tanaman Sehat',
+                  value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: green4,
+                  iconColor: green2,
+                ),
+                DashboardItem(
+                  title: 'Tanaman Sakit',
+                  value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: red2,
+                  iconColor: red,
                 ),
               ],
-              crossAxisCount: 2,
-              valueFontSize: 60,
+              crossAxisCount: 3,
+              valueFontSize: 32,
+              titleFontSize: 13.5,
+              paddingSize: 10,
+              iconsWidth: 36,
             ),
+            const SizedBox(height: 12),
+            ListItem(
+              title: 'Hasil Laporan Per Jenis Tanaman',
+              items: (_perkebunanData?['daftarTanaman'] as List<dynamic>? ?? [])
+                  .map((tanaman) => {
+                        'id': tanaman['id'],
+                        'name': tanaman['nama'],
+                        'isActive': tanaman['status'],
+                        'icon': tanaman['gambar'],
+                      })
+                  .toList(),
+              type: 'basic',
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/statistik-laporan-tanaman/$id').then((_) {
+                  _fetchData(isRefresh: true);
+                });
+              },
+            ),
+            const SizedBox(height: 12),
             const SizedBox(height: 12),
           ] else if (!_isLoading) ...[
             Center(
@@ -249,49 +286,6 @@ class _ReportScreenState extends State<ReportScreen> {
               ],
               crossAxisCount: 2,
               valueFontSize: 60,
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {
-                toastification.show(
-                  context:
-                      context, // Diperlukan untuk membangun widget default jika type bukan custom
-                  title: const Text('Halo dari Toastification! 👋'),
-                  description:
-                      const Text('Ini adalah notifikasi toast sederhana.'),
-                  type: ToastificationType
-                      .success, // Jenis toast (success, info, warning, error)
-                  style: ToastificationStyle
-                      .flat, // Gaya toast (flat, filled, outlined)
-                  autoCloseDuration:
-                      const Duration(seconds: 5), // Durasi toast ditampilkan
-                  alignment: Alignment.topCenter, // Opsional: Atur posisi
-                  // animationBuilder: (context, animation, alignment, child) { // Opsional: Kustomisasi animasi
-                  //   return ScaleTransition(scale: animation, child: child);
-                  // },
-                  // icon: const Icon(Icons.check), // Opsional: Ikon kustom
-                  // primaryColor: Colors.green, // Opsional: Warna utama
-                  // backgroundColor: Colors.lightGreenAccent, // Opsional: Warna latar belakang
-                  // foregroundColor: Colors.black, // Opsional: Warna teks
-                  // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16), // Opsional: Padding
-                  // margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Opsional: Margin
-                  // borderRadius: BorderRadius.circular(12), // Opsional: Border radius
-                  // boxShadow: lowModeShadow, // Opsional: Bayangan
-                  // showProgressBar: true, // Opsional: Tampilkan progress bar
-                  // closeButtonShowType: CloseButtonShowType.onHover, // Opsional: Kapan tombol close ditampilkan
-                  // closeOnClick: true, // Opsional: Tutup toast saat diklik
-                  // pauseOnHover: true, // Opsional: Jeda auto-close saat di-hover
-                  // dragToClose: true, // Opsional: Geser untuk menutup
-                  // applyBlurEffect: true, // Opsional: Terapkan efek blur
-                  // callbacks: ToastificationCallbacks( // Opsional: Callbacks
-                  //   onTap: (toastItem) => print('Toast diketuk'),
-                  //   onCloseButtonTap: (toastItem) => print('Tombol close diketuk'),
-                  //   onAutoCompleteCompleted: (toastItem) => print('Auto close selesai'),
-                  //   onDismissed: (toastItem) => print('Toast di-dismiss'),
-                  // ),
-                );
-              },
-              child: const Text('Tampilkan Toast'),
             ),
             const SizedBox(height: 12),
           ] else if (!_isLoading) ...[
