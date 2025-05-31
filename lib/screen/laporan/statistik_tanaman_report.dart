@@ -1039,7 +1039,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
             String subtitleText = 'Status: $status';
             if (alasan.isNotEmpty) {
-              subtitleText += '\nAlasan: $alasan';
+              subtitleText += '\nAlasan: \n $alasan';
             }
 
             return Tooltip(
