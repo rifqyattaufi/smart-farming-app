@@ -925,6 +925,18 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text('Persentase Tanaman Sehat:',
+                    style: medium14.copyWith(color: green1)),
+                Text(
+                  '${persentaseSehat.toStringAsFixed(1)}%',
+                  style: regular12.copyWith(color: green1),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Text('Total Tanaman:', style: medium14.copyWith(color: dark2)),
                 Text('$totalTanaman', style: bold14.copyWith(color: dark1)),
               ],
@@ -1072,7 +1084,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       child: Column(
         children: [
           _buildStatistikHarianCard(),
-          const SizedBox(height: 12),
           _buildDetailSkorTanamanList(),
           const SizedBox(height: 12),
           // ChartWidget(
