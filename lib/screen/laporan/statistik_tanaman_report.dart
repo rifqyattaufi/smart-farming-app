@@ -907,6 +907,12 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
             'Tidak ada rekomendasi.';
     final double persentaseSehat =
         (_statistikHarianData!['persentaseSehat'] as num?)?.toDouble() ?? 0.0;
+    final double persentasePerluPerhatian =
+        (_statistikHarianData!['persentasePerluPerhatian'] as num?)
+                ?.toDouble() ??
+            0.0;
+    final double persentaseKritis =
+        (_statistikHarianData!['persentaseKritis'] as num?)?.toDouble() ?? 0.0;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -925,18 +931,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Persentase Tanaman Sehat:',
-                    style: medium14.copyWith(color: green1)),
-                Text(
-                  '${persentaseSehat.toStringAsFixed(1)}%',
-                  style: regular12.copyWith(color: green1),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
                 Text('Total Tanaman:', style: medium14.copyWith(color: dark2)),
                 Text('$totalTanaman', style: bold14.copyWith(color: dark1)),
               ],
@@ -946,7 +940,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Tanaman Sehat:', style: medium14.copyWith(color: green1)),
-                Text('$tanamanSehat', style: bold14.copyWith(color: green1)),
+                Text('$tanamanSehat (${persentaseSehat.toStringAsFixed(1)}%)',
+                    style: bold14.copyWith(color: green1)),
               ],
             ),
             const SizedBox(height: 8.0),
@@ -955,7 +950,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               children: [
                 Text('Perlu Perhatian:',
                     style: medium14.copyWith(color: Colors.orange)),
-                Text('$perluPerhatian',
+                Text(
+                    '$perluPerhatian (${persentasePerluPerhatian.toStringAsFixed(1)}%)',
                     style: bold14.copyWith(color: Colors.orange)),
               ],
             ),
@@ -964,7 +960,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Kritis:', style: medium14.copyWith(color: red)),
-                Text('$kritis', style: bold14.copyWith(color: red)),
+                Text('$kritis (${persentaseKritis.toStringAsFixed(1)}%)',
+                    style: bold14.copyWith(color: red)),
               ],
             ),
             const SizedBox(height: 12.0),
