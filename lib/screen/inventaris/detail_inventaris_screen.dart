@@ -354,8 +354,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         _showErrorSnackbar(response['message'] ?? "Gagal memperbarui stok.");
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         _showErrorSnackbar("Error saat memperbarui stok: ${e.toString()}");
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -551,8 +552,12 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     final DateTime today = DateTime(now.year, now.month, now.day);
 
     bool showExpiryInfo = expiryDateTime?.isAfter(today) ?? false;
-    bool isExpiredOrTodayOrNotSet = expiryDateTime != null && !(expiryDateTime.isAfter(today)); //untuk cek apakah sudah kadaluwarsa atau hari ini, jika tidak ada tanggal kadaluwarsa maka dianggap tidak kadaluwarsa
+
+    bool isExpiredOrTodayOrNotSet =
+        expiryDateTime != null && !(expiryDateTime.isAfter(today));
+
     String expiryDateString = _inventarisDetails?['tanggalKadaluwarsa'] ?? '';
+
     bool isKadaluwarsaTidakDiatur = expiryDateString.isNotEmpty &&
         _formatDisplayDate(expiryDateString) == 'Tidak diatur';
 
@@ -663,10 +668,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                       ],
                     ),
                     infoItem("Satuan", satuanNama.isNotEmpty ? satuanNama : ""),
-                    
                     _buildKetersediaan("Ketersediaan inventaris", ketersediaan),
-                    
-                    
                     if (showExpiryInfo) ...[
                       infoItem("Tanggal kadaluwarsa",
                           _formatDisplayDate(expiryDateString)),
@@ -683,8 +685,6 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                     ] else if (isKadaluwarsaTidakDiatur) ...[
                       infoItem("Tanggal kadaluwarsa", "Tidak diatur"),
                     ],
-
-
                     infoItem("Tanggal didaftarkan",
                         _formatDisplayDate(_inventarisDetails?['createdAt'])),
                     if (_formatDisplayTime(_inventarisDetails?['createdAt'])
@@ -788,9 +788,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                   items: historyItemsForListItem,
                   type: "history",
                   onItemTap: (context, tappedItem) {
-                    final laporanId = tappedItem['laporanId']?.toString();
-                    if (laporanId != null && laporanId.isNotEmpty) {
-                      context.push('/detail-laporan/$laporanId');
+                    final id = tappedItem['id']?.toString();
+                    if (id != null && id.isNotEmpty) {
+                      context.push('/detail-pemakaian-inventaris/$id');
                     } else {
                       _showErrorSnackbar("Detail laporan tidak tersedia.");
                     }

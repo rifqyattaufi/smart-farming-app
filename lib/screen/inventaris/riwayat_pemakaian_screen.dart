@@ -100,8 +100,8 @@ class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
                                 })
                             .toList(),
                         onItemTap: (context, item) {
-                          final name = item['name'] ?? '';
-                          context.push('/detail-laporan/$name');
+                          final id = item['id'] ?? '';
+                          context.push('/detail-pemakaian-inventaris/$id');
                         },
                       ),
                       const SizedBox(height: 12),
@@ -121,8 +121,8 @@ class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
                                 })
                             .toList(),
                         onItemTap: (context, item) {
-                          final name = item['name'] ?? '';
-                          context.push('/detail-laporan/$name');
+                          final id = item['id'] ?? '';
+                          context.push('/detail-pemakaian-inventaris/$id');
                         },
                       ),
                     ],

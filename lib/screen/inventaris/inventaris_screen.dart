@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/kategori_inv_service.dart';
@@ -913,7 +914,48 @@ class _InventarisScreenState extends State<InventarisScreen> {
       return jumlah == 0;
     }).toList();
 
+    final itemYangSudahKadaluwarsa =
+        _filteredInventarisList.where((inventaris) {
+      final tanggalKadaluwarsaString =
+          inventaris['tanggalKadaluwarsa'] as String?;
+
+      if (tanggalKadaluwarsaString == null) return false;
+
+      final kadaluarsaDate =
+          DateTime.tryParse(tanggalKadaluwarsaString.replaceFirst(' ', 'T'));
+
+      if (kadaluarsaDate == null) return false;
+
+      return kadaluarsaDate.isBefore(now);
+    }).toList();
+
     bool showSemuaInventarisSection = _filteredInventarisList.isNotEmpty;
+
+    String formatTanggalKadaluwarsa(String? tanggalKadaluwarsaString) {
+      if (tanggalKadaluwarsaString == null ||
+          tanggalKadaluwarsaString.isEmpty) {
+        return 'Tanggal tidak tersedia';
+      }
+
+      try {
+        DateTime? tanggalKadaluwarsa =
+            DateTime.tryParse(tanggalKadaluwarsaString);
+
+        if (tanggalKadaluwarsa == null) {
+          return 'Format tanggal tidak valid';
+        }
+
+        if (tanggalKadaluwarsa.year < 1900) {
+          return 'Tidak diatur';
+        }
+
+        final DateFormat formatter = DateFormat('EE, MMM dd yyyy HH:mm');
+
+        return formatter.format(tanggalKadaluwarsa);
+      } catch (e) {
+        return 'Error format tanggal';
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -929,6 +971,24 @@ class _InventarisScreenState extends State<InventarisScreen> {
                           'Stok: ${inventaris['jumlah'] ?? 0} ${inventaris['Satuan']?['lambang'] ?? ''}',
                       'icon': inventaris['gambar'] as String?,
                       'id': inventaris['id'],
+                    })
+                .toList(),
+            onItemTap: (ctx, item) => context
+                .push('/detail-inventaris/${item['id']}')
+                .then((_) => _handleRefresh()),
+          ),
+        if (itemYangSudahKadaluwarsa.isNotEmpty)
+          ListItem(
+            title: 'Item Kadaluwarsa',
+            type: 'basic',
+            items: itemYangSudahKadaluwarsa
+                .map((inventaris) => {
+                      'name': inventaris['nama'] ?? 'N/A',
+                      'category':
+                          'Kadaluwarsa pada: ${formatTanggalKadaluwarsa(inventaris['tanggalKadaluwarsa'])}',
+                      'icon': inventaris['gambar'] as String?,
+                      'id': inventaris['id'],
+                      'isActive': false,
                     })
                 .toList(),
             onItemTap: (ctx, item) => context

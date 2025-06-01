@@ -113,7 +113,7 @@ class ListItem extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: item['isActive'] == false
-                        ? red.withValues(alpha: 0.1)
+                        ? red.withValues(alpha: 0.2)
                         : green2.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),

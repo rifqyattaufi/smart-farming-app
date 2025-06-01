@@ -293,8 +293,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             onViewAll: () =>
                                 context.push('/riwayat-pemakaian-inventaris'),
                             onItemTap: (context, item) {
-                              final name = item['name'] ?? '';
-                              context.push('/detail-laporan/$name');
+                              final id = item['id'] ?? '';
+                              context.push('/detail-pemakaian-inventaris/$id');
                             },
                           ),
                           const SizedBox(height: 12),
