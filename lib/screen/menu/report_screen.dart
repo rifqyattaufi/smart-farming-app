@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
-import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/widget/list_items.dart';
+import 'package:toastification/toastification.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -14,6 +16,74 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
+  final DashboardService _dashboardService = DashboardService();
+  Map<String, dynamic>? _perkebunanData;
+  Map<String, dynamic>? _peternakanData;
+  bool _isLoading = true;
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorPerkebunanKey =
+      GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorPeternakanKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData(isRefresh: false);
+  }
+
+  Future<void> _fetchData({isRefresh = false}) async {
+    if (!isRefresh && !_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    try {
+      final results = await Future.wait([
+        _dashboardService.getDashboardPerkebunan(),
+        _dashboardService.getDashboardPeternakan(),
+      ]);
+
+      if (!mounted) return;
+      setState(() {
+        _perkebunanData = results[0];
+        _peternakanData = results[1];
+        if (isRefresh) {
+          _showError("Data berhasil diperbarui", isError: false);
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      // ignore: control_flow_in_finally
+      if (!mounted) return;
+      if (_isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showError(String message, {bool isError = true}) {
+    if (mounted) {
+      toastification.show(
+        context: context,
+        title: isError
+            ? const Text('Oops, Ada yang Salah! 👎')
+            : const Text('Hore! Sukses! 👍'),
+        description: Text(message),
+        type: isError ? ToastificationType.error : ToastificationType.success,
+        style: ToastificationStyle.flatColored,
+        autoCloseDuration: const Duration(seconds: 4),
+        alignment: Alignment.topCenter,
+        showProgressBar: true,
+      );
+    }
+  }
+
   int _selectedTabIndex = 0;
   final List<String> tabList = [
     'Perkebunan',
@@ -29,6 +99,224 @@ class _ReportScreenState extends State<ReportScreen> {
       index,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildPerkebunanContent() {
+    if (!_isLoading && _perkebunanData == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Gagal memuat data perkebunan."),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                _fetchData(isRefresh: true);
+              },
+              child: const Text("Coba Lagi"),
+            )
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      key: _refreshIndicatorPerkebunanKey,
+      onRefresh: () => _fetchData(isRefresh: true),
+      color: green1,
+      backgroundColor: white,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        children: [
+          if (_perkebunanData != null) ...[
+            DashboardGrid(
+              title: 'Statistik Perkebunan Bulan Ini',
+              items: [
+                DashboardItem(
+                  title: 'Suhu (°C)',
+                  value: _perkebunanData?['suhu'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: yellow1,
+                  iconColor: yellow,
+                ),
+                DashboardItem(
+                  title: 'Jenis Tanaman Budidaya',
+                  value: _perkebunanData?['jenisTanaman'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: blue3,
+                  iconColor: blue1,
+                ),
+                DashboardItem(
+                  title: 'Tanaman Mati',
+                  value: _perkebunanData?['jumlahKematian'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: red2,
+                  iconColor: red,
+                ),
+                DashboardItem(
+                  title: 'Laporan Panen',
+                  value: _perkebunanData?['jumlahPanen'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: yellow1,
+                  iconColor: yellow,
+                ),
+                DashboardItem(
+                  title: 'Tanaman Sehat',
+                  value: _perkebunanData?['jumlahSehat'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: green4,
+                  iconColor: green2,
+                ),
+                DashboardItem(
+                  title: 'Tanaman Sakit',
+                  value: _perkebunanData?['jumlahSakit'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: red2,
+                  iconColor: red,
+                ),
+              ],
+              crossAxisCount: 3,
+              valueFontSize: 32,
+              titleFontSize: 13.5,
+              paddingSize: 10,
+              iconsWidth: 36,
+            ),
+            const SizedBox(height: 12),
+            ListItem(
+              title: 'Hasil Laporan Per Jenis Tanaman',
+              items: (_perkebunanData?['daftarTanaman'] as List<dynamic>? ?? [])
+                  .map((tanaman) => {
+                        'id': tanaman['id'],
+                        'name': tanaman['nama'],
+                        'isActive': tanaman['status'],
+                        'icon': tanaman['gambar'],
+                      })
+                  .toList(),
+              type: 'basic',
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/statistik-laporan-tanaman/$id').then((_) {
+                  _fetchData(isRefresh: true);
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ] else if (!_isLoading) ...[
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Gagal memuat data perkebunan."),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => _fetchData(isRefresh: true),
+                      child: const Text("Coba Lagi"),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ]
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeternakanContent() {
+    if (!_isLoading && _peternakanData == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Gagal memuat data perkebunan."),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _fetchData(isRefresh: true),
+              child: const Text("Coba Lagi"),
+            )
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      key: _refreshIndicatorPeternakanKey,
+      onRefresh: () => _fetchData(isRefresh: true),
+      color: green1,
+      backgroundColor: white,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        children: [
+          if (_peternakanData != null) ...[
+            DashboardGrid(
+              title: 'Statistik Peternakan Bulan Ini',
+              type: DashboardGridType.none,
+              items: [
+                DashboardItem(
+                  title: 'Jumlah Ternak',
+                  value: _peternakanData?['jumlahTernak'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: green3,
+                  iconColor: yellow,
+                ),
+                DashboardItem(
+                  title: 'Jenis Ternak',
+                  value: _peternakanData?['jenisTernak'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: green4,
+                  iconColor: green2,
+                ),
+                DashboardItem(
+                  title: 'Ternak Mati',
+                  value: _peternakanData?['jumlahKematian'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: red2,
+                  iconColor: red,
+                ),
+                DashboardItem(
+                  title: 'Laporan Panen',
+                  value: _peternakanData?['jumlahPanen'].toString() ?? '-',
+                  icon: 'other',
+                  bgColor: blue3,
+                  iconColor: blue1,
+                ),
+              ],
+              crossAxisCount: 2,
+              valueFontSize: 60,
+            ),
+            const SizedBox(height: 12),
+          ] else if (!_isLoading) ...[
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Gagal memuat data peternakan."),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => _fetchData(isRefresh: true),
+                      child: const Text("Coba Lagi"),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ]
+        ],
+      ),
     );
   }
 
@@ -50,174 +338,78 @@ class _ReportScreenState extends State<ReportScreen> {
               greeting: 'Laporan'),
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Tabs(
-              onTabChanged: _onTabChanged,
-              selectedIndex: _selectedTabIndex,
-              tabTitles: tabList,
-            ),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedTabIndex = index;
-                  });
-                },
-                children: [
-                  // Perkebunan Tab
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Column(
-                      children: [
-                        DashboardGrid(
-                          title: 'Statistik Perkebunan Bulan Ini',
-                          type: DashboardGridType.none,
-                          items: [
-                            DashboardItem(
-                              title: 'Suhu (°C)',
-                              value: '28',
-                              icon: 'other',
-                              bgColor: green3,
-                              iconColor: yellow,
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: _isLoading &&
+                      (_perkebunanData == null || _peternakanData == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : NestedScrollView(
+                      headerSliverBuilder:
+                          (BuildContext context, bool innerBoxIsScrolled) {
+                        return <Widget>[
+                          SliverPersistentHeader(
+                            delegate: _SliverAppBarDelegate(
+                              Container(
+                                color: Colors.white,
+                                child: Tabs(
+                                  onTabChanged: _onTabChanged,
+                                  selectedIndex: _selectedTabIndex,
+                                  tabTitles: tabList,
+                                ),
+                              ),
+                              60.0,
                             ),
-                            DashboardItem(
-                              title: 'Jenis Tanaman',
-                              value: '18',
-                              icon: 'other',
-                              bgColor: green4,
-                              iconColor: green2,
+                            pinned: true,
+                          ),
+                        ];
+                      },
+                      body: Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          Expanded(
+                            child: PageView(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _selectedTabIndex = index;
+                                });
+                              },
+                              children: [
+                                _buildPerkebunanContent(),
+                                _buildPeternakanContent(),
+                              ],
                             ),
-                            DashboardItem(
-                              title: 'Tanaman Mati',
-                              value: '2',
-                              icon: 'other',
-                              bgColor: red2,
-                              iconColor: red,
-                            ),
-                            DashboardItem(
-                              title: 'Laporan Panen',
-                              value: '8',
-                              icon: 'other',
-                              bgColor: blue3,
-                              iconColor: blue1,
-                            ),
-                          ],
-                          crossAxisCount: 2,
-                          valueFontSize: 60,
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Jenis Tanaman',
-                          items: const [
-                            {
-                              'name': 'Melon',
-                              'category': 'Kebun A',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onItemTap: (BuildContext context,
-                              Map<String, dynamic> item) {
-                            context.push('/statistik-laporan-tanaman');
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Laporan Hama',
-                          items: const [
-                            {
-                              'name': 'Tikus',
-                              'category': 'Diidentifikasi terdapat 3 ekor',
-                              'icon': 'assets/icons/goclub.svg',
-                            },
-                            {
-                              'name': 'Ulat',
-                              'category': 'Diidentifikasi terdapat 5 ekor',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onViewAll: () => context.push('/laporan-hama'),
-                          onItemTap: (context, item) {
-                            final name = item['name'] ?? '';
-                            context.push('/detail-laporan/$name');
-                          },
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  // Peternakan Tab
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Column(
-                      children: [
-                        DashboardGrid(
-                          title: 'Statistik Peternakan Bulan Ini',
-                          type: DashboardGridType.none,
-                          items: [
-                            DashboardItem(
-                              title: 'Jumlah Ternak',
-                              value: '30',
-                              icon: 'other',
-                              bgColor: green3,
-                              iconColor: yellow,
-                            ),
-                            DashboardItem(
-                              title: 'Jenis Ternak',
-                              value: '18',
-                              icon: 'other',
-                              bgColor: green4,
-                              iconColor: green2,
-                            ),
-                            DashboardItem(
-                              title: 'Ternak Mati',
-                              value: '2',
-                              icon: 'other',
-                              bgColor: red2,
-                              iconColor: red,
-                            ),
-                            DashboardItem(
-                              title: 'Laporan Panen',
-                              value: '8',
-                              icon: 'other',
-                              bgColor: blue3,
-                              iconColor: blue1,
-                            ),
-                          ],
-                          crossAxisCount: 2,
-                          valueFontSize: 60,
-                        ),
-                        const SizedBox(height: 12),
-                        ListItem(
-                          title: 'Daftar Jenis Ternak',
-                          items: const [
-                            {
-                              'name': 'Ayam',
-                              'category': 'Kandang A',
-                              'icon': 'assets/icons/goclub.svg',
-                            }
-                          ],
-                          type: 'basic',
-                          onItemTap: (BuildContext context,
-                              Map<String, dynamic> item) {
-                            context.push('/statistik-laporan-ternak');
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
             ),
-          ],
-        ),
-      ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._child, this._height);
+
+  final Widget _child;
+  final double _height;
+
+  @override
+  double get minExtent => _height;
+  @override
+  double get maxExtent => _height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: _child);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return oldDelegate._child != _child || oldDelegate._height != _height;
   }
 }

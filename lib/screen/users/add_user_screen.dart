@@ -255,144 +255,146 @@ class _AddUserScreenState extends State<AddUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          backgroundColor: white,
-          leadingWidth: 0,
-          titleSpacing: 0,
-          elevation: 0,
-          toolbarHeight: 80,
-          title: const Header(
-              headerType: HeaderType.back,
-              title: 'Manajemen Pengguna',
-              greeting: 'Tambah Pengguna'),
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80),
+          child: AppBar(
+            backgroundColor: white,
+            leadingWidth: 0,
+            titleSpacing: 0,
+            elevation: 0,
+            toolbarHeight: 80,
+            title: const Header(
+                headerType: HeaderType.back,
+                title: 'Manajemen Pengguna',
+                greeting: 'Tambah Pengguna'),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ProfileImagePicker(
-                        image: _selectedImage,
-                        imageUrl: _imageUrl,
-                        onPickImage: (ctx) => _pickImage(ctx),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ProfileImagePicker(
+                          image: _selectedImage,
+                          imageUrl: _imageUrl,
+                          onPickImage: (ctx) => _pickImage(ctx),
+                          isDisabled:
+                              (widget.isEdit ?? false) && widget.id != null,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownFieldWidget(
+                      label: "Pilih role",
+                      hint: "Pilih role",
+                      items: const [
+                        "Penanggung Jawab",
+                        "Petugas Pelaporan",
+                        "Inventor RFC"
+                      ],
+                      selectedValue: selectedLocation,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedLocation = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Role tidak boleh kosong';
+                        }
+                        return null;
+                      },
+                    ),
+                    InputFieldWidget(
+                        label: "Nama pengguna",
+                        hint: "Contoh: James Doe",
+                        controller: _namaController,
                         isDisabled:
                             (widget.isEdit ?? false) && widget.id != null,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownFieldWidget(
-                    label: "Pilih role",
-                    hint: "Pilih role",
-                    items: const [
-                      "Penanggung Jawab",
-                      "Petugas Pelaporan",
-                      "Inventor RFC"
-                    ],
-                    selectedValue: selectedLocation,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedLocation = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Role tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  InputFieldWidget(
-                      label: "Nama pengguna",
-                      hint: "Contoh: James Doe",
-                      controller: _namaController,
+                        isGrayed: (widget.isEdit ?? false) && widget.id != null,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama pengguna tidak boleh kosong';
+                          }
+                          return null;
+                        }),
+                    InputFieldWidget(
+                      label: "Email pengguna",
+                      hint: "Contoh: example@mail.com",
+                      controller: _emailController,
                       isDisabled: (widget.isEdit ?? false) && widget.id != null,
                       isGrayed: (widget.isEdit ?? false) && widget.id != null,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Nama pengguna tidak boleh kosong';
+                          return 'Email pengguna tidak boleh kosong';
+                        }
+                        // Simple email validation
+                        final emailRegex = RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                        if (!emailRegex.hasMatch(value)) {
+                          return 'Format email tidak valid';
                         }
                         return null;
-                      }),
-                  InputFieldWidget(
-                    label: "Email pengguna",
-                    hint: "Contoh: example@mail.com",
-                    controller: _emailController,
-                    isDisabled: (widget.isEdit ?? false) && widget.id != null,
-                    isGrayed: (widget.isEdit ?? false) && widget.id != null,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email pengguna tidak boleh kosong';
-                      }
-                      // Simple email validation
-                      final emailRegex = RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Format email tidak valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  InputFieldWidget(
-                    label: "Nomor telepon",
-                    hint: "Contoh: 08**********",
-                    controller: _nomorController,
-                    isDisabled: (widget.isEdit ?? false) && widget.id != null,
-                    isGrayed: (widget.isEdit ?? false) && widget.id != null,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nomor telepon tidak boleh kosong';
-                      }
-                      // Simple phone number validation
-                      final phoneRegex = RegExp(r'^\d{10,15}$');
-                      if (!phoneRegex.hasMatch(value)) {
-                        return 'Format nomor telepon tidak valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  if (!(widget.isEdit ?? false))
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Catatan:',
-                          style: medium14.copyWith(color: dark1),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '- Password untuk pengguna baru adalah email pengguna.\n'
-                          '- Pastikan untuk mengubah password setelah akun dibuat.',
-                          style: regular12.copyWith(color: dark1),
-                        ),
-                      ],
+                      },
                     ),
-                  const SizedBox(height: 20),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                    InputFieldWidget(
+                      label: "Nomor telepon",
+                      hint: "Contoh: 08**********",
+                      controller: _nomorController,
+                      isDisabled: (widget.isEdit ?? false) && widget.id != null,
+                      isGrayed: (widget.isEdit ?? false) && widget.id != null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nomor telepon tidak boleh kosong';
+                        }
+                        // Simple phone number validation
+                        final phoneRegex = RegExp(r'^\d{10,15}$');
+                        if (!phoneRegex.hasMatch(value)) {
+                          return 'Format nomor telepon tidak valid';
+                        }
+                        return null;
+                      },
+                    ),
+                    if (!(widget.isEdit ?? false))
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Catatan:',
+                            style: medium14.copyWith(color: dark1),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '- Password untuk pengguna baru adalah email pengguna.\n'
+                            '- Pastikan untuk mengubah password setelah akun dibuat.',
+                            style: regular12.copyWith(color: dark1),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            onPressed: () {
+              // Your action here
+            },
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
+          ),
+        ));
   }
 }

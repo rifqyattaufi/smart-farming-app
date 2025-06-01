@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/screen/blank_screen.dart';
@@ -17,7 +18,7 @@ import 'package:smart_farming_app/screen/hama/hama_screen.dart';
 import 'package:smart_farming_app/screen/notifications/add_global_notification.dart';
 import 'package:smart_farming_app/screen/notifications/notification_management_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_komoditas_tanaman_screen.dart';
-import 'package:smart_farming_app/screen/statistik_tanaman_report.dart';
+import 'package:smart_farming_app/screen/laporan/statistik_tanaman_report.dart';
 import 'package:smart_farming_app/screen/introduction.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/add_pemakaian_inventaris_screen.dart';
@@ -83,7 +84,7 @@ import 'package:smart_farming_app/screen/riwayat_aktivitas/riwayat_aktivitas_scr
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/screen/satuan/satuan_screen.dart';
 import 'package:smart_farming_app/screen/splash_screen.dart';
-import 'package:smart_farming_app/screen/statistik_ternak_report.dart';
+import 'package:smart_farming_app/screen/laporan/statistik_ternak_report.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/detail_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/tanaman_screen.dart';
@@ -486,8 +487,14 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
-        path: '/statistik-laporan-tanaman',
-        builder: (context, state) => const StatistikTanamanReport()),
+      path: '/statistik-laporan-tanaman/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return StatistikTanamanReport(
+          idTanaman: id,
+        );
+      },
+    ),
     GoRoute(
         path: '/statistik-laporan-ternak',
         builder: (context, state) => const StatistikTernakReport()),
@@ -757,10 +764,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Smart Farming App',
-      debugShowCheckedModeBanner: false,
-      routerConfig: _router,
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        title: 'Smart Farming App',
+        debugShowCheckedModeBanner: false,
+        routerConfig: _router,
+      ),
     );
   }
 }

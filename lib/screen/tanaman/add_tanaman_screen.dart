@@ -377,23 +377,22 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 24),
-                        CustomButton(
-                          onPressed: _submitForm,
-                          buttonText: widget.isEdit
-                              ? 'Simpan Perubahan'
-                              : 'Tambah Tanaman',
-                          backgroundColor: green1,
-                          textStyle: semibold16.copyWith(color: white),
-                          textColor: white,
-                          isLoading: _isLoading,
-                        ),
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
               ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomButton(
+          onPressed: _submitForm,
+          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
+          backgroundColor: green1,
+          textStyle: semibold16.copyWith(color: white),
+          textColor: white,
+          isLoading: _isLoading,
+        ),
       ),
     );
   }

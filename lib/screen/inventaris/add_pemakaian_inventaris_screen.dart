@@ -390,19 +390,20 @@ class _AddPemakaianInventarisScreenState
                         }
                         return null;
                       }),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    onPressed: _submitForm,
-                    backgroundColor: green1,
-                    textStyle: semibold16,
-                    textColor: white,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomButton(
+          onPressed: _submitForm,
+          backgroundColor: green1,
+          textStyle: semibold16,
+          textColor: white,
+          isLoading: _isLoading,
         ),
       ),
     );

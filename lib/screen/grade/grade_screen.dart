@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/screen/grade/add_grade_screen.dart';
 import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -130,11 +131,17 @@ class _GradeScreenState extends State<GradeScreen> {
 
   void _showError(String message, {bool isError = true}) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: isError ? Colors.red : Colors.green,
-        ),
+      toastification.show(
+        context: context,
+        title: isError
+            ? const Text('Oops, Ada yang Salah! 👎')
+            : const Text('Hore! Sukses! 👍'),
+        description: Text(message),
+        type: isError ? ToastificationType.error : ToastificationType.success,
+        style: ToastificationStyle.flatColored,
+        autoCloseDuration: const Duration(seconds: 4),
+        alignment: Alignment.topCenter,
+        showProgressBar: true,
       );
     }
   }
@@ -291,7 +298,7 @@ class _GradeScreenState extends State<GradeScreen> {
                                                       if (response['status'] ==
                                                           true) {
                                                         _showError(
-                                                            "data grade hasil panen berhasil dihapus",
+                                                            "Data grade hasil panen berhasil dihapus",
                                                             isError: false);
                                                         _fetchGradeData(
                                                             page: 1,
