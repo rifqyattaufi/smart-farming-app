@@ -46,12 +46,14 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
 
     if (widget.idInventaris == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('ID Inventaris tidak valid.'),
-              backgroundColor: Colors.red),
-        );
-        context.pop();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('ID Inventaris tidak valid.'),
+                backgroundColor: Colors.red),
+          );
+          context.pop();
+        }
       });
       return;
     }
@@ -70,6 +72,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     try {
       final response =
           await _inventarisService.getInventarisById(widget.idInventaris!);
+      if (!mounted) return;
       if (response['status']) {
         final data = response['data'];
         setState(() {
@@ -84,11 +87,13 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
             response['message'] ?? 'Gagal memuat data inventaris');
       }
     } catch (e) {
-      _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
     } finally {
-      setState(() {
-        _isLoadingInitialData = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingInitialData = false;
+        });
+      }
     }
   }
 
@@ -125,10 +130,12 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   void _updateChartDisplayData(
       List<dynamic> rawBackendData, ChartFilterType filterType) {
     if (_selectedChartDateRange == null) {
-      setState(() {
-        _chartDataPoints = [];
-        _chartXLabels = [];
-      });
+      if (mounted) {
+        setState(() {
+          _chartDataPoints = [];
+          _chartXLabels = [];
+        });
+      }
       return;
     }
 
@@ -220,7 +227,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
 
   Future<void> _fetchFilteredChartData() async {
     if (widget.idInventaris == null || _selectedChartDateRange == null) return;
-    setState(() => _isLoadingChart = true);
+    if (mounted) setState(() => _isLoadingChart = true);
 
     String groupBy;
     switch (_selectedChartFilterType) {
@@ -243,6 +250,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         endDate: _selectedChartDateRange!.end,
         groupBy: groupBy,
       );
+      if (!mounted) return;
 
       if (response['status']) {
         final List<dynamic> newChartRawData = response['data'] ?? [];
@@ -252,10 +260,10 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         _updateChartDisplayData([], _selectedChartFilterType);
       }
     } catch (e) {
-      _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
       _updateChartDisplayData([], _selectedChartFilterType);
     } finally {
-      setState(() => _isLoadingChart = false);
+      if (mounted) setState(() => _isLoadingChart = false);
     }
   }
 
@@ -264,7 +272,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     if (widget.idInventaris == null || _isLoadingRiwayat) return;
     if (!isRefresh && page > _riwayatTotalPages) return;
 
-    setState(() => _isLoadingRiwayat = true);
+    if (mounted) setState(() => _isLoadingRiwayat = true);
 
     try {
       final response =
@@ -273,6 +281,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         page: page,
         limit: 10,
       );
+      if (!mounted) return;
 
       if (response['status']) {
         final List<dynamic> newItems = response['data'] ?? [];
@@ -290,9 +299,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
             response['message'] ?? 'Gagal memuat riwayat pemakaian');
       }
     } catch (e) {
-      _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
     } finally {
-      setState(() => _isLoadingRiwayat = false);
+      if (mounted) setState(() => _isLoadingRiwayat = false);
     }
   }
 
@@ -306,9 +315,11 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       return;
     }
 
-    setState(() {
-      _isUpdatingStock = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isUpdatingStock = true;
+      });
+    }
 
     try {
       final Map<String, dynamic> payload = {
@@ -317,21 +328,34 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       };
 
       final response = await _inventarisService.updateInventaris(payload);
+      if (!mounted) return;
 
       if (response['status'] == true) {
         setState(() {
           if (response['data'] != null && response['data']['jumlah'] != null) {
             _inventarisDetails!['jumlah'] = response['data']['jumlah'];
+            newStockNum = response['data']['jumlah'] is num
+                ? response['data']['jumlah']
+                : num.tryParse(response['data']['jumlah'].toString()) ??
+                    newStockNum;
           } else {
             _inventarisDetails!['jumlah'] = newStockNum;
           }
+
+          if (newStockNum == 0) {
+            _inventarisDetails!['ketersediaan'] = 'Tidak Tersedia';
+          } else if (currentStockNum == 0 && newStockNum > 0) {
+            _inventarisDetails!['ketersediaan'] = 'Tersedia';
+          }
+
           _showErrorSnackbar("Stok berhasil diperbarui.", isError: false);
         });
       } else {
         _showErrorSnackbar(response['message'] ?? "Gagal memperbarui stok.");
       }
     } catch (e) {
-      _showErrorSnackbar("Error saat memperbarui stok: ${e.toString()}");
+      if (mounted)
+        _showErrorSnackbar("Error saat memperbarui stok: ${e.toString()}");
     } finally {
       if (mounted) {
         setState(() {
@@ -353,19 +377,28 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   }
 
   Future<void> _deleteData() async {
-    if (widget.idInventaris == null) return;
-    final response =
-        await _inventarisService.deleteInventaris(widget.idInventaris!);
-    if (response['status']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Berhasil menghapus data inventaris'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      context.pop();
-    } else {
-      _showErrorSnackbar(response['message'] ?? 'Gagal menghapus data');
+    if (widget.idInventaris == null || !mounted) return;
+    setState(() => _isDeleting = true);
+    try {
+      final response =
+          await _inventarisService.deleteInventaris(widget.idInventaris!);
+      if (!mounted) return;
+
+      if (response['status']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berhasil menghapus data inventaris'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.pop();
+      } else {
+        _showErrorSnackbar(response['message'] ?? 'Gagal menghapus data');
+      }
+    } catch (e) {
+      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
     }
   }
 
@@ -382,7 +415,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         initialDate: currentSafeRange.start,
         firstDate: DateTime(2000),
         lastDate: DateTime(now.year + 5),
-        helpText: 'Pilih Tanggal Mulai (Mingguan)',
+        helpText: 'Pilih Tanggal Mulai',
       );
       if (pickedStartDate != null) {
         newRange = DateTimeRange(
@@ -402,9 +435,11 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     }
 
     if (newRange != null && newRange != _selectedChartDateRange) {
-      setState(() {
-        _selectedChartDateRange = newRange;
-      });
+      if (mounted) {
+        setState(() {
+          _selectedChartDateRange = newRange;
+        });
+      }
       await _fetchFilteredChartData();
     }
   }
@@ -427,24 +462,46 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       case ChartFilterType.custom:
         formattedStart = dfDayMonthYear.format(range.start);
         formattedEnd = dfDayMonthYear.format(range.end);
-        return "Penggunaan Inventaris Per $formattedStart - $formattedEnd";
+
+        if (_selectedChartFilterType == ChartFilterType.custom &&
+            range.start.year == range.end.year &&
+            range.start.month == range.end.month &&
+            range.start.day == range.end.day) {
+          return "Penggunaan Inventaris $formattedStart";
+        }
+
+        return "Penggunaan Per $formattedStart - $formattedEnd";
 
       case ChartFilterType.monthly:
         formattedStart = dfMonthYear.format(range.start);
         formattedEnd = dfMonthYear.format(range.end);
         if (range.start.year == range.end.year &&
             range.start.month == range.end.month) {
-          return formattedStart;
+          return "Penggunaan Bulan ${dfMonthYear.format(range.start)}";
         }
-        return "Penggunaan Inventaris Per $formattedStart - $formattedEnd";
+        return "Penggunaan $formattedStart - $formattedEnd";
 
       case ChartFilterType.yearly:
         formattedStart = dfYear.format(range.start);
         formattedEnd = dfYear.format(range.end);
         if (range.start.year == range.end.year) {
-          return formattedStart;
+          return "Penggunaan Tahun ${dfYear.format(range.start)}";
         }
-        return "Penggunaan Inventaris Per $formattedStart - $formattedEnd";
+        return "Penggunaan $formattedStart - $formattedEnd";
+    }
+  }
+
+  DateTime? get _parsedExpiryDate {
+    final dateString = _inventarisDetails?['tanggalKadaluwarsa'];
+    if (dateString == null) return null;
+    try {
+      final dateTime = DateTime.tryParse(dateString);
+      if (dateTime == null || dateTime.year < 1900) {
+        return null;
+      }
+      return dateTime;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -460,7 +517,6 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         _inventarisDetails?['Satuan'] ?? _inventarisDetails?['satuan'];
     final String ketersediaan =
         _inventarisDetails?['ketersediaan'] ?? 'Unknown';
-    final String kondisi = _inventarisDetails?['kondisi'] ?? 'Unknown';
     final String satuanNama = satuan?['nama'] ?? '';
     final String satuanLambang = satuan?['lambang'] ?? '';
     final num jumlah = _inventarisDetails?['jumlah'] ?? 0;
@@ -489,6 +545,16 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         'laporanId': item['laporanId'],
       };
     }).toList();
+
+    final DateTime? expiryDateTime = _parsedExpiryDate;
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
+
+    bool showExpiryInfo = expiryDateTime?.isAfter(today) ?? false;
+    bool isExpiredOrTodayOrNotSet = expiryDateTime != null && !(expiryDateTime.isAfter(today)); //untuk cek apakah sudah kadaluwarsa atau hari ini, jika tidak ada tanggal kadaluwarsa maka dianggap tidak kadaluwarsa
+    String expiryDateString = _inventarisDetails?['tanggalKadaluwarsa'] ?? '';
+    bool isKadaluwarsaTidakDiatur = expiryDateString.isNotEmpty &&
+        _formatDisplayDate(expiryDateString) == 'Tidak diatur';
 
     return Scaffold(
       backgroundColor: white,
@@ -597,20 +663,34 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                       ],
                     ),
                     infoItem("Satuan", satuanNama.isNotEmpty ? satuanNama : ""),
+                    
                     _buildKetersediaan("Ketersediaan inventaris", ketersediaan),
-                    _buildKondisi("Kondisi inventaris", kondisi),
-                    infoItem(
-                        "Tanggal kadaluwarsa",
-                        _formatDisplayDate(
-                            _inventarisDetails?['tanggalKadaluwarsa'])),
-                    infoItem(
-                        "Waktu kadaluwarsa",
-                        _formatDisplayTime(
-                            _inventarisDetails?['tanggalKadaluwarsa'])),
+                    
+                    
+                    if (showExpiryInfo) ...[
+                      infoItem("Tanggal kadaluwarsa",
+                          _formatDisplayDate(expiryDateString)),
+                      if (_formatDisplayTime(expiryDateString).isNotEmpty)
+                        infoItem("Waktu kadaluwarsa",
+                            _formatDisplayTime(expiryDateString)),
+                    ] else if (isExpiredOrTodayOrNotSet) ...[
+                      _buildKetersediaan("Status Kadaluwarsa", 'kadaluwarsa'),
+                      infoItem("Tanggal kadaluwarsa",
+                          _formatDisplayDate(expiryDateString)),
+                      if (_formatDisplayTime(expiryDateString).isNotEmpty)
+                        infoItem("Waktu kadaluwarsa",
+                            _formatDisplayTime(expiryDateString)),
+                    ] else if (isKadaluwarsaTidakDiatur) ...[
+                      infoItem("Tanggal kadaluwarsa", "Tidak diatur"),
+                    ],
+
+
                     infoItem("Tanggal didaftarkan",
                         _formatDisplayDate(_inventarisDetails?['createdAt'])),
-                    infoItem("Waktu didaftarkan",
-                        _formatDisplayTime(_inventarisDetails?['createdAt'])),
+                    if (_formatDisplayTime(_inventarisDetails?['createdAt'])
+                        .isNotEmpty)
+                      infoItem("Waktu didaftarkan",
+                          _formatDisplayTime(_inventarisDetails?['createdAt'])),
                     const SizedBox(height: 8),
                     Text("Deskripsi inventaris",
                         style: medium14.copyWith(color: dark1)),
@@ -639,32 +719,34 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                         onChartFilterTypeChanged: (ChartFilterType? newValue) {
                           if (newValue != null &&
                               newValue != _selectedChartFilterType) {
-                            setState(() {
-                              _selectedChartFilterType = newValue;
-                              final DateTime now = DateTime.now();
-                              if (newValue == ChartFilterType.monthly) {
-                                final DateTime endDateDefault =
-                                    DateTime(now.year, now.month + 1, 0);
-                                final DateTime startDateDefault =
-                                    DateTime(now.year, now.month - 11, 1);
-                                _selectedChartDateRange = DateTimeRange(
-                                    start: startDateDefault,
-                                    end: endDateDefault);
-                              } else if (newValue == ChartFilterType.yearly) {
-                                final DateTime endDateDefault =
-                                    DateTime(now.year, 12, 31);
-                                final DateTime startDateDefault =
-                                    DateTime(now.year - 4, 1, 1);
-                                _selectedChartDateRange = DateTimeRange(
-                                    start: startDateDefault,
-                                    end: endDateDefault);
-                              } else if (newValue == ChartFilterType.weekly) {
-                                _selectedChartDateRange = DateTimeRange(
-                                    start:
-                                        now.subtract(const Duration(days: 6)),
-                                    end: now);
-                              }
-                            });
+                            if (mounted) {
+                              setState(() {
+                                _selectedChartFilterType = newValue;
+                                final DateTime now = DateTime.now();
+                                if (newValue == ChartFilterType.monthly) {
+                                  final DateTime endDateDefault =
+                                      DateTime(now.year, now.month + 1, 0);
+                                  final DateTime startDateDefault =
+                                      DateTime(now.year, now.month - 5, 1);
+                                  _selectedChartDateRange = DateTimeRange(
+                                      start: startDateDefault,
+                                      end: endDateDefault);
+                                } else if (newValue == ChartFilterType.yearly) {
+                                  final DateTime endDateDefault =
+                                      DateTime(now.year, 12, 31);
+                                  final DateTime startDateDefault =
+                                      DateTime(now.year - 2, 1, 1);
+                                  _selectedChartDateRange = DateTimeRange(
+                                      start: startDateDefault,
+                                      end: endDateDefault);
+                                } else if (newValue == ChartFilterType.weekly) {
+                                  _selectedChartDateRange = DateTimeRange(
+                                      start:
+                                          now.subtract(const Duration(days: 6)),
+                                      end: now);
+                                }
+                              });
+                            }
                             _fetchFilteredChartData();
                           }
                         },
@@ -690,6 +772,16 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                     child: Padding(
                         padding: EdgeInsets.all(16.0),
                         child: CircularProgressIndicator()))
+              else if (_riwayatPemakaianList.isEmpty && !_isLoadingRiwayat)
+                Center(
+                    child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Text(
+                    'Tidak ada riwayat pemakaian.',
+                    style: medium14.copyWith(color: dark2),
+                    textAlign: TextAlign.center,
+                  ),
+                ))
               else
                 ListItem(
                   title: 'Riwayat Pemakaian Inventaris',
@@ -732,13 +824,18 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           children: [
             CustomButton(
               onPressed: () {
-                context.push('/tambah-inventaris',
-                    extra: AddInventarisScreen(
-                      onInventarisAdded: () => _fetchInitialData(),
-                      isEdit: true,
-                      idInventaris: widget.idInventaris,
-                      inventarisData: _inventarisDetails,
-                    ));
+                if (_inventarisDetails != null) {
+                  context.push('/tambah-inventaris',
+                      extra: AddInventarisScreen(
+                        onInventarisAdded: () => _fetchInitialData(),
+                        isEdit: true,
+                        idInventaris: widget.idInventaris,
+                        inventarisData: _inventarisDetails,
+                      ));
+                } else {
+                  _showErrorSnackbar(
+                      "Data inventaris tidak ditemukan untuk diubah.");
+                }
               },
               buttonText: 'Ubah Data',
               backgroundColor: yellow2,
@@ -752,7 +849,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                   : () {
                       _handleDeleteConfirmation();
                     },
-              buttonText: 'Hapus Data',
+              buttonText: _isDeleting ? 'Menghapus...' : 'Hapus Data',
               backgroundColor: red,
               textStyle: semibold16,
               textColor: white,
@@ -779,6 +876,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   }
 
   void _scrollListener() {
+    if (!mounted) return;
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
         !_isLoadingRiwayat &&
@@ -792,12 +890,13 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Flexible(child: Text(label, style: medium14.copyWith(color: dark1))),
           const SizedBox(width: 10),
           Flexible(
               child: Text(
-            value,
+            value.isEmpty ? "-" : value,
             style: regular14.copyWith(color: dark2),
             textAlign: TextAlign.end,
           )),
@@ -807,7 +906,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   }
 
   String _formatDisplayDate(String? dateString) {
-    if (dateString == null) return 'Unknown date';
+    if (dateString == null || dateString.isEmpty) return 'Unknown date';
     try {
       final dateTime = DateTime.tryParse(dateString);
       if (dateTime == null) return 'Invalid date';
@@ -825,7 +924,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       final dateTime = DateTime.tryParse(dateString);
       if (dateTime == null) return 'Invalid time';
 
-      if (dateTime.year < 1900 && dateTime.hour == 0 && dateTime.minute == 0) {
+      if (dateTime.year < 1900) {
         return '';
       }
       return DateFormat('HH:mm').format(dateTime);
@@ -845,62 +944,17 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         textColor = green2;
         displayText = 'Tersedia';
         break;
-      case 'tidak tersedia':
+      case 'kadaluwarsa':
+        backgroundColor = red.withValues(alpha: 0.1);
+        textColor = red;
+        displayText = 'Kadaluwarsa';
+        break;
+      default:
         backgroundColor = red.withValues(alpha: 0.1);
         textColor = red;
         displayText = 'Tidak Tersedia';
         break;
-      case 'kadaluwarsa':
-      case 'expired':
-        backgroundColor = yellow.withValues(alpha: 0.1);
-        textColor = yellow;
-        displayText = 'Kadaluwarsa';
-        break;
-      default:
-        backgroundColor = Colors.grey.withValues(alpha: 0.1);
-        textColor = Colors.grey;
-        displayText = status;
-        break;
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: medium14.copyWith(color: dark1)),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(100),
-            ),
-            child:
-                Text(displayText, style: regular12.copyWith(color: textColor)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKondisi(String label, String status) {
-    Color backgroundColor;
-    Color textColor;
-    String displayText;
-
-    if (status.toLowerCase() == 'baik') {
-      backgroundColor = green2.withValues(alpha: 0.1);
-      textColor = green2;
-      displayText = 'Baik';
-    } else if (status.toLowerCase() == 'rusak') {
-      backgroundColor = yellow.withValues(alpha: 0.1);
-      textColor = yellow;
-      displayText = 'Rusak';
-    } else {
-      backgroundColor = Colors.grey.withValues(alpha: 0.1);
-      textColor = Colors.grey;
-      displayText = status;
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(

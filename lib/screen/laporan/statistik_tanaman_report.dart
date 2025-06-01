@@ -1637,7 +1637,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   'name': "${item['name'] ?? 'Nutrisi'}",
                   'category': (item['category'] as String?) ?? 'Nutrisi',
                   'image':
-                      item['image'] as String? ?? 'assets/images/appIcon.png',
+                      item['gambar'] as String? ?? 'assets/images/appIcon.png',
                   'person': item['person'] as String? ?? 'N/A',
                   'date': _formatDisplayDate(item['date'] as String? ?? ''),
                   'time': _formatDisplayTime(item['time'] as String? ?? ''),

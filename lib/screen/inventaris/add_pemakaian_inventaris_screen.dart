@@ -134,8 +134,20 @@ class _AddPemakaianInventarisScreenState
           await _inventarisService.getInventarisByKategoriId(kategoriId);
       if (inventarisResponse['status'] && inventarisResponse['data'] != null) {
         setState(() {
-          _inventarisList =
-              List<Map<String, dynamic>>.from(inventarisResponse['data']);
+          final today = DateTime.now();
+          _inventarisList = List<Map<String, dynamic>>.from(
+            (inventarisResponse['data'] as List).where((item) {
+              final jumlah = item['jumlah'] ?? 0;
+              final tanggalKadaluwarsaStr = item['tanggalKadaluwarsa'];
+              if (tanggalKadaluwarsaStr == null) return false;
+              final tanggalKadaluwarsa =
+                  DateTime.tryParse(tanggalKadaluwarsaStr);
+              if (tanggalKadaluwarsa == null) return false;
+              return jumlah > 0 &&
+                  !tanggalKadaluwarsa
+                      .isBefore(DateTime(today.year, today.month, today.day));
+            }),
+          );
         });
       } else {
         _showErrorSnackbar(

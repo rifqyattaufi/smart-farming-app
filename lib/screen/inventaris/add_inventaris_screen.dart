@@ -1,19 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
-import 'package:smart_farming_app/theme.dart';
-import 'dart:io';
-
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
-import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddInventarisScreen extends StatefulWidget {
   final VoidCallback? onInventarisAdded;
@@ -48,8 +46,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
 
   String? selectedLocation;
   String? selectedSatuan;
-  String ketersediaanInv = 'tersedia';
-  String kondisiInv = 'baik';
   DateTime? _selectedDateTimeKadaluwarsa;
 
   List<Map<String, dynamic>> kategoriList = [];
@@ -177,8 +173,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
           data['satuan']?['id']?.toString() ??
           data['SatuanId']?.toString();
 
-      kondisiInv = data['kondisi'] ?? 'baik';
-      ketersediaanInv = data['ketersediaan'] ?? 'tersedia';
       _descriptionController.text = data['detail'] ?? '';
       _existingImageUrl = data['gambar'];
 
@@ -283,8 +277,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         'satuanId': selectedSatuan,
         'stokMinim': int.tryParse(_minimController.text) ?? 0,
         'tanggalKadaluwarsa': formattedKadaluwarsaForBackend,
-        'kondisi': kondisiInv,
-        'ketersediaan': ketersediaanInv,
         'gambar': finalImageUrl,
         'detail': _descriptionController.text,
       };
@@ -507,23 +499,6 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                               ? 'Tanggal & waktu kadaluwarsa tidak boleh kosong'
                               : null,
                         ),
-                        RadioField(
-                          label: 'Kondisi inventaris',
-                          selectedValue: kondisiInv,
-                          options: const ['baik', 'rusak'],
-                          onChanged: (value) =>
-                              setState(() => kondisiInv = value),
-                        ),
-                        RadioField(
-                            label: 'Ketersediaan',
-                            selectedValue: ketersediaanInv,
-                            options: const [
-                              'tersedia',
-                              'tidak tersedia',
-                              'kadaluwarsa'
-                            ],
-                            onChanged: (value) =>
-                                setState(() => ketersediaanInv = value)),
                         ImagePickerWidget(
                           label: "Unggah gambar inventaris",
                           image: _image,
