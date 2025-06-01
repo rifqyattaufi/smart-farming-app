@@ -123,6 +123,35 @@ class NewestReports extends StatelessWidget {
                                       ),
                                     ),
                                   if (mode == NewestReportsMode.full &&
+                                      report['isActive'] != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Container(
+                                        width: 60,
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        margin: const EdgeInsets.only(right: 8),
+                                        decoration: BoxDecoration(
+                                          color: report['isActive'] == true
+                                              ? green1.withOpacity(0.1)
+                                              : red.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            report['isActive'] == true
+                                                ? 'Aktif'
+                                                : 'Non aktif',
+                                            style: regular10.copyWith(
+                                                color: dark2),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if (mode == NewestReportsMode.full &&
                                       report['subtext'] != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),

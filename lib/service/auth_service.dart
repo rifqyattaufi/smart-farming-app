@@ -140,4 +140,37 @@ class AuthService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> register(Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/auth/register');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
+
+      final body = json.decode(response.body);
+      if (response.statusCode == 201) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Registration successful',
+          'data': body['data'],
+        };
+      } else {
+        return {
+          'status': false,
+          'message':
+              body['message'] ?? 'Registration failed. Please try again.',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }

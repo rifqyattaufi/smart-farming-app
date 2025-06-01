@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_farming_app/service/user_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,6 +17,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -79,6 +81,22 @@ class _SplashScreenState extends State<SplashScreen>
       await prefs.setBool('isFirstLaunch', false);
       if (!mounted) return;
       context.go('/introduction');
+      return;
+    }
+
+    final user = await _authService.getUser();
+    final userData = await _userService.getUserById(user?['id'] ?? '');
+    if (userData['isActive'] == false) {
+      await _authService.logout();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Akun Anda dinonaktifkan. Silakan hubungi admin.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      context.go('/login');
       return;
     }
 

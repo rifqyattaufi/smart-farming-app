@@ -13,6 +13,7 @@ class InputFieldWidget extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final bool isDisabled;
+  final bool isGrayed;
 
   const InputFieldWidget({
     super.key,
@@ -27,6 +28,7 @@ class InputFieldWidget extends StatelessWidget {
     this.validator,
     this.keyboardType,
     this.isDisabled = false,
+    this.isGrayed = false,
   });
 
   @override
@@ -45,6 +47,9 @@ class InputFieldWidget extends StatelessWidget {
           maxLines: obscureText ? 1 : maxLines,
           validator: validator,
           readOnly: isDisabled,
+          style: medium14.copyWith(
+            color: isGrayed ? dark3 : dark1,
+          ),
           decoration: InputDecoration(
             hintText: obscureText && isTextEmpty ? '● ● ● ● ● ● ● ●' : hint,
             hintStyle: medium14.copyWith(color: grey),

@@ -688,12 +688,10 @@ final _router = GoRouter(
       builder: (context, state) => const UsersScreen(),
     ),
     GoRoute(
-      path: '/detail-pengguna/:id',
+      path: '/detail-pengguna',
       builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return DetailUserScreen(
-          idUser: id,
-        );
+        final extra = state.extra as DetailUserScreen;
+        return extra;
       },
     ),
     GoRoute(
@@ -702,7 +700,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/tambah-pengguna',
-      builder: (context, state) => const AddUserScreen(),
+      builder: (context, state) {
+        final extra = state.extra as AddUserScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/laporan-hama',

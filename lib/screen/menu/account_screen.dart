@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -66,7 +67,7 @@ class _AccountScreenState extends State<AccountScreen> {
               reports: [
                 {
                   'text': 'Data Akun',
-                  'onTap': () => context.push('/detail'),
+                  'onTap': () => context.push('/detail-pengguna', extra: const DetailUserScreen()),
                 },
                 {
                   'text': 'Ubah Password',
