@@ -27,7 +27,11 @@ class ProfileImagePicker extends StatelessWidget {
             backgroundImage: image != null ? FileImage(image!) : null,
             child: imageUrl != null && imageUrl!.isNotEmpty
                 ? ClipOval(
-                    child: ImageBuilder(url: imageUrl!, fit: BoxFit.cover))
+                    child: ImageBuilder(
+                        height: 100,
+                        width: 100,
+                        url: imageUrl!,
+                        fit: BoxFit.cover))
                 : image == null
                     ? const Icon(Icons.person, size: 50, color: Colors.grey)
                     : null),

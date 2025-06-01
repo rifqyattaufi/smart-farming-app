@@ -389,11 +389,12 @@ class _AddUserScreenState extends State<AddUserScreen> {
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
             onPressed: () {
-              // Your action here
+              _submitForm();
             },
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            isLoading: _isLoading,
           ),
         ));
   }

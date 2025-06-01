@@ -286,11 +286,15 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                   const SizedBox(height: 16),
                   CustomButton(
                     onPressed: () {
-                      context.push('/tambah-pengguna',
-                          extra: AddUserScreen(
-                            id: widget.id,
-                            isEdit: true,
-                          ));
+                      context
+                          .push('/tambah-pengguna',
+                              extra: AddUserScreen(
+                                id: widget.id,
+                                isEdit: true,
+                              ))
+                          .then((_) {
+                        _fetchData();
+                      });
                     },
                     buttonText: 'Ubah Data',
                     backgroundColor: yellow2,
