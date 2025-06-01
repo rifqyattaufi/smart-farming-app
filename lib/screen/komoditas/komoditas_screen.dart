@@ -584,15 +584,6 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               })
           .toList(),
       type: 'basic',
-      onItemTap: (context, item) {
-        final id = item['id'];
-        if (id != null) {
-          context.push('/detail-laporan/$id');
-        } else {
-          final name = item['name'] ?? '';
-          context.push('/detail-laporan/$name');
-        }
-      },
     );
   }
 
@@ -607,15 +598,6 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               })
           .toList(),
       type: 'basic',
-      onItemTap: (context, item) {
-        final id = item['id'];
-        if (id != null) {
-          context.push('/detail-laporan/$id');
-        } else {
-          final name = item['name'] ?? '';
-          context.push('/detail-laporan/$name');
-        }
-      },
     );
   }
 }

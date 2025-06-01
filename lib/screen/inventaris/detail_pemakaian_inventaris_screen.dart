@@ -66,8 +66,6 @@ class _DetailPemakaianInventarisScreenState
             _jumlahPemakaian = response['data']['jumlah'] ?? 0;
             _isLoading = false;
           });
-          print(
-              'Data pemakaian inventaris berhasil dimuat: $_inventarisDetails');
         } else {
           setState(() {
             _isLoading = false;
