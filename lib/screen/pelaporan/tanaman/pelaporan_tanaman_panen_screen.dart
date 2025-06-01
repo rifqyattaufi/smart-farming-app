@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
+import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -13,6 +13,16 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+
+class RincianGradeForm {
+  String? gradeId;
+  String? gradeNama;
+  TextEditingController jumlahController = TextEditingController();
+  GlobalKey<FormFieldState> gradeFieldKey = GlobalKey<FormFieldState>();
+  GlobalKey<FormFieldState> jumlahFieldKey = GlobalKey<FormFieldState>();
+
+  RincianGradeForm({this.gradeId, this.gradeNama});
+}
 
 class PelaporanTanamanPanenScreen extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -35,58 +45,144 @@ class PelaporanTanamanPanenScreen extends StatefulWidget {
 
 class _PelaporanTanamanPanenScreenState
     extends State<PelaporanTanamanPanenScreen> {
-  final SatuanService _satuanService = SatuanService();
   final LaporanService _laporanService = LaporanService();
   final ImageService _imageService = ImageService();
+  final GradeService _gradeService = GradeService();
+  final SatuanService _satuanService = SatuanService();
 
-  List<TextEditingController> sizeControllers = [];
-  List<TextEditingController> catatanControllers = [];
-  Map<String, dynamic>? satuanList;
-  List<File?> imageList = [];
-  File? _image;
-  final picker = ImagePicker();
-  final List<GlobalKey<FormState>> formKeys = [];
+  final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  Future<void> _fetchData() async {
+  final TextEditingController _catatanController = TextEditingController();
+  File? _image;
+
+  DateTime _tanggalPanen = DateTime.now();
+  final TextEditingController _umurTanamanController = TextEditingController();
+  final TextEditingController _estimasiPanenController =
+      TextEditingController();
+  final TextEditingController _gagalPanenController = TextEditingController();
+
+  List<RincianGradeForm> _rincianGradeList = [];
+  List<Map<String, dynamic>> _gradeMasterList = [];
+  bool _isLoadingGrade = true;
+
+  Map<String, dynamic>? satuanData;
+
+  bool _isLoadingSatuan = true;
+
+  List<File?> imageList = [];
+  final picker = ImagePicker();
+
+  Future<void> _fetchSatuanData() async {
+    if (widget.data?['komoditas']?['satuan'] == null) {
+      setState(() => _isLoadingSatuan = false);
+      return;
+    }
+    setState(() => _isLoadingSatuan = true);
     try {
       final response = await _satuanService
           .getSatuanById(widget.data!['komoditas']['satuan']);
-      if (response['status']) {
-        setState(() {
-          satuanList = {
-            'id': response['data']['id'],
-            'nama':
-                "${response['data']['nama']} - ${response['data']['lambang']}",
-          };
-        });
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          setState(() {
+            satuanData = {
+              'id': response['data']['id'],
+              'nama':
+                  "${response['data']['nama']} - ${response['data']['lambang']}",
+            };
+            _isLoadingSatuan = false;
+          });
+        } else {
+          _showError(response['message'] ?? 'Gagal memuat data satuan.');
+          setState(() => _isLoadingSatuan = false);
+        }
       }
     } catch (e) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
+      if (mounted) {
+        _showError('Error fetching satuan data: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingSatuan = false);
+      }
     }
+  }
+
+  Future<void> _fetchGradeMaster() async {
+    setState(() => _isLoadingGrade = true);
+    try {
+      final response = await _gradeService.getPagedGrades();
+      if (response['status'] == true && response['data'] != null) {
+        final List<dynamic> gradeData = response['data'];
+        setState(() {
+          _gradeMasterList = gradeData.map((grade) {
+            return {
+              'id': grade['id'],
+              'nama': grade['nama'],
+              'deskripsi': grade['deskripsi'] ?? '',
+            };
+          }).toList();
+          _isLoadingGrade = false;
+        });
+      } else {
+        _showError(response['message'] ?? 'Gagal memuat data grade.');
+        setState(() => _isLoadingGrade = false);
+      }
+    } catch (e) {
+      _showError('Error fetching grade data: $e');
+      setState(() => _isLoadingGrade = false);
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+    });
+  }
+
+  void _tambahRincianGrade() {
+    setState(() {
+      _rincianGradeList.add(RincianGradeForm());
+    });
+  }
+
+  void _hapusRincianGrade(int index) {
+    setState(() {
+      _rincianGradeList.removeAt(index);
+    });
+  }
+
+  double _calculateTotalRealisasiPanen() {
+    double total = 0.0;
+
+    for (var rincian in _rincianGradeList) {
+      final jumlahText = rincian.jumlahController.text;
+      final jumlahValue = double.tryParse(jumlahText);
+      if (jumlahValue != null && jumlahValue > 0) {
+        total += jumlahValue;
+      }
+    }
+
+    return total;
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
-    final length = objekBudidayaList.length;
-    sizeControllers = List.generate(length, (_) => TextEditingController());
-    catatanControllers = List.generate(length, (_) => TextEditingController());
-    imageList = List.generate(length, (_) => null);
-    formKeys.clear();
-    formKeys.addAll(List.generate(length, (_) => GlobalKey<FormState>()));
+    _fetchSatuanData();
+    _fetchGradeMaster();
+
+    if (_rincianGradeList.isEmpty) {
+      _tambahRincianGrade();
+    }
   }
 
-  Future<void> _pickImage(BuildContext context, int index) async {
+  Future<void> _pickImage(BuildContext context) async {
     _image = null;
     showModalBottomSheet(
       context: context,
@@ -107,7 +203,6 @@ class _PelaporanTanamanPanenScreenState
                 if (pickedFile != null) {
                   setState(() {
                     _image = File(pickedFile.path);
-                    imageList[index] = _image;
                   });
                 }
               },
@@ -122,7 +217,6 @@ class _PelaporanTanamanPanenScreenState
                 if (pickedFile != null) {
                   setState(() {
                     _image = File(pickedFile.path);
-                    imageList[index] = _image;
                   });
                 }
               },
@@ -134,100 +228,118 @@ class _PelaporanTanamanPanenScreenState
   }
 
   Future<void> _submitForm() async {
-    if (_isLoading) return;
-    setState(() {
-      _isLoading = true;
-    });
-    final objekBudidayaList = widget.data?['objekBudidaya'];
-    final list = (objekBudidayaList == null ||
-            (objekBudidayaList is List && objekBudidayaList.isEmpty))
-        ? [null]
-        : objekBudidayaList;
-
-    bool allValid = true;
-    for (int i = 0; i < list.length; i++) {
-      if (!(formKeys[i].currentState?.validate() ?? false)) {
-        allValid = false;
-      }
-
-      if (imageList[i] == null && allValid == true) {
-        allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Gambar bukti panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')} belum dipilih'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-    if (!allValid) {
-      setState(() {
-        _isLoading = false;
-      });
+    if (!_formKey.currentState!.validate()) {
+      _showError('Harap lengkapi semua field yang wajib diisi.');
       return;
     }
+    for (var rincian in _rincianGradeList) {
+      if (rincian.gradeId == null || rincian.jumlahController.text.isEmpty) {
+        _showError(
+            'Harap pilih grade dan isi jumlah pada setiap rincian grade.');
+        return;
+      }
+      if (double.tryParse(rincian.jumlahController.text) == null ||
+          double.parse(rincian.jumlahController.text) <= 0) {
+        _showError('Jumlah pada rincian grade harus angka positif.');
+        return;
+      }
+    }
+
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
 
     try {
-      for (int i = 0; i < list.length; i++) {
-        final imageUrl = await _imageService.uploadImage(imageList[i]!);
-
-        final data = {
-          'unitBudidayaId': widget.data?['unitBudidaya']?['id'],
-          'objekBudidayaId': list[i]?['id'],
-          'tipe': widget.tipe,
-          'judul':
-              "Laporan Panen ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}",
-          'gambar': imageUrl['data'],
-          'catatan': catatanControllers[i].text,
-          'panen': {
-            'komoditasId': widget.data?['komoditas']?['id'],
-            'jumlah': double.parse(sizeControllers[i].text),
-          }
-        };
-
-        final response = await _laporanService.createLaporanPanen(data);
-
-        if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')} berhasil dikirim'),
-              backgroundColor: Colors.green,
-            ),
-          );
+      String? imageUrl;
+      if (_image != null) {
+        final imageResponse = await _imageService.uploadImage(_image!);
+        if (imageResponse['status'] == true && imageResponse['data'] != null) {
+          imageUrl = imageResponse['data'];
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          _showError(
+              imageResponse['message'] ?? 'Gagal mengunggah gambar laporan.');
+          setState(() => _isLoading = false);
+          return;
         }
       }
 
-      for (int i = 0; i < widget.step; i++) {
-        Navigator.pop(context);
+      // Hitung total realisasi panen
+      double totalRealisasiPanen = _calculateTotalRealisasiPanen();
+
+      final payload = {
+        'judul':
+            "Laporan Panen ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${widget.data?['komoditas']?['name'] ?? ''}",
+        'unitBudidayaId': widget.data?['unitBudidaya']?['id'],
+        'tipe': 'panen',
+        'gambar': imageUrl,
+        'catatan': _catatanController.text,
+        'panen': {
+          'tanggalPanen': _tanggalPanen.toIso8601String(),
+          'komoditasId': widget.data?['komoditas']?['id'],
+          'umurTanamanPanen': _umurTanamanController.text.isNotEmpty
+              ? int.tryParse(_umurTanamanController.text)
+              : null,
+          'estimasiPanen': _estimasiPanenController.text.isNotEmpty
+              ? double.tryParse(_estimasiPanenController.text)
+              : null,
+          'gagalPanen': _gagalPanenController.text.isNotEmpty
+              ? double.tryParse(_gagalPanenController.text)
+              : null,
+          'realisasiPanen': totalRealisasiPanen,
+          'rincianGrade': _rincianGradeList
+              .map((rincian) => {
+                    'gradeId': rincian.gradeId,
+                    'jumlah': double.parse(rincian.jumlahController.text),
+                  })
+              .toList(),
+        }
+      };
+      final response = await _laporanService.createLaporanPanenKebun(payload);
+      if (mounted) {
+        if (response['status'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Laporan Panen ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${widget.data?['komoditas']?['name'] ?? ''} berhasil dikirim!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Pop sebanyak step yang telah dilalui + halaman ini
+          for (int i = 0; i < (widget.step + 1); i++) {
+            // +1 untuk pop halaman form ini sendiri
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              break;
+            }
+          }
+        } else {
+          _showError(response['message'] ?? 'Gagal mengirim laporan panen.');
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error submitting form: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showError('Terjadi kesalahan: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
+  void dispose() {
+    _catatanController.dispose();
+    _umurTanamanController.dispose();
+    _estimasiPanenController.dispose();
+    _gagalPanenController.dispose();
+    for (var rincian in _rincianGradeList) {
+      rincian.jumlahController.dispose();
+    }
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -252,111 +364,306 @@ class _PelaporanTanamanPanenScreenState
             child: Column(
               children: [
                 BannerWidget(
-                  title: 'Step ${widget.step} - Isi Form Pelaporan',
+                  title: 'Step ${widget.step} - Isi Form Pelaporan Panen',
                   subtitle:
                       'Harap mengisi form dengan data yang benar sesuai  kondisi lapangan!',
                   showDate: true,
                 ),
-                ...List.generate(objekBudidayaList.length, (i) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Form(
-                      key: formKeys[i],
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Data Komoditas Tanaman',
-                            style: semibold16.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            (widget.data?['komoditas']?['name'] ?? '-'),
-                            style: bold20.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '${widget.data?['komoditas']?['jenisBudidayaLatin'] ?? '-'} - ${widget.data?['unitBudidaya']?['name'] ?? '-'}',
-                            style: semibold16.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Tanggal dan waktu tanam: ',
-                            style: regular14.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            (() {
-                              final createdAt =
-                                  widget.data?['unitBudidaya']?['createdAt'];
-                              if (createdAt == null) return '-';
-                              try {
-                                return DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                    .format(DateTime.parse(createdAt));
-                              } catch (_) {
-                                return 'Unknown';
-                              }
-                            })(),
-                            style: regular14.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          InputFieldWidget(
-                            label: "Jumlah panen",
-                            hint: "Contoh: 20",
-                            controller: sizeControllers[i],
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Jumlah panen wajib diisi';
-                              }
-                              if (double.tryParse(value) == null) {
-                                return 'Jumlah panen harus berupa angka';
-                              }
-                              if (double.parse(value) <= 0) {
-                                return 'Jumlah panen harus lebih dari 0';
-                              }
-                              return null;
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Data Komoditas Tanaman',
+                          style: semibold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          (widget.data?['komoditas']?['name'] ?? '-'),
+                          style: bold20.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '${widget.data?['komoditas']?['jenisBudidayaLatin'] ?? '-'} - ${widget.data?['unitBudidaya']?['name'] ?? '-'}',
+                          style: semibold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Tanggal dan waktu tanam: ${(() {
+                            final createdAtRaw =
+                                widget.data?['unitBudidaya']?['createdAt'];
+                            if (createdAtRaw == null ||
+                                createdAtRaw is! String ||
+                                createdAtRaw.isEmpty) {
+                              return '-';
+                            }
+                            try {
+                              return DateFormat('EE, dd MMMM yyyy HH:mm')
+                                  .format(DateTime.parse(createdAtRaw));
+                            } catch (_) {
+                              return 'Unknown';
+                            }
+                          })()}',
+                          style: regular14.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        Text("Detail Kejadian Panen",
+                            style: bold18.copyWith(color: dark1)),
+                        const SizedBox(height: 12),
+                        InputFieldWidget(
+                          label: "Tanggal panen dilakukan",
+                          hint: "Contoh: Senin, 17 Februari 2025",
+                          controller: TextEditingController(
+                              text: DateFormat('EEEE, dd MMMM yyyy')
+                                  .format(_tanggalPanen)),
+                          suffixIcon: const Icon(Icons.calendar_today),
+                          isDisabled: true,
+                          onSuffixIconTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: _tanggalPanen,
+                              firstDate: DateTime(2000),
+                              lastDate:
+                                  DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (picked != null && picked != _tanggalPanen) {
+                              setState(() {
+                                _tanggalPanen = picked;
+                              });
+                            }
+                          },
+                          validator: (value) => (value == null || value.isEmpty)
+                              ? 'Tanggal & waktu kadaluwarsa tidak boleh kosong'
+                              : null,
+                        ),
+                        InputFieldWidget(
+                          label: "Umur tanaman saat panen (hari)",
+                          hint: "Contoh: 90",
+                          controller: _umurTanamanController,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                int.tryParse(value) == null) {
+                              return 'Harus berupa angka';
+                            }
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                int.tryParse(value)! <= 0) {
+                              return 'Umur tanaman harus lebih dari 0';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                          label: "Estimasi total panen (sebelum panen)",
+                          hint: "Contoh: 100",
+                          controller: _estimasiPanenController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value) == null) {
+                              return 'Harus berupa angka';
+                            }
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value)! <= 0) {
+                              return 'Estimasi panen harus lebih dari 0';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                          label: "Kuantitas gagal panen (jika ada)",
+                          hint: "Contoh: 5",
+                          controller: _gagalPanenController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value) == null) {
+                              return 'Harus berupa angka';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => setState(() {}),
+                        ),
+                        DropdownFieldWidget(
+                          label: "Satuan panen",
+                          hint: "Pilih satuan panen",
+                          items:
+                              satuanData != null ? [satuanData!['nama']] : [],
+                          selectedValue:
+                              satuanData != null ? satuanData!['nama'] : '-',
+                          onChanged: (value) => {},
+                          isEdit: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Satuan panen wajib diisi';
+                            }
+                            return null;
+                          },
+                        ),
+                        ImagePickerWidget(
+                          label: "Unggah bukti hasil panen",
+                          image: _image,
+                          onPickImage: (ctx) async {
+                            await _pickImage(ctx);
+                          },
+                        ),
+                        InputFieldWidget(
+                          label: "Catatan/jurnal pelaporan",
+                          hint: "Keterangan",
+                          controller: _catatanController,
+                          maxLines: 10,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Catatan wajib diisi';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Rincian Hasil Panen per Grade",
+                                style: bold18.copyWith(color: dark1)),
+                            IconButton(
+                              icon: Icon(Icons.add_circle, color: green1),
+                              onPressed: _tambahRincianGrade,
+                              tooltip: "Tambah Rincian Grade",
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (_isLoadingGrade)
+                          const Center(child: CircularProgressIndicator())
+                        else if (_gradeMasterList.isEmpty)
+                          const Text(
+                              "Data master grade tidak ditemukan. Tidak dapat menambahkan rincian.")
+                        else
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _rincianGradeList.length,
+                            itemBuilder: (context, index) {
+                              final rincian = _rincianGradeList[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    DropdownFieldWidget(
+                                      key: rincian.gradeFieldKey,
+                                      label: 'Pilih Grade Kualitas',
+                                      hint: 'Pilih Grade',
+                                      items: _gradeMasterList
+                                          .map((grade) =>
+                                              grade['nama'].toString())
+                                          .toList(),
+                                      selectedValue: rincian.gradeNama,
+                                      onChanged: (String? selectedNamaGrade) {
+                                        setState(() {
+                                          rincian.gradeNama = selectedNamaGrade;
+                                          if (selectedNamaGrade != null &&
+                                              _gradeMasterList.any((g) =>
+                                                  g['nama'] ==
+                                                  selectedNamaGrade)) {
+                                            rincian.gradeId = _gradeMasterList
+                                                    .firstWhere((grade) =>
+                                                        grade['nama'] ==
+                                                        selectedNamaGrade)['id']
+                                                as String?;
+                                          } else {
+                                            rincian.gradeId = null;
+                                          }
+                                        });
+                                      },
+                                      validator: (value) =>
+                                          (value == null || value.isEmpty)
+                                              ? 'Grade wajib dipilih'
+                                              : null,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    InputFieldWidget(
+                                      key: rincian.jumlahFieldKey,
+                                      label: "Jumlah kuantitas grade ini",
+                                      hint: "Contoh: 5",
+                                      controller: rincian.jumlahController,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Jumlah wajib diisi';
+                                        }
+                                        final sanitizedValue =
+                                            value.replaceAll(',', '.');
+                                        if (double.tryParse(sanitizedValue) ==
+                                            null) {
+                                          return 'Harus angka';
+                                        }
+                                        if (double.parse(sanitizedValue) <= 0) {
+                                          return 'Harus > 0';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (value) {
+                                        setState(() {});
+                                      },
+                                    ),
+                                    if (_rincianGradeList.length > 1)
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextButton.icon(
+                                          icon: Icon(Icons.delete_outline,
+                                              color: red, size: 24),
+                                          label: Text('Hapus Grade',
+                                              style: regular14.copyWith(
+                                                  color: red)),
+                                          onPressed: () =>
+                                              _hapusRincianGrade(index),
+                                          style: TextButton.styleFrom(
+                                              padding: EdgeInsets.zero),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
-                          DropdownFieldWidget(
-                            label: "Satuan panen",
-                            hint: "Pilih satuan panen",
-                            items: [satuanList?['nama'] ?? '-'],
-                            selectedValue: satuanList?['nama'] ?? '-',
-                            onChanged: (value) => {},
-                            isEdit: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Satuan panen wajib diisi';
-                              }
-                              return null;
-                            },
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total Realisasi Panen:",
+                                style: semibold16.copyWith(color: dark1),
+                              ),
+                              Text(
+                                _isLoadingSatuan
+                                    ? "Menghitung..."
+                                    : "${_calculateTotalRealisasiPanen().toStringAsFixed(1)} ${satuanData!['nama'] ?? ''}",
+                                style: bold18.copyWith(color: green1),
+                              ),
+                            ],
                           ),
-                          ImagePickerWidget(
-                            label: "Unggah bukti hasil panen",
-                            image: imageList[i],
-                            onPickImage: (ctx) async {
-                              await _pickImage(ctx, i);
-                            },
-                          ),
-                          InputFieldWidget(
-                            label: "Catatan/jurnal pelaporan",
-                            hint: "Keterangan",
-                            controller: catatanControllers[i],
-                            maxLines: 10,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Catatan wajib diisi';
-                              }
-                              return null;
-                            },
-                          ),
-                          const Divider(),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                  );
-                }),
+                  ),
+                ),
                 const SizedBox(height: 16),
               ],
             ),

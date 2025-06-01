@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -68,6 +69,28 @@ class _PelaporanHarianTanamanScreenState
   final List<TextEditingController> _satuanController = [];
   final List<File?> _imageTanamanList = [];
   final List<File?> _imageDosisList = [];
+  List<double> _lastHeights = [];
+
+  final Map<String, String> statusTumbuhDisplayMap = {
+    'bibit': 'Bibit',
+    'perkecambahan': 'Perkecambahan',
+    'vegetatifAwal': 'Vegetatif Awal',
+    'vegetatifLanjut': 'Vegetatif Lanjut',
+    'generatifAwal': 'Generatif Awal',
+    'generatifLanjut': 'Generatif Lanjut',
+    'panen': 'Panen',
+    'dormansi': 'Dormansi',
+  };
+
+  final Map<String, String> kondisiDaunDisplayMap = {
+    'sehat': 'Sehat',
+    'kering': 'Kering',
+    'layu': 'Layu',
+    'kuning': 'Kuning',
+    'keriting': 'Keriting',
+    'bercak': 'Bercak',
+    'rusak': 'Rusak',
+  };
 
   Future<void> _fetchData() async {
     try {
@@ -87,6 +110,8 @@ class _PelaporanHarianTanamanScreenState
                     'name': item['nama'],
                     'id': item['id'],
                     'satuanId': item['SatuanId'],
+                    'stok': item['jumlah'],
+                    'satuanNama': item['Satuan']?['nama'] ?? '',
                   })
               .toList();
         });
@@ -107,6 +132,8 @@ class _PelaporanHarianTanamanScreenState
                     'name': item['nama'],
                     'id': item['id'],
                     'satuanId': item['SatuanId'],
+                    'stok': item['jumlah'],
+                    'satuanNama': item['Satuan']?['nama'] ?? '',
                   })
               .toList();
         });
@@ -127,6 +154,8 @@ class _PelaporanHarianTanamanScreenState
                     'name': item['nama'],
                     'id': item['id'],
                     'satuanId': item['SatuanId'],
+                    'stok': item['jumlah'],
+                    'satuanNama': item['Satuan']?['nama'] ?? '',
                   })
               .toList();
         });
@@ -147,6 +176,8 @@ class _PelaporanHarianTanamanScreenState
                     'name': item['nama'],
                     'id': item['id'],
                     'satuanId': item['SatuanId'],
+                    'stok': item['jumlah'],
+                    'satuanNama': item['Satuan']?['nama'] ?? '',
                   })
               .toList();
         });
@@ -166,6 +197,64 @@ class _PelaporanHarianTanamanScreenState
           backgroundColor: Colors.red,
         ),
       );
+    }
+
+    // Fetch last heights
+    final List<dynamic>? sourceObjekList = widget.data?['objekBudidaya'];
+    for (int i = 0; i < _heightController.length; i++) {
+      final objek = (sourceObjekList != null && i < sourceObjekList.length)
+          ? sourceObjekList[i]
+          : null;
+      final String? objekId = (objek is Map && objek.containsKey('id'))
+          ? objek['id'] as String?
+          : null;
+
+      if (objekId != null) {
+        try {
+          final responseHeight = await _laporanService
+              .getLastHarianKebunByObjekBudidayaId(objekId);
+
+          if (mounted) {
+            Map<String, dynamic>? dataFromService =
+                responseHeight['data'] as Map<String, dynamic>?;
+            Map<String, dynamic>? harianKebunData =
+                dataFromService?['HarianKebun'] as Map<String, dynamic>?;
+            dynamic tinggiTanamanValue = harianKebunData?['tinggiTanaman'];
+
+            setState(() {
+              if (responseHeight['status'] == true &&
+                  tinggiTanamanValue != null) {
+                _lastHeights[i] = (tinggiTanamanValue as num).toDouble();
+                _heightController[i].text = _lastHeights[i].toStringAsFixed(1);
+              } else {
+                _heightController[i].text = "0.0";
+                _lastHeights[i] = 0.0;
+              }
+            });
+          }
+        } catch (e) {
+          if (mounted) {
+            setState(() {
+              _heightController[i].text = "0.0";
+              _lastHeights[i] = 0.0;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    'Gagal memuat tinggi terakhir untuk ${objek?['name'] ?? 'tanaman $i'}. Error: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _heightController[i].text = "0.0";
+            if (i < _lastHeights.length) _lastHeights[i] = 0.0;
+          });
+        }
+      }
     }
   }
 
@@ -287,41 +376,45 @@ class _PelaporanHarianTanamanScreenState
     setState(() {
       _isLoading = true;
     });
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
-    final list = (objekBudidayaList == null ||
-            (objekBudidayaList is List && objekBudidayaList.isEmpty))
-        ? [null]
-        : objekBudidayaList;
+    int formCountToValidate = _formKeys.length;
+    final List<dynamic>? objekBudidayaOriginalList =
+        widget.data?['objekBudidaya'];
+    print('Validating $formCountToValidate forms');
+    print('Original objekBudidaya list: $objekBudidayaOriginalList');
     bool allValid = true;
-    for (int i = 0; i < list.length; i++) {
+    for (int i = 0; i < formCountToValidate; i++) {
       if (_formKeys[i].currentState == null ||
           !_formKeys[i].currentState!.validate()) {
         allValid = false;
       }
 
-      if (_imageTanamanList[i] == null && allValid == true) {
+      if (_imageTanamanList[i] == null) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unggah bukti pelaporan harian tanaman'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Unggah bukti kondisi tanaman untuk tanaman ${i + 1}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
 
-      // Hanya cek gambar dosis jika statusNutrisi[i] == 'Ya'
-      if (statusNutrisi[i] == 'Ya' &&
-          _imageDosisList[i] == null &&
-          allValid == true) {
+      if (statusNutrisi[i] == 'Ya' && _imageDosisList[i] == null) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unggah bukti pemberian dosis ke tanaman'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Unggah bukti pemberian dosis untuk tanaman ${i + 1}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
+
     if (!allValid) {
       setState(() {
         _isLoading = false;
@@ -330,7 +423,14 @@ class _PelaporanHarianTanamanScreenState
     }
 
     try {
-      for (int i = 0; i < list.length; i++) {
+      bool anyReportFailed = false;
+      for (int i = 0; i < formCountToValidate; i++) {
+        final currentObjek = (objekBudidayaOriginalList != null &&
+                i < objekBudidayaOriginalList.length)
+            ? objekBudidayaOriginalList[i]
+            : null;
+
+        print('Processing form $i for objek: $currentObjek');
         final double? tinggiTanaman =
             double.tryParse(_heightController[i].text);
         final String kondisi = kondisiDaun[i];
@@ -339,9 +439,9 @@ class _PelaporanHarianTanamanScreenState
         final imageUrl = await _imageService.uploadImage(_imageTanamanList[i]!);
         final dataTanaman = {
           'unitBudidayaId': widget.data?['unitBudidaya']['id'],
-          "objekBudidayaId": list[i]['id'],
+          "objekBudidayaId": currentObjek?['id'],
           "judul":
-              "Laporan Harian ${widget.data?['unitBudidaya']['name']} - ${list[i]['name']}",
+              "Laporan Harian ${widget.data?['unitBudidaya']['name']} - ${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}",
           "tipe": widget.tipe,
           "gambar": imageUrl['data'],
           "catatan": _catatanController[i].text,
@@ -364,10 +464,10 @@ class _PelaporanHarianTanamanScreenState
 
           final dataDosis = {
             'unitBudidayaId': widget.data?['unitBudidaya']['id'],
-            'objekBudidayaId': list[i]['id'],
-            'tipe': widget.tipe,
+            'objekBudidayaId': currentObjek?['id'],
+            'tipe': 'vitamin',
             'judul':
-                "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? '')}",
+                "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(currentObjek?['name'] ?? 'Tanaman ${i + 1}')}",
             'gambar': imageDosisUrl['data'],
             'catatan': _catatanController[i].text,
             'vitamin': {
@@ -382,62 +482,75 @@ class _PelaporanHarianTanamanScreenState
 
           nutrisiSuccess = responseDosis['status'];
           if (!nutrisiSuccess) {
+            anyReportFailed = true;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error: ${responseDosis['message']}'),
+                content: Text(
+                    'Error Laporan Nutrisi (${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}): ${responseDosis['message']}'),
                 backgroundColor: Colors.red,
               ),
             );
           }
         }
 
-        if (responseTanaman['status'] && nutrisiSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('Pelaporan Harian berhasil ${list[i]['name']} dikirim'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else if (!responseTanaman['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${responseTanaman['message']}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+        if (!responseTanaman['status']) {
+          anyReportFailed = true;
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                    'Error Laporan Harian (${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}): ${responseTanaman['message']}'),
+                backgroundColor: Colors.red));
+          }
+        }
+
+        if (responseTanaman['status'] && nutrisiSuccess && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  'Pelaporan Harian berhasil ${currentObjek?['name'] ?? 'Tanaman ${i + 1}'} dikirim'),
+              backgroundColor: Colors.green));
         }
       }
 
-      for (int i = 0; i < widget.step; i++) {
-        Navigator.pop(context);
+      if (!anyReportFailed && mounted) {
+        // Hanya pop jika semua berhasil
+        for (int k = 0; k < widget.step; k++) {
+          if (Navigator.canPop(context)) Navigator.pop(context);
+        }
       }
     } catch (e) {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error submit: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
+    final List<dynamic> objekBudidayaProp =
+        widget.data?['objekBudidaya'] ?? [null];
+    int count = objekBudidayaProp.length;
+    if (objekBudidayaProp.isEmpty ||
+        (objekBudidayaProp.length == 1 && objekBudidayaProp[0] == null)) {
+      // Jika objekBudidaya kosong atau hanya berisi null dari default, anggap 1 form default
+      count = 1;
+    }
 
-    for (int i = 0; i < objekBudidayaList.length; i++) {
+    for (int i = 0; i < count; i++) {
       _formKeys.add(GlobalKey<FormState>());
       _catatanController.add(TextEditingController());
       _sizeController.add(TextEditingController());
       _satuanController.add(TextEditingController());
-      _heightController.add(TextEditingController());
+      _heightController.add(TextEditingController(text: "0"));
       _imageTanamanList.add(null);
       _imageDosisList.add(null);
       selectedBahanList.add({});
@@ -448,13 +561,16 @@ class _PelaporanHarianTanamanScreenState
       statusNutrisi.add('Ya');
       kondisiDaun.add('sehat');
       statusTumbuh.add('bibit');
+      _lastHeights.add(0.0);
     }
     _fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [];
+    int formCount = _heightController.length;
+    final List<dynamic>? dataObjekBudidaya = widget.data?['objekBudidaya'];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -484,8 +600,36 @@ class _PelaporanHarianTanamanScreenState
                       'Harap mengisi form dengan data yang benar sesuai kondisi lapangan!',
                   showDate: true,
                 ),
-                ...List.generate(objekBudidayaList.length, (i) {
-                  final objek = objekBudidayaList[i];
+                ...List.generate(formCount, (i) {
+                  final objek = (dataObjekBudidaya != null &&
+                          i < dataObjekBudidaya.length)
+                      ? dataObjekBudidaya[i]
+                      : null;
+
+                  Map<String, dynamic>? currentBahanTerpilih =
+                      (selectedBahanList.length > i)
+                          ? selectedBahanList[i]
+                          : null;
+
+                  String labelUntukJumlah = "Jumlah/dosis";
+                  String satuanDisplay = "";
+
+                  if (currentBahanTerpilih != null &&
+                      currentBahanTerpilih['stok'] != null) {
+                    dynamic stokValue = currentBahanTerpilih['stok'];
+                    String stokFormatted = "";
+
+                    if (stokValue is num) {
+                      stokFormatted = stokValue.toStringAsFixed(1);
+                    } else {
+                      stokFormatted = stokValue.toString();
+                    }
+
+                    satuanDisplay =
+                        currentBahanTerpilih['satuanNama'] as String? ?? '';
+                    labelUntukJumlah =
+                        "Jumlah/dosis (Sisa: $stokFormatted $satuanDisplay)";
+                  }
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Form(
@@ -494,15 +638,17 @@ class _PelaporanHarianTanamanScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Data Tanaman',
+                            'Data Tanaman ${(formCount > 1 || objek != null) ? (objek?['name'] ?? "Tanaman ${i + 1}") : ""}',
                             style: semibold16.copyWith(color: dark1),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             ((objek?['name'] != null &&
-                                        (objek?['name'] as String).isNotEmpty)
-                                    ? '${objek?['name']} - '
-                                    : '') +
+                                        (objek!['name'] as String).isNotEmpty)
+                                    ? '${objek['name']} - '
+                                    : (formCount == 1 && objek == null
+                                        ? 'Tanaman Default - '
+                                        : '')) +
                                 (widget.data?['unitBudidaya']?['category'] ??
                                     '-'),
                             style: bold20.copyWith(color: dark1),
@@ -514,15 +660,20 @@ class _PelaporanHarianTanamanScreenState
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Tanggal dan waktu tanam: ',
-                            style: regular14.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            objek?['createdAt'] != null
-                                ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                    .format(DateTime.parse(objek['createdAt']))
-                                : 'Unknown',
+                            'Tanggal dan waktu tanam: ${(() {
+                              final createdAtRaw = objek?['createdAt'];
+                              if (createdAtRaw == null ||
+                                  createdAtRaw is! String ||
+                                  createdAtRaw.isEmpty) {
+                                return '-';
+                              }
+                              try {
+                                return DateFormat('EE, dd MMMM yyyy HH:mm')
+                                    .format(DateTime.parse(createdAtRaw));
+                              } catch (_) {
+                                return 'Unknown';
+                              }
+                            })()}',
                             style: regular14.copyWith(color: dark1),
                           ),
                           const SizedBox(height: 12),
@@ -570,31 +721,40 @@ class _PelaporanHarianTanamanScreenState
                           ),
                           InputFieldWidget(
                               label: "Pertumbuhan tinggi tanaman (cm)",
-                              hint: "Contoh: 30",
+                              hint:
+                                  "Contoh: ${_lastHeights[i].toStringAsFixed(1)} atau lebih",
                               controller: _heightController[i],
-                              keyboardType: TextInputType.number,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Masukkan pertumbuhan tinggi tanaman';
+                                  return 'Masukkan tinggi tanaman saat ini';
+                                }
+                                final newHeight = double.tryParse(value);
+                                if (newHeight == null) {
+                                  return 'Masukkan angka yang valid';
+                                }
+                                if (newHeight < _lastHeights[i]) {
+                                  return 'Tinggi tidak boleh kurang dari tinggi sebelumnya (${_lastHeights[i].toStringAsFixed(1)} cm)';
                                 }
                                 return null;
                               }),
                           DropdownFieldWidget(
                             label: "Kondisi daun",
                             hint: "Pilih kondisi daun",
-                            items: const [
-                              'sehat',
-                              'kering',
-                              'layu',
-                              'kuning',
-                              'keriting',
-                              'bercak',
-                              'rusak'
-                            ],
-                            selectedValue: kondisiDaun[i],
-                            onChanged: (value) {
+                            items: kondisiDaunDisplayMap.values.toList(),
+                            selectedValue:
+                                kondisiDaunDisplayMap[kondisiDaun[i]],
+                            onChanged: (displayValue) {
+                              if (displayValue == null) return;
                               setState(() {
-                                kondisiDaun[i] = value!;
+                                kondisiDaun[i] = kondisiDaunDisplayMap.entries
+                                    .firstWhere(
+                                        (entry) => entry.value == displayValue,
+                                        orElse: () =>
+                                            kondisiDaunDisplayMap.entries.first)
+                                    .key;
                               });
                             },
                             validator: (value) {
@@ -607,20 +767,18 @@ class _PelaporanHarianTanamanScreenState
                           DropdownFieldWidget(
                             label: "Status pertumbuhan tanaman",
                             hint: "Pilih status tumbuh",
-                            items: const [
-                              'bibit',
-                              'perkecambahan',
-                              'vegetatifAwal',
-                              'vegetatifLanjut',
-                              'generatifAwal',
-                              'generatifLanjut',
-                              'panen',
-                              'dormansi'
-                            ],
-                            selectedValue: statusTumbuh[i],
-                            onChanged: (value) {
+                            items: statusTumbuhDisplayMap.values.toList(),
+                            selectedValue:
+                                statusTumbuhDisplayMap[statusTumbuh[i]],
+                            onChanged: (displayValue) {
+                              if (displayValue == null) return;
                               setState(() {
-                                statusTumbuh[i] = value!;
+                                statusTumbuh[i] = statusTumbuhDisplayMap.entries
+                                    .firstWhere(
+                                        (entry) => entry.value == displayValue,
+                                        orElse: () => statusTumbuhDisplayMap
+                                            .entries.first)
+                                    .key;
                               });
                             },
                             validator: (value) {
@@ -664,6 +822,7 @@ class _PelaporanHarianTanamanScreenState
                                   statusPemberianList[i] = value;
                                   selectedBahanList[i] = {};
                                   _satuanController[i].clear();
+                                  _sizeController[i].clear();
                                 });
                               },
                             ),
@@ -734,18 +893,31 @@ class _PelaporanHarianTanamanScreenState
                               },
                             ),
                             InputFieldWidget(
-                                label: "Jumlah/dosis",
+                                label: labelUntukJumlah,
                                 hint: "Contoh: 10",
                                 controller: _sizeController[i],
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Masukkan jumlah/dosis';
-                                  } else if (double.tryParse(value) == null) {
+                                  }
+                                  final number = double.tryParse(value);
+                                  if (number == null) {
                                     return 'Masukkan angka yang valid';
                                   }
-                                  if (double.parse(value) <= 0) {
-                                    return 'Jumlah/dosis tidak boleh kurang dari 1';
+                                  if (number <= 0) {
+                                    return 'Jumlah/dosis harus lebih dari 0';
+                                  }
+                                  if (currentBahanTerpilih != null &&
+                                      currentBahanTerpilih['stok'] != null) {
+                                    dynamic stokValue =
+                                        currentBahanTerpilih['stok'];
+                                    if (stokValue is num &&
+                                        number > stokValue) {
+                                      return 'Dosis melebihi stok (Sisa: ${stokValue.toStringAsFixed(1)} $satuanDisplay)';
+                                    }
                                   }
                                   return null;
                                 }),

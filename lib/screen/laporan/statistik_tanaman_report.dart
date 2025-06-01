@@ -800,11 +800,11 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                 final plantItem = item as Map<String, dynamic>?;
                 final jenisBudidayaNama =
                     _tanamanReport!['nama'] as String? ?? 'Tidak Diketahui';
-                final ikonGambar = _tanamanReport!['gambar'] as String? ?? '';
+                final plantImg = _tanamanReport!['gambar'] as String? ?? '';
 
                 return {
                   'name': plantItem?['namaId'] as String? ?? 'Tanpa Nama',
-                  'icon': ikonGambar,
+                  'icon': plantImg,
                   'category': jenisBudidayaNama,
                   'id': plantItem?['id'] as String? ?? '',
                   'subtitle': plantItem?['deskripsi'] as String? ?? '',
@@ -1636,7 +1636,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   'id': item['laporanId'] as String? ?? '',
                   'name': "${item['name'] ?? 'Nutrisi'}",
                   'category': (item['category'] as String?) ?? 'Nutrisi',
-                  'image': item['gambar'],
+                  'image':
+                      item['image'] as String? ?? 'assets/images/appIcon.png',
                   'person': item['person'] as String? ?? 'N/A',
                   'date': _formatDisplayDate(item['date'] as String? ?? ''),
                   'time': _formatDisplayTime(item['time'] as String? ?? ''),

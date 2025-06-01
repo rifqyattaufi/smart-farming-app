@@ -14,6 +14,7 @@ class InputFieldWidget extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool isDisabled;
   final bool isGrayed;
+  final ValueChanged<String>? onChanged;
 
   const InputFieldWidget({
     super.key,
@@ -29,6 +30,7 @@ class InputFieldWidget extends StatelessWidget {
     this.keyboardType,
     this.isDisabled = false,
     this.isGrayed = false,
+    this.onChanged,
   });
 
   @override
@@ -47,6 +49,7 @@ class InputFieldWidget extends StatelessWidget {
           maxLines: obscureText ? 1 : maxLines,
           validator: validator,
           readOnly: isDisabled,
+          onChanged: onChanged,
           style: medium14.copyWith(
             color: isGrayed ? dark3 : dark1,
           ),

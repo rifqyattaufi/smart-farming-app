@@ -119,6 +119,78 @@ class LaporanService {
       };
     }
   }
+  
+  Future<Map<String, dynamic>> getLastHarianKebunByObjekBudidayaId(
+      String objekBudidayaId) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json'
+    };
+    final url = Uri.parse('$baseUrl/harian-kebun/last/$objekBudidayaId');
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getLastHarianKebunByObjekBudidayaId(objekBudidayaId);
+      } else {
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> createLaporanPanenKebun(
+      Map<String, dynamic> data) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json'
+    };
+    final url = Uri.parse('$baseUrl/panen-kebun');
+
+    try {
+      final response =
+          await http.post(url, headers: headers, body: json.encode(data));
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 201) {
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await createLaporanPanenKebun(data);
+      } else {
+        return {
+          'status': false,
+          'message': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 
   Future<Map<String, dynamic>> createLaporanSakit(
       Map<String, dynamic> data) async {

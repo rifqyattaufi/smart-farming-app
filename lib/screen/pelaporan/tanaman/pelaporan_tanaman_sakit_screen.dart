@@ -255,15 +255,20 @@ class _PelaporanTanamanSakitScreenState
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Tanggal dan waktu tanam: ',
-                            style: regular14.copyWith(color: dark1),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            objek?['createdAt'] != null
-                                ? DateFormat('EEEE, dd MMMM yyyy HH:mm')
-                                    .format(DateTime.parse(objek['createdAt']))
-                                : 'Unknown',
+                            'Tanggal dan waktu tanam: ${(() {
+                              final createdAtRaw = objek?['createdAt'];
+                              if (createdAtRaw == null ||
+                                  createdAtRaw is! String ||
+                                  createdAtRaw.isEmpty) {
+                                return '-';
+                              }
+                              try {
+                                return DateFormat('EE, dd MMMM yyyy HH:mm')
+                                    .format(DateTime.parse(createdAtRaw));
+                              } catch (_) {
+                                return 'Unknown';
+                              }
+                            })()}',
                             style: regular14.copyWith(color: dark1),
                           ),
                           const SizedBox(height: 12),

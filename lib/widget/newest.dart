@@ -33,8 +33,7 @@ class NewestReports extends StatelessWidget {
   String _formatTime(dynamic time) {
     if (time == null) return 'Unknown Time';
     try {
-      return DateFormat('EEEE, d MMMM yyyy | HH:mm')
-          .format(DateTime.parse(time));
+      return DateFormat('EE, d MMMM yyyy | HH:mm').format(DateTime.parse(time));
     } catch (e) {
       return 'Unknown Time';
     }
@@ -152,9 +151,11 @@ class NewestReports extends StatelessWidget {
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Row(
                                         children: [
-                                          Text(
-                                            '${_formatTime(report['time'])} | ${_formatTimeAgo(report['time'])}',
-                                            style: timeTextStyle,
+                                          Expanded(
+                                            child: Text(
+                                              '${_formatTime(report['time'])} | ${_formatTimeAgo(report['time'])}',
+                                              style: timeTextStyle,
+                                            ),
                                           ),
                                         ],
                                       ),

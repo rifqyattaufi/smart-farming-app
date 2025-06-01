@@ -17,22 +17,6 @@ class StatistikTernakReport extends StatefulWidget {
 }
 
 class _StatistikTernakReportState extends State<StatistikTernakReport> {
-  DateTimeRange? _selectedRange;
-
-  void _openDatePicker() async {
-    DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2023),
-      lastDate: DateTime.now(),
-      initialDateRange: _selectedRange,
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedRange = picked;
-      });
-    }
-  }
-
   int _selectedTabIndex = 0;
   final List<String> tabList = [
     'Informasi',
