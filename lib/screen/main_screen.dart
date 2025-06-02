@@ -26,15 +26,11 @@ class MainScreen extends StatelessWidget {
     final Brightness systemBrightness =
         MediaQuery.of(context).platformBrightness;
 
-    final bool isDarkMode = systemBrightness == Brightness.dark;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(
-          systemNavigationBarColor: isDarkMode ? Colors.black : Colors.white,
-          systemNavigationBarIconBrightness:
-              isDarkMode ? Brightness.light : Brightness.dark,
-        ),
+        const SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.white,
+            systemNavigationBarIconBrightness: Brightness.light),
       );
     });
     final String location = GoRouterState.of(context).uri.toString();
@@ -57,7 +53,7 @@ class MainScreen extends StatelessWidget {
                 offset: const Offset(0, -8),
               ),
             ],
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: Colors.white,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -77,15 +73,13 @@ class MainScreen extends StatelessWidget {
                         iconPath,
                         height: 28,
                         colorFilter: ColorFilter.mode(
-                            isActive ? green1 : (isDarkMode ? green1 : dark1),
-                            BlendMode.srcIn),
+                            isActive ? green1 : dark1, BlendMode.srcIn),
                       )
                     else
                       Image.asset(
                         iconPath,
                         height: 28,
-                        color:
-                            isActive ? green1 : (isDarkMode ? green1 : dark1),
+                        color: isActive ? green1 : dark1,
                       ),
                     const SizedBox(height: 4),
                     Text(
