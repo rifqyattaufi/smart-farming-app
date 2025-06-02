@@ -153,7 +153,7 @@ class NewestReports extends StatelessWidget {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              '${_formatTime(report['time'])} | ${_formatTimeAgo(report['time'])}',
+                                              _formatTimeAgo(report['time']),
                                               style: timeTextStyle,
                                             ),
                                           ),
@@ -172,8 +172,8 @@ class NewestReports extends StatelessWidget {
                                         margin: const EdgeInsets.only(right: 8),
                                         decoration: BoxDecoration(
                                           color: report['isActive'] == true
-                                              ? green1.withOpacity(0.1)
-                                              : red.withOpacity(0.1),
+                                              ? green1.withValues(alpha: 0.1)
+                                              : red.withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(100),
                                         ),
@@ -274,7 +274,7 @@ class NewestReports extends StatelessWidget {
                                                 ),
                                               ),
                                             Text(
-                                              report['time'] ?? 'Unknown Time',
+                                              report['time'],
                                               style: timeTextStyle,
                                             ),
                                           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/notifications/add_global_notification.dart';
 import 'package:smart_farming_app/service/global_notification_service.dart';
@@ -59,6 +60,15 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
     super.initState();
   }
 
+  String _formatTime(dynamic time) {
+    if (time == null) return 'Unknown Time';
+    try {
+      return DateFormat('EE, d MMMM yyyy | HH:mm').format(DateTime.parse(time));
+    } catch (e) {
+      return 'Unknown Time';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,8 +127,13 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
                             infoItem("Waktu Notifikasi",
                                 _notificationData?['scheduledTime'] ?? "-"),
                             if (_notificationData?['scheduledDate'] != null)
-                              infoItem("Tanggal Notifikasi",
-                                  _notificationData?['scheduledDate'] ?? "-"),
+                              infoItem(
+                                "Tanggal Notifikasi",
+                                _notificationData?['scheduledDate'] != null
+                                    ? _formatTime(
+                                        _notificationData!['scheduledDate'])
+                                    : "-",
+                              ),
                           ],
                         ),
                       ),
