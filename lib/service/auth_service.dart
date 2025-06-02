@@ -302,4 +302,32 @@ class AuthService {
       };
     }
   }
+
+  Future<void> linkWithGoogle() async{
+    final url = Uri.parse('$baseUrl/auth/google/link');
+    final token = await getToken();
+
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return body;
+      } else {
+        throw Exception('Failed to link with Google: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: ${e.toString()}');
+    }
+  }
 }
