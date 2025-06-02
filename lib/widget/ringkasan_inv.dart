@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,6 @@ class RingkasanInv extends StatefulWidget {
   final int itemTersedia;
   final int stokRendah;
   final int itemBaru;
-  final DateTime tanggal;
 
   const RingkasanInv({
     super.key,
@@ -22,7 +22,6 @@ class RingkasanInv extends StatefulWidget {
     required this.itemTersedia,
     required this.stokRendah,
     required this.itemBaru,
-    required this.tanggal,
   });
 
   @override
@@ -31,6 +30,8 @@ class RingkasanInv extends StatefulWidget {
 
 class _RingkasanInvState extends State<RingkasanInv> {
   int? _touchedIndex;
+  late Timer _timer;
+  late DateTime _currentTime;
 
   late List<Map<String, dynamic>> _pieData;
 
@@ -60,6 +61,13 @@ class _RingkasanInvState extends State<RingkasanInv> {
         'title': 'Item Baru'
       },
     ];
+
+    _currentTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      setState(() {
+        _currentTime = DateTime.now();
+      });
+    });
   }
 
   @override
@@ -98,6 +106,12 @@ class _RingkasanInvState extends State<RingkasanInv> {
     }
   }
 
+  @override
+  void dispose() {
+    _timer.cancel(); // Hentikan timer saat widget dihapus
+    super.dispose();
+  }
+
   PieChartSectionData _pieSection(Color color, int value, String title,
       {bool isTouched = false}) {
     final double radius = isTouched ? 18 : 12;
@@ -121,8 +135,8 @@ class _RingkasanInvState extends State<RingkasanInv> {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('EEEE, d MMMM y').format(widget.tanggal);
-    final timeStr = DateFormat('HH.mm').format(widget.tanggal);
+    final dateStr = DateFormat('EEEE, d MMMM y').format(_currentTime);
+    final timeStr = DateFormat('HH.mm').format(_currentTime);
 
     List<PieChartSectionData> sections = [];
     for (int i = 0; i < _pieData.length; i++) {

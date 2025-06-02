@@ -40,11 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _isLoading = true;
     _fetchData(isRefresh: false);
   }
 
   Future<void> _fetchData({isRefresh = false}) async {
-    if (!isRefresh && !_isLoading) {
+    if (isRefresh && mounted) {
       setState(() {
         _isLoading = true;
       });
@@ -60,13 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _perkebunanData = results[0];
         _peternakanData = results[1];
-        if (isRefresh) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: const Text('Data berhasil diperbarui!'),
-                backgroundColor: green1),
-          );
-        }
+        _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
@@ -76,14 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.red,
         ),
       );
-    } finally {
-      // ignore: control_flow_in_finally
-      if (!mounted) return;
-      if (_isLoading) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 

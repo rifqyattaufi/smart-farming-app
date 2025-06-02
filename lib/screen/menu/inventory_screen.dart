@@ -232,7 +232,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             itemTersedia: _inventarisData?['itemTersedia'] ?? 0,
                             stokRendah: _inventarisData?['stokRendah'] ?? 0,
                             itemBaru: _inventarisData?['itemBaru'] ?? 0,
-                            tanggal: DateTime.now(),
                           ),
                           const SizedBox(height: 12),
                           MenuGrid(

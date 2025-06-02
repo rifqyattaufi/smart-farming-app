@@ -49,9 +49,6 @@ class _ReportScreenState extends State<ReportScreen> {
       setState(() {
         _perkebunanData = results[0];
         _peternakanData = results[1];
-        if (isRefresh) {
-          _showError("Data berhasil diperbarui", isError: false);
-        }
       });
     } catch (e) {
       if (!mounted) return;
