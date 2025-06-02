@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
@@ -255,8 +256,18 @@ final _router = GoRouter(
       builder: (context, state) => const LupaPasswordScreen(),
     ),
     GoRoute(
+      path: '/reset-password',
+      builder: (context, state) {
+        final extra = state.extra as ResetPasswordScreen;
+        return extra;
+      },
+    ),
+    GoRoute(
       path: '/verifikasi-otp',
-      builder: (context, state) => const OtpScreen(),
+      builder: (context, state) {
+        final extra = state.extra as OtpScreen;
+        return extra;
+      },
     ),
     GoRoute(
       path: '/pilih-tanaman',
