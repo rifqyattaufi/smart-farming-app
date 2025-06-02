@@ -9,14 +9,16 @@ class MainScreen extends StatelessWidget {
   const MainScreen({super.key, required this.child});
 
   static final tabs = [
-    {'icon': 'other.svg', 'label': 'Beranda', 'location': '/home'},
-    {'icon': 'explore.svg', 'label': 'Laporan', 'location': '/report'},
-    {'icon': 'gosend.svg', 'label': 'Inventaris', 'location': '/inventory'},
-    {'icon': 'goclub.svg', 'label': 'Akun', 'location': '/account'},
+    {'icon': 'home-filled.png', 'label': 'Beranda', 'location': '/home'},
+    {'icon': 'report-filled.png', 'label': 'Laporan', 'location': '/report'},
+    {'icon': 'box-filled.png', 'label': 'Inventaris', 'location': '/inventory'},
+    {'icon': 'person-filled.png', 'label': 'Akun', 'location': '/account'},
   ];
 
   int _locationToIndex(String location) {
-    return tabs.indexWhere((tab) => location == tab['location']);
+    final index =
+        tabs.indexWhere((tab) => location.startsWith(tab['location']!));
+    return index == -1 ? 0 : index;
   }
 
   @override
@@ -55,27 +57,36 @@ class MainScreen extends StatelessWidget {
                 offset: const Offset(0, -8),
               ),
             ],
-            color: Colors.white,
+            color: isDarkMode ? Colors.black : Colors.white,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(tabs.length, (index) {
               final tab = tabs[index];
               final isActive = index == selectedIndex;
+              final String iconPath = "assets/icons/set/${tab['icon']!}";
+              final bool isSvg = iconPath.toLowerCase().endsWith('.svg');
 
               return GestureDetector(
                 onTap: () => context.go(tab['location']!),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/${tab['icon']}",
-                      height: 28,
-                      colorFilter: ColorFilter.mode(
-                        isActive ? green1 : dark1,
-                        BlendMode.srcIn,
+                    if (isSvg)
+                      SvgPicture.asset(
+                        iconPath,
+                        height: 28,
+                        colorFilter: ColorFilter.mode(
+                            isActive ? green1 : (isDarkMode ? green1 : dark1),
+                            BlendMode.srcIn),
+                      )
+                    else
+                      Image.asset(
+                        iconPath,
+                        height: 28,
+                        color:
+                            isActive ? green1 : (isDarkMode ? green1 : dark1),
                       ),
-                    ),
                     const SizedBox(height: 4),
                     Text(
                       tab['label']!,
