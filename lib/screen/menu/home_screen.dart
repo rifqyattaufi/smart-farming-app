@@ -63,6 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
         _peternakanData = results[1];
         _isLoading = false;
       });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pageController.hasClients) {
+          if (_pageController.page?.round() != _selectedTabIndex) {
+            _pageController.jumpToPage(_selectedTabIndex);
+          }
+        }
+      });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,6 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPerkebunanContent() {
+    if (_isLoading && _perkebunanData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     if (!_isLoading && _perkebunanData == null) {
       return Center(
         child: Column(
@@ -375,12 +386,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPeternakanContent() {
+    if (_isLoading && _peternakanData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     if (!_isLoading && _peternakanData == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data perkebunan."),
+            const Text("Gagal memuat data peternakan."),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () => _fetchData(isRefresh: true),
@@ -698,6 +712,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.warehouse, color: green1),
                           title: const Text("Tambah Kebun"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-kebun',
                                 extra: AddKebunScreen(
                                   isEdit: false,
@@ -710,6 +725,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(Icons.yard_outlined, color: green1),
                           title: const Text("Tambah Jenis Tanaman"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-tanaman',
                                 extra: AddTanamanScreen(
                                   isEdit: false,
@@ -723,6 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.inventory_outlined, color: green1),
                           title: const Text("Tambah Komoditas Tanaman"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-komoditas-tanaman',
                                 extra: AddKomoditasTanamanScreen(
                                   isEdit: false,
@@ -760,6 +777,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.warehouse_outlined, color: green1),
                           title: const Text("Tambah Kandang"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-kandang',
                                 extra: AddKandangScreen(
                                   isEdit: false,
@@ -773,6 +791,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.cruelty_free_rounded, color: green1),
                           title: const Text("Tambah Jenis Ternak"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-ternak',
                                 extra: AddTernakScreen(
                                   isEdit: false,
@@ -786,6 +805,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.inventory_outlined, color: green1),
                           title: const Text("Tambah Komoditas Ternak"),
                           onTap: () {
+                            Navigator.pop(context);
                             context.push('/tambah-komoditas-ternak',
                                 extra: AddKomoditasTernakScreen(
                                   isEdit: false,

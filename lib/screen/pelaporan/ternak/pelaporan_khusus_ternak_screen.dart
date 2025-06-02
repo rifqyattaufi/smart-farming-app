@@ -106,6 +106,7 @@ class _PelaporanKhususTernakScreenState
           child: Padding(
             padding: const EdgeInsets.only(bottom: 100),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BannerWidget(
                   title: 'Step $_step - Apa yang ingin kamu laporkan?',
