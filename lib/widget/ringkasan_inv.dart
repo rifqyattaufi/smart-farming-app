@@ -63,10 +63,12 @@ class _RingkasanInvState extends State<RingkasanInv> {
     ];
 
     _currentTime = DateTime.now();
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      setState(() {
-        _currentTime = DateTime.now();
-      });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentTime = DateTime.now();
+        });
+      }
     });
   }
 
@@ -75,7 +77,9 @@ class _RingkasanInvState extends State<RingkasanInv> {
     super.didUpdateWidget(oldWidget);
     if (widget.itemTersedia != oldWidget.itemTersedia ||
         widget.seringDigunakan != oldWidget.seringDigunakan ||
-        false) {
+        widget.jarangDigunakan != oldWidget.jarangDigunakan ||
+        widget.stokRendah != oldWidget.stokRendah ||
+        widget.itemBaru != oldWidget.itemBaru) {
       _pieData = [
         {
           'color': green2,
@@ -108,7 +112,7 @@ class _RingkasanInvState extends State<RingkasanInv> {
 
   @override
   void dispose() {
-    _timer.cancel(); // Hentikan timer saat widget dihapus
+    _timer.cancel();
     super.dispose();
   }
 

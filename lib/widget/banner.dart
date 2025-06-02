@@ -27,10 +27,12 @@ class _BannerWidgetState extends State<BannerWidget> {
   void initState() {
     super.initState();
     _currentTime = DateTime.now();
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      setState(() {
-        _currentTime = DateTime.now();
-      });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentTime = DateTime.now();
+        });
+      }
     });
   }
 
