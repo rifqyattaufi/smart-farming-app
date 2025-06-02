@@ -736,6 +736,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               selectedIndex: _selectedTabIndex,
               tabTitles: tabList,
             ),
+            const SizedBox(height: 12),
             Expanded(
               child: PageView(
                 controller: _pageController,
