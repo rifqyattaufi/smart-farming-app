@@ -190,8 +190,8 @@ class _RingkasanInvState extends State<RingkasanInv> {
                   ),
                   const SizedBox(width: 16),
                   SizedBox(
-                    width: 120,
-                    height: 120,
+                    width: 150,
+                    height: 150,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -215,7 +215,7 @@ class _RingkasanInvState extends State<RingkasanInv> {
                               },
                             ),
                             sectionsSpace: 2,
-                            centerSpaceRadius: 35,
+                            centerSpaceRadius: 60,
                             sections: sections,
                           ),
                         ),
@@ -227,14 +227,14 @@ class _RingkasanInvState extends State<RingkasanInv> {
                                 children: [
                                   Text(
                                     _pieData[_touchedIndex!]['title'] as String,
-                                    style: regular10.copyWith(color: dark2),
+                                    style: regular14.copyWith(color: dark2),
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     (_pieData[_touchedIndex!]['value'] as int)
                                         .toString(),
-                                    style: bold16.copyWith(color: dark1),
+                                    style: bold18.copyWith(color: dark1),
                                   ),
                                 ],
                               )
@@ -242,10 +242,10 @@ class _RingkasanInvState extends State<RingkasanInv> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text("Total Item",
-                                      style: regular10.copyWith(color: dark2)),
+                                      style: regular14.copyWith(color: dark2)),
                                   const SizedBox(height: 2),
                                   Text("${widget.totalItem}",
-                                      style: bold20.copyWith(color: dark1)),
+                                      style: bold18.copyWith(color: dark1)),
                                 ],
                               )
                       ],
@@ -264,7 +264,8 @@ class _RingkasanInvState extends State<RingkasanInv> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: regular14.copyWith(color: dark2)),
+          Expanded(child: Text(label, style: regular14.copyWith(color: dark2))),
+          const SizedBox(width: 8),
           Text(value, style: semibold14.copyWith(color: dark1)),
         ],
       ),
