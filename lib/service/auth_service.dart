@@ -173,4 +173,133 @@ class AuthService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> lupaPassword(Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/auth/forgotPassword');
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: json.encode(data),
+      );
+
+      final body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Password reset link sent successfully',
+        };
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to send password reset link',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> resendOtp(Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/auth/resendOtp');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
+
+      final body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'OTP resent successfully',
+        };
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to resend OTP',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> checkOtp(Map<String, dynamic> data) {
+    final url = "$baseUrl/auth/checkOtp";
+
+    try {
+      return http
+          .post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      )
+          .then((response) {
+        final body = json.decode(response.body);
+        if (response.statusCode == 200) {
+          return {
+            'status': true,
+            'message': body['message'] ?? 'OTP verified successfully',
+          };
+        } else {
+          return {
+            'status': false,
+            'message': body['message'] ?? 'Failed to verify OTP',
+          };
+        }
+      });
+    } catch (e) {
+      return Future.value({
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      });
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/auth/resetPassword');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
+
+      final body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Password reset successfully',
+        };
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to reset password',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }
