@@ -593,7 +593,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         initialDate: currentSafeRange.start,
         firstDate: DateTime(2000),
         lastDate: DateTime(now.year + 5),
-        helpText: 'Pilih Tanggal Mulai (Mingguan)',
+        helpText: 'Pilih Tanggal Mulai',
       );
       if (pickedStartDate != null) {
         newRange = DateTimeRange(
@@ -638,6 +638,14 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       case ChartFilterType.custom:
         formattedStart = dfDayMonthYear.format(range.start);
         formattedEnd = dfDayMonthYear.format(range.end);
+
+        if (_selectedChartFilterType == ChartFilterType.custom &&
+            range.start.year == range.end.year &&
+            range.start.month == range.end.month &&
+            range.start.day == range.end.day) {
+          return "Penggunaan $formattedStart";
+        }
+
         return "Pelaporan Per $formattedStart - $formattedEnd";
 
       case ChartFilterType.monthly:
@@ -645,7 +653,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         formattedEnd = dfMonthYear.format(range.end);
         if (range.start.year == range.end.year &&
             range.start.month == range.end.month) {
-          return formattedStart;
+          return "Penggunaan Bulan ${dfMonthYear.format(range.start)}";
         }
         return "Pelaporan Per $formattedStart - $formattedEnd";
 
@@ -653,7 +661,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         formattedStart = dfYear.format(range.start);
         formattedEnd = dfYear.format(range.end);
         if (range.start.year == range.end.year) {
-          return formattedStart;
+          return "Penggunaan Tahun ${dfYear.format(range.start)}";
         }
         return "Pelaporan Per $formattedStart - $formattedEnd";
     }

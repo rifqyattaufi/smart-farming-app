@@ -67,7 +67,8 @@ class _AccountScreenState extends State<AccountScreen> {
               reports: [
                 {
                   'text': 'Data Akun',
-                  'onTap': () => context.push('/detail-pengguna', extra: const DetailUserScreen()),
+                  'onTap': () => context.push('/detail-pengguna',
+                      extra: const DetailUserScreen()),
                 },
                 {
                   'text': 'Ubah Password',
@@ -86,6 +87,10 @@ class _AccountScreenState extends State<AccountScreen> {
               title: 'Pengaturan Lainnya',
               reports: [
                 {
+                  'text': 'Manajemen Notifikasi Global',
+                  'onTap': () => context.push('/manajemen-notifikasi'),
+                },
+                {
                   'text': 'Manajemen Pengguna',
                   'onTap': () => context.push('/manajemen-pengguna'),
                 },
@@ -96,10 +101,6 @@ class _AccountScreenState extends State<AccountScreen> {
                 {
                   'text': 'Manajemen Grade Hasil Panen',
                   'onTap': () => context.push('/manajemen-grade'),
-                },
-                {
-                  'text': 'Manajemen Notifikasi Global',
-                  'onTap': () => context.push('/manajemen-notifikasi'),
                 },
                 {
                   'text': 'Log Aktivitas',
