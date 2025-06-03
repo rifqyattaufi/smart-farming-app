@@ -12,6 +12,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddInventarisScreen extends StatefulWidget {
   final VoidCallback? onInventarisAdded;
@@ -115,7 +116,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         }).toList();
       });
     } else {
-      _showError(response['message'] ?? "Gagal memuat kategori.");
+      showAppToast(context, response['message'] ?? 'Gagal memuat data');
     }
   }
 
@@ -133,7 +134,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         }).toList();
       });
     } else {
-      _showError(response['message'] ?? "Gagal memuat satuan.");
+      showAppToast(context, response['message'] ?? 'Gagal memuat data');
     }
   }
 
@@ -148,7 +149,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
       } else if (widget.idInventaris != null) {
         _fetchInventarisDataForEdit(widget.idInventaris!);
       } else {
-        _showError("ID Inventaris tidak valid untuk mode edit.");
+        showAppToast(context, 'ID inventaris tidak ditemukan');
       }
     }
   }
@@ -183,7 +184,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
           _dateController.text = DateFormat('EEEE, dd MMMM yyyy HH:mm')
               .format(_selectedDateTimeKadaluwarsa!);
         } catch (e) {
-          _showError(
+          showAppToast(context,
               "Format tanggal kadaluwarsa tidak valid: ${data['tanggalKadaluwarsa']}");
           _dateController.text = '';
           _selectedDateTimeKadaluwarsa = null;
@@ -202,25 +203,14 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         final dataInventaris = response['data']['inventaris'];
         _prefillFormFromData(dataInventaris);
       } else {
-        _showError(response['message'] ??
-            "Gagal memuat data inventaris untuk diedit.");
+        showAppToast(context, response['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      _showError('Error memuat data inventaris: $e');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-
-  void _showError(String message) {
-    if (!mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message), backgroundColor: Colors.red),
-        );
-      }
-    });
   }
 
   @override
@@ -241,12 +231,12 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         (!widget.isEdit ||
             (widget.isEdit &&
                 (_existingImageUrl == null || _existingImageUrl!.isEmpty)))) {
-      _showError('Gambar inventaris tidak boleh kosong');
+      showAppToast(context, 'Gambar inventaris tidak boleh kosong');
       return;
     }
 
     if (_selectedDateTimeKadaluwarsa == null) {
-      _showError('Tanggal kadaluwarsa tidak boleh kosong');
+      showAppToast(context, 'Tanggal kadaluwarsa tidak boleh kosong');
       return;
     }
 
@@ -261,7 +251,8 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
             uploadResponse['data'] != null) {
           finalImageUrl = uploadResponse['data'];
         } else {
-          _showError(uploadResponse['message'] ?? "Gagal mengunggah gambar.");
+          showAppToast(
+              context, uploadResponse['message'] ?? 'Gagal mengunggah gambar');
           setState(() => _isLoading = false);
           return;
         }
@@ -294,21 +285,22 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
 
       if (response['status'] == true) {
         widget.onInventarisAdded?.call();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.isEdit
-                ? 'Inventaris berhasil diperbarui'
-                : 'Inventaris berhasil ditambahkan'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(
+            context,
+            widget.isEdit
+                ? 'Berhasil memperbarui inventaris'
+                : 'Berhasil menambahkan inventaris',
+            isError: false);
+
         Navigator.pop(context);
       } else {
-        _showError(response['message'] ?? "Operasi gagal.");
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       if (!mounted) return;
-      _showError('Terjadi kesalahan: ${e.toString()}');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

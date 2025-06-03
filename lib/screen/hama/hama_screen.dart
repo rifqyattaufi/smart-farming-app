@@ -10,6 +10,7 @@ import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/unit_item.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class HamaScreen extends StatefulWidget {
   const HamaScreen({super.key});
@@ -139,9 +140,8 @@ class _HamaScreenState extends State<HamaScreen> {
           _isLoadingMoreLaporan = false;
           if (isInitialSetupOrRefresh) _isInitialLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red));
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }
@@ -687,14 +687,13 @@ class _HamaScreenState extends State<HamaScreen> {
               if (confirm == true) {
                 final response = await _hamaService.deleteJenisHama(id);
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(response['message'] ??
-                        (response['status'] == true
-                            ? "Berhasil dihapus"
-                            : "Gagal dihapus")),
-                    backgroundColor:
-                        response['status'] == true ? Colors.green : Colors.red,
-                  ));
+                  showAppToast(
+                      context,
+                      response['message'] ??
+                          (response['status'] == true
+                              ? "Berhasil dihapus"
+                              : "Gagal dihapus"),
+                      isError: response['status'] != true);
                   if (response['status'] == true) _handleRefresh();
                 }
               }

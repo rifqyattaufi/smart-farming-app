@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:smart_farming_app/utils/app_enums.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class ChartWidget extends StatelessWidget {
   final String? titleStats;
@@ -16,13 +16,6 @@ class ChartWidget extends StatelessWidget {
   final String? displayedDateRangeText;
   final ValueChanged<ChartFilterType?>? onChartFilterTypeChanged;
 
-  // final String title;
-  // final DateTime firstDate;
-  // final DateTime lastDate;
-  // final int counter;
-  // final bool showCounter;
-  // final String textCounter;
-
   const ChartWidget({
     super.key,
     this.titleStats,
@@ -33,13 +26,6 @@ class ChartWidget extends StatelessWidget {
     this.selectedChartFilterType,
     this.displayedDateRangeText,
     this.onChartFilterTypeChanged,
-
-    // this.title = 'Statistik Laporan',
-    // required this.firstDate,
-    // required this.lastDate,
-    // this.counter = 120,
-    // this.showCounter = true,
-    // this.textCounter = 'Hasil Panen (Kg)',
   });
 
   @override
@@ -66,87 +52,6 @@ class ChartWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // if (showCounter) ...[
-        //   Row(
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: [
-        //       Expanded(
-        //         child: Column(
-        //           crossAxisAlignment: CrossAxisAlignment.start,
-        //           children: [
-        //             Text(
-        //               title,
-        //               style: bold18.copyWith(color: dark1),
-        //             ),
-        //             const SizedBox(height: 4),
-        //             Text(
-        //               'Per ${DateFormat('d MMM', 'id_ID').format(firstDate)} - ${DateFormat('d MMM yyyy', 'id_ID').format(lastDate)}',
-        //               style: regular14.copyWith(color: dark1),
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        //   const SizedBox(height: 12),
-        //   SizedBox(
-        //     width: double.infinity,
-        //     height: 180,
-        //     child: Card(
-        //       elevation: 0,
-        //       shape: RoundedRectangleBorder(
-        //         borderRadius: BorderRadius.circular(15),
-        //         side: BorderSide(color: dark1.withValues(alpha: 0.5), width: 1),
-        //       ),
-        //       color: green4,
-        //       child: Padding(
-        //         padding: const EdgeInsets.all(20),
-        //         child: Stack(
-        //           children: [
-        //             Positioned(
-        //               top: 0,
-        //               left: 0,
-        //               child: Text(
-        //                 counter.toString(),
-        //                 style: bold20.copyWith(color: dark1, fontSize: 60),
-        //               ),
-        //             ),
-        //             Positioned(
-        //               top: 0,
-        //               right: 0,
-        //               child: Container(
-        //                 width: 40,
-        //                 height: 40,
-        //                 decoration: BoxDecoration(
-        //                     shape: BoxShape.circle, color: green1),
-        //                 child: Padding(
-        //                   padding: const EdgeInsets.all(8),
-        //                   child: SvgPicture.asset(
-        //                     'assets/icons/other.svg',
-        //                     colorFilter:
-        //                         ColorFilter.mode(white, BlendMode.srcIn),
-        //                     width: 24,
-        //                   ),
-        //                 ),
-        //               ),
-        //             ),
-        //             Positioned(
-        //               bottom: 0,
-        //               left: 0,
-        //               child: Text(
-        //                 textCounter,
-        //                 style:
-        //                     semibold18.copyWith(color: dark1, fontSize: 18),
-        //               ),
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        //   const SizedBox(height: 24),
-        // ],
-
         if (hasTitleStats || hasDateIcon) ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -166,7 +71,6 @@ class ChartWidget extends StatelessWidget {
         ] else ...[
           const SizedBox(height: 12),
         ],
-
         if (showFilterControls &&
             selectedChartFilterType != null &&
             onChartFilterTypeChanged != null) ...[
@@ -181,9 +85,7 @@ class ChartWidget extends StatelessWidget {
               ),
             ),
         ],
-
         const SizedBox(height: 12),
-
         if (showFilterControls &&
             selectedChartFilterType != null &&
             onChartFilterTypeChanged != null) ...[
@@ -227,7 +129,6 @@ class ChartWidget extends StatelessWidget {
             ],
           ),
         ],
-
         SizedBox(
           height: 200,
           child: !hasValidData

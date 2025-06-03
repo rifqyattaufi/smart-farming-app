@@ -11,6 +11,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddPemakaianInventarisScreen extends StatefulWidget {
   const AddPemakaianInventarisScreen({super.key});
@@ -115,11 +116,12 @@ class _AddPemakaianInventarisScreenState
               List<Map<String, dynamic>>.from(kategoriResponse['data']);
         });
       } else {
-        _showErrorSnackbar(
-            'Gagal memuat kategori: ${kategoriResponse['message'] ?? 'Data tidak valid'}');
+        showAppToast(
+            context, kategoriResponse['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      _showErrorSnackbar('Error memuat kategori: $e');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -150,22 +152,12 @@ class _AddPemakaianInventarisScreenState
           );
         });
       } else {
-        _showErrorSnackbar(
-            'Gagal memuat inventaris: ${inventarisResponse['message'] ?? 'Data tidak valid'}');
+        showAppToast(
+            context, inventarisResponse['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      _showErrorSnackbar('Error memuat inventaris: $e');
-    }
-  }
-
-  void _showErrorSnackbar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -179,12 +171,12 @@ class _AddPemakaianInventarisScreenState
     }
 
     if (_image == null) {
-      _showErrorSnackbar('Silakan unggah bukti pemakaian inventaris');
+      showAppToast(context, 'Silakan unggah bukti pemakaian inventaris');
       return;
     }
 
     if (selectedInvId == null) {
-      _showErrorSnackbar('Silakan pilih inventaris terlebih dahulu');
+      showAppToast(context, 'Silakan pilih inventaris terlebih dahulu');
       return;
     }
 
@@ -198,7 +190,7 @@ class _AddPemakaianInventarisScreenState
       final imageUrlResponse = await _imageService.uploadImage(_image!);
       if (!(imageUrlResponse['status'] ?? false) ||
           imageUrlResponse['data'] == null) {
-        _showErrorSnackbar(
+        showAppToast(context,
             'Gagal mengunggah gambar: ${imageUrlResponse['message'] ?? 'URL tidak valid'}');
         setState(() {
           _isLoading = false;
@@ -228,22 +220,22 @@ class _AddPemakaianInventarisScreenState
           await _laporanService.createLaporanPenggunaanInventaris(data);
 
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pelaporan pemakaian inventaris berhasil dikirim'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(
+            context, 'Berhasil menambahkan laporan pemakaian inventaris',
+            isError: false);
         _resetForm();
         if (mounted) {
           Navigator.pop(context);
         }
       } else {
-        _showErrorSnackbar(
-            'Gagal mengirim laporan: ${response['message'] ?? 'Kesalahan tidak diketahui'}');
+        showAppToast(
+            context,
+            response['message'] ??
+                'Gagal menambahkan laporan pemakaian inventaris');
       }
     } catch (e) {
-      _showErrorSnackbar('Terjadi kesalahan saat menambahkan: $e');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() {

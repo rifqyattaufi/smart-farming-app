@@ -1,17 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
-import 'package:smart_farming_app/theme.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/button.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddLaporanHamaScreen extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -100,10 +101,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         hamaList.add({'id': 'lainnya', 'nama': 'Lainnya'});
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(response['message']), backgroundColor: Colors.red),
-      );
+      showAppToast(context, response['message'] ?? 'Gagal memuat data');
     }
   }
 
@@ -121,10 +119,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         }).toList();
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(response['message']), backgroundColor: Colors.red),
-      );
+      showAppToast(context, response['message'] ?? 'Gagal memuat data');
     }
   }
 
@@ -151,12 +146,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
       });
 
       if (_image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan unggah bukti adanya hama'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Silakan unggah bukti adanya hama');
         return;
       }
 
@@ -172,12 +162,10 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         if (newHamaResponse['status'] == true) {
           newCreatedHamaId = newHamaResponse['data']['id'];
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(newHamaResponse['message'] ??
-                    'Gagal menambahkan jenis hama baru'),
-                backgroundColor: Colors.red),
-          );
+          showAppToast(
+              context,
+              newHamaResponse['message'] ??
+                  'Gagal menambahkan jenis hama baru');
           return;
         }
       }
@@ -208,30 +196,22 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
       final response = await _laporanService.createLaporanHama(data);
 
       if (response['status'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama} berhasil ditambahkan'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(context,
+            'Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama} berhasil ditambahkan',
+            isError: false);
+
         Navigator.pop(context);
       } else {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Terjadi kesalahan saat menambahkan: $e'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 

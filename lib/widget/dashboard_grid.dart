@@ -135,25 +135,6 @@ class DashboardGrid extends StatelessWidget {
                                 color: dark1, fontSize: titleFontSize),
                           ),
                         ),
-                        // Positioned(
-                        //   bottom: 0,
-                        //   left: 0,
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //           builder: (context) => const DetailScreen(),
-                        //         ),
-                        //       );
-                        //     },
-                        //     child: Text(
-                        //       'Lihat detail',
-                        //       style: regular14.copyWith(
-                        //           color: blue1, fontSize: detailFontSize),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),

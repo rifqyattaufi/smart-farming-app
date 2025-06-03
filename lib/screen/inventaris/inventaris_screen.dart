@@ -12,6 +12,7 @@ import 'package:smart_farming_app/widget/custom_tab.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class InventarisScreen extends StatefulWidget {
   const InventarisScreen({super.key});
@@ -53,7 +54,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
   List<dynamic> _displayPerkebunanList = [];
   List<dynamic> _displayPeternakanList = [];
 
-  String _selectedHasilPanenFilter = 'Semua';
+  String _selectedHasilPanenFilter = 'Semua Hasil Panen';
 
   int _currentPagePerkebunan = 1;
   bool _isLoadingMorePerkebunan = false;
@@ -111,8 +112,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal memuat kategori: ${e.toString()}')));
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }
@@ -162,7 +163,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
 
       List<Future> initialHasilPanenFetches = [];
       if (!searchIsActive ||
-          _selectedHasilPanenFilter == 'Semua' ||
+          _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
           _selectedHasilPanenFilter == 'Perkebunan') {
         initialHasilPanenFetches.add(_fetchKomoditasTipePage('tumbuhan',
             page: 1,
@@ -170,7 +171,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
             searchQuery: searchIsActive ? currentSearchQuery : null));
       }
       if (!searchIsActive ||
-          _selectedHasilPanenFilter == 'Semua' ||
+          _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
           _selectedHasilPanenFilter == 'Peternakan') {
         initialHasilPanenFetches.add(_fetchKomoditasTipePage('hewan',
             page: 1,
@@ -365,9 +366,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
         setState(() {
           setIsLoadingMoreFunction(false);
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error memuat $tipe: ${e.toString()}'),
-            backgroundColor: Colors.red));
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }
@@ -422,10 +422,12 @@ class _InventarisScreenState extends State<InventarisScreen> {
       } else {
         // Hasil Panen
         if (_searchController.text.isNotEmpty) {
-          bool canLoadMorePerkebunan = _selectedHasilPanenFilter == 'Semua' ||
-              _selectedHasilPanenFilter == 'Perkebunan';
-          bool canLoadMorePeternakan = _selectedHasilPanenFilter == 'Semua' ||
-              _selectedHasilPanenFilter == 'Peternakan';
+          bool canLoadMorePerkebunan =
+              _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+                  _selectedHasilPanenFilter == 'Perkebunan';
+          bool canLoadMorePeternakan =
+              _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+                  _selectedHasilPanenFilter == 'Peternakan';
 
           if (canLoadMorePerkebunan &&
               _hasNextSearchPagePerkebunan &&
@@ -444,14 +446,14 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 searchQuery: _searchController.text);
           }
         } else {
-          if ((_selectedHasilPanenFilter == 'Semua' ||
+          if ((_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                   _selectedHasilPanenFilter == 'Perkebunan') &&
               _hasNextPagePerkebunan &&
               !_isLoadingMorePerkebunan) {
             _currentPagePerkebunan++;
             _fetchKomoditasTipePage('tumbuhan', page: _currentPagePerkebunan);
           }
-          if ((_selectedHasilPanenFilter == 'Semua' ||
+          if ((_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                   _selectedHasilPanenFilter == 'Peternakan') &&
               _hasNextPagePeternakan &&
               !_isLoadingMorePeternakan) {
@@ -500,10 +502,12 @@ class _InventarisScreenState extends State<InventarisScreen> {
         _displayPerkebunanList.clear();
         _displayPeternakanList.clear();
 
-        bool searchPerkebunan = _selectedHasilPanenFilter == 'Semua' ||
-            _selectedHasilPanenFilter == 'Perkebunan';
-        bool searchPeternakan = _selectedHasilPanenFilter == 'Semua' ||
-            _selectedHasilPanenFilter == 'Peternakan';
+        bool searchPerkebunan =
+            _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+                _selectedHasilPanenFilter == 'Perkebunan';
+        bool searchPeternakan =
+            _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+                _selectedHasilPanenFilter == 'Peternakan';
 
         List<Future> searchFutures = [];
         if (searchPerkebunan) {
@@ -673,7 +677,11 @@ class _InventarisScreenState extends State<InventarisScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ChipFilter(
-                  categories: const ['Semua', 'Perkebunan', 'Peternakan'],
+                  categories: const [
+                    'Semua Hasil Panen',
+                    'Perkebunan',
+                    'Peternakan',
+                  ],
                   selectedCategory: _selectedHasilPanenFilter,
                   onCategorySelected: (category) {
                     setState(() {
@@ -682,7 +690,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                   },
                 ),
               ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
             if ((_isInitialLoading || _isSearching) &&
                 (_selectedTab == 0
                     ? _filteredInventarisList.isEmpty
@@ -735,12 +743,12 @@ class _InventarisScreenState extends State<InventarisScreen> {
     if (_selectedTab == 0 && isLoadingInventaris) {
       showIndicator = true;
     } else if (_selectedTab == 1) {
-      if ((_selectedHasilPanenFilter == 'Semua' ||
+      if ((_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
               _selectedHasilPanenFilter == 'Perkebunan') &&
           isLoadingHasilPanenPerkebunan) {
         showIndicator = true;
       }
-      if ((_selectedHasilPanenFilter == 'Semua' ||
+      if ((_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
               _selectedHasilPanenFilter == 'Peternakan') &&
           isLoadingHasilPanenPeternakan) {
         showIndicator =
@@ -817,9 +825,9 @@ class _InventarisScreenState extends State<InventarisScreen> {
       // Hasil Panen
 
       // Menggunakan _displayPerkebunanList dan _displayPeternakanList
-      bool showPerkebunan = _selectedHasilPanenFilter == 'Semua' ||
+      bool showPerkebunan = _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
           _selectedHasilPanenFilter == 'Perkebunan';
-      bool showPeternakan = _selectedHasilPanenFilter == 'Semua' ||
+      bool showPeternakan = _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
           _selectedHasilPanenFilter == 'Peternakan';
 
       bool perkebunanEffectivelyEmpty =
@@ -843,7 +851,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
           return _emptyContent(
               "Hasil panen tidak ditemukan untuk pencarian ini.");
         }
-        if (_selectedHasilPanenFilter != 'Semua') {
+        if (_selectedHasilPanenFilter != 'Semua Hasil Panen') {
           return _emptyContent("Tidak ada hasil panen pada filter ini.");
         }
         return _emptyContent("Tidak ada data hasil panen yang tersedia.");
@@ -1058,22 +1066,24 @@ class _InventarisScreenState extends State<InventarisScreen> {
     List<dynamic> currentPeternakanList = _displayPeternakanList;
 
     // Kontrol visibilitas section berdasarkan filter chip
-    bool showPerkebunanSection = _selectedHasilPanenFilter == 'Semua' ||
-        _selectedHasilPanenFilter == 'Perkebunan';
-    bool showPeternakanSection = _selectedHasilPanenFilter == 'Semua' ||
-        _selectedHasilPanenFilter == 'Peternakan';
+    bool showPerkebunanSection =
+        _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+            _selectedHasilPanenFilter == 'Perkebunan';
+    bool showPeternakanSection =
+        _selectedHasilPanenFilter == 'Semua Hasil Panen' ||
+            _selectedHasilPanenFilter == 'Peternakan';
 
     // Menentukan section Perkebunan sedang dalam proses loading aktif atau tidak
     bool isPerkebunanCurrentlyLoading = currentPerkebunanList.isEmpty &&
         ((_isInitialLoading &&
                 !isSearchingActive &&
-                (_selectedHasilPanenFilter == 'Semua' ||
+                (_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                     _selectedHasilPanenFilter ==
                         'Perkebunan')) || // Initial load untuk list utama Perkebunan
             _isLoadingMorePerkebunan ||
             (_isSearching &&
                 isSearchingActive &&
-                (_selectedHasilPanenFilter == 'Semua' ||
+                (_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                     _selectedHasilPanenFilter ==
                         'Perkebunan')) || // Search baru sedang berjalan untuk Perkebunan
             (isSearchingActive && _isLoadingMoreSearchPerkebunan));
@@ -1082,13 +1092,13 @@ class _InventarisScreenState extends State<InventarisScreen> {
     bool isPeternakanCurrentlyLoading = currentPeternakanList.isEmpty &&
         ((_isInitialLoading &&
                 !isSearchingActive &&
-                (_selectedHasilPanenFilter == 'Semua' ||
+                (_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                     _selectedHasilPanenFilter ==
                         'Peternakan')) || // Initial load untuk list utama Peternakan
             _isLoadingMorePeternakan ||
             (_isSearching &&
                 isSearchingActive &&
-                (_selectedHasilPanenFilter == 'Semua' ||
+                (_selectedHasilPanenFilter == 'Semua Hasil Panen' ||
                     _selectedHasilPanenFilter ==
                         'Peternakan')) || // Search baru sedang berjalan untuk Peternakan
             (isSearchingActive && _isLoadingMoreSearchPeternakan));
@@ -1098,7 +1108,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
       children: [
         if (showPerkebunanSection) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
             child: Text("Perkebunan", style: bold18.copyWith(color: dark1)),
           ),
           if (isPerkebunanCurrentlyLoading)
@@ -1112,7 +1122,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Center(
                 child: Text(
-                  "Tidak ada data perkebunan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua' ? ' pada filter ini' : '')}.",
+                  "Tidak ada data perkebunan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua Hasil Panen' ? ' pada filter ini' : '')}.",
                   style: regular14.copyWith(color: dark2),
                 ),
               ),
@@ -1156,7 +1166,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Center(
                 child: Text(
-                  "Tidak ada data peternakan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua' ? ' pada filter ini' : '')}.",
+                  "Tidak ada data peternakan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua Hasil Panen' ? ' pada filter ini' : '')}.",
                   style: regular14.copyWith(color: dark2),
                 ),
               ),

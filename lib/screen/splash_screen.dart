@@ -6,6 +6,7 @@ import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_farming_app/service/user_service.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -89,12 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (userData['isActive'] == false) {
       await _authService.logout();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Akun Anda dinonaktifkan. Silakan hubungi admin.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.');
       }
       context.go('/login');
       return;

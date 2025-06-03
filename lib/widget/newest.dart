@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 enum NewestReportsMode { full, simple, log }
 
@@ -30,52 +30,6 @@ class NewestReports extends StatelessWidget {
     this.timeTextStyle = const TextStyle(),
   });
 
-  String _formatTime(dynamic time) {
-    if (time == null) return 'Unknown Time';
-    try {
-      return DateFormat('EE, d MMMM yyyy | HH:mm').format(DateTime.parse(time));
-    } catch (e) {
-      return 'Unknown Time';
-    }
-  }
-
-  String _formatTimeAgo(String? isoTimestamp) {
-    if (isoTimestamp == null || isoTimestamp.isEmpty) {
-      return 'Waktu tidak diketahui';
-    }
-    DateTime? reportTime = DateTime.tryParse(isoTimestamp.trim());
-
-    if (reportTime == null) {
-      return isoTimestamp;
-    }
-
-    final now = DateTime.now();
-    final difference = now.difference(reportTime);
-
-    if (difference.isNegative) {
-      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
-    } else if (difference.inDays > 1) {
-      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
-    } else if (difference.inDays == 1) {
-      final yesterday = now.subtract(const Duration(days: 1));
-      if (reportTime.year == yesterday.year &&
-          reportTime.month == yesterday.month &&
-          reportTime.day == yesterday.day) {
-        return 'Kemarin, ${DateFormat('HH:mm').format(reportTime)}';
-      } else {
-        return DateFormat('dd MMM yy, HH:mm').format(reportTime);
-      }
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} jam lalu';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} menit lalu';
-    } else if (difference.inSeconds >= 0) {
-      return 'Baru saja';
-    } else {
-      return DateFormat('dd MMM yy, HH:mm').format(reportTime);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -83,7 +37,6 @@ class NewestReports extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -99,8 +52,6 @@ class NewestReports extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-
-          // Content
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
@@ -126,16 +77,60 @@ class NewestReports extends StatelessWidget {
                         child: Row(
                           children: [
                             if (showIcon)
-                              ClipOval(
-                                child: SizedBox(
-                                  width: 36,
-                                  height: 36,
-                                  child: ImageBuilder(
-                                    url: report['icon'],
-                                    fit: BoxFit.cover,
-                                  ),
+                              if (report['icon'] != null)
+                                Builder(
+                                  builder: (context) {
+                                    final icon = report['icon'];
+                                    if (icon is String) {
+                                      if (icon.endsWith('.svg')) {
+                                        if (icon.startsWith('http')) {
+                                          // SVG dari URL (misal DiceBear)
+                                          return SizedBox(
+                                            width: 36,
+                                            height: 36,
+                                            child: ClipOval(
+                                              child: SvgPicture.network(
+                                                icon,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          // SVG dari asset lokal
+                                          return SizedBox(
+                                            width: 36,
+                                            height: 36,
+                                            child: SvgPicture.asset(
+                                              icon,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        }
+                                      } else if (icon.startsWith('assets/')) {
+                                        return SizedBox(
+                                          width: 36,
+                                          height: 36,
+                                          child: Image.asset(
+                                            icon,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      } else {
+                                        return SizedBox(
+                                          width: 36,
+                                          height: 36,
+                                          child: ClipOval(
+                                            child: ImageBuilder(
+                                              url: icon,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
                                 ),
-                              ),
                             if (showIcon) const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -153,7 +148,7 @@ class NewestReports extends StatelessWidget {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              _formatTimeAgo(report['time']),
+                                              formatTimeAgo(report['time']),
                                               style: timeTextStyle,
                                             ),
                                           ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class DetailPemakaianInventarisScreen extends StatefulWidget {
   final String? idPemakaianInventaris;
@@ -33,12 +33,7 @@ class _DetailPemakaianInventarisScreenState
         widget.idPemakaianInventaris!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('ID Pemakaian Inventaris tidak valid.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context, 'ID pemakaian inventaris tidak ditemukan.');
           context.pop();
         }
       });
@@ -71,13 +66,7 @@ class _DetailPemakaianInventarisScreenState
             _isLoading = false;
             _inventarisDetails = null;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ??
-                  'Gagal memuat data detail pemakaian inventaris.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context, response['message'] ?? 'Gagal memuat data');
         }
       }
     } catch (e) {
@@ -86,39 +75,9 @@ class _DetailPemakaianInventarisScreenState
           _isLoading = false;
           _inventarisDetails = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
-    }
-  }
-
-  String _formatTanggal(String? tanggalString) {
-    if (tanggalString == null || tanggalString.isEmpty) {
-      return 'Tidak diketahui';
-    }
-    try {
-      final dateTime = DateTime.tryParse(tanggalString);
-      if (dateTime == null) return 'Format tanggal tidak valid';
-      return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
-    } catch (e) {
-      return 'Error format tanggal';
-    }
-  }
-
-  String _formatWaktu(String? tanggalString) {
-    if (tanggalString == null || tanggalString.isEmpty) {
-      return 'Tidak diketahui';
-    }
-    try {
-      final dateTime = DateTime.tryParse(tanggalString);
-      if (dateTime == null) return 'Format waktu tidak valid';
-      return DateFormat('HH:mm').format(dateTime);
-    } catch (e) {
-      return 'Error format waktu';
     }
   }
 
@@ -141,106 +100,118 @@ class _DetailPemakaianInventarisScreenState
           ),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DottedBorder(
-                    color: green1,
-                    strokeWidth: 1.5,
-                    dashPattern: const [6, 4],
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ImageBuilder(
-                        url: _inventarisDetails?['inventaris']?['gambar'] ?? '',
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Informasi Penggunaan Inventaris",
-                          style: bold18.copyWith(color: dark1)),
-                      const SizedBox(height: 12),
-                      infoItem(
-                          "Kategori inventaris",
-                          _inventarisDetails?['inventaris']
-                                  ?['kategoriInventaris']?['nama'] ??
-                              'Tidak diketahui'),
-                      infoItem(
-                          "Nama inventaris",
-                          _inventarisDetails?['inventaris']?['nama'] ??
-                              'Tidak diketahui'),
-                      infoItem(
-                          "Pemakaian oleh",
-                          _inventarisDetails?['laporan']?['user']?['name'] ??
-                              'Tidak diketahui'),
-                      infoItem("Jumlah digunakan", _jumlahPemakaian.toString()),
-                      infoItem(
-                        "Satuan",
-                        _inventarisDetails?['inventaris']?['Satuan'] != null
-                            ? "${_inventarisDetails?['inventaris']?['Satuan']?['nama'] ?? ''} - ${_inventarisDetails?['inventaris']?['Satuan']?['lambang'] ?? ''}"
-                            : 'Tidak diketahui',
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: DottedBorder(
+                          color: green1,
+                          strokeWidth: 1.5,
+                          dashPattern: const [6, 4],
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: ImageBuilder(
+                              url: _inventarisDetails?['inventaris']
+                                      ?['gambar'] ??
+                                  '',
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                       ),
-                      infoItem("Tanggal digunakan",
-                          _formatTanggal(_inventarisDetails?['createdAt'])),
-                      infoItem("Waktu digunakan",
-                          _formatWaktu(_inventarisDetails?['createdAt'])),
-                      const SizedBox(height: 8),
-                      Text("Keperluan penggunaan inventaris",
-                          style: medium14.copyWith(color: dark1)),
-                      const SizedBox(height: 8),
-                      Text(
-                        _inventarisDetails?['laporan']?['catatan'] ??
-                            'Tidak diketahui',
-                        style: regular14.copyWith(color: dark2),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Informasi Penggunaan Inventaris",
+                                style: bold18.copyWith(color: dark1)),
+                            const SizedBox(height: 12),
+                            infoItem(
+                                "Kategori inventaris",
+                                _inventarisDetails?['inventaris']
+                                        ?['kategoriInventaris']?['nama'] ??
+                                    'Tidak diketahui'),
+                            infoItem(
+                                "Nama inventaris",
+                                _inventarisDetails?['inventaris']?['nama'] ??
+                                    'Tidak diketahui'),
+                            infoItem(
+                                "Pemakaian oleh",
+                                _inventarisDetails?['laporan']?['user']
+                                        ?['name'] ??
+                                    'Tidak diketahui'),
+                            infoItem("Jumlah digunakan",
+                                _jumlahPemakaian.toString()),
+                            infoItem(
+                              "Satuan",
+                              _inventarisDetails?['inventaris']?['Satuan'] !=
+                                      null
+                                  ? "${_inventarisDetails?['inventaris']?['Satuan']?['nama'] ?? ''} - ${_inventarisDetails?['inventaris']?['Satuan']?['lambang'] ?? ''}"
+                                  : 'Tidak diketahui',
+                            ),
+                            infoItem(
+                                "Tanggal digunakan",
+                                formatDisplayDate(
+                                    _inventarisDetails?['createdAt'])),
+                            infoItem(
+                                "Waktu digunakan",
+                                formatDisplayTime(
+                                    _inventarisDetails?['createdAt'])),
+                            const SizedBox(height: 8),
+                            Text("Keperluan penggunaan inventaris",
+                                style: medium14.copyWith(color: dark1)),
+                            const SizedBox(height: 8),
+                            Text(
+                              _inventarisDetails?['laporan']?['catatan'] ??
+                                  'Tidak diketahui',
+                              style: regular14.copyWith(color: dark2),
+                            ),
+                            const SizedBox(height: 16),
+                            Text("Bukti penggunaan inventaris",
+                                style: medium14.copyWith(color: dark1)),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      Text("Bukti penggunaan inventaris",
-                          style: medium14.copyWith(color: dark1)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: DottedBorder(
+                          color: green1,
+                          strokeWidth: 1.5,
+                          dashPattern: const [6, 4],
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: ImageBuilder(
+                              url: _inventarisDetails?['laporan']?['gambar'] ??
+                                  '',
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DottedBorder(
-                    color: green1,
-                    strokeWidth: 1.5,
-                    dashPattern: const [6, 4],
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ImageBuilder(
-                        url: _inventarisDetails?['laporan']?['gambar'] ?? '',
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 80),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

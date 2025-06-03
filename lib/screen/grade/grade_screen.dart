@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/screen/grade/add_grade_screen.dart';
 import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/unit_item.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class GradeScreen extends StatefulWidget {
   const GradeScreen({super.key});
@@ -85,12 +85,15 @@ class _GradeScreenState extends State<GradeScreen> {
           _totalPages = response['totalPages'] ?? 1;
         });
       } else {
-        _showError(response['message']?.toString() ??
-            'Gagal memuat data grade hasil panen');
+        if (mounted) {
+          showAppToast(context,
+              response['message'] ?? 'Gagal memuat data');
+        }
       }
     } catch (e) {
       if (!mounted) return;
-      _showError('Terjadi kesalahan: ${e.toString()}');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() {
@@ -127,23 +130,6 @@ class _GradeScreenState extends State<GradeScreen> {
         page: 1,
         isRefresh: true,
         query: _searchQuery.isEmpty ? null : _searchQuery);
-  }
-
-  void _showError(String message, {bool isError = true}) {
-    if (mounted) {
-      toastification.show(
-        context: context,
-        title: isError
-            ? const Text('Oops, Ada yang Salah! 👎')
-            : const Text('Hore! Sukses! 👍'),
-        description: Text(message),
-        type: isError ? ToastificationType.error : ToastificationType.success,
-        style: ToastificationStyle.flatColored,
-        autoCloseDuration: const Duration(seconds: 4),
-        alignment: Alignment.topCenter,
-        showProgressBar: true,
-      );
-    }
   }
 
   @override
@@ -297,16 +283,18 @@ class _GradeScreenState extends State<GradeScreen> {
                                                       if (!mounted) return;
                                                       if (response['status'] ==
                                                           true) {
-                                                        _showError(
+                                                        showAppToast(context,
                                                             "Data grade hasil panen berhasil dihapus",
                                                             isError: false);
                                                         _fetchGradeData(
                                                             page: 1,
                                                             isRefresh: true);
                                                       } else {
-                                                        _showError(response[
-                                                                'message'] ??
-                                                            'Gagal menghapus data grade hasil panen');
+                                                        showAppToast(
+                                                            context,
+                                                            response[
+                                                                    'message'] ??
+                                                                'Gagal menghapus data grade hasil panen');
                                                       }
                                                     },
                                                     child: const Text('Hapus',

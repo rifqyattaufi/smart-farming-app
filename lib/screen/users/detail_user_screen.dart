@@ -8,6 +8,7 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class DetailUserScreen extends StatefulWidget {
   final String? id;
@@ -47,20 +48,11 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                 extra: const DetailUserScreen());
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error fetching user data: ${response['message']}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context, response['message'] ?? 'Gagal memuat data');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching user data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       } finally {
         setState(() {
           _isLoading = false;
@@ -76,22 +68,12 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
               userData = responseUser['data'];
             });
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Error fetching user data: ${responseUser['message']}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showAppToast(context, response['message'] ?? 'Gagal memuat data');
           }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching user data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       } finally {
         setState(() {
           _isLoading = false;
@@ -104,28 +86,16 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
     try {
       final response = await _userService.deactivateUser(userData!['id']);
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pengguna berhasil dinonaktifkan'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(context, 'Pengguna berhasil dinonaktifkan',
+            isError: false);
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deactivating user: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(
+            context, response['message'] ?? 'Gagal menonaktifkan pengguna');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error deactivating user: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -133,28 +103,15 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
     try {
       final response = await _userService.activateUser(userData!['id']);
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pengguna berhasil diaktifkan'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(context, 'Pengguna berhasil diaktifkan', isError: false);
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error activating user: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(
+            context, response['message'] ?? 'Gagal mengaktifkan pengguna');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error activating user: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 

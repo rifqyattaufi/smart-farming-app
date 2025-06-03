@@ -7,6 +7,7 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/newest.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -38,20 +39,11 @@ class _UsersScreenState extends State<UsersScreen> {
               response['data']['inventor'] ?? []));
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching user data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, response['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching user data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -124,8 +116,8 @@ class _UsersScreenState extends State<UsersScreen> {
                       .map((user) => {
                             'text': user['name'] ?? '-',
                             'subtext': user['email'] ?? '-',
-                            'icon':
-                                user['avatarUrl'] ?? 'assets/icons/goclub.svg',
+                            'icon': user['avatarUrl'] ??
+                                'assets/icons/set/person-filled.png',
                             'isActive': user['isActive'] ?? false,
                             'id': user['id'],
                           })

@@ -1,18 +1,18 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/user_service.dart';
-import 'dart:io';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/profile_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddUserScreen extends StatefulWidget {
   final bool? isEdit;
@@ -114,12 +114,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
           data['avatarUrl'] = imageUploadResponse['data'];
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(
-                      'Gagal mengunggah gambar: ${imageUploadResponse['message']}'),
-                  backgroundColor: Colors.red),
-            );
+            showAppToast(context,
+                'Gagal mengunggah gambar: ${imageUploadResponse['message']}');
             setState(() {
               _isLoading = false;
             });
@@ -157,33 +153,24 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
       if (response['status'] == true) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Pengguna berhasil ditambahkan'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          showAppToast(
+              context,
+              widget.isEdit ?? false
+                  ? 'Berhasil memperbarui pengguna'
+                  : 'Berhasil menambahkan pengguna',
+              isError: false);
         }
         Navigator.pop(context, true);
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('Gagal menambahkan pengguna: ${response['message']}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal menambahkan pengguna: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       setState(() {
@@ -219,20 +206,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
           _imageUrl = userData['avatarUrl'];
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal memuat data pengguna: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, response['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal memuat data pengguna: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

@@ -45,6 +45,7 @@ class _ChipFilterState extends State<ChipFilter> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
+              showCheckmark: false,
             ),
           );
         }).toList(),
@@ -52,4 +53,3 @@ class _ChipFilterState extends State<ChipFilter> {
     );
   }
 }
-

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class DetailHamaScreen extends StatefulWidget {
   final String? idLaporanHama;
@@ -29,12 +29,7 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
     if (widget.idLaporanHama == null || widget.idLaporanHama!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('ID Laporan Hama tidak valid.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context, 'ID laporan hama tidak valid');
           context.pop();
         }
       });
@@ -70,13 +65,7 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
             _isLoading = false;
             _laporanHama = null;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ??
-                  'Gagal memuat data detail laporan hama'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context, response['message'] ?? 'Gagal memuat data');
         }
       }
     } catch (e) {
@@ -85,39 +74,9 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
           _isLoading = false;
           _laporanHama = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
-    }
-  }
-
-  String _formatTanggal(String? tanggalString) {
-    if (tanggalString == null || tanggalString.isEmpty) {
-      return 'Tidak diketahui';
-    }
-    try {
-      final dateTime = DateTime.tryParse(tanggalString);
-      if (dateTime == null) return 'Format tanggal tidak valid';
-      return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
-    } catch (e) {
-      return 'Error format tanggal';
-    }
-  }
-
-  String _formatWaktu(String? tanggalString) {
-    if (tanggalString == null || tanggalString.isEmpty) {
-      return 'Tidak diketahui';
-    }
-    try {
-      final dateTime = DateTime.tryParse(tanggalString);
-      if (dateTime == null) return 'Format waktu tidak valid';
-      return DateFormat('HH:mm').format(dateTime);
-    } catch (e) {
-      return 'Error format waktu';
     }
   }
 
@@ -252,11 +211,11 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
                                 ),
                                 infoItem(
                                     "Tanggal pelaporan",
-                                    _formatTanggal(
+                                    formatDisplayDate(
                                         _laporanHama?['createdAt'] as String?)),
                                 infoItem(
                                     "Waktu pelaporan",
-                                    _formatWaktu(
+                                    formatDisplayTime(
                                         _laporanHama?['createdAt'] as String?)),
                                 const SizedBox(height: 8),
                                 infoItem("Dilaporkan oleh",

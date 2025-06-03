@@ -11,7 +11,7 @@ class ListItemSelectable extends StatefulWidget {
   final ListItemType type;
   final void Function(BuildContext context, Map<String, dynamic>)? onItemTap;
   final void Function(List<Map<String, dynamic>> selectedItems)?
-      onSelectionChanged; // Tambahkan ini
+      onSelectionChanged;
 
   const ListItemSelectable({
     super.key,
@@ -19,7 +19,7 @@ class ListItemSelectable extends StatefulWidget {
     required this.items,
     this.type = ListItemType.basic,
     this.onItemTap,
-    this.onSelectionChanged, // Tambahkan ini
+    this.onSelectionChanged,
   });
 
   @override
@@ -47,7 +47,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
           selectedIndexes.add(index);
         }
       } else {
-        selectedIndexes = {index}; // Hanya satu item yang dipilih
+        selectedIndexes = {index};
       }
     });
     _notifySelectionChanged();

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/theme.dart';
-
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddHamaScreen extends StatefulWidget {
   final VoidCallback? onHamaAdded;
@@ -62,11 +62,7 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
       if (widget.isEdit) {
         if (widget.id == null) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('ID Jenis Hama tidak valid untuk update.'),
-                  backgroundColor: Colors.red),
-            );
+            showAppToast(context, 'ID jenis hama tidak ditemukan');
             setState(() => _isLoading = false);
           }
           return;
@@ -81,34 +77,28 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
       if (response['status'] == true) {
         widget.onHamaAdded?.call();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isEdit
-                  ? 'Berhasil memperbarui data jenis hama'
-                  : 'Berhasil menambahkan data jenis hama'),
-              backgroundColor: Colors.green),
-        );
+        showAppToast(
+            context,
+            widget.isEdit
+                ? 'Berhasil memperbarui data jenis hama'
+                : 'Berhasil menambahkan data jenis hama',
+            isError: false);
         Navigator.pop(context);
       } else {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message'] ?? 'Gagal menyimpan data.'),
-              backgroundColor: Colors.red),
-        );
+
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Terjadi kesalahan: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }

@@ -4,7 +4,7 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
-import 'package:toastification/toastification.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class AddGradeScreen extends StatefulWidget {
   final VoidCallback? onGradeAdded;
@@ -75,17 +75,12 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           widget.onGradeAdded!();
         }
 
-        toastification.show(
-          context: context,
-          title: const Text('Hore! Sukses! 👍'),
-          description: Text(widget.isUpdate
-              ? 'Berhasil memperbarui data grade hasil panen.'
-              : 'Berhasil menambahkan data grade hasil panen.'),
-          type: ToastificationType.success,
-          style: ToastificationStyle.flatColored,
-          autoCloseDuration: const Duration(seconds: 4),
-          alignment: Alignment.topCenter,
-          showProgressBar: true,
+        showAppToast(
+          context,
+          widget.isUpdate
+              ? 'Berhasil memperbarui data grade hasil panen'
+              : 'Berhasil menambahkan data grade hasil panen',
+          isError: false,
         );
 
         setState(() {
@@ -98,17 +93,8 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           isLoading = false;
         });
 
-        toastification.show(
-          context: context,
-          title: const Text('Oops, Ada yang Salah! 👎'),
-          description:
-              Text(response['message'] ?? 'Terjadi kesalahan tidak diketahui'),
-          type: ToastificationType.error,
-          style: ToastificationStyle.flatColored,
-          autoCloseDuration: const Duration(seconds: 5),
-          alignment: Alignment.topCenter,
-          showProgressBar: true,
-        );
+        showAppToast(
+            context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       if (!mounted) return;
@@ -116,16 +102,8 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
         isLoading = false;
       });
 
-      toastification.show(
-        context: context,
-        title: const Text('Error Tidak Terduga 😢'),
-        description: Text('Terjadi kesalahan: $e. Silakan coba lagi.'),
-        type: ToastificationType.error,
-        style: ToastificationStyle.flatColored,
-        autoCloseDuration: const Duration(seconds: 5),
-        alignment: Alignment.topCenter,
-        showProgressBar: true,
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 

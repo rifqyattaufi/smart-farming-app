@@ -216,15 +216,13 @@ class _RingkasanInvState extends State<RingkasanInv> {
                         PieChart(
                           PieChartData(
                             pieTouchData: PieTouchData(
-                              // TAMBAHKAN INI
                               touchCallback: (FlTouchEvent event,
                                   PieTouchResponse? pieTouchResponse) {
                                 setState(() {
                                   if (!event.isInterestedForInteractions ||
                                       pieTouchResponse == null ||
                                       pieTouchResponse.touchedSection == null) {
-                                    _touchedIndex =
-                                        -1; // Tidak ada yang disentuh
+                                    _touchedIndex = -1;
                                     return;
                                   }
                                   _touchedIndex = pieTouchResponse

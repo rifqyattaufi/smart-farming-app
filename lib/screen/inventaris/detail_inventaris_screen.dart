@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/theme.dart';
-import 'package:smart_farming_app/utils/app_enums.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/utils/custom_picker_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -47,11 +47,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     if (widget.idInventaris == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('ID Inventaris tidak valid.'),
-                backgroundColor: Colors.red),
-          );
+          showAppToast(context, 'ID Inventaris tidak ditemukan.');
           context.pop();
         }
       });
@@ -83,11 +79,13 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         });
         await _fetchRiwayatPemakaian(page: 1, isRefresh: true);
       } else {
-        _showErrorSnackbar(
-            response['message'] ?? 'Gagal memuat data inventaris');
+        showAppToast(context, response['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -256,11 +254,15 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         final List<dynamic> newChartRawData = response['data'] ?? [];
         _updateChartDisplayData(newChartRawData, _selectedChartFilterType);
       } else {
-        _showErrorSnackbar(response['message'] ?? 'Gagal memuat statistik');
+        showAppToast(
+            context, response['message'] ?? 'Gagal memuat data statistik');
         _updateChartDisplayData([], _selectedChartFilterType);
       }
     } catch (e) {
-      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
       _updateChartDisplayData([], _selectedChartFilterType);
     } finally {
       if (mounted) setState(() => _isLoadingChart = false);
@@ -295,11 +297,13 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           _riwayatTotalPages = response['totalPages'] ?? 1;
         });
       } else {
-        _showErrorSnackbar(
-            response['message'] ?? 'Gagal memuat riwayat pemakaian');
+        showAppToast(context, response['message'] ?? 'Gagal memuat data');
       }
     } catch (e) {
-      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     } finally {
       if (mounted) setState(() => _isLoadingRiwayat = false);
     }
@@ -311,7 +315,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     num newStockNum = currentStockNum + change;
 
     if (newStockNum < 0) {
-      _showErrorSnackbar("Jumlah stok tidak boleh kurang dari 0.");
+      showAppToast(context, 'Jumlah stok tidak bisa kurang dari 0.');
       return;
     }
 
@@ -348,14 +352,15 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
             _inventarisDetails!['ketersediaan'] = 'Tersedia';
           }
 
-          _showErrorSnackbar("Stok berhasil diperbarui.", isError: false);
+          showAppToast(context, 'Stok berhasil diperbarui.', isError: false);
         });
       } else {
-        _showErrorSnackbar(response['message'] ?? "Gagal memperbarui stok.");
+        showAppToast(context, response['message'] ?? 'Gagal memperbarui stok');
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar("Error saat memperbarui stok: ${e.toString()}");
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {
@@ -363,17 +368,6 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           _isUpdatingStock = false;
         });
       }
-    }
-  }
-
-  void _showErrorSnackbar(String message, {bool isError = true}) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: isError ? Colors.red : Colors.green,
-        ),
-      );
     }
   }
 
@@ -386,18 +380,17 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       if (!mounted) return;
 
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil menghapus data inventaris'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showAppToast(context, 'Data inventaris berhasil dihapus.',
+            isError: false);
         context.pop();
       } else {
-        _showErrorSnackbar(response['message'] ?? 'Gagal menghapus data');
+        showAppToast(context, response['message'] ?? 'Gagal menghapus data');
       }
     } catch (e) {
-      if (mounted) _showErrorSnackbar('Error: ${e.toString()}');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     } finally {
       if (mounted) setState(() => _isDeleting = false);
     }
@@ -792,7 +785,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                     if (id != null && id.isNotEmpty) {
                       context.push('/detail-pemakaian-inventaris/$id');
                     } else {
-                      _showErrorSnackbar("Detail laporan tidak tersedia.");
+                      showAppToast(context, 'Detail riwayat tidak ditemukan.');
                     }
                   },
                 ),
@@ -833,8 +826,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                         inventarisData: _inventarisDetails,
                       ));
                 } else {
-                  _showErrorSnackbar(
-                      "Data inventaris tidak ditemukan untuk diubah.");
+                  showAppToast(context, 'Data inventaris tidak ditemukan');
                 }
               },
               buttonText: 'Ubah Data',

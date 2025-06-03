@@ -167,7 +167,7 @@ class ListItem extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'Pemakaian oleh: ${item['person'] ?? 'Petugas Tidak Diketahui'}',
+                    'Pemakaian oleh: ${item['person'] ?? 'Unknown Person'}',
                     style: regular12.copyWith(color: dark2),
                   ),
                 ],
