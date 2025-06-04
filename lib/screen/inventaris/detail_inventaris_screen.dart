@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -24,6 +26,7 @@ class DetailInventarisScreen extends StatefulWidget {
 class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
   final InventarisService _inventarisService = InventarisService();
 
+  final _step = 1;
   Map<String, dynamic>? _inventarisDetails;
   List<dynamic> _chartDataPoints = [];
   List<String> _chartXLabels = [];
@@ -309,6 +312,67 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     }
   }
 
+  Future<void> _showHewanTumbuhanDialog(String categoryName) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        String greeting = 'Pelaporan Pemakaian $categoryName';
+        if (categoryName == 'Vitamin' ||
+            categoryName == 'Vaksin' ||
+            categoryName == 'Disinfektan') {
+          greeting = 'Pelaporan Pemberian $categoryName';
+        } else if (categoryName == 'Pupuk') {
+          greeting = 'Pelaporan Pemupukan';
+        }
+
+        return AlertDialog(
+          title: const Text('Pilih Target Pemakaian'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Pemakaian "$categoryName" ini akan ditujukan untuk hewan atau tumbuhan?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('TUMBUHAN'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.push('/pilih-kebun',
+                    extra: PilihKebunScreen(
+                      step: _step + 1,
+                      tipe: 'vitamin',
+                      greeting: greeting,
+                    ));
+              },
+            ),
+            TextButton(
+              child: const Text('HEWAN'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.push('/pilih-kandang',
+                    extra: PilihKandangScreen(
+                      step: _step + 1,
+                      tipe: 'vitamin',
+                      greeting: greeting,
+                    ));
+              },
+            ),
+            TextButton(
+              child: Text('BATAL', style: TextStyle(color: red)),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _updateStock(int change) async {
     if (_inventarisDetails == null || widget.idInventaris == null) return;
     num currentStockNum = _inventarisDetails!['jumlah'] ?? 0;
@@ -317,6 +381,21 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     if (newStockNum < 0) {
       showAppToast(context, 'Jumlah stok tidak bisa kurang dari 0.');
       return;
+    }
+
+    if (change > 0) {
+      // Cek apakah stok saat ini TIDAK NOL
+      if (currentStockNum > 0) {
+        if (mounted) {
+          showAppToast(
+            context,
+            'Habiskan dulu stok inventaris ini (stok saat ini: $currentStockNum). Stok baru hanya bisa ditambahkan jika stok sudah 0.',
+            title: 'Stok Masih Tersedia',
+          );
+        }
+        return; // Hentikan proses penambahan stok
+      }
+      // Jika stok saat ini adalah 0 dan change > 0, maka penambahan diizinkan dan akan dilanjutkan.
     }
 
     if (mounted) {
@@ -351,6 +430,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           } else if (currentStockNum == 0 && newStockNum > 0) {
             _inventarisDetails!['ketersediaan'] = 'Tersedia';
           }
+
+          _fetchFilteredChartData();
+          _fetchRiwayatPemakaian(page: 1, isRefresh: true);
 
           showAppToast(context, 'Stok berhasil diperbarui.', isError: false);
         });
@@ -624,10 +706,52 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                                 children: [
                                   IconButton(
                                     icon: Icon(Icons.remove_circle_outline,
-                                        color: red, size: 28),
+                                        color: (_inventarisDetails?['jumlah'] ??
+                                                    0) >
+                                                0
+                                            ? red
+                                            : grey,
+                                        size: 28),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
-                                    onPressed: () => _updateStock(-1),
+                                    onPressed: () {
+                                      if (_inventarisDetails == null ||
+                                          widget.idInventaris == null) {
+                                        showAppToast(context,
+                                            "Data inventaris tidak ditemukan.");
+                                        return;
+                                      }
+                                      num currentStock =
+                                          _inventarisDetails!['jumlah'] ?? 0;
+                                      final String? categoryName =
+                                          _inventarisDetails![
+                                              'kategoriInventaris']?['nama'];
+
+                                      if (currentStock > 0) {
+                                        const List<String> specialCategories = [
+                                          'Vitamin',
+                                          'Pupuk',
+                                          'Disinfektan',
+                                          'Vaksin'
+                                        ];
+                                        // Stok masih ada, arahkan ke halaman pemakaian inventaris
+                                        if (categoryName != null &&
+                                            specialCategories
+                                                .contains(categoryName)) {
+                                          // Kategori spesial, tampilkan dialog Hewan/Tumbuhan
+                                          _showHewanTumbuhanDialog(
+                                              categoryName);
+                                        } else {
+                                          // Kategori lain, langsung ke halaman tambah pemakaian
+                                          context.push(
+                                              '/tambah-pemakaian-inventaris');
+                                        }
+                                      } else {
+                                        // Stok sudah 0, tidak bisa dikurangi lagi
+                                        showAppToast(context,
+                                            'Stok sudah habis, tidak bisa dikurangi.');
+                                      }
+                                    },
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(

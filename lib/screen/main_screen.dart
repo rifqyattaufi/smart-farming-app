@@ -27,7 +27,7 @@ class MainScreen extends StatelessWidget {
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
             systemNavigationBarColor: Colors.white,
-            systemNavigationBarIconBrightness: Brightness.light),
+            systemNavigationBarIconBrightness: Brightness.dark),
       );
     });
     final String location = GoRouterState.of(context).uri.toString();

@@ -206,7 +206,6 @@ class _ReportScreenState extends State<ReportScreen> {
               },
             ),
             const SizedBox(height: 12),
-            const SizedBox(height: 12),
           ] else if (!_isLoading) ...[
             Center(
               child: Padding(
@@ -292,6 +291,25 @@ class _ReportScreenState extends State<ReportScreen> {
               ],
               crossAxisCount: 2,
               valueFontSize: 60,
+            ),
+            const SizedBox(height: 12),
+            ListItem(
+              title: 'Hasil Laporan Per Jenis Ternak',
+              items: (_peternakanData?['daftarTernak'] as List<dynamic>? ?? [])
+                  .map((ternak) => {
+                        'id': ternak['id'],
+                        'name': ternak['nama'],
+                        'isActive': ternak['status'],
+                        'icon': ternak['gambar'],
+                      })
+                  .toList(),
+              type: 'basic',
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/statistik-laporan-ternak/$id').then((_) {
+                  _fetchData(isRefresh: true);
+                });
+              },
             ),
             const SizedBox(height: 12),
           ] else if (!_isLoading) ...[
