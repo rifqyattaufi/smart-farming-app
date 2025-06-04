@@ -140,7 +140,7 @@ class SakitTab extends StatelessWidget {
                       item['id'] as String? ??
                       '',
                   'text':
-                      item['judul'] as String? ?? 'Laporan Sakit Tidak Bernama',
+                      item['text'] as String? ?? 'Laporan Sakit Tidak Bernama',
                   'subtext': 'Oleh: ${item['petugasNama'] as String? ?? 'N/A'}',
                   'icon': item['gambar'] as String? ??
                       'assets/icons/set/symptom.png', // Ikon yang lebih relevan
