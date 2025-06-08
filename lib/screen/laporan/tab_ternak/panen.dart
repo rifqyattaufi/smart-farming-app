@@ -33,12 +33,10 @@ class PanenTab extends StatelessWidget {
   });
 
   String _generateRangkumanPanen() {
-
     if (laporanPanenState.isLoading) {
       return "Memuat data laporan panen...";
     }
     if (laporanPanenState.error != null) {
-
       return "Tidak dapat memuat rangkuman: ${laporanPanenState.error}";
     }
     if (laporanPanenState.dataPoints.isEmpty) {
@@ -94,28 +92,34 @@ class PanenTab extends StatelessWidget {
 
           // Rangkuman Section
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Rangkuman Panen', style: bold18.copyWith(color: dark1)),
+                Text('Rangkuman Statistik Panen',
+                    style: bold18.copyWith(color: dark1)),
                 const SizedBox(height: 8),
                 Text(
-                  _generateRangkumanPanen(), // Menggunakan fungsi baru
-                  style: regular14.copyWith(color: dark2, height: 1.5),
+                  _generateRangkumanPanen(),
+                  style: regular14.copyWith(color: dark2),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
 
           // Riwayat Section
           if (riwayatPanenState.isLoading)
-            const Center(child: CircularProgressIndicator(strokeWidth: 2))
+            const Center(
+                child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(strokeWidth: 2)))
           else if (riwayatPanenState.error != null)
             Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('Error: ${riwayatPanenState.error}'))
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                  'Error memuat riwayat laporan panen: ${riwayatPanenState.error}',
+                  style: const TextStyle(color: Colors.red)),
+            )
           else if (riwayatPanenState.items.isNotEmpty)
             NewestReports(
               title: 'Riwayat Pelaporan Panen',
@@ -129,14 +133,28 @@ class PanenTab extends StatelessWidget {
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {
-                // Navigasi atau aksi lainnya
+                final laporanId = tappedItem['id'] as String?;
+                final laporanJudul = tappedItem['text'] as String?;
+                if (laporanId != null && laporanId.isNotEmpty) {
+                  // Navigasi: itemContext.push('/detail-laporan-panen/$laporanId');
+                  ScaffoldMessenger.of(itemContext).showSnackBar(
+                      SnackBar(content: Text('Membuka detail: $laporanJudul')));
+                } else {
+                  ScaffoldMessenger.of(itemContext).showSnackBar(const SnackBar(
+                      content: Text('Detail laporan tidak tersedia.')));
+                }
               },
               mode: NewestReportsMode.full,
+              titleTextStyle: bold18.copyWith(color: dark1),
+              reportTextStyle: medium12.copyWith(color: dark1),
+              timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
             const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: Text('Tidak ada riwayat panen.'))),
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                  'Tidak ada riwayat pelaporan panen ternak untuk ditampilkan saat ini.'),
+            ),
           const SizedBox(height: 80),
         ],
       ),
