@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Untuk format tanggal di rangkuman
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
-// Impor ChartDataState dan RiwayatDataState (sesuaikan path jika perlu)
-import 'package:smart_farming_app/screen/laporan/statistik_tanaman_report.dart'
-    show ChartDataState, RiwayatDataState;
-// Impor ChartSection jika diletakkan di file terpisah
+import 'package:smart_farming_app/model/chart_data_state.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 
-// Jika ChartSection tidak diimpor, Anda bisa paste definisinya di atas kelas SakitTab
-
 class SakitTab extends StatelessWidget {
-  final ChartDataState laporanSakitState; // Menggunakan struktur state baru
-  final RiwayatDataState riwayatSakitState; // Menggunakan struktur state baru
+  final ChartDataState laporanSakitState;
+  final RiwayatDataState riwayatSakitState;
 
   final Future<void> Function() onDateIconPressed;
   final ChartFilterType selectedChartFilterType;
   final String formattedDisplayedDateRange;
   final void Function(ChartFilterType?) onChartFilterTypeChanged;
 
-  // Fungsi formatter dari parent
   final String Function(String?) formatDisplayDate;
   final String Function(String?) formatDisplayTime;
-  final DateTimeRange? selectedChartDateRange; // Untuk rangkuman dinamis
+  final DateTimeRange? selectedChartDateRange;
 
   const SakitTab({
     super.key,
@@ -68,9 +62,7 @@ class SakitTab extends StatelessWidget {
     String rangkuman =
         "Berdasarkan statistik pelaporan $periodeText, ditemukan total $totalSakit kasus tanaman sakit. ";
 
-    // Contoh tambahan: mencari penyakit yang paling sering dilaporkan jika data detail ada
-    // Ini memerlukan asumsi struktur data `laporanSakitState.rawData` atau modifikasi pada `_processBackendChartData`
-    // Untuk saat ini, kita buat sederhana.
+    // Contoh tambahan: mencari penyakit yang paling sering dilaporkan jika data detail ada --> PR
     if (totalSakit > 0) {
       rangkuman +=
           "Perlu dilakukan pengecekan lebih lanjut untuk identifikasi dan penanganan penyakit.";
@@ -87,7 +79,7 @@ class SakitTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Chart untuk Laporan Sakit menggunakan ChartSection
+          // Chart untuk Laporan Sakit
           ChartSection(
             title: 'Statistik Laporan Tanaman Sakit',
             chartState: laporanSakitState,
@@ -97,7 +89,6 @@ class SakitTab extends StatelessWidget {
             selectedChartFilterType: selectedChartFilterType,
             displayedDateRangeText: formattedDisplayedDateRange,
             onChartFilterTypeChanged: onChartFilterTypeChanged,
-            lineColor: red, // Memberi warna merah untuk chart sakit
           ),
 
           const SizedBox(height: 12),
@@ -110,7 +101,7 @@ class SakitTab extends StatelessWidget {
                     style: bold18.copyWith(color: dark1)),
                 const SizedBox(height: 12),
                 Text(
-                  _generateRangkumanSakit(), // Rangkuman dinamis
+                  _generateRangkumanSakit(),
                   style: regular14.copyWith(color: dark2),
                 )
               ],
@@ -142,14 +133,12 @@ class SakitTab extends StatelessWidget {
                   'text':
                       item['text'] as String? ?? 'Laporan Sakit Tidak Bernama',
                   'subtext': 'Oleh: ${item['petugasNama'] as String? ?? 'N/A'}',
-                  'icon': item['gambar'] as String? ??
-                      'assets/icons/set/symptom.png', // Ikon yang lebih relevan
-                  // Gunakan formatter dari parent jika waktu dari backend adalah ISO string
+                  'icon':
+                      item['gambar'] as String? ?? 'assets/images/appIcon.png',
                   'time': formatDisplayTime(
                       item['createdAt'] as String? ?? item['time'] as String?),
-                  'date': formatDisplayDate(item['createdAt'] as String? ??
-                      item['date']
-                          as String?), // Tambahkan tanggal jika NewestReports mendukung
+                  'date': formatDisplayDate(
+                      item['createdAt'] as String? ?? item['date'] as String?),
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {

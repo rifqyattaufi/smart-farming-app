@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Untuk format tanggal di rangkuman
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
-// Impor ChartDataState dan RiwayatDataState (sesuaikan path jika perlu)
-import 'package:smart_farming_app/screen/laporan/statistik_tanaman_report.dart'
-    show ChartDataState, RiwayatDataState;
-// Impor ChartSection jika diletakkan di file terpisah
+import 'package:smart_farming_app/model/chart_data_state.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
-import 'package:smart_farming_app/widget/newest.dart'; // NewestReports untuk laporan terbaru (jika ada)
-
-// Jika ChartSection tidak diimpor, Anda bisa paste definisinya di atas kelas NutrisiTab
+import 'package:smart_farming_app/widget/newest.dart';
 
 class NutrisiTab extends StatelessWidget {
-  final ChartDataState nutrisiState; // Menggunakan struktur state baru
-  // Jika ada NewestReports yang dinamis untuk nutrisi:
-  // final RiwayatDataState newestNutrisiReportsState;
-  final RiwayatDataState riwayatPupukState; // Untuk ListItem riwayat lengkap
+  final ChartDataState nutrisiState;
+  final RiwayatDataState riwayatPupukState;
 
   final Future<void> Function()? onDateIconPressed;
   final ChartFilterType? selectedChartFilterType;
@@ -25,12 +18,11 @@ class NutrisiTab extends StatelessWidget {
 
   final String Function(String?) formatDisplayDate;
   final String Function(String?) formatDisplayTime;
-  final DateTimeRange? selectedChartDateRange; // Untuk rangkuman dinamis
+  final DateTimeRange? selectedChartDateRange;
 
   const NutrisiTab({
     super.key,
     required this.nutrisiState,
-    // required this.newestNutrisiReportsState, // Jika dinamis
     required this.riwayatPupukState,
     this.onDateIconPressed,
     this.selectedChartFilterType,
@@ -89,7 +81,7 @@ class NutrisiTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Chart untuk Pemberian Nutrisi menggunakan ChartSection
+          // Chart untuk Pemberian Nutrisi
           ChartSection(
             title: 'Statistik Pemberian Nutrisi Tanaman',
             chartState: nutrisiState,
@@ -99,7 +91,6 @@ class NutrisiTab extends StatelessWidget {
             selectedChartFilterType: selectedChartFilterType,
             displayedDateRangeText: formattedDisplayedDateRange,
             onChartFilterTypeChanged: onChartFilterTypeChanged,
-            lineColor: green1, // Warna untuk nutrisi
           ),
 
           const SizedBox(height: 12),
@@ -112,7 +103,7 @@ class NutrisiTab extends StatelessWidget {
                     style: bold18.copyWith(color: dark1)),
                 const SizedBox(height: 12),
                 Text(
-                  _generateRangkumanNutrisi(), // Rangkuman dinamis
+                  _generateRangkumanNutrisi(),
                   style: regular14.copyWith(color: dark2),
                 )
               ],
@@ -120,12 +111,9 @@ class NutrisiTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Contoh NewestReports (jika Anda ingin membuatnya dinamis, gunakan newestNutrisiReportsState)
-          // Untuk saat ini, saya biarkan statis seperti kode asli Anda, tapi idealnya ini juga dinamis
           NewestReports(
             title: 'Laporan Pemberian Nutrisi Terbaru',
             reports: const [
-              // Data statis ini bisa diganti dari newestNutrisiReportsState.items
               {
                 'id': 'nutrisi_report_static_1',
                 'text':
@@ -143,12 +131,11 @@ class NutrisiTab extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Lihat Semua Laporan Nutrisi Terbaru')));
             },
-            mode: NewestReportsMode
-                .simple, // Mungkin mode simple lebih cocok di sini
+            mode: NewestReportsMode.simple,
           ),
           const SizedBox(height: 16),
 
-          // Riwayat Pemberian Nutrisi (ListItem)
+          // Riwayat Pemberian Nutrisi
           if (riwayatPupukState.isLoading)
             const Center(
                 child: Padding(
@@ -171,8 +158,8 @@ class NutrisiTab extends StatelessWidget {
                       '',
                   'name': "${item['name'] ?? 'Nutrisi Tidak Bernama'}",
                   'category': (item['category'] as String?) ?? 'Nutrisi',
-                  'image': item['gambar'] as String? ??
-                      'assets/icons/set/fertilizer_bag.png', // Ikon yang lebih relevan
+                  'image':
+                      item['gambar'] as String? ?? 'assets/images/appIcon.png',
                   'person': item['petugasNama'] as String? ??
                       item['person'] as String? ??
                       'N/A',
@@ -182,7 +169,6 @@ class NutrisiTab extends StatelessWidget {
                   'time': formatDisplayTime(item['waktu'] as String? ??
                       item['time'] as String? ??
                       item['createdAt'] as String?),
-                  // 'description': 'Dosis: ${item['dosis'] ?? '-'} | Metode: ${item['metode'] ?? '-'}', // Contoh deskripsi
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {

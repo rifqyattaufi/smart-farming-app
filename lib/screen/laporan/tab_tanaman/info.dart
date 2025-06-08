@@ -6,7 +6,6 @@ import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/info_item.dart';
 
 class InfoTab extends StatefulWidget {
-  // Diubah menjadi StatefulWidget
   final bool isLoadingInitialData;
   final Map<String, dynamic>? tanamanReport;
   final List<dynamic> kebunList;
@@ -122,7 +121,7 @@ class _InfoTabState extends State<InfoTab> {
 
     List<Widget> listChildren = [];
 
-    // Bagian 1: Gambar Utama (Sama seperti sebelumnya)
+    // Bagian 1: Gambar Utama
     listChildren.add(
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -145,7 +144,7 @@ class _InfoTabState extends State<InfoTab> {
       ),
     );
 
-    // Bagian 2: Informasi Jenis Tanaman (Sama seperti sebelumnya)
+    // Bagian 2: Informasi Jenis Tanaman
     listChildren.add(
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -197,7 +196,7 @@ class _InfoTabState extends State<InfoTab> {
       ),
     );
 
-    // Bagian 3: Daftar Kebun Budidaya (Dengan "Muat Lagi")
+    // Bagian 3: Daftar Kebun Budidaya
     if (widget.kebunList.isNotEmpty) {
       final kebunToShow = widget.kebunList.take(_displayedKebunCount).toList();
       listChildren.add(
@@ -207,12 +206,7 @@ class _InfoTabState extends State<InfoTab> {
             title: 'Daftar Kebun Budidaya 🏞️',
             type: 'basic',
             items: kebunToShow.map((kebun) {
-              // Menggunakan kebunToShow
               final kebunItem = kebun as Map<String, dynamic>;
-              final jumlahObjekDiKebun =
-                  (kebunItem['ObjekBudidayas'] as List<dynamic>?)?.length ??
-                      (kebunItem['jumlah'] as int?) ??
-                      0;
               return {
                 'name': kebunItem['nama'] as String? ?? 'Kebun Tanpa Nama',
                 'icon': kebunItem['gambar'] as String? ??
@@ -220,9 +214,6 @@ class _InfoTabState extends State<InfoTab> {
                 'category':
                     kebunItem['lokasi'] as String? ?? 'Lokasi Tidak Ada',
                 'id': kebunItem['id'] as String? ?? UniqueKey().toString(),
-                'subtitle': 'Jumlah Tanaman: $jumlahObjekDiKebun bibit',
-                'description': kebunItem['deskripsi'] as String? ??
-                    'Tidak ada deskripsi kebun.',
               };
             }).toList(),
             onItemTap: (ctx, selectedKebun) {
@@ -255,7 +246,7 @@ class _InfoTabState extends State<InfoTab> {
       );
     }
 
-    // Bagian 4: Daftar Tanaman per Kebun (Objek Budidaya - Dengan "Muat Lagi")
+    // Bagian 4: Daftar Tanaman per Kebun (Objek Budidaya)
     // Menampilkan objek budidaya hanya untuk kebun yang sudah ditampilkan
     final displayedKebunData = widget.kebunList.take(_displayedKebunCount);
 
@@ -276,12 +267,11 @@ class _InfoTabState extends State<InfoTab> {
 
       if (semuaObjekBudidayaDiKebunIni.isNotEmpty) {
         listChildren.add(Padding(
-          padding: const EdgeInsets.only(
-              top: 0, bottom: 0), // Mengurangi bottom padding di sini
+          padding: const EdgeInsets.only(top: 0, bottom: 0),
           child: ListItem(
             title:
                 'Detail Tanaman di ${kebunItem['nama'] ?? 'Kebun Tanpa Nama'}',
-            type: 'detailed',
+            type: 'basic',
             items: objekBudidayaToShow.map((item) {
               // Menggunakan objekBudidayaToShow
               final plantItem = item as Map<String, dynamic>;
@@ -289,14 +279,8 @@ class _InfoTabState extends State<InfoTab> {
                 'name': plantItem['namaId'] as String? ??
                     'Tanaman (ID: ${plantItem['id']?.substring(0, 6) ?? 'N/A'})',
                 'icon': gambarUtama,
-                'category': '$namaTanaman (${kebunItem['nama']})',
+                'category': '$namaTanaman - ${kebunItem['nama']}',
                 'id': plantItem['id'] as String? ?? UniqueKey().toString(),
-                'subtitle':
-                    'Kode: ${plantItem['kode'] as String? ?? '-'} | Status: ${plantItem['statusKondisi'] as String? ?? 'Baik'}',
-                'description': plantItem['deskripsi'] as String? ??
-                    'Deskripsi objek budidaya tidak tersedia.',
-                'tanggalTanam': widget
-                    .formatDisplayDate(plantItem['tanggalTanam'] as String?),
               };
             }).toList(),
             onItemTap: (ctx, selectedPlant) {
@@ -314,26 +298,21 @@ class _InfoTabState extends State<InfoTab> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
               child: InkWell(
-                // Membuat area yang bisa di-tap
                 onTap: () => _loadMoreObjekBudidaya(
                     kebunId, semuaObjekBudidayaDiKebunIni.length),
-                borderRadius:
-                    BorderRadius.circular(8), // Untuk efek ripple yang bagus
+                borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 12.0), // Padding di dalam InkWell
+                      vertical: 8.0, horizontal: 12.0),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // Menengahkan konten
-                    mainAxisSize: MainAxisSize
-                        .min, // Membuat Row sekecil kontennya jika di Center
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         "Muat lagi tanaman di ${kebunItem['nama'] ?? ''}",
                         style: regular14.copyWith(color: green1),
                       ),
-                      const SizedBox(width: 8), // Jarak antara teks dan ikon
+                      const SizedBox(width: 8),
                       Icon(Icons.keyboard_arrow_down, color: green1),
                     ],
                   ),

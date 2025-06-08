@@ -1,92 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
+import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/service/report_service.dart';
+import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
+import 'package:smart_farming_app/utils/custom_picker_utils.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/harian.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/info.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/panen.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/sakit.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/vitamin.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/mati.dart';
-import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
-import 'package:smart_farming_app/service/report_service.dart';
-import 'package:smart_farming_app/theme.dart';
-import 'package:smart_farming_app/utils/app_utils.dart';
-import 'package:smart_farming_app/utils/custom_picker_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
-
-// --- State Helper Classes ---
-class ChartDataState<T> {
-  bool isLoading;
-  String? error;
-  List<Map<String, dynamic>> dataPoints;
-  List<String> xLabels;
-  T? rawData;
-
-  ChartDataState({
-    this.isLoading = true,
-    this.error,
-    this.dataPoints = const [],
-    this.xLabels = const [],
-    this.rawData,
-  });
-
-  void setLoading() {
-    isLoading = true;
-    error = null;
-    // dataPoints = []; // Optional: clear data on new load
-    // xLabels = [];    // Optional: clear data on new load
-  }
-
-  void setData(List<Map<String, dynamic>> points, List<String> labels,
-      [T? raw]) {
-    dataPoints = points;
-    xLabels = labels;
-    isLoading = false;
-    error = null;
-    rawData = raw;
-  }
-
-  void setError(String errorMessage) {
-    error = errorMessage;
-    isLoading = false;
-    dataPoints = [];
-    xLabels = [];
-  }
-}
-
-class RiwayatDataState<T> {
-  bool isLoading;
-  String? error;
-  List<Map<String, dynamic>> items;
-  T? rawData;
-
-  RiwayatDataState({
-    this.isLoading = true,
-    this.error,
-    this.items = const [],
-    this.rawData,
-  });
-
-  void setLoading() {
-    isLoading = true;
-    error = null;
-  }
-
-  void setData(List<Map<String, dynamic>> newItems, [T? raw]) {
-    items = newItems;
-    isLoading = false;
-    error = null;
-    rawData = raw;
-  }
-
-  void setError(String errorMessage) {
-    error = errorMessage;
-    isLoading = false;
-    items = [];
-  }
-}
-// --- End State Helper Classes ---
 
 class StatistikTanamanReport extends StatefulWidget {
   final String? idTanaman;

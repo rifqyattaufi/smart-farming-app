@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
-import 'package:smart_farming_app/utils/app_utils.dart'; // ChartFilterType
-// Impor ChartDataState dan RiwayatDataState jika diletakkan di file terpisah
-import 'package:smart_farming_app/screen/laporan/statistik_tanaman_report.dart'
-    show ChartDataState, RiwayatDataState;
+import 'package:smart_farming_app/utils/app_utils.dart';
+import 'package:smart_farming_app/model/chart_data_state.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/detail_skor_tanaman_list.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 import 'package:smart_farming_app/widget/statistik_harian_card.dart';
 
-// Helper Widget untuk menampilkan Chart
 class HarianTab extends StatelessWidget {
   final ChartDataState laporanHarianState;
   final ChartDataState penyiramanState;
@@ -247,7 +244,7 @@ class HarianTab extends StatelessWidget {
           const Text('Tidak ada riwayat pemberian pupuk untuk ditampilkan.')));
     }
 
-    listChildren.add(const SizedBox(height: 20)); // Padding bawah
+    listChildren.add(const SizedBox(height: 20));
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
