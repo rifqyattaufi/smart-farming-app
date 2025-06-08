@@ -42,7 +42,7 @@ class _PelaporanKematianTernakScreenState
   List<TextEditingController> _catatanController = [];
   List<TextEditingController> _dateController = [];
   List<TextEditingController> _nameController = [];
-  TextEditingController _jumlahController = TextEditingController();
+  final TextEditingController _jumlahController = TextEditingController();
   List<File?> _imageList = [];
 
   Future<void> _pickImageTernak(BuildContext context, int index) async {
@@ -135,8 +135,10 @@ class _PelaporanKematianTernakScreenState
           'unitBudidayaId': widget.data?['unitBudidaya']?['id'],
           'objekBudidayaId': list[i]?['id'],
           'tipe': widget.tipe,
-          'judul':
-              "Laporan Kematian ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? '')}",
+          'judul': (list[i]?['name'] != null &&
+                  (list[i]?['name'] as String).isNotEmpty)
+              ? "Laporan Kematian ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${list[i]?['name']}"
+              : "Laporan Kematian ${widget.data?['unitBudidaya']?['name'] ?? ''}",
           'gambar': imageUrl['data'],
           'catatan': _catatanController[i].text,
           'kematian': {
@@ -301,7 +303,7 @@ class _PelaporanKematianTernakScreenState
                             return null;
                           },
                         ),
-                        if (objekBudidayaList.length == 1)
+                        if (objek == null)
                           InputFieldWidget(
                             label: "Jumlah Kematian",
                             hint: "Contoh: 2",

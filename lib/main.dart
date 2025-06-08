@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/firebase_options.dart';
@@ -45,16 +46,16 @@ import 'package:smart_farming_app/screen/main_screen.dart';
 import 'package:smart_farming_app/screen/menu/home_screen.dart';
 import 'package:smart_farming_app/screen/menu/petugas/home_screen.dart';
 import 'package:smart_farming_app/screen/notifications/detail_notif_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_harian_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_mati_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_nutrisi_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_panen_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/detail/detail_laporan_sakit_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_mati_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_nutrisi_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_harian_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_mati_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_nutrisi_ternak_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_panen_ternak_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_sakit_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_kematian_ternak_screen.dart';
@@ -207,6 +208,8 @@ void main() async {
 
   fcmService = FcmService(flutterLocalNotificationsPlugin);
   await fcmService.initFCM();
+
+  await initializeDateFormatting('id_ID', null);
 
   runApp(const MyApp());
 }
@@ -423,15 +426,6 @@ final _router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as PelaporanTanamanPanenScreen;
         return extra;
-      },
-    ),
-    GoRoute(
-      path: '/detail-laporan-panen-tanaman/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return DetailLaporanPanenScreen(
-          idLaporanPanen: id,
-        );
       },
     ),
     GoRoute(
