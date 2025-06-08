@@ -217,8 +217,8 @@ class _ReportScreenState extends State<ReportScreen> {
               items: _laporanHamaList.map((laporan) {
                 final jenisHama = laporan['Hama']?['JenisHama'];
                 final unitBudidaya = laporan['UnitBudidaya'];
-                final user = laporan['User'];
-                // Format Tanggal & Waktu dengan pengecekan null
+                final user = laporan['user'];
+
                 final String tgl;
                 final String waktu;
                 if (laporan['createdAt'] != null) {
