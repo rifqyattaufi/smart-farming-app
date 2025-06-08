@@ -173,10 +173,12 @@ class _PelaporanNutrisiTernakScreenState
 
         final data = {
           'unitBudidayaId': widget.data?['unitBudidaya']['id'],
-          'objekBudidayaId': list[i]['id'],
+          'objekBudidayaId': list[i]?['id'],
           'tipe': widget.tipe,
-          'judul':
-              "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? '')}",
+          'judul': (list[i]?['name'] != null &&
+                  (list[i]?['name'] as String).isNotEmpty)
+              ? "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${list[i]?['name']}"
+              : "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''}",
           'gambar': imageUrl['data'],
           'catatan': _catatanController[i].text,
           'vitamin': {

@@ -46,6 +46,7 @@ class _DetailPemakaianInventarisScreenState
   }
 
   Future<void> _fetchData() async {
+    print(widget.idPemakaianInventaris);
     if (!mounted) return;
     setState(() {
       _isLoading = true;

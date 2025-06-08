@@ -131,8 +131,10 @@ class _PelaporanTernakSakitScreenState
           'unitBudidayaId': widget.data['unitBudidaya']?['id'],
           'objekBudidayaId': list[i]?['id'],
           'tipe': widget.tipe,
-          'judul':
-              "Laporan Sakit ${widget.data['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}",
+          'judul': (list[i]?['name'] != null &&
+                  (list[i]?['name'] as String).isNotEmpty)
+              ? "Laporan Sakit ${widget.data['unitBudidaya']?['name'] ?? ''} - ${list[i]?['name']}"
+              : "Laporan Sakit ${widget.data['unitBudidaya']?['name'] ?? ''}",
           'gambar': imageUrl['data'],
           'catatan': _catatanController[i].text,
           'sakit': {

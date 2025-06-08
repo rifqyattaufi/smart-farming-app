@@ -10,6 +10,7 @@ import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -283,16 +284,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             'text': aktivitas['judul'] ?? '-',
                             'time': aktivitas['createdAt'],
                             'icon': aktivitas['userAvatarUrl'] ?? '-',
+                            'tipe': aktivitas['tipe'] ?? 'unknown',
+                            'jenisBudidaya':
+                                aktivitas['jenisBudidayaTipe'] ?? 'unknown',
+                            'id': aktivitas['id'],
                           })
                       .toList(),
               onViewAll: () => context.push('/riwayat-aktivitas').then((_) {
                 _fetchData(isRefresh: true);
               }),
               onItemTap: (context, item) {
-                final name = item['text'] ?? '';
-                context.push('/detail-laporan/$name').then((_) {
-                  _fetchData(isRefresh: true);
-                });
+                navigateToDetailLaporan(context,
+                    idLaporan: item['id'],
+                    jenisLaporan: item['tipe'],
+                    jenisBudidaya: item['jenisBudidaya']);
               },
               mode: NewestReportsMode.full,
               titleTextStyle: bold18.copyWith(color: dark1),
@@ -556,16 +561,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             'text': aktivitas['judul'] ?? '-',
                             'time': aktivitas['createdAt'],
                             'icon': aktivitas['userAvatarUrl'] ?? '-',
+                            'tipe': aktivitas['tipe'] ?? 'unknown',
+                            'jenisBudidaya':
+                                aktivitas['jenisBudidayaTipe'] ?? 'unknown',
                           })
                       .toList(),
               onViewAll: () => context.push('/riwayat-aktivitas').then((_) {
                 _fetchData(isRefresh: true);
               }),
               onItemTap: (context, item) {
-                final id = item['id'] ?? '';
-                context.push('/detail-laporan/$id').then((_) {
-                  _fetchData(isRefresh: true);
-                });
+                navigateToDetailLaporan(context,
+                    idLaporan: item['id'],
+                    jenisLaporan: item['tipe'],
+                    jenisBudidaya: item['jenisBudidaya']);
               },
               mode: NewestReportsMode.full,
               titleTextStyle: bold18.copyWith(color: dark1),

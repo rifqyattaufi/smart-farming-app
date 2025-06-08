@@ -38,8 +38,8 @@ class _HeaderState extends State<Header> {
   @override
   void initState() {
     super.initState();
-    _title = widget.title;
-    _greeting = widget.greeting;
+    // _title = widget.title;
+    // _greeting = widget.greeting;
 
     if (widget.title == null) {
       _authService.getUser().then((user) {
@@ -120,12 +120,12 @@ class _HeaderState extends State<Header> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _title ?? 'Penanggung Jawab RFC',
+                      widget.title ?? _title ?? '',
                       style: regular12.copyWith(color: dark1),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _greeting ?? 'Halo, Pak Dwi 👋',
+                      widget.greeting ?? _greeting ?? '',
                       style: semibold20.copyWith(color: dark1),
                     ),
                   ],

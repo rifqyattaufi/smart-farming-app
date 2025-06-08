@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 
@@ -118,6 +118,8 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
             'id': aktivitas['id'] as String?,
             'time': aktivitas['createdAt'] as String?,
             'icon': aktivitas['userAvatarUrl'] as String? ?? '-',
+            'tipe': aktivitas['tipe'] as String? ?? '-',
+            'jenisBudidaya': aktivitas['jenisBudidayaTipe'] as String? ?? '-',
           };
         })
         .where((item) => item.containsKey('id') && item['id'] != null)
@@ -174,9 +176,10 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                                 if (itemId != null &&
                                     itemId.isNotEmpty &&
                                     itemId != '-') {
-                                  context
-                                      .push('/detail-laporan/$itemId')
-                                      .then((_) {});
+                                  navigateToDetailLaporan(context,
+                                      idLaporan: item['id'],
+                                      jenisLaporan: item['tipe'],
+                                      jenisBudidaya: item['jenisBudidaya']);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
