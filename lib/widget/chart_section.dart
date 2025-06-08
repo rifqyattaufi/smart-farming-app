@@ -1,13 +1,7 @@
-// Anda bisa letakkan ini di file terpisah misal: 'lib/widget/chart_section.dart'
-// dan impor di SakitTab serta NutrisiTab.
-// import 'package:smart_farming_app/widget/chart_section.dart';
-
-// Jika belum ada, ini versi singkatnya:
 import 'package:flutter/material.dart';
-import 'package:smart_farming_app/screen/laporan/statistik_tanaman_report.dart' show ChartDataState; // Sesuaikan path
-import 'package:smart_farming_app/utils/app_utils.dart'; // Untuk ChartFilterType
+import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/chart.dart';
-
 
 class ChartSection extends StatelessWidget {
   final String title;
@@ -18,7 +12,6 @@ class ChartSection extends StatelessWidget {
   final ChartFilterType? selectedChartFilterType;
   final String? displayedDateRangeText;
   final void Function(ChartFilterType?)? onChartFilterTypeChanged;
-  final Color? lineColor; // Tambahan untuk kustomisasi warna garis chart
 
   const ChartSection({
     super.key,
@@ -30,22 +23,26 @@ class ChartSection extends StatelessWidget {
     this.selectedChartFilterType,
     this.displayedDateRangeText,
     this.onChartFilterTypeChanged,
-    this.lineColor,
   });
 
   @override
   Widget build(BuildContext context) {
     Widget content;
     if (chartState.isLoading) {
-      content = const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator(strokeWidth: 2)));
+      content = const Center(
+          child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(strokeWidth: 2)));
     } else if (chartState.error != null) {
       content = Padding(
         padding: const EdgeInsets.all(16),
-        child: Text('Error $title: ${chartState.error}', style: const TextStyle(color: Colors.red)),
+        child: Text('Error $title: ${chartState.error}',
+            style: const TextStyle(color: Colors.red)),
       );
     } else {
       final List<double> values = chartState.dataPoints
-          .map<double>((e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
+          .map<double>(
+              (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
           .toList();
 
       if (values.isEmpty || chartState.xLabels.isEmpty) {
@@ -65,11 +62,10 @@ class ChartSection extends StatelessWidget {
           selectedChartFilterType: selectedChartFilterType,
           displayedDateRangeText: displayedDateRangeText,
           onChartFilterTypeChanged: onChartFilterTypeChanged,
-          // lineColor: lineColor, // Gunakan warna garis
         );
       }
     }
-    return Padding( // Default padding for each section item
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: content,
     );

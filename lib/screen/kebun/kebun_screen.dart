@@ -27,7 +27,7 @@ class _KebunScreenState extends State<KebunScreen> {
       final response =
           await _unitBudidayaService.getUnitBudidayaByTipe('tumbuhan');
       setState(() {
-        _kebunList = response['data'];
+        _kebunList = response['data'] ?? [];
         _filteredKebunList = _kebunList;
       });
     } catch (e) {
@@ -51,7 +51,7 @@ class _KebunScreenState extends State<KebunScreen> {
 
       if (response['status']) {
         setState(() {
-          _filteredKebunList = response['data'];
+          _filteredKebunList = response['data'] ?? [];
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -539,8 +539,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.inventory,
                   backgroundColor: Colors.teal,
                   iconColor: Colors.white,
-                  onTap: () =>
-                      context.push('/manajemen-komoditas-ternak').then((_) {
+                  onTap: () => context.push('/manajemen-komoditas').then((_) {
                     _fetchData(isRefresh: true);
                   }),
                 ),

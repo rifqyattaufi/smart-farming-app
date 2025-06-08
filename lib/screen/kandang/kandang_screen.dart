@@ -27,7 +27,7 @@ class _KandangScreenState extends State<KandangScreen> {
       final response =
           await _unitBudidayaService.getUnitBudidayaByTipe('hewan');
       setState(() {
-        _kandangList = response['data'];
+        _kandangList = response['data'] ?? [];
         _filteredKandangList = _kandangList;
       });
     } catch (e) {
@@ -51,7 +51,7 @@ class _KandangScreenState extends State<KandangScreen> {
 
       if (response['status']) {
         setState(() {
-          _filteredKandangList = response['data'];
+          _filteredKandangList = response['data'] ?? [];
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -126,7 +126,7 @@ class _PelaporanKhususTernakScreenState
                   MenuButton(
                     title: item['title'],
                     subtext: item['description'],
-                    icon: Icons.shopping_bag_outlined,
+                    icon: Icons.cruelty_free_rounded,
                     backgroundColor: Colors.grey.shade200,
                     iconColor: green1,
                     isSelected: selectedReport == item['title'],

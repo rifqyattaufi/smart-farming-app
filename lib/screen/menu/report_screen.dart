@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
+import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
-import 'package:toastification/toastification.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -17,8 +19,11 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   final DashboardService _dashboardService = DashboardService();
+  final HamaService _hamaService = HamaService();
+
   Map<String, dynamic>? _perkebunanData;
   Map<String, dynamic>? _peternakanData;
+  List<dynamic> _laporanHamaList = [];
   bool _isLoading = true;
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorPerkebunanKey =
@@ -43,16 +48,19 @@ class _ReportScreenState extends State<ReportScreen> {
       final results = await Future.wait([
         _dashboardService.getDashboardPerkebunan(),
         _dashboardService.getDashboardPeternakan(),
+        _hamaService.getLaporanHama(),
       ]);
 
       if (!mounted) return;
       setState(() {
         _perkebunanData = results[0];
         _peternakanData = results[1];
+        _laporanHamaList = results[2]['data'] ?? [];
       });
     } catch (e) {
       if (!mounted) return;
-      _showError('Terjadi kesalahan: ${e.toString()}');
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       // ignore: control_flow_in_finally
       if (!mounted) return;
@@ -61,23 +69,6 @@ class _ReportScreenState extends State<ReportScreen> {
           _isLoading = false;
         });
       }
-    }
-  }
-
-  void _showError(String message, {bool isError = true}) {
-    if (mounted) {
-      toastification.show(
-        context: context,
-        title: isError
-            ? const Text('Oops, Ada yang Salah! 👎')
-            : const Text('Hore! Sukses! 👍'),
-        description: Text(message),
-        type: isError ? ToastificationType.error : ToastificationType.success,
-        style: ToastificationStyle.flatColored,
-        autoCloseDuration: const Duration(seconds: 4),
-        alignment: Alignment.topCenter,
-        showProgressBar: true,
-      );
     }
   }
 
@@ -206,6 +197,77 @@ class _ReportScreenState extends State<ReportScreen> {
               },
             ),
             const SizedBox(height: 12),
+            ListItem(
+              title: 'Hasil Komoditas Perkebunan',
+              items:
+                  (_perkebunanData?['daftarKomoditas'] as List<dynamic>? ?? [])
+                      .map((tanaman) => {
+                            'id': tanaman['id'],
+                            'name': tanaman['nama'],
+                            'category':
+                                'Hasil panen: ${tanaman['jumlah']} ${tanaman['Satuan']?['lambang']}',
+                            'icon': tanaman['gambar'],
+                          })
+                      .toList(),
+              type: 'basic',
+            ),
+            const SizedBox(height: 12),
+            ListItem(
+              title: 'Laporan Hama Terbaru',
+              items: _laporanHamaList.map((laporan) {
+                final jenisHama = laporan['Hama']?['JenisHama'];
+                final unitBudidaya = laporan['UnitBudidaya'];
+                final user = laporan['User'];
+                // Format Tanggal & Waktu dengan pengecekan null
+                final String tgl;
+                final String waktu;
+                if (laporan['createdAt'] != null) {
+                  final dateTime = DateTime.parse(laporan['createdAt']);
+                  tgl = DateFormat('EEEE, dd MMM yyyy').format(dateTime);
+                  waktu = DateFormat('HH:mm').format(dateTime);
+                } else {
+                  tgl = 'N/A';
+                  waktu = 'N/A';
+                }
+
+                // Membangun string kategori dengan lebih aman
+                final kategoriParts = <String>[];
+                if (jenisHama?['nama'] != null) {
+                  kategoriParts.add("Jenis Hama: ${jenisHama['nama']}");
+                }
+                if (unitBudidaya?['nama'] != null) {
+                  kategoriParts.add("Lokasi: ${unitBudidaya['nama']}");
+                }
+                if (laporan['Hama']?['jumlah'] != null) {
+                  kategoriParts.add("Jumlah: ${laporan['Hama']['jumlah']}");
+                }
+                final kategori = kategoriParts.join('\n');
+
+                return {
+                  'name':
+                      laporan['judul'] ?? jenisHama?['nama'] ?? 'Laporan Hama',
+                  'category':
+                      kategori.isNotEmpty ? kategori : 'Detail tidak tersedia',
+                  'image':
+                      laporan['gambar'] ?? 'assets/images/placeholder_hama.png',
+                  'person': user?['name'] ?? 'Petugas Tidak Diketahui',
+                  'date': tgl,
+                  'time': waktu,
+                  'id': laporan['id'],
+                };
+              }).toList(),
+              type: 'history',
+              onItemTap: (context, item) {
+                final id = item['id'] as String?;
+                if (id != null) {
+                  // Pastikan route '/detail-laporan-hama/$id' sudah terdaftar di GoRouter
+                  context.push('/detail-laporan-hama/$id').then((_) {
+                    _fetchData(isRefresh: true);
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 24),
           ] else if (!_isLoading) ...[
             Center(
               child: Padding(
@@ -312,6 +374,21 @@ class _ReportScreenState extends State<ReportScreen> {
               },
             ),
             const SizedBox(height: 12),
+            ListItem(
+              title: 'Hasil Komoditas Peternakan',
+              items:
+                  (_peternakanData?['daftarKomoditas'] as List<dynamic>? ?? [])
+                      .map((ternak) => {
+                            'id': ternak['id'],
+                            'name': ternak['nama'],
+                            'category':
+                                'Hasil panen: ${ternak['jumlah']} ${ternak['Satuan']?['lambang']}',
+                            'icon': ternak['gambar'],
+                          })
+                      .toList(),
+              type: 'basic',
+            ),
+            const SizedBox(height: 24),
           ] else if (!_isLoading) ...[
             Center(
               child: Padding(

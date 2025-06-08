@@ -139,7 +139,7 @@ class _PelaporanKhususTanamanScreenState
                   MenuButton(
                     title: item['title'],
                     subtext: item['description'],
-                    icon: Icons.shopping_bag_outlined,
+                    icon: Icons.yard,
                     backgroundColor: Colors.grey.shade200,
                     iconColor: green1,
                     isSelected: selectedReport == item['title'],
