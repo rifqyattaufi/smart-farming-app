@@ -1,0 +1,2 @@
+D:/Backup/Kampus/SEMESTER 08/tugas_akhir/smart-farming-app/android/app/.cxx/RelWithDebInfo/4o634a6w/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/Backup/Kampus/SEMESTER 08/tugas_akhir/smart-farming-app/android/app/.cxx/RelWithDebInfo/4o634a6w/arm64-v8a/CMakeFiles/rebuild_cache.dir
