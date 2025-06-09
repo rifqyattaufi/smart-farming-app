@@ -491,6 +491,56 @@ class ReportService {
     }
   }
 
+  Future<Map<String, dynamic>> getStatistikPemberianDisinfektan({
+    required String jenisBudidayaId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String groupBy,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'startDate': DateFormat('yyyy-MM-dd').format(startDate),
+      'endDate': DateFormat('yyyy-MM-dd').format(endDate),
+      'groupBy': groupBy,
+    };
+    final url =
+        Uri.parse('$baseUrl/statistik-pemberian-disinfektan/$jenisBudidayaId')
+            .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getStatistikPemberianDisinfektan(
+            jenisBudidayaId: jenisBudidayaId,
+            startDate: startDate,
+            endDate: endDate,
+            groupBy: groupBy);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load statistics',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> getRiwayatLaporanUmumJenisBudidaya({
     required String jenisBudidayaId,
     int limit = 5,

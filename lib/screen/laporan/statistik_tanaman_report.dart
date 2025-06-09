@@ -11,7 +11,7 @@ import 'package:smart_farming_app/screen/laporan/tab_tanaman/harian.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/info.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/panen.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/sakit.dart';
-import 'package:smart_farming_app/screen/laporan/tab_tanaman/vitamin.dart';
+import 'package:smart_farming_app/screen/laporan/tab_tanaman/nutrisi.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/mati.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
@@ -50,6 +50,9 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'laporanMati': ChartDataState<List<dynamic>>(),
     'statistikPenyakit': ChartDataState<List<dynamic>>(),
     'statistikPenyebabKematian': ChartDataState<List<dynamic>>(),
+    'laporanNutrisi': ChartDataState<List<dynamic>>(),
+    'laporanVitamin': ChartDataState<List<dynamic>>(),
+    'laporanDisinfektan': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
@@ -57,6 +60,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'pupuk': RiwayatDataState<List<dynamic>>(),
     'sakit': RiwayatDataState<List<dynamic>>(),
     'mati': RiwayatDataState<List<dynamic>>(),
+    'nutrisi': RiwayatDataState<List<dynamic>>(),
   };
   // --- End Unified State ---
 
@@ -294,6 +298,9 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           if (chartKey != 'laporanHarian' &&
               chartKey != 'laporanSakit' &&
               chartKey != 'laporanMati' &&
+              chartKey != 'laporanNutrisi' &&
+              chartKey != 'laporanVitamin' &&
+              chartKey != 'laporanDisinfektan' &&
               _chartStates['laporanHarian']!.xLabels.isNotEmpty) {
             finalXLabels =
                 List<String>.from(_chartStates['laporanHarian']!.xLabels);
@@ -477,6 +484,45 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   endDate: end,
                   groupBy: gb),
         ),
+        _fetchAndProcessChartData(
+          chartKey: 'laporanVitamin',
+          valueKey: 'jumlahPemberianVitamin',
+          groupBy: groupBy,
+          defaultErrorMessage:
+              'Gagal memuat statistik laporan pemberian vaksin',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPemberianVitamin(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end,
+                  groupBy: gb),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'laporanNutrisi',
+          valueKey: 'jumlahKejadianPemberianPupuk',
+          groupBy: groupBy,
+          defaultErrorMessage:
+              'Gagal memuat statistik laporan pemberian nutrisi',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPemberianNutrisi(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end,
+                  groupBy: gb),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'laporanDisinfektan',
+          valueKey: 'jumlahPemberianDisinfektan',
+          groupBy: groupBy,
+          defaultErrorMessage:
+              'Gagal memuat statistik laporan pemberian disinfektan',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPemberianDisinfektan(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end,
+                  groupBy: gb),
+        ),
         _fetchAndProcessRiwayatData(
             riwayatKey: 'umum',
             defaultErrorMessage: 'Gagal memuat riwayat pelaporan umum',
@@ -504,6 +550,16 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     limit: 3,
                     page: 1,
                     tipeNutrisi: 'pupuk')),
+        _fetchAndProcessRiwayatData(
+            riwayatKey: 'nutrisi',
+            defaultErrorMessage:
+                'Gagal memuat riwayat pelaporan pemberian nutrisi',
+            fetchFunction: () =>
+                _reportService.getRiwayatPemberianNutrisiJenisBudidaya(
+                    jenisBudidayaId: widget.idTanaman!,
+                    limit: 5,
+                    page: 1,
+                    tipeNutrisi: 'pupuk,vitamin,disinfektan')),
       ]);
     } catch (e) {
       if (mounted) {
@@ -965,8 +1021,10 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   NutrisiTab(
-                    nutrisiState: _chartStates['nutrisi']!,
-                    riwayatPupukState: _riwayatStates['pupuk']!,
+                    nutrisiState: _chartStates['laporanNutrisi']!,
+                    vitaminState: _chartStates['laporanVitamin']!,
+                    disinfektanState: _chartStates['laporanDisinfektan']!,
+                    riwayatNutrisiState: _riwayatStates['nutrisi']!,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,
                     formattedDisplayedDateRange: formattedDisplayedDateRange,

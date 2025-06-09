@@ -46,7 +46,6 @@ class _PelaporanNutrisiTanamanScreenState
   List<Map<String, dynamic>?> selectedBahanList = [];
 
   List<Map<String, dynamic>> listBahanVitamin = [];
-  List<Map<String, dynamic>> listBahanVaksin = [];
   List<Map<String, dynamic>> listBahanPupuk = [];
   List<Map<String, dynamic>> listBahanDisinfektan = [];
 
@@ -90,7 +89,7 @@ class _PelaporanNutrisiTanamanScreenState
     _formKeys.clear();
     _formKeys.addAll(List.generate(length, (_) => GlobalKey<FormState>()));
 
-    statusPemberianList = List.generate(length, (_) => 'Vitamin'); // Default
+    statusPemberianList = List.generate(length, (_) => 'Pupuk'); // Default
     selectedBahanList = List.generate(length, (_) => null); // Default null
   }
 
@@ -119,15 +118,12 @@ class _PelaporanNutrisiTanamanScreenState
     try {
       final responseVitamin =
           await _inventarisService.getInventarisByKategoriName('Vitamin');
-      final responseVaksin =
-          await _inventarisService.getInventarisByKategoriName('Vaksin');
       final responsePupuk =
           await _inventarisService.getInventarisByKategoriName('Pupuk');
       final responseDisinfektan =
           await _inventarisService.getInventarisByKategoriName('Disinfektan');
 
       if (mounted) {
-        // Selalu cek 'mounted' sebelum setState di async
         if (responseVitamin['status']) {
           setState(() {
             listBahanVitamin = (responseVitamin['data'] as List)
@@ -141,21 +137,6 @@ class _PelaporanNutrisiTanamanScreenState
         } else {
           _showErrorSnackbar(
               'Error fetching vitamin data: ${responseVitamin['message']}');
-        }
-
-        if (responseVaksin['status']) {
-          setState(() {
-            listBahanVaksin = (responseVaksin['data'] as List)
-                .map<Map<String, dynamic>>((item) => {
-                      'name': item['nama'],
-                      'id': item['id'],
-                      'satuanId': item['SatuanId'],
-                    })
-                .toList();
-          });
-        } else {
-          _showErrorSnackbar(
-              'Error fetching vaksin data: ${responseVaksin['message']}');
         }
 
         if (responsePupuk['status']) {
@@ -457,9 +438,6 @@ class _PelaporanNutrisiTanamanScreenState
                             case 'Vitamin':
                               currentBahanList = listBahanVitamin;
                               break;
-                            case 'Vaksin':
-                              currentBahanList = listBahanVaksin;
-                              break;
                             case 'Pupuk':
                               currentBahanList = listBahanPupuk;
                               break;
@@ -522,12 +500,11 @@ class _PelaporanNutrisiTanamanScreenState
                                   RadioField(
                                     label: 'Jenis Pemberian',
                                     selectedValue:
-                                        statusPemberianList[i] ?? 'Vitamin',
+                                        statusPemberianList[i] ?? 'Pupuk',
                                     options: const [
-                                      'Vitamin',
                                       'Pupuk',
-                                      'Vaksin',
                                       'Disinfektan',
+                                      'Vitamin',
                                     ],
                                     onChanged: (value) {
                                       setState(() {

@@ -4,12 +4,14 @@ import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
-import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 
 class NutrisiTab extends StatelessWidget {
   final ChartDataState nutrisiState;
-  final RiwayatDataState riwayatPupukState;
+  final ChartDataState vitaminState;
+  final ChartDataState disinfektanState;
+
+  final RiwayatDataState riwayatNutrisiState;
 
   final Future<void> Function()? onDateIconPressed;
   final ChartFilterType? selectedChartFilterType;
@@ -23,24 +25,32 @@ class NutrisiTab extends StatelessWidget {
   const NutrisiTab({
     super.key,
     required this.nutrisiState,
-    required this.riwayatPupukState,
-    this.onDateIconPressed,
-    this.selectedChartFilterType,
-    this.formattedDisplayedDateRange,
-    this.onChartFilterTypeChanged,
+    required this.vitaminState,
+    required this.disinfektanState,
+    required this.riwayatNutrisiState,
+    required this.onDateIconPressed,
+    required this.selectedChartFilterType,
+    required this.formattedDisplayedDateRange,
+    required this.onChartFilterTypeChanged,
     required this.formatDisplayDate,
     required this.formatDisplayTime,
     this.selectedChartDateRange,
   });
 
   String _generateRangkumanNutrisi() {
-    if (nutrisiState.isLoading) {
+    if (nutrisiState.isLoading ||
+        vitaminState.isLoading ||
+        disinfektanState.isLoading) {
       return "Memuat data pemberian nutrisi...";
     }
-    if (nutrisiState.error != null) {
+    if (nutrisiState.error != null ||
+        vitaminState.error != null ||
+        disinfektanState.error != null) {
       return "Tidak dapat memuat rangkuman pemberian nutrisi.";
     }
-    if (nutrisiState.dataPoints.isEmpty) {
+    if (nutrisiState.dataPoints.isEmpty &&
+        vitaminState.dataPoints.isEmpty &&
+        disinfektanState.dataPoints.isEmpty) {
       return "Tidak ada data pemberian nutrisi pada periode ini.";
     }
 
@@ -57,20 +67,27 @@ class NutrisiTab extends StatelessWidget {
           : "pada periode $startDateFormatted hingga $endDateFormatted";
     }
 
-    num totalKejadian = nutrisiState.dataPoints.fold(
+    num totalNutrisi = nutrisiState.dataPoints.fold(0,
+        (prev, curr) => prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0));
+    num totalVitamin = vitaminState.dataPoints.fold(0,
+        (prev, curr) => prev + ((curr['jumlahPemberianVitamin'] as num?) ?? 0));
+    num totalDisinfektan = disinfektanState.dataPoints.fold(
         0,
         (prev, curr) =>
-            prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0));
-    String rataRataText = "";
-    if ((selectedChartFilterType == ChartFilterType.weekly ||
-            selectedChartFilterType == ChartFilterType.custom) &&
-        nutrisiState.dataPoints.isNotEmpty) {
-      double rataRata = totalKejadian / nutrisiState.dataPoints.length;
-      rataRataText =
-          "dengan rata-rata ${rataRata.toStringAsFixed(1)} kali per hari";
+            prev + ((curr['jumlahPemberianDisinfektan'] as num?) ?? 0));
+
+    final List<String> summaryParts = [];
+    if (totalVitamin > 0) {
+      summaryParts.add("total $totalVitamin kasus pemberian vitamin");
+    }
+    if (totalNutrisi > 0) {
+      summaryParts.add("$totalNutrisi kasus pemberian nutrisi tanaman");
+    }
+    if (totalDisinfektan > 0) {
+      summaryParts.add("$totalDisinfektan kasus pemberian disinfektan");
     }
 
-    return "Berdasarkan statistik pelaporan $periodeText, terdapat total $totalKejadian laporan pemberian nutrisi $rataRataText.";
+    return "Berdasarkan statistik pelaporan $periodeText, ditemukan ${summaryParts.join(' dan ')}.";
   }
 
   @override
@@ -92,14 +109,28 @@ class NutrisiTab extends StatelessWidget {
             displayedDateRangeText: formattedDisplayedDateRange,
             onChartFilterTypeChanged: onChartFilterTypeChanged,
           ),
-
           const SizedBox(height: 12),
+          ChartSection(
+            title: 'Statistik Laporan Pemberian Disinfektan',
+            chartState: disinfektanState,
+            valueKeyForMapping: 'jumlahPemberianDisinfektan',
+            showFilterControls: false,
+          ),
+          const SizedBox(height: 12),
+          ChartSection(
+            title: 'Statistik Laporan Pemberian Vitamin',
+            chartState: vitaminState,
+            valueKeyForMapping: 'jumlahPemberianVitamin',
+            showFilterControls: false,
+          ),
+          const SizedBox(height: 12),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Rangkuman Statistik Nutrisi",
+                Text("Rangkuman Statistik Pemberian Nutrisi",
                     style: bold18.copyWith(color: dark1)),
                 const SizedBox(height: 12),
                 Text(
@@ -111,70 +142,40 @@ class NutrisiTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          NewestReports(
-            title: 'Laporan Pemberian Nutrisi Terbaru',
-            reports: const [
-              {
-                'id': 'nutrisi_report_static_1',
-                'text':
-                    'Pemberian pupuk NPK terjadwal telah dilakukan oleh Pak Budi.',
-                'icon':
-                    'assets/icons/set/carbohydrates.png', // Ikon yang lebih relevan
-                'time': 'Baru saja',
-              }
-            ],
-            onItemTap: (itemContext, item) {
-              ScaffoldMessenger.of(itemContext).showSnackBar(
-                  SnackBar(content: Text('Tap pada: ${item['text']}')));
-            },
-            onViewAll: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Lihat Semua Laporan Nutrisi Terbaru')));
-            },
-            mode: NewestReportsMode.simple,
-          ),
-          const SizedBox(height: 16),
-
-          // Riwayat Pemberian Nutrisi
-          if (riwayatPupukState.isLoading)
+          // Riwayat Pelaporan Pemberian Nutrisi
+          if (riwayatNutrisiState.isLoading)
             const Center(
                 child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: CircularProgressIndicator(strokeWidth: 2)))
-          else if (riwayatPupukState.error != null)
+          else if (riwayatNutrisiState.error != null)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text('Error Riwayat Nutrisi: ${riwayatPupukState.error}',
+              child: Text(
+                  'Error memuat riwayat laporan pemberian nutrisi: ${riwayatNutrisiState.error}',
                   style: const TextStyle(color: Colors.red)),
             )
-          else if (riwayatPupukState.items.isNotEmpty)
-            ListItem(
-              title: 'Riwayat Pemberian Nutrisi Lengkap',
-              type: 'history',
-              items: riwayatPupukState.items.map((item) {
+          else if (riwayatNutrisiState.items.isNotEmpty)
+            NewestReports(
+              title: 'Riwayat Pemberian Nutrisi',
+              reports: riwayatNutrisiState.items.map((item) {
                 return {
                   'id': item['laporanId'] as String? ??
                       item['id'] as String? ??
                       '',
-                  'name': "${item['name'] ?? 'Nutrisi Tidak Bernama'}",
-                  'category': (item['category'] as String?) ?? 'Nutrisi',
-                  'image':
+                  'text':
+                      'Pemberian ${item['name'] as String? ?? 'Laporan Pemberian Nutrisi'}',
+                  'subtext': 'Oleh: ${item['person'] as String? ?? 'N/A'}',
+                  'icon':
                       item['gambar'] as String? ?? 'assets/images/appIcon.png',
-                  'person': item['petugasNama'] as String? ??
-                      item['person'] as String? ??
-                      'N/A',
-                  'date': formatDisplayDate(item['tanggal'] as String? ??
-                      item['date'] as String? ??
-                      item['createdAt'] as String?),
-                  'time': formatDisplayTime(item['waktu'] as String? ??
-                      item['time'] as String? ??
-                      item['createdAt'] as String?),
+                  'time': item['time'],
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {
                 final laporanId = tappedItem['id'] as String?;
-                final laporanJudul = tappedItem['name'] as String?;
+                final laporanJudul = tappedItem['text'] as String?;
                 if (laporanId != null && laporanId.isNotEmpty) {
+                  // Navigasi: itemContext.push('/detail-laporan-nutrisi/$laporanId');
                   ScaffoldMessenger.of(itemContext).showSnackBar(
                       SnackBar(content: Text('Membuka detail: $laporanJudul')));
                 } else {
@@ -182,6 +183,10 @@ class NutrisiTab extends StatelessWidget {
                       content: Text('Detail laporan tidak tersedia.')));
                 }
               },
+              mode: NewestReportsMode.full,
+              titleTextStyle: bold18.copyWith(color: dark1),
+              reportTextStyle: medium12.copyWith(color: dark1),
+              timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
             const Padding(

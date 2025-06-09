@@ -157,7 +157,7 @@ class VitaminTab extends StatelessWidget {
                 final laporanId = tappedItem['id'] as String?;
                 final laporanJudul = tappedItem['text'] as String?;
                 if (laporanId != null && laporanId.isNotEmpty) {
-                  // Navigasi: itemContext.push('/detail-laporan-sakit/$laporanId');
+                  // Navigasi: itemContext.push('/detail-laporan-nutrisi/$laporanId');
                   ScaffoldMessenger.of(itemContext).showSnackBar(
                       SnackBar(content: Text('Membuka detail: $laporanJudul')));
                 } else {
