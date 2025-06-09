@@ -142,7 +142,7 @@ class _DetailLaporanHarianTernakScreenState
                                     _laporanHarian?['HarianTernak']
                                         ['cekKandang']),
                                 infoItem("Pelaporan oleh",
-                                    _laporanHarian?['User']['name']),
+                                    _laporanHarian?['user']['name']),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     _laporanHarian?["createdAt"] != null

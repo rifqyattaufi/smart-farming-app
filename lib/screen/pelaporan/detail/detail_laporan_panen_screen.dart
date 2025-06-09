@@ -175,7 +175,7 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
                                 infoItem("Satuan panen",
                                     "${_laporanPanen?['PanenKebun']['Komodita']['Satuan']['nama'] ?? '-'} - ${_laporanPanen?['PanenKebun']['Komodita']['Satuan']['lambang'] ?? '-'}"),
                                 infoItem("Pelaporan oleh",
-                                    _laporanPanen?['User']['name'] ?? '-'),
+                                    _laporanPanen?['user']['name'] ?? '-'),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     _laporanPanen?["createdAt"] != null

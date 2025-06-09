@@ -33,6 +33,7 @@ class _DetailLaporanPanenTernakScreenState
         setState(() {
           _laporanPanenTernak = response['data'];
         });
+        print('Response data: ${response['data']}');
       } else {
         showAppToast(context,
             response['message'] ?? 'Gagal memuat data laporan panen ternak.');
@@ -144,8 +145,8 @@ class _DetailLaporanPanenTernakScreenState
                                         "-"),
                                 infoItem(
                                     "Nama komoditas",
-                                    _laporanPanenTernak?['Panen']['Komodita']
-                                            ['nama'] ??
+                                    _laporanPanenTernak?['Panen']?['komoditas']
+                                            ?['nama'] ??
                                         "-"),
                                 infoItem(
                                     "Lokasi ternak",
@@ -158,10 +159,10 @@ class _DetailLaporanPanenTernakScreenState
                                             ?.toString() ??
                                         "-"),
                                 infoItem("Satuan panen",
-                                    "${_laporanPanenTernak?['Panen']['Komodita']['Satuan']['nama'] ?? '-'} - ${_laporanPanenTernak?['Panen']['Komodita']['Satuan']['lambang'] ?? '-'}"),
+                                    "${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['nama'] ?? '-'} - ${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['lambang'] ?? '-'}"),
                                 infoItem(
                                     "Pelaporan oleh",
-                                    _laporanPanenTernak?['User']['name'] ??
+                                    _laporanPanenTernak?['user']['name'] ??
                                         "-"),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",

@@ -147,7 +147,7 @@ class _DetailLaporanSakitScreenState extends State<DetailLaporanSakitScreen> {
                                 infoItem("Nama penyakit",
                                     laporanSakit?['Sakit']['penyakit']),
                                 infoItem("Pelaporan oleh",
-                                    laporanSakit?['User']['name']),
+                                    laporanSakit?['user']['name']),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     laporanSakit?["createdAt"] != null

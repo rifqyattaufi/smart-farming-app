@@ -53,10 +53,7 @@ import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_s
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_ternak_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_mati_ternak_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_nutrisi_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_ternak_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/detail/detail_laporan_sakit_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_kematian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_khusus_ternak_screen.dart';
@@ -381,28 +378,10 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/detail-laporan-nutrisi-ternak/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return DetailLaporanNutrisiTernakScreen(
-          idLaporanNutrisiTernak: id,
-        );
-      },
-    ),
-    GoRoute(
       path: '/pelaporan-kematian-ternak',
       builder: (context, state) {
         final extra = state.extra as PelaporanKematianTernakScreen;
         return extra;
-      },
-    ),
-    GoRoute(
-      path: '/detail-laporan-kematian-ternak/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return DetailLaporanMatiTernakScreen(
-          idLaporanMatiTernak: id,
-        );
       },
     ),
     GoRoute(
@@ -465,15 +444,6 @@ final _router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as PelaporanTernakSakitScreen;
         return extra;
-      },
-    ),
-    GoRoute(
-      path: '/detail-laporan-sakit-ternak/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return DetailLaporanSakitTernakScreen(
-          idLaporanSakitTernak: id,
-        );
       },
     ),
     GoRoute(

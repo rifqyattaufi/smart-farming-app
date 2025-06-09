@@ -160,7 +160,7 @@ class _DetailLaporanMatiScreenState extends State<DetailLaporanMatiScreen> {
                                                     ['tanggal']))
                                         : "-"),
                                 infoItem("Pelaporan oleh",
-                                    _laporanMati?["User"]['name'] ?? "-"),
+                                    _laporanMati?["user"]['name'] ?? "-"),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     _laporanMati?["createdAt"] != null

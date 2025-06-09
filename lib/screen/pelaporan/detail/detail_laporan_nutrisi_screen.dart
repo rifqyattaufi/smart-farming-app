@@ -162,7 +162,7 @@ class _DetailLaporanNutrisiScreenState
                                     laporanNutrisi?["UnitBudidaya"]['nama'] ??
                                         "-"),
                                 infoItem("Pelaporan oleh",
-                                    laporanNutrisi?['User']['name'] ?? "-"),
+                                    laporanNutrisi?['user']?['name'] ?? "-"),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     laporanNutrisi?["createdAt"] != null

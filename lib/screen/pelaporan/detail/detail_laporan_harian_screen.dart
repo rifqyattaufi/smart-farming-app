@@ -6,8 +6,6 @@ import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
-import 'package:smart_farming_app/widget/list_items.dart';
-import 'package:go_router/go_router.dart';
 
 class DetailLaporanHarianScreen extends StatefulWidget {
   final String? idLaporanHarian;
@@ -178,7 +176,7 @@ class _DetailLaporanHarianScreenState extends State<DetailLaporanHarianScreen> {
                                                 ['statusTumbuh']] ??
                                         "-"),
                                 infoItem("Pelaporan oleh",
-                                    _laporanHarian?['User']['name']),
+                                    _laporanHarian?['user']['name']),
                                 infoItem(
                                     "Tanggal & waktu pelaporan",
                                     _laporanHarian?["createdAt"] != null
