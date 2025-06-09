@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
-import 'package:smart_farming_app/widget/detail_skor_tanaman_list.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
-import 'package:smart_farming_app/widget/statistik_harian_card.dart';
 
 class HarianTab extends StatelessWidget {
   final ChartDataState laporanHarianState;
@@ -15,7 +14,6 @@ class HarianTab extends StatelessWidget {
   final ChartDataState pruningState;
   final ChartDataState repottingState;
 
-  final bool isLoadingStatistikHarian;
   final String? statistikHarianErrorMessage;
   final Map<String, dynamic>? statistikHarianData;
 
@@ -31,10 +29,6 @@ class HarianTab extends StatelessWidget {
 
   final String Function(String?) formatDisplayDate;
   final String Function(String?) formatDisplayTime;
-  final void Function(BuildContext, Map<String, dynamic>)
-      onRiwayatPelaporanUmumItemTap;
-  final void Function(BuildContext, Map<String, dynamic>)
-      onRiwayatPemberianPupukItemTap;
 
   const HarianTab({
     super.key,
@@ -43,7 +37,6 @@ class HarianTab extends StatelessWidget {
     required this.nutrisiState,
     required this.pruningState,
     required this.repottingState,
-    required this.isLoadingStatistikHarian,
     this.statistikHarianErrorMessage,
     this.statistikHarianData,
     required this.onDateIconPressed,
@@ -55,8 +48,6 @@ class HarianTab extends StatelessWidget {
     required this.riwayatPupukState,
     required this.formatDisplayDate,
     required this.formatDisplayTime,
-    required this.onRiwayatPelaporanUmumItemTap,
-    required this.onRiwayatPemberianPupukItemTap,
   });
 
   Widget _paddedError(String message) {
@@ -77,7 +68,7 @@ class HarianTab extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> listChildren = [];
 
-    // Chart Laporan Harian (dengan filter)
+    // Chart Laporan Harian
     listChildren.add(ChartSection(
       title: 'Statistik Laporan Harian',
       chartState: laporanHarianState,
@@ -90,52 +81,42 @@ class HarianTab extends StatelessWidget {
     ));
 
     // Chart Penyiraman
-    listChildren.add(ChartSection(
-      title: 'Statistik Penyiraman Tanaman',
-      chartState: penyiramanState,
-      valueKeyForMapping: 'jumlahPenyiraman',
-    ));
+    listChildren.add(
+      ChartSection(
+        title: 'Statistik Penyiraman Tanaman',
+        chartState: penyiramanState,
+        valueKeyForMapping: 'jumlahPenyiraman',
+      ),
+    );
 
     // Chart Pruning
-    listChildren.add(ChartSection(
-      title: 'Statistik Pruning Tanaman',
-      chartState: pruningState,
-      valueKeyForMapping: 'jumlahPruning',
-    ));
+    listChildren.add(
+      ChartSection(
+        title: 'Statistik Pruning Tanaman',
+        chartState: pruningState,
+        valueKeyForMapping: 'jumlahPruning',
+      ),
+    );
 
     // Chart Repotting
-    listChildren.add(ChartSection(
-      title: 'Statistik Repotting Tanaman',
-      chartState: repottingState,
-      valueKeyForMapping: 'jumlahRepotting',
-    ));
+    listChildren.add(
+      ChartSection(
+        title: 'Statistik Repotting Tanaman',
+        chartState: repottingState,
+        valueKeyForMapping: 'jumlahRepotting',
+      ),
+    );
 
     // Chart Pemberian Nutrisi
-    listChildren.add(ChartSection(
-      title: 'Statistik Pemberian Nutrisi',
-      chartState: nutrisiState,
-      valueKeyForMapping: 'jumlahKejadianPemberianPupuk',
-    ));
+    listChildren.add(
+      ChartSection(
+        title: 'Statistik Pemberian Nutrisi',
+        chartState: nutrisiState,
+        valueKeyForMapping: 'jumlahKejadianPemberianPupuk',
+      ),
+    );
 
     listChildren.add(const SizedBox(height: 4));
-
-    // Statistik Harian Card
-    listChildren.add(StatistikHarianCard(
-      isLoading: isLoadingStatistikHarian,
-      errorMessage: statistikHarianErrorMessage,
-      data: statistikHarianData,
-    ));
-
-    // Detail Skor Tanaman List
-    if (statistikHarianData != null &&
-        statistikHarianData!['detailTanaman'] != null) {
-      listChildren.add(DetailSkorTanamanListWidget(
-        isLoading: isLoadingStatistikHarian,
-        detailTanamanList:
-            statistikHarianData!['detailTanaman'] as List<dynamic>? ?? [],
-      ));
-    }
-    listChildren.add(const SizedBox(height: 12));
 
     // Rangkuman Statistik Teks
     listChildren.add(
@@ -163,7 +144,7 @@ class HarianTab extends StatelessWidget {
       ),
     );
 
-    // Riwayat Pelaporan Umum
+    // Riwayat Pelaporan Harian
     if (riwayatUmumState.isLoading) {
       listChildren.add(const Center(
           child: Padding(
@@ -179,22 +160,29 @@ class HarianTab extends StatelessWidget {
             .map((item) => {
                   'id': item['laporanId'] as String? ??
                       item['id'] as String? ??
-                      '', // accomodate different id keys
-                  'text': item['judul'] as String? ??
-                      item['text'] as String? ??
-                      'Laporan',
-                  'subtext': 'Oleh: ${item['petugasNama'] as String? ?? 'N/A'}',
+                      '',
+                  'text': item['text'] as String? ?? 'Laporan',
+                  'subtext': 'Oleh: ${item['person'] as String? ?? 'N/A'}',
                   'icon':
                       item['gambar'] as String? ?? 'assets/images/appIcon.png',
-                  'time': item[
-                      'time'], // Assume time is already formatted or handled by NewestReports
+                  'time': item['time'],
                 })
             .toList(),
-        onViewAll: () {
-          /* Navigasi */ ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Melihat Semua Laporan Umum')));
+        onItemTap: (itemContext, tappedItem) {
+          final idLaporan = tappedItem['id'] as String?;
+          if (idLaporan != null) {
+            navigateToDetailLaporan(itemContext,
+                idLaporan: idLaporan,
+                jenisLaporan: 'harian',
+                jenisBudidaya: 'tumbuhan');
+          } else {
+            ScaffoldMessenger.of(itemContext).showSnackBar(
+              const SnackBar(
+                content: Text('ID laporan tidak ditemukan.'),
+              ),
+            );
+          }
         },
-        onItemTap: onRiwayatPelaporanUmumItemTap,
         mode: NewestReportsMode.full,
         titleTextStyle: bold18.copyWith(color: dark1),
         reportTextStyle: medium12.copyWith(color: dark1),
@@ -202,25 +190,32 @@ class HarianTab extends StatelessWidget {
       ));
     } else {
       listChildren.add(_paddedItem(
-          const Text('Tidak ada riwayat pelaporan umum untuk ditampilkan.')));
+          const Text('Tidak ada riwayat pelaporan harian untuk ditampilkan.')));
     }
     listChildren.add(const SizedBox(height: 12));
 
     // Riwayat Pemberian Pupuk
     if (riwayatPupukState.isLoading) {
-      listChildren.add(const Center(
+      listChildren.add(
+        const Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(strokeWidth: 2))));
+            padding: EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
     } else if (riwayatPupukState.error != null) {
       listChildren.add(
-          _paddedError('Error Riwayat Nutrisi: ${riwayatPupukState.error}'));
+        _paddedError('Error Riwayat Nutrisi: ${riwayatPupukState.error}'),
+      );
     } else if (riwayatPupukState.items.isNotEmpty) {
-      listChildren.add(ListItem(
-        title: 'Riwayat Pemberian Pupuk',
-        type: 'history',
-        items: riwayatPupukState.items
-            .map((item) => {
+      listChildren.add(
+        ListItem(
+          title: 'Riwayat Pemberian Pupuk',
+          type: 'history',
+          items: riwayatPupukState.items
+              .map(
+                (item) => {
                   'id': item['laporanId'] as String? ??
                       item['id'] as String? ??
                       '',
@@ -232,16 +227,37 @@ class HarianTab extends StatelessWidget {
                       item['petugasNama'] as String? ??
                       'N/A',
                   'date': formatDisplayDate(
-                      item['date'] as String? ?? item['createdAt'] as String?),
+                    item['date'] as String? ?? item['createdAt'] as String?,
+                  ),
                   'time': formatDisplayTime(
-                      item['time'] as String? ?? item['createdAt'] as String?),
-                })
-            .toList(),
-        onItemTap: onRiwayatPemberianPupukItemTap,
-      ));
+                    item['time'] as String? ?? item['createdAt'] as String?,
+                  ),
+                },
+              )
+              .toList(),
+          onItemTap: (itemContext, tappedItem) {
+            final idLaporan = tappedItem['id'] as String?;
+            if (idLaporan != null) {
+              navigateToDetailLaporan(
+                itemContext,
+                idLaporan: idLaporan,
+                jenisLaporan: 'vitamin',
+                jenisBudidaya: 'tumbuhan',
+              );
+            } else {
+              ScaffoldMessenger.of(itemContext).showSnackBar(
+                const SnackBar(content: Text('ID laporan tidak ditemukan.')),
+              );
+            }
+          },
+        ),
+      );
     } else {
-      listChildren.add(_paddedItem(
-          const Text('Tidak ada riwayat pemberian pupuk untuk ditampilkan.')));
+      listChildren.add(
+        _paddedItem(
+          const Text('Tidak ada riwayat pemberian pupuk untuk ditampilkan.'),
+        ),
+      );
     }
 
     listChildren.add(const SizedBox(height: 20));

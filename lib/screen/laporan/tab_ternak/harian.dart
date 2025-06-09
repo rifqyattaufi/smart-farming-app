@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 
@@ -139,15 +140,18 @@ class HarianTab extends StatelessWidget {
                 })
             .toList(),
         onItemTap: (itemContext, tappedItem) {
-          final laporanId = tappedItem['id'] as String?;
-          final laporanJudul = tappedItem['text'] as String?;
-          if (laporanId != null && laporanId.isNotEmpty) {
-            // Navigasi: itemContext.push('/detail-laporan-harian/$laporanId');
-            ScaffoldMessenger.of(itemContext).showSnackBar(
-                SnackBar(content: Text('Membuka detail: $laporanJudul')));
+          final idLaporan = tappedItem['id'] as String?;
+          if (idLaporan != null) {
+            navigateToDetailLaporan(itemContext,
+                idLaporan: idLaporan,
+                jenisLaporan: 'harian',
+                jenisBudidaya: 'hewan');
           } else {
-            ScaffoldMessenger.of(itemContext).showSnackBar(const SnackBar(
-                content: Text('Detail laporan tidak tersedia.')));
+            ScaffoldMessenger.of(itemContext).showSnackBar(
+              const SnackBar(
+                content: Text('ID laporan tidak ditemukan.'),
+              ),
+            );
           }
         },
         mode: NewestReportsMode.full,

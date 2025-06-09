@@ -32,11 +32,12 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
           _laporanPanen = response['data'];
         });
       } else {
-        showAppToast(context,
-            response['message'] ?? 'Gagal memuat data laporan kematian.');
+        showAppToast(
+            context, response['message'] ?? 'Gagal memuat data laporan panen.');
       }
     } catch (e) {
-      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+      showAppToast(
+          context, 'Terjadi kesalahan: $e. Silakan coba lagi',
           title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
@@ -151,7 +152,7 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
                                         '-'),
                                 infoItem(
                                     "Nama komoditas panen",
-                                    _laporanPanen?['PanenKebun']['Komodita']
+                                    _laporanPanen?['PanenKebun']['komoditas']
                                             ['nama'] ??
                                         '-'),
                                 infoItem(
@@ -173,7 +174,7 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
                                             ?.toString() ??
                                         '-'),
                                 infoItem("Satuan panen",
-                                    "${_laporanPanen?['PanenKebun']['Komodita']['Satuan']['nama'] ?? '-'} - ${_laporanPanen?['PanenKebun']['Komodita']['Satuan']['lambang'] ?? '-'}"),
+                                    "${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['nama'] ?? '-'} - ${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['lambang'] ?? '-'}"),
                                 infoItem("Pelaporan oleh",
                                     _laporanPanen?['user']['name'] ?? '-'),
                                 infoItem(

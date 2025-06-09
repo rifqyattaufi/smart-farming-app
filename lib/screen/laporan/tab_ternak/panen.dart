@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -177,7 +178,7 @@ class PanenTab extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const SizedBox(width: 40), // Beri ruang untuk ikon
+                            const SizedBox(width: 40),
                           ],
                         ),
                         Row(
@@ -314,22 +315,26 @@ class PanenTab extends StatelessWidget {
               reports: riwayatPanenState.items.map((item) {
                 return {
                   'id': item['laporanId'] ?? item['id'] ?? '',
-                  'text': item['judul'] ?? 'Laporan Panen',
+                  'text': item['text'] ?? 'Laporan Panen',
                   'subtext': 'Oleh: ${item['person'] ?? 'N/A'}',
                   'icon': item['gambar'],
                   'time': item['time'],
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {
-                final laporanId = tappedItem['id'] as String?;
-                final laporanJudul = tappedItem['text'] as String?;
-                if (laporanId != null && laporanId.isNotEmpty) {
-                  // Navigasi: itemContext.push('/detail-laporan-panen/$laporanId');
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                      SnackBar(content: Text('Membuka detail: $laporanJudul')));
+                final idLaporan = tappedItem['id'] as String?;
+                if (idLaporan != null) {
+                  navigateToDetailLaporan(
+                    itemContext,
+                    idLaporan: idLaporan,
+                    jenisLaporan: 'panen',
+                    jenisBudidaya: 'hewan',
+                  );
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(const SnackBar(
-                      content: Text('Detail laporan tidak tersedia.')));
+                  ScaffoldMessenger.of(itemContext).showSnackBar(
+                    const SnackBar(
+                        content: Text('ID laporan tidak ditemukan.')),
+                  );
                 }
               },
               mode: NewestReportsMode.full,

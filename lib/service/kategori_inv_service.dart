@@ -90,7 +90,8 @@ class KategoriInvService {
       } else {
         return {
           'status': false,
-          'message': body,
+          'message':
+              body['message'] ?? 'Terjadi kesalahan yang tidak diketahui',
         };
       }
     } catch (e) {
