@@ -30,7 +30,6 @@ class InfoTab extends StatefulWidget {
 }
 
 class _InfoTabState extends State<InfoTab> {
-  // State class
   static const int _increment = 3; // Jumlah item yang dimuat setiap kali
   int _displayedKebunCount = _increment;
   // Map untuk menyimpan jumlah objek budidaya yang ditampilkan per ID kebun
@@ -151,14 +150,14 @@ class _InfoTabState extends State<InfoTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Informasi Jenis Tanaman 🌱",
+            Text("Informasi Jenis Tanaman",
                 style: bold18.copyWith(color: dark1)),
             const SizedBox(height: 12),
             InfoItemWidget("Nama jenis tanaman", value: namaTanaman),
             InfoItemWidget("Nama latin", value: namaLatin),
             InfoItemWidget("Lokasi tanaman", value: lokasiTanamanDisplay),
             InfoItemWidget("Jumlah tanaman",
-                value: "${widget.jumlahTanaman} bibit"),
+                value: "${widget.jumlahTanaman} tanaman"),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Row(
@@ -203,7 +202,7 @@ class _InfoTabState extends State<InfoTab> {
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: ListItem(
-            title: 'Daftar Kebun Budidaya 🏞️',
+            title: 'Daftar Kebun Budidaya',
             type: 'basic',
             items: kebunToShow.map((kebun) {
               final kebunItem = kebun as Map<String, dynamic>;
@@ -212,7 +211,7 @@ class _InfoTabState extends State<InfoTab> {
                 'icon': kebunItem['gambar'] as String? ??
                     'assets/images/default_kebun.png',
                 'category':
-                    kebunItem['lokasi'] as String? ?? 'Lokasi Tidak Ada',
+                    '${kebunItem['lokasi'] ?? 'Lokasi Tidak Ada'} - ${(kebunItem['jumlah'] ?? 0)} tanaman',
                 'id': kebunItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
@@ -252,8 +251,8 @@ class _InfoTabState extends State<InfoTab> {
 
     for (var kebunData in displayedKebunData) {
       final kebunItem = kebunData as Map<String, dynamic>;
-      final String kebunId = kebunItem['id'] as String? ??
-          'unknown_kebun_${kebunItem.hashCode}'; // ID unik jika null
+      final String kebunId =
+          kebunItem['id'] as String? ?? 'unknown_kebun_${kebunItem.hashCode}';
       final List<dynamic> semuaObjekBudidayaDiKebunIni =
           (kebunItem['ObjekBudidayas'] as List<dynamic>?) ?? [];
 
@@ -273,7 +272,6 @@ class _InfoTabState extends State<InfoTab> {
                 'Detail Tanaman di ${kebunItem['nama'] ?? 'Kebun Tanpa Nama'}',
             type: 'basic',
             items: objekBudidayaToShow.map((item) {
-              // Menggunakan objekBudidayaToShow
               final plantItem = item as Map<String, dynamic>;
               return {
                 'name': plantItem['namaId'] as String? ??

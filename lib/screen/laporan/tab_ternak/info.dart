@@ -252,7 +252,7 @@ class _InfoTabState extends State<InfoTab> {
     for (var kandangData in displayedKandangData) {
       final kandangItem = kandangData as Map<String, dynamic>;
       final String kandangId = kandangItem['id'] as String? ??
-          'unknown_kandang_${kandangItem.hashCode}'; // ID unik jika null
+          'unknown_kandang_${kandangItem.hashCode}';
       final List<dynamic> semuaObjekBudidayaDiKandangIni =
           (kandangItem['ObjekBudidayas'] as List<dynamic>?) ?? [];
 
