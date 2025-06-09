@@ -52,23 +52,20 @@ class _PelaporanHarianTanamanScreenState
 
   List<Map<String, dynamic>> selectedBahanList = [];
   List<Map<String, dynamic>> listBahanVitamin = [];
-  List<Map<String, dynamic>> listBahanVaksin = [];
   List<Map<String, dynamic>> listBahanPupuk = [];
   List<Map<String, dynamic>> listBahanDisinfektan = [];
 
   bool _isLoading = false;
-  File? _imageTanaman;
-  File? _imageDosis;
   final picker = ImagePicker();
 
-  final List<GlobalKey<FormState>> _formKeys = [];
+  List<GlobalKey<FormState>> _formKeys = [];
 
-  final List<TextEditingController> _heightController = [];
-  final List<TextEditingController> _catatanController = [];
-  final List<TextEditingController> _sizeController = [];
-  final List<TextEditingController> _satuanController = [];
-  final List<File?> _imageTanamanList = [];
-  final List<File?> _imageDosisList = [];
+  List<TextEditingController> _heightController = [];
+  List<TextEditingController> _catatanController = [];
+  List<TextEditingController> _sizeController = [];
+  List<TextEditingController> _satuanController = [];
+  List<File?> _imageTanamanList = [];
+  List<File?> _imageDosisList = [];
   List<double> _lastHeights = [];
 
   final Map<String, String> statusTumbuhDisplayMap = {
@@ -96,8 +93,6 @@ class _PelaporanHarianTanamanScreenState
     try {
       final responseVitamin =
           await _inventarisService.getInventarisByKategoriName('Vitamin');
-      final responseVaksin =
-          await _inventarisService.getInventarisByKategoriName('Vaksin');
       final responsePupuk =
           await _inventarisService.getInventarisByKategoriName('Pupuk');
       final responseDisinfektan =
@@ -125,28 +120,6 @@ class _PelaporanHarianTanamanScreenState
         );
       }
 
-      if (responseVaksin['status']) {
-        setState(() {
-          listBahanVaksin = responseVaksin['data']
-              .map<Map<String, dynamic>>((item) => {
-                    'name': item['nama'],
-                    'id': item['id'],
-                    'satuanId': item['SatuanId'],
-                    'stok': item['jumlah'],
-                    'satuanNama': item['Satuan']?['nama'] ?? '',
-                  })
-              .toList();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching vaksin data: ${responseVaksin['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-
       if (responsePupuk['status']) {
         setState(() {
           listBahanPupuk = responsePupuk['data']
@@ -163,7 +136,7 @@ class _PelaporanHarianTanamanScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text('Error fetching vaksin data: ${responsePupuk['message']}'),
+                Text('Error fetching pupuk data: ${responsePupuk['message']}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -185,7 +158,7 @@ class _PelaporanHarianTanamanScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Error fetching vaksin data: ${responseDisinfektan['message']}'),
+                'Error fetching disinfektan data: ${responseDisinfektan['message']}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -200,66 +173,67 @@ class _PelaporanHarianTanamanScreenState
     }
 
     // Fetch last heights
-    final List<dynamic>? sourceObjekList = widget.data?['objekBudidaya'];
-    for (int i = 0; i < _heightController.length; i++) {
-      final objek = (sourceObjekList != null && i < sourceObjekList.length)
-          ? sourceObjekList[i]
-          : null;
-      final String? objekId = (objek is Map && objek.containsKey('id'))
-          ? objek['id'] as String?
-          : null;
+    try {
+      // 1. Siapkan semua future untuk mengambil tinggi tanaman
+      final List<Future<Map<String, dynamic>>> heightFutures = [];
+      final List<dynamic>? sourceObjekList = widget.data?['objekBudidaya'];
 
-      if (objekId != null) {
-        try {
-          final responseHeight = await _laporanService
-              .getLastHarianKebunByObjekBudidayaId(objekId);
+      for (int i = 0; i < _heightController.length; i++) {
+        final objek = (sourceObjekList != null && i < sourceObjekList.length)
+            ? sourceObjekList[i]
+            : null;
+        final String? objekId = (objek is Map && objek.containsKey('id'))
+            ? objek['id'] as String?
+            : null;
 
-          if (mounted) {
+        if (objekId != null) {
+          heightFutures.add(
+              _laporanService.getLastHarianKebunByObjekBudidayaId(objekId));
+        } else {
+          // Jika tidak ada ID, buat future palsu yang langsung selesai
+          heightFutures.add(Future.value({'status': false, 'data': null}));
+        }
+      }
+
+      // 2. Jalankan semua future secara paralel
+      final List<Map<String, dynamic>> heightResults =
+          await Future.wait(heightFutures);
+
+      // 3. Panggil setState HANYA SEKALI setelah semua data siap
+      if (mounted) {
+        setState(() {
+          for (int i = 0; i < heightResults.length; i++) {
+            final responseHeight = heightResults[i];
             Map<String, dynamic>? dataFromService =
                 responseHeight['data'] as Map<String, dynamic>?;
             Map<String, dynamic>? harianKebunData =
                 dataFromService?['HarianKebun'] as Map<String, dynamic>?;
             dynamic tinggiTanamanValue = harianKebunData?['tinggiTanaman'];
 
-            setState(() {
-              if (responseHeight['status'] == true &&
-                  tinggiTanamanValue != null) {
-                _lastHeights[i] = (tinggiTanamanValue as num).toDouble();
-                _heightController[i].text = _lastHeights[i].toStringAsFixed(1);
-              } else {
-                _heightController[i].text = "0.0";
-                _lastHeights[i] = 0.0;
-              }
-            });
-          }
-        } catch (e) {
-          if (mounted) {
-            setState(() {
+            if (responseHeight['status'] == true &&
+                tinggiTanamanValue != null) {
+              _lastHeights[i] = (tinggiTanamanValue as num).toDouble();
+              _heightController[i].text = _lastHeights[i].toStringAsFixed(1);
+            } else {
               _heightController[i].text = "0.0";
               _lastHeights[i] = 0.0;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Gagal memuat tinggi terakhir untuk ${objek?['name'] ?? 'tanaman $i'}. Error: $e'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            }
           }
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _heightController[i].text = "0.0";
-            if (i < _lastHeights.length) _lastHeights[i] = 0.0;
-          });
-        }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching last heights: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
   Future<void> _pickImage(BuildContext context, int index) async {
-    _imageTanaman = null;
     await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -278,8 +252,7 @@ class _PelaporanHarianTanamanScreenState
                     await picker.pickImage(source: ImageSource.camera);
                 if (pickedFile != null) {
                   setState(() {
-                    _imageTanaman = File(pickedFile.path);
-                    _imageTanamanList[index] = _imageTanaman;
+                    _imageTanamanList[index] = File(pickedFile.path);
                   });
                 }
               },
@@ -293,8 +266,7 @@ class _PelaporanHarianTanamanScreenState
                     await picker.pickImage(source: ImageSource.gallery);
                 if (pickedFile != null) {
                   setState(() {
-                    _imageTanaman = File(pickedFile.path);
-                    _imageTanamanList[index] = _imageTanaman;
+                    _imageTanamanList[index] = File(pickedFile.path);
                   });
                 }
               },
@@ -324,8 +296,7 @@ class _PelaporanHarianTanamanScreenState
                     await picker.pickImage(source: ImageSource.camera);
                 if (pickedFile != null) {
                   setState(() {
-                    _imageDosis = File(pickedFile.path);
-                    _imageDosisList[index] = _imageDosis;
+                    _imageDosisList[index] = File(pickedFile.path);
                   });
                 }
               },
@@ -339,8 +310,7 @@ class _PelaporanHarianTanamanScreenState
                     await picker.pickImage(source: ImageSource.gallery);
                 if (pickedFile != null) {
                   setState(() {
-                    _imageDosis = File(pickedFile.path);
-                    _imageDosisList[index] = _imageDosis;
+                    _imageDosisList[index] = File(pickedFile.path);
                   });
                 }
               },
@@ -376,15 +346,11 @@ class _PelaporanHarianTanamanScreenState
     setState(() {
       _isLoading = true;
     });
+
     int formCountToValidate = _formKeys.length;
-    final List<dynamic>? objekBudidayaOriginalList =
-        widget.data?['objekBudidaya'];
-    print('Validating $formCountToValidate forms');
-    print('Original objekBudidaya list: $objekBudidayaOriginalList');
     bool allValid = true;
     for (int i = 0; i < formCountToValidate; i++) {
-      if (_formKeys[i].currentState == null ||
-          !_formKeys[i].currentState!.validate()) {
+      if (!(_formKeys[i].currentState?.validate() ?? false)) {
         allValid = false;
       }
 
@@ -416,112 +382,142 @@ class _PelaporanHarianTanamanScreenState
     }
 
     if (!allValid) {
-      setState(() {
-        _isLoading = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Harap periksa kembali semua isian form.'),
+        backgroundColor: Colors.red,
+      ));
+      setState(() => _isLoading = false);
       return;
     }
 
     try {
-      bool anyReportFailed = false;
+      final List<Future<bool>> submissionFutures = [];
+      final List<dynamic>? objekBudidayaOriginalList =
+          widget.data?['objekBudidaya'];
+
       for (int i = 0; i < formCountToValidate; i++) {
-        final currentObjek = (objekBudidayaOriginalList != null &&
-                i < objekBudidayaOriginalList.length)
-            ? objekBudidayaOriginalList[i]
-            : null;
+        // final stopwatch = Stopwatch()..start();
+        final future = () async {
+          try {
+            final currentObjek = (objekBudidayaOriginalList != null &&
+                    i < objekBudidayaOriginalList.length)
+                ? objekBudidayaOriginalList[i]
+                : null;
 
-        print('Processing form $i for objek: $currentObjek');
-        final double? tinggiTanaman =
-            double.tryParse(_heightController[i].text);
-        final String kondisi = kondisiDaun[i];
-        final String status = statusTumbuh[i];
-
-        final imageUrl = await _imageService.uploadImage(_imageTanamanList[i]!);
-        final dataTanaman = {
-          'unitBudidayaId': widget.data?['unitBudidaya']['id'],
-          "objekBudidayaId": currentObjek?['id'],
-          "judul":
-              "Laporan Harian ${widget.data?['unitBudidaya']['name']} - ${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}",
-          "tipe": widget.tipe,
-          "gambar": imageUrl['data'],
-          "catatan": _catatanController[i].text,
-          "harianKebun": {
-            "penyiraman": statusPenyiraman[i] == 'Ya',
-            "pruning": statusPruning[i] == 'Ya',
-            "repotting": statusRepotting[i] == 'Ya',
-            "tinggiTanaman": tinggiTanaman,
-            "kondisiDaun": kondisi,
-            "statusTumbuh": status,
-          }
-        };
-        final responseTanaman =
-            await _laporanService.createLaporanHarianKebun(dataTanaman);
-
-        bool nutrisiSuccess = true;
-        if (statusNutrisi[i] == 'Ya') {
-          final imageDosisUrl =
-              await _imageService.uploadImage(_imageDosisList[i]!);
-
-          final dataDosis = {
-            'unitBudidayaId': widget.data?['unitBudidaya']['id'],
-            'objekBudidayaId': currentObjek?['id'],
-            'tipe': 'vitamin',
-            'judul':
-                "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(currentObjek?['name'] ?? 'Tanaman ${i + 1}')}",
-            'gambar': imageDosisUrl['data'],
-            'catatan': _catatanController[i].text,
-            'vitamin': {
-              'inventarisId': selectedBahanList[i]['id'],
-              'tipe': statusPemberianList[i],
-              'jumlah': double.parse(_sizeController[i].text),
+            // print('SUBMIT($i): Mengunggah gambar tanaman...');
+            final imageUrlResponse =
+                await _imageService.uploadImage(_imageTanamanList[i]!);
+            // print(
+            //     'SUBMIT($i): Upload gambar tanaman selesai dalam ${stopwatch.elapsedMilliseconds}ms');
+            // stopwatch.reset();
+            if (!imageUrlResponse['status']) {
+              return false;
             }
-          };
 
-          final responseDosis =
-              await _laporanService.createLaporanNutrisi(dataDosis);
+            // print('SUBMIT($i): Mengirim laporan harian...');
+            // stopwatch.start();
+            final double? tinggiTanaman =
+                double.tryParse(_heightController[i].text);
+            final String kondisi = kondisiDaun[i];
+            final String status = statusTumbuh[i];
 
-          nutrisiSuccess = responseDosis['status'];
-          if (!nutrisiSuccess) {
-            anyReportFailed = true;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Error Laporan Nutrisi (${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}): ${responseDosis['message']}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            final dataTanaman = {
+              'unitBudidayaId': widget.data?['unitBudidaya']['id'],
+              "objekBudidayaId": currentObjek?['id'],
+              "judul":
+                  "Laporan Harian ${widget.data?['unitBudidaya']['name']} - ${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}",
+              "tipe": widget.tipe,
+              "gambar": imageUrlResponse['data'],
+              "catatan": _catatanController[i].text,
+              "harianKebun": {
+                "penyiraman": statusPenyiraman[i] == 'Ya',
+                "pruning": statusPruning[i] == 'Ya',
+                "repotting": statusRepotting[i] == 'Ya',
+                "tinggiTanaman": tinggiTanaman,
+                "kondisiDaun": kondisi,
+                "statusTumbuh": status,
+              }
+            };
+            final responseTanaman =
+                await _laporanService.createLaporanHarianKebun(dataTanaman);
+            // print(
+            //     'SUBMIT($i): Kirim laporan harian selesai dalam ${stopwatch.elapsedMilliseconds}ms');
+            // stopwatch.reset();
+            if (!responseTanaman['status']) {
+              return false;
+            }
+
+            if (statusNutrisi[i] == 'Ya') {
+              // print('SUBMIT($i): Mengunggah gambar dosis...');
+              // stopwatch.start();
+              final imageDosisUrlResponse =
+                  await _imageService.uploadImage(_imageDosisList[i]!);
+              // print(
+              //     'SUBMIT($i): Upload gambar dosis selesai dalam ${stopwatch.elapsedMilliseconds}ms');
+              // stopwatch.reset();
+              if (!imageDosisUrlResponse['status']) return false;
+
+              // print('SUBMIT($i): Mengirim laporan nutrisi...');
+              // stopwatch.start();
+              final dataDosis = {
+                'unitBudidayaId': widget.data?['unitBudidaya']['id'],
+                'objekBudidayaId': currentObjek?['id'],
+                'tipe': 'vitamin',
+                'judul':
+                    "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(currentObjek?['name'] ?? 'Tanaman ${i + 1}')}",
+                'gambar': imageDosisUrlResponse['data'],
+                'catatan': _catatanController[i].text,
+                'vitamin': {
+                  'inventarisId': selectedBahanList[i]['id'],
+                  'tipe': statusPemberianList[i],
+                  'jumlah': double.parse(_sizeController[i].text),
+                }
+              };
+
+              final responseDosis =
+                  await _laporanService.createLaporanNutrisi(dataDosis);
+              // print(
+              //     'SUBMIT($i): Kirim laporan nutrisi selesai dalam ${stopwatch.elapsedMilliseconds}ms');
+              // stopwatch.reset();
+              if (!responseDosis['status']) {
+                return false;
+              }
+            }
+
+            return true;
+          } catch (e) {
+            return false;
           }
-        }
-
-        if (!responseTanaman['status']) {
-          anyReportFailed = true;
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    'Error Laporan Harian (${currentObjek?['name'] ?? 'Tanaman ${i + 1}'}): ${responseTanaman['message']}'),
-                backgroundColor: Colors.red));
-          }
-        }
-
-        if (responseTanaman['status'] && nutrisiSuccess && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                  'Pelaporan Harian berhasil ${currentObjek?['name'] ?? 'Tanaman ${i + 1}'} dikirim'),
-              backgroundColor: Colors.green));
-        }
+        }();
+        submissionFutures.add(future);
       }
 
-      if (!anyReportFailed && mounted) {
-        // Hanya pop jika semua berhasil
-        for (int k = 0; k < widget.step; k++) {
-          if (Navigator.canPop(context)) Navigator.pop(context);
+      final List<bool> results = await Future.wait(submissionFutures);
+
+      final bool anyReportFailed = results.contains(false);
+
+      if (mounted) {
+        if (anyReportFailed) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Beberapa laporan gagal dikirim. Silakan coba lagi.'),
+            backgroundColor: Colors.red,
+          ));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Semua laporan berhasil dikirim!'),
+            backgroundColor: Colors.green,
+          ));
+          for (int k = 0; k < widget.step; k++) {
+            if (Navigator.canPop(context)) Navigator.pop(context);
+          }
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error submit: $e'), backgroundColor: Colors.red),
+              content: Text('Terjadi kesalahan besar saat submit: $e'),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -541,28 +537,27 @@ class _PelaporanHarianTanamanScreenState
     int count = objekBudidayaProp.length;
     if (objekBudidayaProp.isEmpty ||
         (objekBudidayaProp.length == 1 && objekBudidayaProp[0] == null)) {
-      // Jika objekBudidaya kosong atau hanya berisi null dari default, anggap 1 form default
       count = 1;
     }
 
-    for (int i = 0; i < count; i++) {
-      _formKeys.add(GlobalKey<FormState>());
-      _catatanController.add(TextEditingController());
-      _sizeController.add(TextEditingController());
-      _satuanController.add(TextEditingController());
-      _heightController.add(TextEditingController(text: "0"));
-      _imageTanamanList.add(null);
-      _imageDosisList.add(null);
-      selectedBahanList.add({});
-      statusPemberianList.add(null);
-      statusPenyiraman.add('Ya');
-      statusPruning.add('Ya');
-      statusRepotting.add('Ya');
-      statusNutrisi.add('Ya');
-      kondisiDaun.add('sehat');
-      statusTumbuh.add('bibit');
-      _lastHeights.add(0.0);
-    }
+    _formKeys = List.generate(count, (_) => GlobalKey<FormState>());
+    _catatanController = List.generate(count, (_) => TextEditingController());
+    _sizeController = List.generate(count, (_) => TextEditingController());
+    _satuanController = List.generate(count, (_) => TextEditingController());
+    _heightController =
+        List.generate(count, (_) => TextEditingController(text: "0"));
+    _imageTanamanList = List.generate(count, (_) => null);
+    _imageDosisList = List.generate(count, (_) => null);
+    selectedBahanList = List.generate(count, (_) => <String, dynamic>{});
+    statusPemberianList = List.generate(count, (_) => 'Pupuk');
+    statusPenyiraman = List.generate(count, (_) => 'Ya');
+    statusPruning = List.generate(count, (_) => 'Ya');
+    statusRepotting = List.generate(count, (_) => 'Ya');
+    statusNutrisi = List.generate(count, (_) => 'Ya');
+    kondisiDaun = List.generate(count, (_) => 'sehat');
+    statusTumbuh = List.generate(count, (_) => 'bibit');
+    _lastHeights = List.generate(count, (_) => 0.0);
+
     _fetchData();
   }
 
@@ -809,12 +804,10 @@ class _PelaporanHarianTanamanScreenState
                           if (statusNutrisi[i] == 'Ya') ...[
                             RadioField(
                               label: 'Jenis Pemberian',
-                              selectedValue:
-                                  statusPemberianList[i] ?? 'Vitamin',
+                              selectedValue: statusPemberianList[i] ?? 'Pupuk',
                               options: const [
-                                'Vitamin',
                                 'Pupuk',
-                                'Vaksin',
+                                'Vitamin',
                                 'Disinfektan',
                               ],
                               onChanged: (value) {
@@ -841,11 +834,6 @@ class _PelaporanHarianTanamanScreenState
                                         .map((item) => item['name'] as String)
                                         .toList()
                                         .cast<String>();
-                                  case 'Vaksin':
-                                    return listBahanVaksin
-                                        .map((item) => item['name'] as String)
-                                        .toList()
-                                        .cast<String>();
                                   case 'Disinfektan':
                                     return listBahanDisinfektan
                                         .map((item) => item['name'] as String)
@@ -855,35 +843,42 @@ class _PelaporanHarianTanamanScreenState
                                     return <String>[];
                                 }
                               })(),
-                              selectedValue: selectedBahanList[i]['name'] ?? '',
+                              selectedValue:
+                                  selectedBahanList[i]['name'] as String?,
                               onChanged: (value) {
+                                if (value == null) return;
+
+                                Map<String, dynamic> findBahan(
+                                    List<Map<String, dynamic>> list) {
+                                  return list.firstWhere(
+                                    (item) => item['name'] == value,
+                                    orElse: () => <String, dynamic>{},
+                                  );
+                                }
+
                                 setState(() {
+                                  Map<String, dynamic> bahanTerpilih = {};
                                   switch (statusPemberianList[i]) {
                                     case 'Vitamin':
-                                      selectedBahanList[i] =
-                                          listBahanVitamin.firstWhere(
-                                              (item) => item['name'] == value);
+                                      bahanTerpilih =
+                                          findBahan(listBahanVitamin);
                                       break;
                                     case 'Pupuk':
-                                      selectedBahanList[i] =
-                                          listBahanPupuk.firstWhere(
-                                              (item) => item['name'] == value);
-                                      break;
-                                    case 'Vaksin':
-                                      selectedBahanList[i] =
-                                          listBahanVaksin.firstWhere(
-                                              (item) => item['name'] == value);
+                                      bahanTerpilih = findBahan(listBahanPupuk);
                                       break;
                                     case 'Disinfektan':
-                                      selectedBahanList[i] =
-                                          listBahanDisinfektan.firstWhere(
-                                              (item) => item['name'] == value);
+                                      bahanTerpilih =
+                                          findBahan(listBahanDisinfektan);
                                       break;
-                                    default:
-                                      selectedBahanList[i] = {};
+                                  }
+                                  selectedBahanList[i] = bahanTerpilih;
+
+                                  if (bahanTerpilih.isNotEmpty) {
+                                    changeSatuan(i);
+                                  } else {
+                                    _satuanController[i].clear();
                                   }
                                 });
-                                changeSatuan(i);
                               },
                               validator: (value) {
                                 if (value == null || value.isEmpty) {

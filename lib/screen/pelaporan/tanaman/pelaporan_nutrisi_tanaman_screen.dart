@@ -126,11 +126,13 @@ class _PelaporanNutrisiTanamanScreenState
       if (mounted) {
         if (responseVitamin['status']) {
           setState(() {
-            listBahanVitamin = (responseVitamin['data'] as List)
+            listBahanVitamin = responseVitamin['data']
                 .map<Map<String, dynamic>>((item) => {
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
+                      'stok': item['jumlah'],
+                      'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
           });
@@ -141,11 +143,13 @@ class _PelaporanNutrisiTanamanScreenState
 
         if (responsePupuk['status']) {
           setState(() {
-            listBahanPupuk = (responsePupuk['data'] as List)
+            listBahanPupuk = responsePupuk['data']
                 .map<Map<String, dynamic>>((item) => {
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
+                      'stok': item['jumlah'],
+                      'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
           });
@@ -156,11 +160,13 @@ class _PelaporanNutrisiTanamanScreenState
 
         if (responseDisinfektan['status']) {
           setState(() {
-            listBahanDisinfektan = (responseDisinfektan['data'] as List)
+            listBahanDisinfektan = responseDisinfektan['data']
                 .map<Map<String, dynamic>>((item) => {
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
+                      'stok': item['jumlah'],
+                      'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
           });
@@ -448,6 +454,33 @@ class _PelaporanNutrisiTanamanScreenState
                               currentBahanList = [];
                           }
 
+                          Map<String, dynamic>? currentBahanTerpilih =
+                              (selectedBahanList.length > i)
+                                  ? selectedBahanList[i]
+                                  : null;
+
+                          String labelUntukJumlah = "Jumlah/dosis";
+                          String satuanDisplay = "";
+
+                          if (currentBahanTerpilih != null &&
+                              currentBahanTerpilih['stok'] != null) {
+                            final dynamic stokValue =
+                                currentBahanTerpilih['stok'];
+                            satuanDisplay =
+                                currentBahanTerpilih['satuanNama'] as String? ??
+                                    '';
+
+                            final double? stokAngka =
+                                double.tryParse(stokValue.toString());
+
+                            if (stokAngka != null) {
+                              final String stokFormatted =
+                                  stokAngka.toStringAsFixed(1);
+                              labelUntukJumlah =
+                                  "Jumlah/dosis (Sisa: $stokFormatted $satuanDisplay)";
+                            }
+                          }
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -503,8 +536,8 @@ class _PelaporanNutrisiTanamanScreenState
                                         statusPemberianList[i] ?? 'Pupuk',
                                     options: const [
                                       'Pupuk',
-                                      'Disinfektan',
                                       'Vitamin',
+                                      'Disinfektan',
                                     ],
                                     onChanged: (value) {
                                       setState(() {
@@ -522,7 +555,7 @@ class _PelaporanNutrisiTanamanScreenState
                                         .map((item) => item['name'] as String)
                                         .toList(),
                                     selectedValue: selectedBahanList[i]?['name']
-                                        as String?, // Ambil nama, bisa null
+                                        as String?,
                                     onChanged: (value) {
                                       if (value == null) {
                                         setState(() {
@@ -531,13 +564,26 @@ class _PelaporanNutrisiTanamanScreenState
                                         });
                                         return;
                                       }
-                                      setState(() {
-                                        selectedBahanList[i] =
+
+                                      Map<String, dynamic>? matchingItem;
+                                      try {
+                                        matchingItem =
                                             currentBahanList.firstWhere(
-                                                (item) => item['name'] == value,
-                                                orElse: () => {});
+                                          (item) => item['name'] == value,
+                                        );
+                                      } catch (e) {
+                                        matchingItem = null;
+                                      }
+
+                                      setState(() {
+                                        selectedBahanList[i] = matchingItem;
+
+                                        if (matchingItem == null) {
+                                          _satuanControllers[i].clear();
+                                        } else {
+                                          changeSatuan(i);
+                                        }
                                       });
-                                      changeSatuan(i);
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -547,18 +593,33 @@ class _PelaporanNutrisiTanamanScreenState
                                     },
                                   ),
                                   InputFieldWidget(
-                                      label: "Jumlah/dosis",
+                                      label: labelUntukJumlah,
                                       hint: "Contoh: 10",
                                       controller: _sizeControllers[i],
-                                      keyboardType: TextInputType.number,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Masukkan jumlah/dosis';
-                                        } else if (double.tryParse(value) ==
-                                            null) {
+                                        }
+                                        final number = double.tryParse(value);
+                                        if (number == null) {
                                           return 'Masukkan angka yang valid';
-                                        } else if (double.parse(value) <= 0) {
+                                        }
+                                        if (number <= 0) {
                                           return 'Jumlah/dosis harus lebih dari 0';
+                                        }
+
+                                        if (currentBahanTerpilih != null &&
+                                            currentBahanTerpilih['stok'] !=
+                                                null) {
+                                          dynamic stokValue =
+                                              currentBahanTerpilih['stok'];
+                                          if (stokValue is num &&
+                                              number > stokValue) {
+                                            return 'Dosis melebihi stok (Sisa: ${stokValue.toStringAsFixed(1)} $satuanDisplay)';
+                                          }
                                         }
                                         return null;
                                       }),
