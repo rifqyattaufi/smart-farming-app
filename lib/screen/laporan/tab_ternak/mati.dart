@@ -8,6 +8,7 @@ import 'package:smart_farming_app/widget/newest.dart';
 
 class MatiTab extends StatelessWidget {
   final ChartDataState laporanMatiState;
+  final ChartDataState statistikPenyebabState;
   final RiwayatDataState riwayatMatiState;
 
   final Future<void> Function() onDateIconPressed;
@@ -22,6 +23,7 @@ class MatiTab extends StatelessWidget {
   const MatiTab({
     super.key,
     required this.laporanMatiState,
+    required this.statistikPenyebabState,
     required this.riwayatMatiState,
     required this.onDateIconPressed,
     required this.selectedChartFilterType,
@@ -33,7 +35,7 @@ class MatiTab extends StatelessWidget {
   });
 
   String _generateRangkumanMati() {
-    if (laporanMatiState.isLoading) {
+    if (laporanMatiState.isLoading || statistikPenyebabState.isLoading) {
       return "Memuat data laporan kematian...";
     }
     if (laporanMatiState.error != null) {
@@ -43,26 +45,50 @@ class MatiTab extends StatelessWidget {
       return "Tidak ada laporan kematian ternak pada periode ini.";
     }
 
-    StringBuffer summary = StringBuffer();
-
-    String periodeText;
+    final DateFormat rangeFormatter = DateFormat('d MMMM yyyy');
+    String periodeText = "pada periode terpilih";
     if (selectedChartDateRange != null) {
-      String startDateFormatted =
-          DateFormat('d MMMM yyyy').format(selectedChartDateRange!.start);
-      String endDateFormatted =
-          DateFormat('d MMMM yyyy').format(selectedChartDateRange!.end);
-      periodeText = selectedChartDateRange!.start
-              .isAtSameMomentAs(selectedChartDateRange!.end)
-          ? "pada tanggal $startDateFormatted"
-          : "pada periode $startDateFormatted hingga $endDateFormatted";
-    } else {
-      periodeText = "pada periode terpilih";
-    } // Hitung total kematian
-    int totalKematian = laporanMatiState.dataPoints.fold(0,
-        (sum, point) => sum + ((point['jumlahKematian'] as num?) ?? 0).toInt());
+      final String start = rangeFormatter.format(selectedChartDateRange!.start);
+      final String end = rangeFormatter.format(selectedChartDateRange!.end);
+      periodeText = (start == end)
+          ? "pada tanggal $start"
+          : "pada periode $start hingga $end";
+    }
 
-    summary.write(
-        "Berdasarkan statistik pelaporan $periodeText, ditemukan total $totalKematian kasus kematian ternak. ");
+    num totalKematian = laporanMatiState.dataPoints.fold(
+        0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0));
+
+    final summary = StringBuffer(
+        "Berdasarkan statistik $periodeText, ditemukan total $totalKematian kasus kematian ternak. ");
+
+    final penyakitData = statistikPenyebabState.rawData
+            ?.whereType<Map<String, dynamic>>()
+            .toList() ??
+        [];
+    if (penyakitData.isNotEmpty) {
+      summary.write("Rincian penyebab yang ditemukan yaitu ");
+
+      final List<String> penyebabParts = penyakitData.map<String>((item) {
+        final nama = item['penyebab'] ?? 'N/A';
+        final total = (item['jumlahKematian'] as num?)?.toInt() ?? 0;
+        return "$total kasus $nama";
+      }).toList();
+
+      if (penyebabParts.length == 1) {
+        summary.write(penyebabParts.first);
+      } else if (penyebabParts.length == 2) {
+        summary.write("${penyebabParts.first} dan ${penyebabParts.last}");
+      } else {
+        final lastItem = penyebabParts.removeLast();
+        summary.write("${penyebabParts.join(', ')}, dan $lastItem");
+      }
+      summary.write(". ");
+    }
+
+    if (totalKematian > 0) {
+      summary.write(
+          "Perlu dilakukan pengecekan lebih lanjut untuk identifikasi dan penanganan.");
+    }
 
     return summary.toString();
   }

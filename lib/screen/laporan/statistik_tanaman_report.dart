@@ -47,12 +47,16 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'repotting': ChartDataState<List<dynamic>>(),
     'nutrisi': ChartDataState<List<dynamic>>(),
     'laporanSakit': ChartDataState<List<dynamic>>(),
+    'laporanMati': ChartDataState<List<dynamic>>(),
+    'statistikPenyakit': ChartDataState<List<dynamic>>(),
+    'statistikPenyebabKematian': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
     'umum': RiwayatDataState<List<dynamic>>(),
     'pupuk': RiwayatDataState<List<dynamic>>(),
     'sakit': RiwayatDataState<List<dynamic>>(),
+    'mati': RiwayatDataState<List<dynamic>>(),
   };
   // --- End Unified State ---
 
@@ -289,6 +293,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           List<String> finalXLabels = processed['labels'];
           if (chartKey != 'laporanHarian' &&
               chartKey != 'laporanSakit' &&
+              chartKey != 'laporanMati' &&
               _chartStates['laporanHarian']!.xLabels.isNotEmpty) {
             finalXLabels =
                 List<String>.from(_chartStates['laporanHarian']!.xLabels);
@@ -394,6 +399,38 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   groupBy: gb),
         ),
         _fetchAndProcessChartData(
+          chartKey: 'statistikPenyakit',
+          valueKey: 'jumlahKasus',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPenyakit(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'statistikPenyebabKematian',
+          valueKey: 'jumlahKematian',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPenyebabKematian(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'laporanMati',
+          valueKey: 'jumlahKematian',
+          groupBy: groupBy,
+          defaultErrorMessage: 'Gagal memuat statistik laporan kematian',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikKematian(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end,
+                  groupBy: gb),
+        ),
+        _fetchAndProcessChartData(
           chartKey: 'penyiraman',
           valueKey: 'jumlahPenyiraman',
           groupBy: groupBy,
@@ -452,6 +489,12 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
             fetchFunction: () =>
                 _reportService.getRiwayatLaporanSakitJenisBudidaya(
                     jenisBudidayaId: widget.idTanaman!, limit: 3, page: 1)),
+        _fetchAndProcessRiwayatData(
+            riwayatKey: 'mati',
+            defaultErrorMessage: 'Gagal memuat riwayat pelaporan kematian',
+            fetchFunction: () =>
+                _reportService.getRiwayatLaporanKematianJenisBudidaya(
+                    jenisBudidayaId: widget.idTanaman!, limit: 5, page: 1)),
         _fetchAndProcessRiwayatData(
             riwayatKey: 'pupuk',
             defaultErrorMessage: 'Gagal memuat riwayat pemberian pupuk',
@@ -581,6 +624,151 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     setState(() => _selectedTabIndex = index);
     _pageController.animateToPage(index,
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  }
+
+  Map<String, dynamic> _findMinMaxDays(
+      List<dynamic> dataPoints, String valueKey) {
+    if (dataPoints.isEmpty) {
+      return {
+        'minValue': 0,
+        'maxValue': 0,
+        'minDays': <DateTime>[],
+        'maxDays': <DateTime>[]
+      };
+    }
+
+    num minValue = double.infinity;
+    num maxValue = double.negativeInfinity;
+
+    for (var item in dataPoints) {
+      final value = (item[valueKey] as num?) ?? 0;
+      if (value < minValue) minValue = value;
+      if (value > maxValue) maxValue = value;
+    }
+
+    List<DateTime> minDays = [];
+    List<DateTime> maxDays = [];
+
+    for (var item in dataPoints) {
+      final value = (item[valueKey] as num?) ?? 0;
+      final date = DateTime.tryParse(item['period'] ?? '');
+      if (date == null) continue;
+
+      if (value == minValue) {
+        minDays.add(date);
+      }
+      if (value == maxValue) {
+        maxDays.add(date);
+      }
+    }
+
+    return {
+      'minValue': minValue,
+      'maxValue': maxValue,
+      'minDays': minDays.toSet().toList(),
+      'maxDays': maxDays.toSet().toList()
+    };
+  }
+
+  String _formatConsecutiveDates(List<DateTime> dates) {
+    if (dates.isEmpty) return '';
+
+    dates.sort((a, b) => a.compareTo(b));
+
+    // Jika hanya 1 atau 2 tanggal, format sederhana saja
+    if (dates.length <= 2) {
+      final formatter = DateFormat('d MMMM yyyy');
+      return dates.map((d) => formatter.format(d)).join(' & ');
+    }
+
+    // Cek Pola Tahunan (misal: 1 Jan 2021, 1 Jan 2022, 1 Jan 2023)
+    bool isYearlyConsecutive = true;
+    for (int i = 0; i < dates.length - 1; i++) {
+      if (dates[i].day != dates[i + 1].day ||
+          dates[i].month != dates[i + 1].month ||
+          dates[i].year != dates[i + 1].year - 1) {
+        isYearlyConsecutive = false;
+        break;
+      }
+    }
+    if (isYearlyConsecutive) {
+      final startYear = DateFormat('yyyy').format(dates.first);
+      final endYear = DateFormat('yyyy').format(dates.last);
+      // Tampilkan tanggal lengkap untuk konteks jika hanya rentang tahun
+      final fullDateExample = DateFormat('d MMMM').format(dates.first);
+      if (startYear == endYear) {
+        return DateFormat('d MMMM yyyy').format(dates.first);
+      }
+      // return "$startYear - $endYear (setiap tanggal $fullDateExample)";
+      return "setiap tanggal $fullDateExample dari tahun $startYear - $endYear";
+    }
+
+    // Cek Pola Bulanan dalam tahun yang sama (misal: 1 Jan 2025, 1 Feb 2025, 1 Mar 2025)
+    bool isMonthlyConsecutive = true;
+    for (int i = 0; i < dates.length - 1; i++) {
+      DateTime expectedNextMonth =
+          DateTime(dates[i].year, dates[i].month + 1, dates[i].day);
+      // Normalisasi jika melewati akhir tahun
+      if (expectedNextMonth.month != (dates[i].month + 1) % 12) {
+        expectedNextMonth = DateTime(dates[i].year + 1, 1, dates[i].day);
+      }
+
+      if (dates[i + 1].day != dates[i].day ||
+          dates[i + 1].month != expectedNextMonth.month ||
+          dates[i + 1].year != expectedNextMonth.year) {
+        isMonthlyConsecutive = false;
+        break;
+      }
+    }
+    if (isMonthlyConsecutive) {
+      final start = dates.first;
+      final end = dates.last;
+      final dfMonth = DateFormat('MMMM');
+      final dfMonthYear = DateFormat('MMMM yyyy');
+
+      if (start.year == end.year) {
+        // return "Setiap tanggal ${start.day} dari ${dfMonth.format(start)} - ${dfMonthYear.format(end)}";
+        return "${dfMonth.format(start)} - ${dfMonthYear.format(end)} (setiap tanggal ${start.day})";
+      } else {
+        return "${dfMonthYear.format(start)} - ${dfMonthYear.format(end)} (setiap tanggal ${start.day})";
+      }
+    }
+
+    // Fallback ke Logika Awal (Harian) jika tidak ada pola tahunan/bulanan
+    final List<String> parts = [];
+    int i = 0;
+    while (i < dates.length) {
+      final List<DateTime> sequence = [dates[i]];
+      int j = i + 1;
+      while (
+          j < dates.length && dates[j].difference(dates[j - 1]).inDays == 1) {
+        sequence.add(dates[j]);
+        j++;
+      }
+
+      if (sequence.length >= 3) {
+        final start = sequence.first;
+        final end = sequence.last;
+        final dfDay = DateFormat('d');
+        final dfDayMonthYear = DateFormat('d MMMM yyyy');
+
+        if (start.month == end.month && start.year == end.year) {
+          parts.add("${dfDay.format(start)} - ${dfDayMonthYear.format(end)}");
+        } else if (start.year == end.year) {
+          parts.add(
+              "${DateFormat('d MMMM').format(start)} - ${dfDayMonthYear.format(end)}");
+        } else {
+          parts.add(
+              "${dfDayMonthYear.format(start)} - ${dfDayMonthYear.format(end)}");
+        }
+      } else {
+        final formatter = DateFormat('d MMMM yyyy');
+        parts.addAll(sequence.map((d) => formatter.format(d)));
+      }
+      i = j;
+    }
+
+    return parts.join(' & ');
   }
 
   String _generateStatistikRangkumanText() {
@@ -755,6 +943,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   ),
                   SakitTab(
                     laporanSakitState: _chartStates['laporanSakit']!,
+                    statistikPenyakitState: _chartStates['statistikPenyakit']!,
                     riwayatSakitState: _riwayatStates['sakit']!,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,
@@ -763,7 +952,18 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayDate: formatDisplayDate,
                     formatDisplayTime: formatDisplayTime,
                   ),
-                  const MatiTab(),
+                  MatiTab(
+                    laporanMatiState: _chartStates['laporanMati']!,
+                    statistikPenyebabState:
+                        _chartStates['statistikPenyebabKematian']!,
+                    riwayatMatiState: _riwayatStates['mati']!,
+                    onDateIconPressed: _showDateFilterDialog,
+                    selectedChartFilterType: _selectedChartFilterType,
+                    formattedDisplayedDateRange: formattedDisplayedDateRange,
+                    onChartFilterTypeChanged: _handleChartFilterTypeChanged,
+                    formatDisplayDate: formatDisplayDate,
+                    formatDisplayTime: formatDisplayTime,
+                  ),
                   NutrisiTab(
                     nutrisiState: _chartStates['nutrisi']!,
                     riwayatPupukState: _riwayatStates['pupuk']!,

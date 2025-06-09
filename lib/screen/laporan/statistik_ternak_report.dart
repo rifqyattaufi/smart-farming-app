@@ -48,6 +48,8 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
     'laporanVitamin': ChartDataState<List<dynamic>>(),
     'laporanVaksin': ChartDataState<List<dynamic>>(),
     'laporanPanen': ChartDataState<List<dynamic>>(),
+    'statistikPenyakit': ChartDataState<List<dynamic>>(),
+    'statistikPenyebabKematian': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
@@ -375,11 +377,31 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
           groupBy: groupBy,
           defaultErrorMessage: 'Gagal memuat statistik laporan kematian',
           fetchFunction: (gb, start, end) =>
-              _reportService.getStatistikLaporanMati(
+              _reportService.getStatistikKematian(
                   jenisBudidayaId: widget.idTernak!,
                   startDate: start,
                   endDate: end,
                   groupBy: gb),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'statistikPenyakit',
+          valueKey: 'jumlahKasus',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPenyakit(
+                  jenisBudidayaId: widget.idTernak!,
+                  startDate: start,
+                  endDate: end),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'statistikPenyebabKematian',
+          valueKey: 'jumlahKematian',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikPenyebabKematian(
+                  jenisBudidayaId: widget.idTernak!,
+                  startDate: start,
+                  endDate: end),
         ),
         _fetchAndProcessChartData(
           chartKey: 'laporanPanen',
@@ -968,6 +990,7 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
                   ),
                   SakitTab(
                     laporanSakitState: _chartStates['laporanSakit']!,
+                    statistikPenyakitState: _chartStates['statistikPenyakit']!,
                     riwayatSakitState: _riwayatStates['sakit']!,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,
@@ -978,6 +1001,8 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
                   ),
                   MatiTab(
                     laporanMatiState: _chartStates['laporanMati']!,
+                    statistikPenyebabState:
+                        _chartStates['statistikPenyebabKematian']!,
                     riwayatMatiState: _riwayatStates['mati']!,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,

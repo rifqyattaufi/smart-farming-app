@@ -8,6 +8,7 @@ import 'package:smart_farming_app/widget/newest.dart';
 
 class SakitTab extends StatelessWidget {
   final ChartDataState laporanSakitState;
+  final ChartDataState statistikPenyakitState;
   final RiwayatDataState riwayatSakitState;
 
   final Future<void> Function() onDateIconPressed;
@@ -22,6 +23,7 @@ class SakitTab extends StatelessWidget {
   const SakitTab({
     super.key,
     required this.laporanSakitState,
+    required this.statistikPenyakitState,
     required this.riwayatSakitState,
     required this.onDateIconPressed,
     required this.selectedChartFilterType,
@@ -33,7 +35,7 @@ class SakitTab extends StatelessWidget {
   });
 
   String _generateRangkumanSakit() {
-    if (laporanSakitState.isLoading) {
+    if (laporanSakitState.isLoading || statistikPenyakitState.isLoading) {
       return "Memuat data laporan sakit...";
     }
     if (laporanSakitState.error != null) {
@@ -43,32 +45,52 @@ class SakitTab extends StatelessWidget {
       return "Tidak ada laporan tanaman sakit pada periode ini.";
     }
 
-    final DateFormat rangeFormatter = DateFormat('d MMM yyyy');
+    final DateFormat rangeFormatter = DateFormat('d MMMM yyyy');
     String periodeText = "pada periode terpilih";
     if (selectedChartDateRange != null) {
-      final String startDateFormatted =
-          rangeFormatter.format(selectedChartDateRange!.start);
-      final String endDateFormatted =
-          rangeFormatter.format(selectedChartDateRange!.end);
-      periodeText = selectedChartDateRange!.start
-              .isAtSameMomentAs(selectedChartDateRange!.end)
-          ? "pada tanggal $startDateFormatted"
-          : "pada periode $startDateFormatted hingga $endDateFormatted";
+      final String start = rangeFormatter.format(selectedChartDateRange!.start);
+      final String end = rangeFormatter.format(selectedChartDateRange!.end);
+      periodeText = (start == end)
+          ? "pada tanggal $start"
+          : "pada periode $start hingga $end";
     }
 
     num totalSakit = laporanSakitState.dataPoints
         .fold(0, (prev, curr) => prev + ((curr['jumlahSakit'] as num?) ?? 0));
 
-    String rangkuman =
-        "Berdasarkan statistik pelaporan $periodeText, ditemukan total $totalSakit kasus tanaman sakit. ";
+    final summary = StringBuffer(
+        "Berdasarkan statistik $periodeText, ditemukan total $totalSakit kasus tanaman sakit. ");
 
-    // Contoh tambahan: mencari penyakit yang paling sering dilaporkan jika data detail ada --> PR
-    if (totalSakit > 0) {
-      rangkuman +=
-          "Perlu dilakukan pengecekan lebih lanjut untuk identifikasi dan penanganan penyakit.";
+    final penyakitData = statistikPenyakitState.rawData
+            ?.whereType<Map<String, dynamic>>()
+            .toList() ??
+        [];
+    if (penyakitData.isNotEmpty) {
+      summary.write("Rincian penyakit yang ditemukan yaitu ");
+
+      final List<String> penyakitParts = penyakitData.map<String>((item) {
+        final nama = item['penyakit'] ?? 'N/A';
+        final total = (item['jumlahKasus'] as num?)?.toInt() ?? 0;
+        return "$total kasus $nama";
+      }).toList();
+
+      if (penyakitParts.length == 1) {
+        summary.write(penyakitParts.first);
+      } else if (penyakitParts.length == 2) {
+        summary.write("${penyakitParts.first} dan ${penyakitParts.last}");
+      } else {
+        final lastItem = penyakitParts.removeLast();
+        summary.write("${penyakitParts.join(', ')}, dan $lastItem");
+      }
+      summary.write(". ");
     }
 
-    return rangkuman;
+    if (totalSakit > 0) {
+      summary.write(
+          "Perlu dilakukan pengecekan lebih lanjut untuk identifikasi dan penanganan.");
+    }
+
+    return summary.toString();
   }
 
   @override
@@ -79,7 +101,7 @@ class SakitTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Chart untuk Laporan Sakit
+          // Statistik Laporan Tanaman Sakit
           ChartSection(
             title: 'Statistik Laporan Tanaman Sakit',
             chartState: laporanSakitState,
@@ -92,6 +114,7 @@ class SakitTab extends StatelessWidget {
           ),
 
           const SizedBox(height: 12),
+          // Rangkuman Statistik Tanaman Sakit
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -132,13 +155,10 @@ class SakitTab extends StatelessWidget {
                       '',
                   'text':
                       item['text'] as String? ?? 'Laporan Sakit Tidak Bernama',
-                  'subtext': 'Oleh: ${item['petugasNama'] as String? ?? 'N/A'}',
+                  'subtext': 'Oleh: ${item['person'] as String? ?? 'N/A'}',
                   'icon':
                       item['gambar'] as String? ?? 'assets/images/appIcon.png',
-                  'time': formatDisplayTime(
-                      item['createdAt'] as String? ?? item['time'] as String?),
-                  'date': formatDisplayDate(
-                      item['createdAt'] as String? ?? item['date'] as String?),
+                  'time': item['time'],
                 };
               }).toList(),
               onItemTap: (itemContext, tappedItem) {
@@ -153,12 +173,7 @@ class SakitTab extends StatelessWidget {
                       content: Text('Detail laporan tidak tersedia.')));
                 }
               },
-              onViewAll: () {
-                // Navigasi: context.push('/semua-laporan-sakit');
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Melihat Semua Laporan Sakit')));
-              },
-              mode: NewestReportsMode.full, // Atau .simple jika lebih ringkas
+              mode: NewestReportsMode.full,
               titleTextStyle: bold18.copyWith(color: dark1),
               reportTextStyle: medium12.copyWith(color: dark1),
               timeTextStyle: regular12.copyWith(color: dark2),
