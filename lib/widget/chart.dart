@@ -80,7 +80,7 @@ class ChartWidget extends StatelessWidget {
               padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
               child: Text(
                 displayedDateRangeText!,
-                style: regular12.copyWith(color: dark2),
+                style: regular14.copyWith(color: dark2),
                 textAlign: TextAlign.center,
               ),
             ),

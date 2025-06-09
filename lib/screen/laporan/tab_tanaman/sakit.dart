@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -93,6 +94,84 @@ class SakitTab extends StatelessWidget {
     return summary.toString();
   }
 
+  Widget _buildCounterCard(BuildContext context) {
+    Widget cardContent;
+
+    if (laporanSakitState.isLoading) {
+      cardContent =
+          const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    } else if (laporanSakitState.error != null) {
+      cardContent = Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "Gagal memuat total",
+            style: regular14.copyWith(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    } else {
+      final totalSakit = laporanSakitState.dataPoints.fold<num>(
+          0, (sum, item) => sum + ((item['jumlahSakit'] as num?) ?? 0));
+
+      cardContent = Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            child: Text(
+              totalSakit.toInt().toString(),
+              style: bold20.copyWith(color: dark1, fontSize: 60),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: green1),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: SvgPicture.asset(
+                  'assets/icons/other.svg',
+                  colorFilter: ColorFilter.mode(white, BlendMode.srcIn),
+                  width: 24,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            child: Text(
+              'Tanaman Sakit',
+              style: semibold18.copyWith(color: dark1, fontSize: 18),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      height: 180,
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: dark1.withValues(alpha: 0.5), width: 1),
+        ),
+        color: green4,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: cardContent,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -101,6 +180,31 @@ class SakitTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //Counter Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Tanaman Sakit',
+                  style: bold18.copyWith(color: dark1),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  formattedDisplayedDateRange,
+                  style: regular14.copyWith(color: dark2),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _buildCounterCard(context),
+          ),
+          const SizedBox(height: 12),
+
           // Statistik Laporan Tanaman Sakit
           ChartSection(
             title: 'Statistik Laporan Tanaman Sakit',

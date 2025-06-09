@@ -50,6 +50,7 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
     'laporanPanen': ChartDataState<List<dynamic>>(),
     'statistikPenyakit': ChartDataState<List<dynamic>>(),
     'statistikPenyebabKematian': ChartDataState<List<dynamic>>(),
+    'panenKomoditas': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
@@ -389,6 +390,16 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
           groupBy: 'day',
           fetchFunction: (gb, start, end) =>
               _reportService.getStatistikPenyakit(
+                  jenisBudidayaId: widget.idTernak!,
+                  startDate: start,
+                  endDate: end),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'panenKomoditas',
+          valueKey: 'totalPanen',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikJumlahPanen(
                   jenisBudidayaId: widget.idTernak!,
                   startDate: start,
                   endDate: end),
@@ -964,6 +975,7 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
                   ),
                   PanenTab(
                     laporanPanenState: _chartStates['laporanPanen']!,
+                    panenKomoditasState: _chartStates['panenKomoditas']!,
                     riwayatPanenState: _riwayatStates['panen']!,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,

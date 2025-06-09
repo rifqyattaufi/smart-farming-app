@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
+import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/chart.dart';
 
@@ -12,6 +13,7 @@ class ChartSection extends StatelessWidget {
   final ChartFilterType? selectedChartFilterType;
   final String? displayedDateRangeText;
   final void Function(ChartFilterType?)? onChartFilterTypeChanged;
+  final String? labelKeyForMapping;
 
   const ChartSection({
     super.key,
@@ -23,6 +25,7 @@ class ChartSection extends StatelessWidget {
     this.selectedChartFilterType,
     this.displayedDateRangeText,
     this.onChartFilterTypeChanged,
+    this.labelKeyForMapping,
   });
 
   @override
@@ -31,32 +34,50 @@ class ChartSection extends StatelessWidget {
     if (chartState.isLoading) {
       content = const Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
               child: CircularProgressIndicator(strokeWidth: 2)));
     } else if (chartState.error != null) {
       content = Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Text('Error $title: ${chartState.error}',
             style: const TextStyle(color: Colors.red)),
       );
     } else {
-      final List<double> values = chartState.dataPoints
-          .map<double>(
-              (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
-          .toList();
+      List<double> finalValues;
+      List<String> finalXLabels;
 
-      if (values.isEmpty || chartState.xLabels.isEmpty) {
+      if (labelKeyForMapping != null) {
+        final data =
+            chartState.rawData?.whereType<Map<String, dynamic>>().toList() ??
+                [];
+        finalValues = data
+            .map<double>(
+                (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
+            .toList();
+        finalXLabels = data
+            .map<String>((e) => (e[labelKeyForMapping!] as String?) ?? 'N/A')
+            .toList();
+      } else {
+        finalValues = chartState.dataPoints
+            .map<double>(
+                (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
+            .toList();
+        finalXLabels = chartState.xLabels;
+      }
+
+      if (finalValues.isEmpty) {
         content = Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Tidak ada data statistik $title untuk ditampilkan.'),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('Tidak ada data $title untuk ditampilkan.',
+                style: regular14.copyWith(color: dark2)),
           ),
         );
       } else {
         content = ChartWidget(
           titleStats: title,
-          data: values,
-          xLabels: chartState.xLabels,
+          data: finalValues,
+          xLabels: finalXLabels,
           showFilterControls: showFilterControls,
           onDateIconPressed: onDateIconPressed,
           selectedChartFilterType: selectedChartFilterType,

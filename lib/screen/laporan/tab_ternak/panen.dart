@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
@@ -8,6 +9,7 @@ import 'package:smart_farming_app/utils/app_utils.dart';
 
 class PanenTab extends StatelessWidget {
   final ChartDataState laporanPanenState;
+  final ChartDataState panenKomoditasState;
   final RiwayatDataState riwayatPanenState;
 
   final Future<void> Function() onDateIconPressed;
@@ -22,6 +24,7 @@ class PanenTab extends StatelessWidget {
   const PanenTab({
     super.key,
     required this.laporanPanenState,
+    required this.panenKomoditasState,
     required this.riwayatPanenState,
     required this.onDateIconPressed,
     required this.selectedChartFilterType,
@@ -33,20 +36,19 @@ class PanenTab extends StatelessWidget {
   });
 
   String _generateRangkumanPanen() {
-    if (laporanPanenState.isLoading) {
+    if (laporanPanenState.isLoading && panenKomoditasState.isLoading) {
       return "Memuat data laporan panen...";
     }
     if (laporanPanenState.error != null) {
-      return "Tidak dapat memuat rangkuman: ${laporanPanenState.error}";
+      return "Tidak dapat memuat rangkuman: ${laporanPanenState.error ?? panenKomoditasState.error}";
     }
     if (laporanPanenState.dataPoints.isEmpty) {
       return "Tidak ada laporan panen ternak pada periode ini.";
     }
 
-    // Tentukan periode teks
     String periodeText;
     if (selectedChartDateRange != null) {
-      final formatter = DateFormat('d MMMM yyyy', 'id_ID');
+      final formatter = DateFormat('d MMMM yyyy');
       String start = formatter.format(selectedChartDateRange!.start);
       String end = formatter.format(selectedChartDateRange!.end);
       periodeText = (start == end)
@@ -56,7 +58,6 @@ class PanenTab extends StatelessWidget {
       periodeText = "pada periode terpilih";
     }
 
-    // Hitung total laporan
     int totalLaporan = laporanPanenState.dataPoints.fold(
         0,
         (sum, point) =>
@@ -65,7 +66,165 @@ class PanenTab extends StatelessWidget {
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, telah dilakukan $totalLaporan kali pelaporan panen. ");
 
+    final komoditasData = panenKomoditasState.rawData
+            ?.whereType<Map<String, dynamic>>()
+            .toList() ??
+        [];
+    if (komoditasData.isNotEmpty) {
+      summary.write("Total hasil panen terdiri dari ");
+      final List<String> komoditasParts = komoditasData.map<String>((item) {
+        final nama = item['namaKomoditas'] ?? 'N/A';
+        final total = (item['totalPanen'] as num?)?.toDouble() ?? 0.0;
+        final satuan = item['lambangSatuan'] as String? ?? '';
+
+        final formattedTotal =
+            total.truncateToDouble() == total ? total.toInt() : total;
+        return "$formattedTotal $satuan $nama".trim();
+      }).toList();
+
+      if (komoditasParts.length == 1) {
+        summary.write(komoditasParts.first);
+      } else if (komoditasParts.length == 2) {
+        summary.write("${komoditasParts.first} dan ${komoditasParts.last}");
+      } else {
+        final lastItem = komoditasParts.removeLast();
+        summary.write("${komoditasParts.join(', ')}, dan $lastItem");
+      }
+      summary.write(".");
+    } else if (!panenKomoditasState.isLoading) {
+      summary.write("Belum ada hasil panen yang tercatat untuk periode ini.");
+    }
+
     return summary.toString();
+  }
+
+  Widget _buildCommodityCounters(BuildContext context) {
+    if (panenKomoditasState.isLoading) {
+      return const SizedBox(
+        height: 100,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+    if (panenKomoditasState.error != null) {
+      return Center(
+        child: Text(
+          "Gagal memuat total panen: ${panenKomoditasState.error}",
+          style: regular14.copyWith(color: Colors.red),
+        ),
+      );
+    }
+
+    final komoditasData = panenKomoditasState.rawData
+            ?.whereType<Map<String, dynamic>>()
+            .toList() ??
+        [];
+
+    if (komoditasData.isEmpty) {
+      // Jika tidak ada data panen komoditas, tampilkan pesan
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(
+          child: Text(
+            'Belum ada hasil panen yang tercatat untuk periode ini.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 150,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        itemCount: komoditasData.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final item = komoditasData[index];
+          final nama = item['namaKomoditas'] as String? ?? 'N/A';
+          final total = (item['totalPanen'] as num?)?.toDouble() ?? 0.0;
+          final satuan = item['lambangSatuan'] as String? ?? '';
+
+          final formattedTotal = total.truncateToDouble() == total
+              ? total.toInt().toString()
+              : total.toString();
+
+          return SizedBox(
+            width: 180,
+            child: Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: dark1.withValues(alpha: 0.5), width: 1),
+              ),
+              color: index % 2 == 0 ? green4 : yellow1.withValues(alpha: 0.5),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                nama,
+                                style: bold16.copyWith(color: dark1),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 40), // Beri ruang untuk ikon
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              formattedTotal,
+                              style:
+                                  bold20.copyWith(color: dark1, fontSize: 36),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              satuan,
+                              style: medium14.copyWith(color: dark2),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: index % 2 == 0
+                            ? green1
+                            : yellow.withValues(alpha: 0.5),
+                        child: ClipOval(
+                          child: SvgPicture.asset(
+                            'assets/icons/other.svg',
+                            colorFilter:
+                                ColorFilter.mode(white, BlendMode.srcIn),
+                            width: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -76,6 +235,28 @@ class PanenTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //Counter Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Hasil Panen per Komoditas',
+                  style: bold18.copyWith(color: dark1),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  formattedDisplayedDateRange,
+                  style: regular14.copyWith(color: dark2),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildCommodityCounters(context),
+          const SizedBox(height: 12),
+
           // Chart Section
           ChartSection(
             title: 'Statistik Frekuensi Laporan Panen',
@@ -89,6 +270,13 @@ class PanenTab extends StatelessWidget {
           ),
 
           const SizedBox(height: 12),
+          ChartSection(
+            title: 'Statistik Jumlah Hasil Panen',
+            chartState: panenKomoditasState,
+            valueKeyForMapping: 'totalPanen',
+            labelKeyForMapping: 'namaKomoditas',
+            showFilterControls: false,
+          ),
 
           // Rangkuman Section
           Padding(
@@ -111,11 +299,11 @@ class PanenTab extends StatelessWidget {
           if (riwayatPanenState.isLoading)
             const Center(
                 child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: CircularProgressIndicator(strokeWidth: 2)))
           else if (riwayatPanenState.error != null)
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                   'Error memuat riwayat laporan panen: ${riwayatPanenState.error}',
                   style: const TextStyle(color: Colors.red)),
