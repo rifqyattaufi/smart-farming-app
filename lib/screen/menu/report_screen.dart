@@ -157,8 +157,8 @@ class _ReportScreenState extends State<ReportScreen> {
                   iconColor: yellow,
                 ),
                 DashboardItem(
-                  title: 'Tanaman Sehat',
-                  value: _perkebunanData?['jumlahSehat'].toString() ?? '-',
+                  title: 'Tanaman',
+                  value: _perkebunanData?['jumlahTanaman'].toString() ?? '-',
                   icon: 'other',
                   bgColor: green4,
                   iconColor: green2,

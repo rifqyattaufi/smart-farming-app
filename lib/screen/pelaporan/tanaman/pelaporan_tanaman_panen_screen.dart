@@ -171,15 +171,73 @@ class _PelaporanTanamanPanenScreenState
     return total;
   }
 
+  void _calculateAndUpdateUmurTanaman() {
+    final createdAtRaw = widget.data?['unitBudidaya']?['createdAt'];
+    if (createdAtRaw == null ||
+        createdAtRaw is! String ||
+        createdAtRaw.isEmpty) {
+      _umurTanamanController.text = '';
+      return;
+    }
+
+    try {
+      final tanggalTanam = DateTime.parse(createdAtRaw);
+
+      final tanggalPanen = _tanggalPanen;
+
+      final tglTanamClean =
+          DateTime(tanggalTanam.year, tanggalTanam.month, tanggalTanam.day);
+      final tglPanenClean =
+          DateTime(tanggalPanen.year, tanggalPanen.month, tanggalPanen.day);
+
+      final umurInDays = tglPanenClean.difference(tglTanamClean).inDays;
+
+      if (umurInDays >= 0) {
+        _umurTanamanController.text = umurInDays.toString();
+      } else {
+        _umurTanamanController.text = '0';
+      }
+
+      setState(() {});
+    } catch (e) {
+      _umurTanamanController.text = '';
+    }
+  }
+
+  Future<void> _fetchGagalPanenData() async {
+    final unitId = widget.data?['unitBudidaya']?['id'];
+    if (unitId == null) return;
+
+    try {
+      final response = await _laporanService.getJumlahKematianByUnitId(unitId);
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          final jumlahMati = response['data'] ?? 0;
+          setState(() {
+            _gagalPanenController.text = jumlahMati.toString();
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showError('Gagal memuat data gagal panen: $e');
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _fetchSatuanData();
     _fetchGradeMaster();
 
+    _fetchGagalPanenData();
+
     if (_rincianGradeList.isEmpty) {
       _tambahRincianGrade();
     }
+
+    _calculateAndUpdateUmurTanaman();
   }
 
   Future<void> _pickImage(BuildContext context) async {
@@ -433,6 +491,7 @@ class _PelaporanTanamanPanenScreenState
                             if (picked != null && picked != _tanggalPanen) {
                               setState(() {
                                 _tanggalPanen = picked;
+                                _calculateAndUpdateUmurTanaman();
                               });
                             }
                           },

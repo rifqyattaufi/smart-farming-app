@@ -273,11 +273,27 @@ class _InfoTabState extends State<InfoTab> {
             type: 'basic',
             items: objekBudidayaToShow.map((item) {
               final plantItem = item as Map<String, dynamic>;
+              final createdAt =
+                  DateTime.parse(plantItem['createdAt'] as String);
+              final duration = DateTime.now().difference(createdAt);
+              String plantAgeString;
+
+              if (duration.inDays > 0) {
+                plantAgeString = '${duration.inDays} hari';
+              } else if (duration.inHours > 0) {
+                plantAgeString = '${duration.inHours} jam';
+              } else if (duration.inMinutes > 0) {
+                plantAgeString = '${duration.inMinutes} menit';
+              } else {
+                plantAgeString = '${duration.inSeconds} detik';
+              }
+
               return {
                 'name': plantItem['namaId'] as String? ??
                     'Tanaman (ID: ${plantItem['id']?.substring(0, 6) ?? 'N/A'})',
                 'icon': gambarUtama,
-                'category': '$namaTanaman - ${kebunItem['nama']}',
+                'category':
+                    '$namaTanaman - ${kebunItem['nama']} - Umur: $plantAgeString',
                 'id': plantItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
