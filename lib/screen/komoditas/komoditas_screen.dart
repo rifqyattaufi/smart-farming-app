@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
@@ -20,12 +21,14 @@ class KomoditasScreen extends StatefulWidget {
 
 class _KomoditasScreenState extends State<KomoditasScreen> {
   final KomoditasService _komoditasService = KomoditasService();
+  final AuthService _authService = AuthService();
 
   final List<dynamic> _komoditasTernakList = [];
   final List<dynamic> _komoditasKebunList = [];
 
   List<dynamic> _komoditasTernakListFiltered = [];
   List<dynamic> _komoditasKebunListFiltered = [];
+  String? _userRole;
 
   int _selectedTab = 0;
   final TextEditingController _searchController = TextEditingController();
@@ -82,6 +85,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
       });
     }
 
+    final role = await _authService.getUserRole();
+
     _currentPageKebun = 1;
     _hasNextPageKebun = true;
     _currentPageTernak = 1;
@@ -101,6 +106,7 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
 
     if (mounted) {
       setState(() {
+        _userRole = role;
         _isInitialLoading = false;
         if (_searchController.text.isEmpty) {
           _komoditasKebunListFiltered = List.from(_komoditasKebunList);
@@ -379,35 +385,37 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            void handleKomoditasUpdate() {
-              _handleRefresh();
-            }
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  void handleKomoditasUpdate() {
+                    _handleRefresh();
+                  }
 
-            if (_selectedTab == 0) {
-              context.push('/tambah-komoditas-tanaman',
-                  extra: AddKomoditasTanamanScreen(
-                    isEdit: false,
-                    onKomoditasTanamanAdded: handleKomoditasUpdate,
-                  ));
-            } else {
-              context.push('/tambah-komoditas-ternak',
-                  extra: AddKomoditasTernakScreen(
-                    isEdit: false,
-                    onKomoditasAdded: handleKomoditasUpdate,
-                  ));
-            }
-          },
-          backgroundColor: green1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+                  if (_selectedTab == 0) {
+                    context.push('/tambah-komoditas-tanaman',
+                        extra: AddKomoditasTanamanScreen(
+                          isEdit: false,
+                          onKomoditasTanamanAdded: handleKomoditasUpdate,
+                        ));
+                  } else {
+                    context.push('/tambah-komoditas-ternak',
+                        extra: AddKomoditasTernakScreen(
+                          isEdit: false,
+                          onKomoditasAdded: handleKomoditasUpdate,
+                        ));
+                  }
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: Column(
           children: [

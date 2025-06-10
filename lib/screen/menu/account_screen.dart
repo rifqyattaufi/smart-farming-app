@@ -15,6 +15,8 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   final AuthService _authService = AuthService();
+  String? _userRole;
+  List<Map<String, dynamic>> report = [];
 
   Future<void> _showLogoutConfirmation() async {
     final shouldLogout = await showDialog<bool>(
@@ -39,6 +41,58 @@ class _AccountScreenState extends State<AccountScreen> {
       await _authService.logout();
       if (mounted) context.go('/login');
     }
+  }
+
+  Future<void> _fetchUserRole() async {
+    final role = await _authService.getUserRole();
+    setState(() {
+      _userRole = role;
+    });
+
+    // Initialize base report items
+    report = [
+      {
+        'text': 'Kebijakan Privasi',
+        'onTap': () => context.push('/kebijakan-privasi'),
+      },
+      {
+        'text': 'Bantuan',
+        'onTap': () => context.push('/detail'),
+      }
+    ];
+
+    if (_userRole == 'pjawab') {
+      setState(() {
+        report.addAll([
+          {
+            'text': 'Manajemen Notifikasi Global',
+            'onTap': () => context.push('/manajemen-notifikasi'),
+          },
+          {
+            'text': 'Manajemen Pengguna',
+            'onTap': () => context.push('/manajemen-pengguna'),
+          },
+          {
+            'text': 'Manajemen Satuan',
+            'onTap': () => context.push('/manajemen-satuan'),
+          },
+          {
+            'text': 'Manajemen Grade Hasil Panen',
+            'onTap': () => context.push('/manajemen-grade'),
+          },
+          {
+            'text': 'Log Aktivitas',
+            'onTap': () => context.push('/log-aktivitas'),
+          }
+        ]);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    _fetchUserRole();
+    super.initState();
   }
 
   @override
@@ -75,8 +129,12 @@ class _AccountScreenState extends State<AccountScreen> {
                   'onTap': () => context.push('/lupa-password'),
                 },
               ],
-              onItemTap: (context, report) =>
-                  context.push('/detail', extra: report),
+              onItemTap: (context, item) {
+                final onTap = item['onTap'];
+                if (onTap != null && onTap is Function) {
+                  onTap();
+                }
+              },
               mode: NewestReportsMode.simple,
               showIcon: false,
               titleTextStyle: bold18.copyWith(color: dark1),
@@ -85,39 +143,12 @@ class _AccountScreenState extends State<AccountScreen> {
             const SizedBox(height: 12),
             NewestReports(
               title: 'Pengaturan Lainnya',
-              reports: [
-                {
-                  'text': 'Manajemen Notifikasi Global',
-                  'onTap': () => context.push('/manajemen-notifikasi'),
-                },
-                {
-                  'text': 'Manajemen Pengguna',
-                  'onTap': () => context.push('/manajemen-pengguna'),
-                },
-                {
-                  'text': 'Manajemen Satuan',
-                  'onTap': () => context.push('/manajemen-satuan'),
-                },
-                {
-                  'text': 'Manajemen Grade Hasil Panen',
-                  'onTap': () => context.push('/manajemen-grade'),
-                },
-                {
-                  'text': 'Log Aktivitas',
-                  'onTap': () => context.push('/log-aktivitas'),
-                },
-                {
-                  'text': 'Kebijakan Privasi',
-                  'onTap': () => context.push('/kebijakan-privasi'),
-                },
-                {
-                  'text': 'Bantuan',
-                  'onTap': () => context.push('/detail'),
-                }
-              ],
+              reports: report,
               onItemTap: (context, item) {
-                final name = item['name'] ?? '';
-                context.push('/detail-laporan/$name');
+                final onTap = item['onTap'];
+                if (onTap != null && onTap is Function) {
+                  onTap();
+                }
               },
               mode: NewestReportsMode.simple,
               showIcon: false,
@@ -131,8 +162,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 {'text': 'Keluar Akun', 'onTap': _showLogoutConfirmation},
               ],
               onItemTap: (context, item) {
-                final name = item['name'] ?? '';
-                context.push('/detail-laporan/$name');
+                final onTap = item['onTap'];
+                if (onTap != null && onTap is Function) {
+                  onTap();
+                }
               },
               mode: NewestReportsMode.simple,
               showIcon: false,

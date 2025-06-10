@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -24,11 +25,13 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
   final _unitBudidayaService = UnitBudidayaService();
   final ScheduleUnitNotificationService _scheduleUnitNotification =
       ScheduleUnitNotificationService();
+  final AuthService _authService = AuthService();
 
   Map<String, dynamic> _kandang = {};
   List<dynamic> _ternakList = [];
   Map<String, dynamic> _notificationPanen = {};
   Map<String, dynamic> _notificationNutrisi = {};
+  String? _userRole;
   final Map<String, String?> dayToInt = {
     '1': 'Senin',
     '2': 'Selasa',
@@ -43,14 +46,15 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
     'weekly': 'Mingguan',
     'monthly': 'Bulanan',
   };
-
   Future<void> _fetchData() async {
     try {
       final response = await _unitBudidayaService
           .getUnitBudidayaById(widget.idKandang ?? '');
+      final role = await _authService.getUserRole();
       setState(() {
         _kandang = response['data']['unitBudidaya'];
         _ternakList = response['data']['objekBudidaya'];
+        _userRole = role;
       });
 
       final notification = await _scheduleUnitNotification
@@ -321,59 +325,61 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomButton(
-              onPressed: () {
-                context.push('/tambah-kandang',
-                    extra: AddKandangScreen(
-                      isEdit: true,
-                      idKandang: widget.idKandang,
-                      onKandangAdded: () => _fetchData(),
-                    ));
-              },
-              buttonText: 'Ubah Data',
-              backgroundColor: yellow2,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-            const SizedBox(height: 12), // Jarak antara tombol
-            CustomButton(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Konfirmasi'),
-                    content: const Text(
-                        'Apakah Anda yakin ingin menghapus kandang ini?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Hapus'),
-                      ),
-                    ],
+      bottomNavigationBar: _userRole != 'pjawab'
+          ? null
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomButton(
+                    onPressed: () {
+                      context.push('/tambah-kandang',
+                          extra: AddKandangScreen(
+                            isEdit: true,
+                            idKandang: widget.idKandang,
+                            onKandangAdded: () => _fetchData(),
+                          ));
+                    },
+                    buttonText: 'Ubah Data',
+                    backgroundColor: yellow2,
+                    textStyle: semibold16,
+                    textColor: white,
                   ),
-                );
+                  const SizedBox(height: 12), // Jarak antara tombol
+                  CustomButton(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Konfirmasi'),
+                          content: const Text(
+                              'Apakah Anda yakin ingin menghapus kandang ini?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Hapus'),
+                            ),
+                          ],
+                        ),
+                      );
 
-                if (confirm == true) {
-                  await _deleteData();
-                }
-              },
-              buttonText: 'Hapus Data',
-              backgroundColor: red,
-              textStyle: semibold16,
-              textColor: white,
+                      if (confirm == true) {
+                        await _deleteData();
+                      }
+                    },
+                    buttonText: 'Hapus Data',
+                    backgroundColor: red,
+                    textStyle: semibold16,
+                    textColor: white,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 

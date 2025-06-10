@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -16,17 +17,20 @@ class KebunScreen extends StatefulWidget {
 
 class _KebunScreenState extends State<KebunScreen> {
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final AuthService _authService = AuthService();
 
   List<dynamic> _kebunList = [];
   List<dynamic> _filteredKebunList = [];
+  String? _userRole;
 
   TextEditingController searchController = TextEditingController();
-
   Future<void> _fetchData() async {
     try {
+      final role = await _authService.getUserRole();
       final response =
           await _unitBudidayaService.getUnitBudidayaByTipe('tumbuhan');
       setState(() {
+        _userRole = role;
         _kebunList = response['data'] ?? [];
         _filteredKebunList = _kebunList;
       });
@@ -89,24 +93,26 @@ class _KebunScreenState extends State<KebunScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            context.push('/tambah-kebun',
-                extra: AddKebunScreen(
-                  isEdit: false,
-                  onKebunAdded: () => _fetchData(),
-                ));
-          },
-          backgroundColor: green1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  context.push('/tambah-kebun',
+                      extra: AddKebunScreen(
+                        isEdit: false,
+                        onKebunAdded: () => _fetchData(),
+                      ));
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(

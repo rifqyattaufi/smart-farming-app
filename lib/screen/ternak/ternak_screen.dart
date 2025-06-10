@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -17,9 +18,11 @@ class TernakScreen extends StatefulWidget {
 
 class _TernakScreenState extends State<TernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+  final AuthService _authService = AuthService();
 
   List<dynamic> _ternakList = [];
   List<dynamic> _filteredTernakList = [];
+  String? _userRole;
 
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -74,11 +77,15 @@ class _TernakScreenState extends State<TernakScreen> {
       _filteredTernakList.clear();
     }
 
+    // Get user role
+    final role = await _authService.getUserRole();
+
     await _fetchDataPage(page: 1, isInitialSetupOrRefresh: true);
 
     if (mounted) {
       setState(() {
         _isInitialLoading = false;
+        _userRole = role;
         if (_searchController.text.isEmpty) {
           _filteredTernakList = List.from(_ternakList);
         }
@@ -270,27 +277,29 @@ class _TernakScreenState extends State<TernakScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            void handleTernakUpdate() {
-              _handleRefresh();
-            }
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  void handleTernakUpdate() {
+                    _handleRefresh();
+                  }
 
-            context.push('/tambah-ternak',
-                extra: AddTernakScreen(
-                  isEdit: false,
-                  onTernakAdded: handleTernakUpdate,
-                ));
-          },
-          backgroundColor: green1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+                  context.push('/tambah-ternak',
+                      extra: AddTernakScreen(
+                        isEdit: false,
+                        onTernakAdded: handleTernakUpdate,
+                      ));
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: Column(
           children: [

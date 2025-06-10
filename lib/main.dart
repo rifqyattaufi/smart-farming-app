@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path/path.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
+import 'package:smart_farming_app/screen/main_screen_petugas.dart';
 import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
@@ -243,6 +245,21 @@ final _router = GoRouter(
         ),
       ],
     ),
+    ShellRoute(
+        builder: (context, state, child) => MainScreenPetugas(child: child),
+        routes: [
+          GoRoute(
+            path: '/home-petugas',
+            builder: (context, state) => const HomeScreenPetugas(),
+          ),
+          GoRoute(
+              path: '/inventory-petugas',
+              builder: (context, state) => const InventoryScreen()),
+          GoRoute(
+            path: '/account-petugas',
+            builder: (context, state) => const AccountScreen(),
+          )
+        ]),
     GoRoute(
       path: '/introduction',
       builder: (context, state) => const Introduction(),
@@ -445,10 +462,6 @@ final _router = GoRouter(
         final extra = state.extra as PelaporanTernakSakitScreen;
         return extra;
       },
-    ),
-    GoRoute(
-      path: '/home-petugas',
-      builder: (context, state) => const HomePetugasScreen(),
     ),
     GoRoute(
       path: '/detail',

@@ -90,7 +90,8 @@ class _SplashScreenState extends State<SplashScreen>
     if (userData['isActive'] == false) {
       await _authService.logout();
       if (mounted) {
-        showAppToast(context, 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.');
+        showAppToast(
+            context, 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.');
       }
       context.go('/login');
       return;
@@ -106,16 +107,15 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     // Cek role pengguna dan arahkan ke halaman sesuai role
-    // final role = await _authService.getUserRole();
+    final role = await _authService.getUserRole();
     if (!mounted) return;
-    // if (role == 'admin') {
-    //   context.go('/home'); // Halaman untuk admin
-    // } else if (role == 'pjawab') {
-    //   context.go('/home-petugas'); // Halaman untuk penanggung jawab
-    // } else {
-    //   context.go('/home'); // Default halaman
-    // }
-    context.go('/home'); // Atur sesuai role jika diperlukan
+    if (role == 'pjawab') {
+      context.go('/home');
+    } else if (role == 'petugas') {
+      // await _authService.logout();
+      // context.go('/login');
+      context.go('/home-petugas');
+    }
   }
 
   @override

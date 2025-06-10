@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -24,11 +25,13 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
   final ScheduleUnitNotificationService _scheduleUnitNotification =
       ScheduleUnitNotificationService();
+  final AuthService _authService = AuthService();
 
   Map<String, dynamic>? _kebun;
   List<dynamic>? _tanamanList;
   Map<String, dynamic> _notificationPanen = {};
   Map<String, dynamic> _notificationNutrisi = {};
+  String? _userRole;
   final Map<String, String?> dayToInt = {
     '1': 'Senin',
     '2': 'Selasa',
@@ -46,9 +49,11 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
 
   Future<void> _fetchData() async {
     try {
+      final role = await _authService.getUserRole();
       final response =
           await _unitBudidayaService.getUnitBudidayaById(widget.idKebun!);
       setState(() {
+        _userRole = role;
         _kebun = response['data']['unitBudidaya'];
         _tanamanList = response['data']['objekBudidaya'];
       });
@@ -320,59 +325,61 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomButton(
-              onPressed: () {
-                context.push('/tambah-kebun',
-                    extra: AddKebunScreen(
-                      isEdit: true,
-                      idKebun: widget.idKebun,
-                      onKebunAdded: () => _fetchData(),
-                    ));
-              },
-              buttonText: 'Ubah Data',
-              backgroundColor: yellow2,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-            const SizedBox(height: 12),
-            CustomButton(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Konfirmasi'),
-                    content: const Text(
-                        'Apakah Anda yakin ingin menghapus kebun ini?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Hapus'),
-                      ),
-                    ],
+      bottomNavigationBar: _userRole != 'pjawab'
+          ? null
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomButton(
+                    onPressed: () {
+                      context.push('/tambah-kebun',
+                          extra: AddKebunScreen(
+                            isEdit: true,
+                            idKebun: widget.idKebun,
+                            onKebunAdded: () => _fetchData(),
+                          ));
+                    },
+                    buttonText: 'Ubah Data',
+                    backgroundColor: yellow2,
+                    textStyle: semibold16,
+                    textColor: white,
                   ),
-                );
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Konfirmasi'),
+                          content: const Text(
+                              'Apakah Anda yakin ingin menghapus kebun ini?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Hapus'),
+                            ),
+                          ],
+                        ),
+                      );
 
-                if (confirm == true) {
-                  await _deleteData();
-                }
-              },
-              buttonText: 'Hapus Data',
-              backgroundColor: red,
-              textStyle: semibold16,
-              textColor: white,
+                      if (confirm == true) {
+                        await _deleteData();
+                      }
+                    },
+                    buttonText: 'Hapus Data',
+                    backgroundColor: red,
+                    textStyle: semibold16,
+                    textColor: white,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 

@@ -38,6 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response['status'] == true) {
+        String? role = await _authService.getUserRole();
+
+        if (role == 'pjawab') {
+          context.go('/home');
+        } else if (role == 'petugas') {
+          // await _authService.logout();
+          // context.go('/login');
+          context.go('/home-petugas');
+        }
         context.go('/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

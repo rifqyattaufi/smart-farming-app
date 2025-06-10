@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -16,19 +17,22 @@ class KandangScreen extends StatefulWidget {
 
 class _KandangScreenState extends State<KandangScreen> {
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final AuthService _authService = AuthService();
 
   List<dynamic> _kandangList = [];
   List<dynamic> _filteredKandangList = [];
+  String? _userRole;
 
   TextEditingController searchController = TextEditingController();
-
   Future<void> _fetchData() async {
     try {
       final response =
           await _unitBudidayaService.getUnitBudidayaByTipe('hewan');
+      final role = await _authService.getUserRole();
       setState(() {
         _kandangList = response['data'] ?? [];
         _filteredKandangList = _kandangList;
+        _userRole = role;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,24 +93,26 @@ class _KandangScreenState extends State<KandangScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            context.push('/tambah-kandang',
-                extra: AddKandangScreen(
-                  isEdit: false,
-                  onKandangAdded: () => _fetchData(),
-                ));
-          },
-          backgroundColor: green1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  context.push('/tambah-kandang',
+                      extra: AddKandangScreen(
+                        isEdit: false,
+                        onKandangAdded: () => _fetchData(),
+                      ));
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(

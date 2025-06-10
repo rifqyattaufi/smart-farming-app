@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/hama/add_hama_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
@@ -21,11 +22,13 @@ class HamaScreen extends StatefulWidget {
 
 class _HamaScreenState extends State<HamaScreen> {
   final HamaService _hamaService = HamaService();
+  final AuthService _authService = AuthService();
 
   int _selectedTab = 0;
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   final ScrollController _scrollController = ScrollController();
+  String? _userRole;
 
   bool _isInitialLoading = true;
   bool _isSearching = false;
@@ -82,6 +85,8 @@ class _HamaScreenState extends State<HamaScreen> {
       });
     }
 
+    final role = await _authService.getUserRole();
+
     if (_selectedTab == 0) {
       // Laporan Hama
       _currentPageLaporan = 1;
@@ -104,6 +109,7 @@ class _HamaScreenState extends State<HamaScreen> {
 
     if (mounted) {
       setState(() {
+        _userRole = role;
         _isInitialLoading = false;
       });
       _updateFilteredListForCurrentTab();
@@ -412,27 +418,31 @@ class _HamaScreenState extends State<HamaScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            if (_selectedTab == 0) {
-              context.push('/pelaporan-hama').then((_) => _handleRefresh());
-            } else {
-              context.push('/tambah-hama',
-                  extra: AddHamaScreen(
-                    isEdit: false,
-                    onHamaAdded: _handleRefresh,
-                  ));
-            }
-          },
-          backgroundColor: green1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  if (_selectedTab == 0) {
+                    context
+                        .push('/pelaporan-hama')
+                        .then((_) => _handleRefresh());
+                  } else {
+                    context.push('/tambah-hama',
+                        extra: AddHamaScreen(
+                          isEdit: false,
+                          onHamaAdded: _handleRefresh,
+                        ));
+                  }
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: Column(
           children: [

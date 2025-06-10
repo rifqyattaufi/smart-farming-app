@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -17,9 +18,11 @@ class TanamanScreen extends StatefulWidget {
 
 class _TanamanScreenState extends State<TanamanScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+  final AuthService _authService = AuthService();
 
   List<dynamic> _tanamanList = [];
   List<dynamic> _filteredTanamanList = [];
+  String? _userRole;
 
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -67,6 +70,8 @@ class _TanamanScreenState extends State<TanamanScreen> {
       });
     }
 
+    final role = await _authService.getUserRole();
+
     _currentPage = 1;
     _hasNextPage = true;
     if (isRefresh) {
@@ -78,6 +83,7 @@ class _TanamanScreenState extends State<TanamanScreen> {
 
     if (mounted) {
       setState(() {
+        _userRole = role;
         _isInitialLoading = false;
         if (_searchController.text.isEmpty) {
           _filteredTanamanList = List.from(_tanamanList);
@@ -270,27 +276,29 @@ class _TanamanScreenState extends State<TanamanScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            void handleTanamanUpdate() {
-              _handleRefresh();
-            }
+      floatingActionButton: _userRole == 'pjawab'
+          ? SizedBox(
+              width: 70,
+              height: 70,
+              child: FloatingActionButton(
+                onPressed: () {
+                  void handleTanamanUpdate() {
+                    _handleRefresh();
+                  }
 
-            context.push('/tambah-tanaman',
-                extra: AddTanamanScreen(
-                  isEdit: false,
-                  onTanamanAdded: handleTanamanUpdate,
-                ));
-          },
-          backgroundColor: green1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
-      ),
+                  context.push('/tambah-tanaman',
+                      extra: AddTanamanScreen(
+                        isEdit: false,
+                        onTanamanAdded: handleTanamanUpdate,
+                      ));
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: Column(
           children: [

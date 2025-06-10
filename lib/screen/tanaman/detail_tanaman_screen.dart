@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/button.dart';
@@ -21,12 +22,14 @@ class DetailTanamanScreen extends StatefulWidget {
 
 class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
+  final AuthService _authService = AuthService();
 
   Map<String, dynamic>? _tanaman;
   List<dynamic> _kebunList = [];
   int _jumlahTanaman = 0;
   bool _isLoading = true;
   bool _isDeleting = false;
+  String? _userRole;
 
   @override
   void initState() {
@@ -59,6 +62,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
     try {
       final response =
           await _jenisBudidayaService.getJenisBudidayaById(widget.idTanaman!);
+      final role = await _authService.getUserRole();
 
       if (mounted) {
         if (response['status'] == true && response['data'] != null) {
@@ -67,11 +71,13 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
             _kebunList =
                 List<dynamic>.from(response['data']['unitBudidaya'] ?? []);
             _jumlahTanaman = response['data']['jumlahBudidaya'] as int? ?? 0;
+            _userRole = role;
             _isLoading = false;
           });
         } else {
           setState(() {
             _isLoading = false;
+            _userRole = role;
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -358,51 +364,52 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                     ),
                   ),
       ),
-      bottomNavigationBar: _isLoading || _tanaman == null
-          ? null
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomButton(
-                    onPressed: () {
-                      if (widget.idTanaman != null) {
-                        context
-                            .push(
-                              '/tambah-tanaman',
-                              extra: AddTanamanScreen(
-                                onTanamanAdded: () {
-                                  _fetchData();
-                                },
-                                isEdit: true,
-                                idTanaman: widget.idTanaman,
-                              ),
-                            )
-                            .then((value) {});
-                      }
-                    },
-                    buttonText: 'Ubah Data',
-                    backgroundColor: yellow2,
-                    textStyle: semibold16.copyWith(color: white),
-                    textColor: white,
+      bottomNavigationBar:
+          _isLoading || _tanaman == null || _userRole != 'pjawab'
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomButton(
+                        onPressed: () {
+                          if (widget.idTanaman != null) {
+                            context
+                                .push(
+                                  '/tambah-tanaman',
+                                  extra: AddTanamanScreen(
+                                    onTanamanAdded: () {
+                                      _fetchData();
+                                    },
+                                    isEdit: true,
+                                    idTanaman: widget.idTanaman,
+                                  ),
+                                )
+                                .then((value) {});
+                          }
+                        },
+                        buttonText: 'Ubah Data',
+                        backgroundColor: yellow2,
+                        textStyle: semibold16.copyWith(color: white),
+                        textColor: white,
+                      ),
+                      const SizedBox(height: 12),
+                      CustomButton(
+                        onPressed: _isDeleting
+                            ? null
+                            : () {
+                                _handleDeleteConfirmation();
+                              },
+                        buttonText: 'Hapus Data',
+                        backgroundColor: red,
+                        textStyle: semibold16.copyWith(color: white),
+                        textColor: white,
+                        isLoading: _isDeleting,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  CustomButton(
-                    onPressed: _isDeleting
-                        ? null
-                        : () {
-                            _handleDeleteConfirmation();
-                          },
-                    buttonText: 'Hapus Data',
-                    backgroundColor: red,
-                    textStyle: semibold16.copyWith(color: white),
-                    textColor: white,
-                    isLoading: _isDeleting,
-                  ),
-                ],
-              ),
-            ),
+                ),
     );
   }
 
