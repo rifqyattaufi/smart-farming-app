@@ -36,6 +36,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
   // State untuk Statistik Harian (Overview Card)
   Map<String, dynamic>? _statistikHarianData;
+  // ignore: unused_field
   bool _isLoadingStatistikHarian = true;
   String? _statistikHarianErrorMessage;
 
@@ -53,6 +54,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'laporanNutrisi': ChartDataState<List<dynamic>>(),
     'laporanVitamin': ChartDataState<List<dynamic>>(),
     'laporanDisinfektan': ChartDataState<List<dynamic>>(),
+    'laporanPanen': ChartDataState<List<dynamic>>(),
+    'panenKomoditas': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
@@ -61,6 +64,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'sakit': RiwayatDataState<List<dynamic>>(),
     'mati': RiwayatDataState<List<dynamic>>(),
     'nutrisi': RiwayatDataState<List<dynamic>>(),
+    'panen': RiwayatDataState<List<dynamic>>(),
   };
   // --- End Unified State ---
 
@@ -301,6 +305,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
               chartKey != 'laporanNutrisi' &&
               chartKey != 'laporanVitamin' &&
               chartKey != 'laporanDisinfektan' &&
+              chartKey != 'laporanPanen' &&
               _chartStates['laporanHarian']!.xLabels.isNotEmpty) {
             finalXLabels =
                 List<String>.from(_chartStates['laporanHarian']!.xLabels);
@@ -489,7 +494,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           valueKey: 'jumlahPemberianVitamin',
           groupBy: groupBy,
           defaultErrorMessage:
-              'Gagal memuat statistik laporan pemberian vaksin',
+              'Gagal memuat statistik laporan pemberian vitamin',
           fetchFunction: (gb, start, end) =>
               _reportService.getStatistikPemberianVitamin(
                   jenisBudidayaId: widget.idTanaman!,
@@ -523,12 +528,39 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   endDate: end,
                   groupBy: gb),
         ),
+        _fetchAndProcessChartData(
+          chartKey: 'laporanPanen',
+          valueKey: 'jumlahLaporanPanenTanaman',
+          groupBy: groupBy,
+          defaultErrorMessage: 'Gagal memuat statistik laporan panen',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikLaporanPanenTanaman(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end,
+                  groupBy: gb),
+        ),
+        _fetchAndProcessChartData(
+          chartKey: 'panenKomoditas',
+          valueKey: 'totalPanen',
+          groupBy: 'day',
+          fetchFunction: (gb, start, end) =>
+              _reportService.getStatistikJumlahPanenTanaman(
+                  jenisBudidayaId: widget.idTanaman!,
+                  startDate: start,
+                  endDate: end),
+        ),
+        // _fetchAndProcessRiwayatData(
+        //     riwayatKey: 'umum',
+        //     defaultErrorMessage: 'Gagal memuat riwayat pelaporan umum',
+        //     fetchFunction: () =>
+        //         _reportService.getRiwayatLaporanUmumJenisBudidaya(
+        //             jenisBudidayaId: widget.idTanaman!, limit: 3, page: 1)),
         _fetchAndProcessRiwayatData(
             riwayatKey: 'umum',
             defaultErrorMessage: 'Gagal memuat riwayat pelaporan umum',
-            fetchFunction: () =>
-                _reportService.getRiwayatLaporanUmumJenisBudidaya(
-                    jenisBudidayaId: widget.idTanaman!, limit: 3, page: 1)),
+            fetchFunction: () => _reportService.getRiwayatLaporanHarianTanaman(
+                jenisBudidayaId: widget.idTanaman!, limit: 5, page: 1)),
         _fetchAndProcessRiwayatData(
             riwayatKey: 'sakit',
             defaultErrorMessage: 'Gagal memuat riwayat pelaporan sakit',
@@ -560,6 +592,11 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     limit: 5,
                     page: 1,
                     tipeNutrisi: 'pupuk,vitamin,disinfektan')),
+        _fetchAndProcessRiwayatData(
+            riwayatKey: 'panen',
+            defaultErrorMessage: 'Gagal memuat riwayat pelaporan panen',
+            fetchFunction: () => _reportService.getRiwayatPelaporanPanenTanaman(
+                jenisBudidayaId: widget.idTanaman!, limit: 5, page: 1)),
       ]);
     } catch (e) {
       if (mounted) {
@@ -831,100 +868,186 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     if (_selectedChartDateRange == null) {
       return "Silakan pilih rentang tanggal untuk melihat rangkuman statistik.";
     }
-    final DateFormat rangeFormatter = DateFormat('d MMM yyyy');
-    final String startDateFormatted =
-        rangeFormatter.format(_selectedChartDateRange!.start);
-    final String endDateFormatted =
-        rangeFormatter.format(_selectedChartDateRange!.end);
-    final StringBuffer summary = StringBuffer(
-        "Berdasarkan statistik pelaporan pada periode $startDateFormatted hingga $endDateFormatted:\n\n");
 
-    // Helper sub-functions
-    String getChartSummary(
-        String chartKey, String valueKey, String entityName, String unit) {
-      final state = _chartStates[chartKey]!;
-      if (state.isLoading) return "Statistik $entityName sedang dimuat...\n\n";
-      if (state.error != null) {
-        return "Tidak dapat memuat statistik $entityName: ${state.error}\n\n";
-      }
-      if (state.dataPoints.isEmpty) {
-        return "Tidak ada data $entityName untuk periode ini.\n\n";
-      }
+    final range = _selectedChartDateRange!;
+    final dfDay = DateFormat('d');
+    final dfMonthYear = DateFormat('d MMMM yyyy');
+    final dfFull = DateFormat('d MMMM yyyy');
+    String displayRange;
 
-      num total = state.dataPoints
-          .fold(0, (prev, curr) => prev + ((curr[valueKey] as num?) ?? 0));
-      String text = "Telah diterima total $total $unit $entityName. ";
-      if ((_selectedChartFilterType == ChartFilterType.weekly ||
-              _selectedChartFilterType == ChartFilterType.custom) &&
-          state.dataPoints.isNotEmpty) {
-        double average = total / state.dataPoints.length;
-        text +=
-            "Dengan rata-rata ${average.toStringAsFixed(1)} $unit per hari. ";
-        if (chartKey == 'laporanHarian') {
-          // Min/Max specific for laporanHarian
-          try {
-            final minItem = state.dataPoints.reduce((c, n) =>
-                ((c[valueKey] as num?) ?? double.infinity) <
-                        ((n[valueKey] as num?) ?? double.infinity)
-                    ? c
-                    : n);
-            final maxItem = state.dataPoints.reduce((c, n) =>
-                ((c[valueKey] as num?) ?? double.negativeInfinity) >
-                        ((n[valueKey] as num?) ?? double.negativeInfinity)
-                    ? c
-                    : n);
-            final DateFormat dayMonthFormatter = DateFormat('d MMMM');
-            String minDay =
-                dayMonthFormatter.format(DateTime.parse(minItem['period']));
-            String maxDay =
-                dayMonthFormatter.format(DateTime.parse(maxItem['period']));
-            text +=
-                "Pelaporan terendah pada tanggal $minDay (${minItem[valueKey]}) dan tertinggi pada $maxDay (${maxItem[valueKey]}).";
-          } catch (e) {
-            text += "Detail hari terendah/tertinggi tidak dapat ditampilkan.";
-          }
-        }
-      }
-      return "$text\n\n";
-    }
-
-    summary.write(getChartSummary(
-        'laporanHarian', 'jumlahLaporan', 'laporan harian', 'laporan'));
-
-    if (_isLoadingStatistikHarian) {
-      summary.write("Statistik tinggi tanaman sedang dimuat...\n\n");
-    } else if (_statistikHarianData != null &&
-        _statistikHarianData!['detailTanaman'] != null) {
-      final List<dynamic> listDetailTanaman =
-          _statistikHarianData!['detailTanaman'] as List<dynamic>;
-      List<double> tinggiTanamanValues = listDetailTanaman
-          .whereType<Map<String, dynamic>>()
-          .where((t) => t['tinggiTanaman'] != null && t['tinggiTanaman'] is num)
-          .map((t) => (t['tinggiTanaman'] as num).toDouble())
-          .toList();
-      if (tinggiTanamanValues.isNotEmpty) {
-        double totalTinggi = tinggiTanamanValues.reduce((a, b) => a + b);
-        double rataRataTinggi = totalTinggi / tinggiTanamanValues.length;
-        summary.write(
-            "Rata-rata tinggi tanaman yang dilaporkan adalah ${rataRataTinggi.toStringAsFixed(1)} cm. ");
+    if (range.start.year == range.end.year) {
+      if (range.start.month == range.end.month) {
+        // Contoh: 2 - 8 Juni 2025
+        displayRange =
+            "${dfDay.format(range.start)} - ${dfMonthYear.format(range.end)}";
       } else {
-        summary.write(
-            "Tidak ada data tinggi tanaman yang valid untuk dihitung rata-ratanya. ");
+        // Contoh: 1 Januari - 30 Juni 2025
+        displayRange =
+            "${DateFormat('d MMMM').format(range.start)} - ${dfFull.format(range.end)}";
       }
-      summary.write("\n\n");
+    } else {
+      // Contoh: 1 Januari 2024 - 30 Juni 2025
+      displayRange =
+          "${dfFull.format(range.start)} - ${dfFull.format(range.end)}";
     }
 
-    summary.write(getChartSummary(
-        'penyiraman', 'jumlahPenyiraman', 'penyiraman tanaman', 'kali'));
-    summary.write(getChartSummary(
-        'nutrisi', 'jumlahKejadianPemberianPupuk', 'pemberian pupuk', 'kali'));
-    summary
-        .write(getChartSummary('pruning', 'jumlahPruning', 'pruning', 'kali'));
-    summary.write(
-        getChartSummary('repotting', 'jumlahRepotting', 'repotting', 'kali'));
+    final StringBuffer summary = StringBuffer(
+        "Berdasarkan statistik pelaporan pada tanggal $displayRange, ");
+
+    final laporanHarianState = _chartStates['laporanHarian']!;
+    if (laporanHarianState.isLoading) {
+      return "Memuat rangkuman statistik...";
+    }
+    if (laporanHarianState.error != null) {
+      return "Tidak dapat memuat rangkuman karena terjadi kesalahan pada data laporan harian.";
+    }
+    if (laporanHarianState.dataPoints.isEmpty) {
+      summary.write("tidak ditemukan adanya aktivitas pelaporan.\n\n");
+    } else {
+      num totalLaporan = laporanHarianState.dataPoints.fold(
+          0, (prev, curr) => prev + ((curr['jumlahLaporan'] as num?) ?? 0));
+      // Menghitung jumlah hari aktual dalam rentang yang dipilih
+      final int daysInPeriod = range.end.difference(range.start).inDays + 1;
+      double avgLaporan = totalLaporan / daysInPeriod; // Pembagi diubah
+      summary.write(
+          "telah dilakukan perawatan dan pelaporan harian dengan rata-rata ${avgLaporan.toStringAsFixed(1)} laporan per hari.\n\n");
+
+      final minMaxLaporan =
+          _findMinMaxDays(laporanHarianState.dataPoints, 'jumlahLaporan');
+      // Gunakan helper yang sudah diperbaiki
+      final String minDaysText =
+          _formatConsecutiveDates(minMaxLaporan['minDays']);
+      final String maxDaysText =
+          _formatConsecutiveDates(minMaxLaporan['maxDays']);
+
+      if (minDaysText.isNotEmpty && maxDaysText.isNotEmpty) {
+        summary.write(
+            "Hari dengan pelaporan terendah pada tanggal $minDaysText (${minMaxLaporan['minValue']} laporan) dan hari dengan pelaporan terbanyak pada tanggal $maxDaysText (${minMaxLaporan['maxValue']} laporan).\n\n");
+      }
+    }
+
+    final penyiramanState = _chartStates['penyiraman']!;
+    final pruningState = _chartStates['pruning']!;
+    final repottingState = _chartStates['repotting']!;
+    final nutrisiState = _chartStates['nutrisi']!;
+
+    if (!penyiramanState.isLoading && penyiramanState.dataPoints.isNotEmpty) {
+      num totalPenyiraman = penyiramanState.dataPoints.fold(
+          0, (prev, curr) => prev + ((curr['jumlahPenyiraman'] as num?) ?? 0));
+      final int daysInPeriod = range.end.difference(range.start).inDays + 1;
+      double avgPenyiraman = totalPenyiraman / daysInPeriod;
+      summary.write(
+          "Frekuensi penyiraman tanaman terjadi $totalPenyiraman kali dengan rata-rata ${avgPenyiraman.toStringAsFixed(1)} kali per hari. ");
+    }
+
+    if (!pruningState.isLoading && pruningState.dataPoints.isNotEmpty) {
+      num totalPruning = pruningState.dataPoints.fold(
+          0, (prev, curr) => prev + ((curr['jumlahPruning'] as num?) ?? 0));
+      final int daysInPeriod = range.end.difference(range.start).inDays + 1;
+      double avgPruning = totalPruning / daysInPeriod;
+      summary.write(
+          "Kemudian, frekuensi pruning tanaman terjadi $totalPruning kali dengan rata-rata ${avgPruning.toStringAsFixed(1)} kali per hari.\n\n");
+    }
+
+    if (!repottingState.isLoading && repottingState.dataPoints.isNotEmpty) {
+      num totalRepotting = repottingState.dataPoints.fold(
+          0, (prev, curr) => prev + ((curr['jumlahRepotting'] as num?) ?? 0));
+      final int daysInPeriod = range.end.difference(range.start).inDays + 1;
+      double avgRepotting = totalRepotting / daysInPeriod;
+      summary.write(
+          "Frekuensi repotting tanaman terjadi $totalRepotting kali dengan rata-rata ${avgRepotting.toStringAsFixed(1)} kali per hari.\n\n");
+    }
+
+    if (!nutrisiState.isLoading && nutrisiState.dataPoints.isNotEmpty) {
+      num totalNutrisi = nutrisiState.dataPoints.fold(
+          0,
+          (prev, curr) =>
+              prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0));
+      final int daysInPeriod = range.end.difference(range.start).inDays + 1;
+      double avgNutrisi = totalNutrisi / daysInPeriod;
+      summary.write(
+          "Frekuensi pemberian nutrisi tanaman terjadi $totalNutrisi kali dengan rata-rata ${avgNutrisi.toStringAsFixed(1)} kali per hari.\n\n");
+    }
+
+    final sakitState = _chartStates['laporanSakit']!;
+    final matiState = _chartStates['laporanMati']!;
+    final vitaminState = _chartStates['laporanVitamin']!;
+    final pupukState = _chartStates['laporanNutrisi']!;
+    final disinfektanState = _chartStates['laporanDisinfektan']!;
+    final panenState = _chartStates['laporanPanen']!;
+
+    num totalSakit = !sakitState.isLoading
+        ? sakitState.dataPoints.fold(
+            0, (prev, curr) => prev + ((curr['jumlahSakit'] as num?) ?? 0))
+        : 0;
+    num totalMati = !matiState.isLoading
+        ? matiState.dataPoints.fold(
+            0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0))
+        : 0;
+    num totalVitamin = !vitaminState.isLoading
+        ? vitaminState.dataPoints.fold(
+            0,
+            (prev, curr) =>
+                prev + ((curr['jumlahPemberianVitamin'] as num?) ?? 0))
+        : 0;
+    num totalNutrisi = !pupukState.isLoading
+        ? pupukState.dataPoints.fold(
+            0,
+            (prev, curr) =>
+                prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0))
+        : 0;
+    num totalDisinfektan = !disinfektanState.isLoading
+        ? disinfektanState.dataPoints.fold(
+            0,
+            (prev, curr) =>
+                prev + ((curr['jumlahPemberianDisinfektan'] as num?) ?? 0))
+        : 0;
+    num totalPanen = !panenState.isLoading
+        ? panenState.dataPoints.fold(
+            0,
+            (prev, curr) =>
+                prev + ((curr['jumlahLaporanPanenTanaman'] as num?) ?? 0))
+        : 0;
+
+    final List<String> attentionItems = [];
+    if (totalSakit > 0) {
+      attentionItems.add("$totalSakit laporan tanaman sakit");
+    }
+    if (totalMati > 0) {
+      attentionItems.add("$totalMati laporan kematian tanaman");
+    }
+    if (totalVitamin > 0) {
+      attentionItems.add("$totalVitamin laporan pemberian vitamin");
+    }
+    if (totalNutrisi > 0) {
+      attentionItems.add("$totalNutrisi laporan pemberian nutrisi");
+    }
+    if (totalDisinfektan > 0) {
+      attentionItems.add("$totalDisinfektan laporan pemberian disinfektan");
+    }
+    if (totalPanen > 0) {
+      attentionItems.add("$totalPanen laporan panen tanaman");
+    }
+
+    if (attentionItems.isNotEmpty) {
+      summary
+          .write("Perlu menjadi perhatian, selama periode ini tercatat ada ");
+      if (attentionItems.length == 1) {
+        summary.write(attentionItems.first);
+      } else if (attentionItems.length == 2) {
+        summary.write("${attentionItems.first} dan ${attentionItems.last}");
+      } else {
+        final lastItem = attentionItems.removeLast();
+        summary.write("${attentionItems.join(', ')}, dan $lastItem");
+      }
+      summary.write(".\n\n");
+    }
 
     summary.write(
-        "Catatan: Statistik di atas berdasarkan data yang tersedia dan dapat berubah seiring waktu. Pastikan untuk melakukan pemantauan rutin terhadap kesehatan tanaman Anda.");
+        "Bukti pelaporan dapat dilihat pada detail riwayat di setiap tab terkait.");
+
+    summary.write(
+        "\n\nCatatan: Statistik di atas berdasarkan data yang tersedia dan dapat berubah seiring waktu. Pastikan untuk melakukan pemantauan rutin terhadap kesehatan tanaman.");
     return summary.toString().trim();
   }
 
@@ -972,14 +1095,23 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayDate: formatDisplayDate,
                     formatDisplayTime: formatDisplayTime,
                   ),
-                  const PanenTab(),
+                  PanenTab(
+                    laporanPanenState: _chartStates['laporanPanen']!,
+                    panenKomoditasState: _chartStates['panenKomoditas']!,
+                    riwayatPanenState: _riwayatStates['panen']!,
+                    onDateIconPressed: _showDateFilterDialog,
+                    selectedChartFilterType: _selectedChartFilterType,
+                    formattedDisplayedDateRange: formattedDisplayedDateRange,
+                    onChartFilterTypeChanged: _handleChartFilterTypeChanged,
+                    formatDisplayDate: formatDisplayDate,
+                    formatDisplayTime: formatDisplayTime,
+                  ),
                   HarianTab(
                     laporanHarianState: _chartStates['laporanHarian']!,
                     penyiramanState: _chartStates['penyiraman']!,
                     nutrisiState: _chartStates['nutrisi']!,
                     pruningState: _chartStates['pruning']!,
                     repottingState: _chartStates['repotting']!,
-                    isLoadingStatistikHarian: _isLoadingStatistikHarian,
                     statistikHarianErrorMessage: _statistikHarianErrorMessage,
                     statistikHarianData: _statistikHarianData,
                     onDateIconPressed: _showDateFilterDialog,
@@ -992,10 +1124,6 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     riwayatPupukState: _riwayatStates['pupuk']!,
                     formatDisplayDate: formatDisplayDate,
                     formatDisplayTime: formatDisplayTime,
-                    onRiwayatPelaporanUmumItemTap:
-                        (tappedContext, tappedItem) {},
-                    onRiwayatPemberianPupukItemTap:
-                        (tappedContext, tappedItem) {},
                   ),
                   SakitTab(
                     laporanSakitState: _chartStates['laporanSakit']!,

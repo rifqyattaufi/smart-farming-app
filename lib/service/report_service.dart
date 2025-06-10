@@ -638,6 +638,55 @@ class ReportService {
     }
   }
 
+  Future<Map<String, dynamic>> getRiwayatLaporanHarianTanaman({
+    required String jenisBudidayaId,
+    int limit = 5,
+    int page = 1,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'limit': limit.toString(),
+      'page': page.toString(),
+    };
+
+    final url = Uri.parse(
+            '$baseUrl/history/harian-tanaman/jenis-budidaya/$jenisBudidayaId')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200 && body['status'] == true) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+          'currentPage': body['currentPage'] ?? 1,
+          'totalPages': body['totalPages'] ?? 1,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getRiwayatLaporanHarianTanaman(
+            jenisBudidayaId: jenisBudidayaId, limit: limit, page: page);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load general report history',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> getRiwayatLaporanSakitJenisBudidaya({
     required String jenisBudidayaId,
     int limit = 5,
@@ -1127,4 +1176,150 @@ class ReportService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> getStatistikLaporanPanenTanaman({
+    required String jenisBudidayaId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String groupBy,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'startDate': DateFormat('yyyy-MM-dd').format(startDate),
+      'endDate': DateFormat('yyyy-MM-dd').format(endDate),
+      'groupBy': groupBy,
+    };
+    final url = Uri.parse('$baseUrl/statistik-panen-kebun/$jenisBudidayaId')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getStatistikLaporanPanenTanaman(
+            jenisBudidayaId: jenisBudidayaId,
+            startDate: startDate,
+            endDate: endDate,
+            groupBy: groupBy);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load statistics',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getRiwayatPelaporanPanenTanaman({
+    required String jenisBudidayaId,
+    int limit = 5,
+    int page = 1,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'limit': limit.toString(),
+      'page': page.toString(),
+    };
+
+    final url = Uri.parse(
+            '$baseUrl/history/panen-tanaman/jenis-budidaya/$jenisBudidayaId')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200 && body['status'] == true) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+          'currentPage': body['currentPage'] ?? 1,
+          'totalPages': body['totalPages'] ?? 1,
+          'totalItems': body['totalItems'] ?? 0,
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getRiwayatPelaporanPanenTanaman(
+            jenisBudidayaId: jenisBudidayaId, limit: limit, page: page);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load general report history',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getStatistikJumlahPanenTanaman({
+    required String jenisBudidayaId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final queryParams = {
+      'startDate': DateFormat('yyyy-MM-dd').format(startDate),
+      'endDate': DateFormat('yyyy-MM-dd').format(endDate),
+    };
+    final url =
+        Uri.parse('$baseUrl/statistik/jumlah-panen-kebun/$jenisBudidayaId')
+            .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getStatistikJumlahPanenTanaman(
+            jenisBudidayaId: jenisBudidayaId,
+            startDate: startDate,
+            endDate: endDate);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load statistics',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
+
 }

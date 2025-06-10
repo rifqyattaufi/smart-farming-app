@@ -51,7 +51,6 @@ import 'package:smart_farming_app/screen/notifications/detail_notif_screen.dart'
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_mati_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_nutrisi_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_ternak_screen.dart';
