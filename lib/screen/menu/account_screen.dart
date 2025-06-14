@@ -49,7 +49,6 @@ class _AccountScreenState extends State<AccountScreen> {
       _userRole = role;
     });
 
-    // Initialize base report items
     report = [
       {
         'text': 'Kebijakan Privasi',
@@ -80,10 +79,10 @@ class _AccountScreenState extends State<AccountScreen> {
             'text': 'Manajemen Grade Hasil Panen',
             'onTap': () => context.push('/manajemen-grade'),
           },
-          {
-            'text': 'Log Aktivitas',
-            'onTap': () => context.push('/log-aktivitas'),
-          }
+          // {
+          //   'text': 'Log Aktivitas',
+          //   'onTap': () => context.push('/log-aktivitas'),
+          // }
         ]);
       });
     }
