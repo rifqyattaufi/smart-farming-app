@@ -164,21 +164,23 @@ class _OtpScreenState extends State<OtpScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomButton(
-          buttonText: 'Verifikasi',
-          onPressed: _isLoading
-              ? null
-              : () {
-                  // Disable button while loading
-                  final otp = _otpKey.currentState?.getOtp() ?? '';
-                  _checkOtp(otp);
-                },
-          backgroundColor: green1,
-          textStyle: semibold16.copyWith(color: white),
-          textColor: white,
-          isLoading: _isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            buttonText: 'Verifikasi',
+            onPressed: _isLoading
+                ? null
+                : () {
+                    // Disable button while loading
+                    final otp = _otpKey.currentState?.getOtp() ?? '';
+                    _checkOtp(otp);
+                  },
+            backgroundColor: green1,
+            textStyle: semibold16.copyWith(color: white),
+            textColor: white,
+            isLoading: _isLoading,
+          ),
         ),
       ),
     );

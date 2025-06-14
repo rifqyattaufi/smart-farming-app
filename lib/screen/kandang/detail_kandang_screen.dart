@@ -327,59 +327,61 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
       ),
       bottomNavigationBar: _userRole != 'pjawab'
           ? null
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomButton(
-                    onPressed: () {
-                      context.push('/tambah-kandang',
-                          extra: AddKandangScreen(
-                            isEdit: true,
-                            idKandang: widget.idKandang,
-                            onKandangAdded: () => _fetchData(),
-                          ));
-                    },
-                    buttonText: 'Ubah Data',
-                    backgroundColor: yellow2,
-                    textStyle: semibold16,
-                    textColor: white,
-                  ),
-                  const SizedBox(height: 12), // Jarak antara tombol
-                  CustomButton(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Konfirmasi'),
-                          content: const Text(
-                              'Apakah Anda yakin ingin menghapus kandang ini?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Batal'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Hapus'),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (confirm == true) {
-                        await _deleteData();
-                      }
-                    },
-                    buttonText: 'Hapus Data',
-                    backgroundColor: red,
-                    textStyle: semibold16,
-                    textColor: white,
-                  ),
-                ],
+          : SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomButton(
+                      onPressed: () {
+                        context.push('/tambah-kandang',
+                            extra: AddKandangScreen(
+                              isEdit: true,
+                              idKandang: widget.idKandang,
+                              onKandangAdded: () => _fetchData(),
+                            ));
+                      },
+                      buttonText: 'Ubah Data',
+                      backgroundColor: yellow2,
+                      textStyle: semibold16,
+                      textColor: white,
+                    ),
+                    const SizedBox(height: 12), // Jarak antara tombol
+                    CustomButton(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Konfirmasi'),
+                            content: const Text(
+                                'Apakah Anda yakin ingin menghapus kandang ini?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Batal'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Hapus'),
+                              ),
+                            ],
+                          ),
+                        );
+            
+                        if (confirm == true) {
+                          await _deleteData();
+                        }
+                      },
+                      buttonText: 'Hapus Data',
+                      backgroundColor: red,
+                      textStyle: semibold16,
+                      textColor: white,
+                    ),
+                  ],
+                ),
               ),
-            ),
+          ),
     );
   }
 

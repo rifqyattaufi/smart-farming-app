@@ -934,43 +934,45 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomButton(
-              onPressed: () {
-                if (_inventarisDetails != null) {
-                  context.push('/tambah-inventaris',
-                      extra: AddInventarisScreen(
-                        onInventarisAdded: () => _fetchInitialData(),
-                        isEdit: true,
-                        idInventaris: widget.idInventaris,
-                        inventarisData: _inventarisDetails,
-                      ));
-                } else {
-                  showAppToast(context, 'Data inventaris tidak ditemukan');
-                }
-              },
-              buttonText: 'Ubah Data',
-              backgroundColor: yellow2,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-            const SizedBox(height: 12),
-            CustomButton(
-              onPressed: _isDeleting
-                  ? null
-                  : () {
-                      _handleDeleteConfirmation();
-                    },
-              buttonText: _isDeleting ? 'Menghapus...' : 'Hapus Data',
-              backgroundColor: red,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-          ],
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomButton(
+                onPressed: () {
+                  if (_inventarisDetails != null) {
+                    context.push('/tambah-inventaris',
+                        extra: AddInventarisScreen(
+                          onInventarisAdded: () => _fetchInitialData(),
+                          isEdit: true,
+                          idInventaris: widget.idInventaris,
+                          inventarisData: _inventarisDetails,
+                        ));
+                  } else {
+                    showAppToast(context, 'Data inventaris tidak ditemukan');
+                  }
+                },
+                buttonText: 'Ubah Data',
+                backgroundColor: yellow2,
+                textStyle: semibold16,
+                textColor: white,
+              ),
+              const SizedBox(height: 12),
+              CustomButton(
+                onPressed: _isDeleting
+                    ? null
+                    : () {
+                        _handleDeleteConfirmation();
+                      },
+                buttonText: _isDeleting ? 'Menghapus...' : 'Hapus Data',
+                backgroundColor: red,
+                textStyle: semibold16,
+                textColor: white,
+              ),
+            ],
+          ),
         ),
       ),
     );

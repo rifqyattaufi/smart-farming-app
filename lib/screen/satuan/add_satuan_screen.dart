@@ -159,14 +159,16 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomButton(
-          onPressed: _submitForm,
-          backgroundColor: green1,
-          textStyle: semibold16,
-          textColor: white,
-          isLoading: isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            onPressed: _submitForm,
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
+            isLoading: isLoading,
+          ),
         ),
       ),
     );

@@ -514,15 +514,17 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                 ),
               ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomButton(
-          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Inventaris',
-          onPressed: _submitForm,
-          backgroundColor: green1,
-          textStyle: semibold16,
-          textColor: white,
-          isLoading: _isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Inventaris',
+            onPressed: _submitForm,
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
+            isLoading: _isLoading,
+          ),
         ),
       ),
     );

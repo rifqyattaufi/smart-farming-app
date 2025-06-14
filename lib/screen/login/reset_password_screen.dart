@@ -184,15 +184,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: CustomButton(
-            buttonText: 'Reset Password',
-            onPressed: _submitForm,
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            isLoading: _isLoading,
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomButton(
+              buttonText: 'Reset Password',
+              onPressed: _submitForm,
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              isLoading: _isLoading,
+            ),
           ),
         ));
   }

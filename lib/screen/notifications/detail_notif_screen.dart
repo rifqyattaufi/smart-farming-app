@@ -142,68 +142,70 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
                 ),
               ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomButton(
-              onPressed: () {
-                context
-                    .push('/add-global-notification',
-                        extra: AddGlobalNotification(
-                          isUpdate: true,
-                          id: widget.id,
-                        ))
-                    .then((value) {
-                  fetchData();
-                });
-              },
-              buttonText: "Ubah Data",
-              backgroundColor: yellow2,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-            const SizedBox(height: 12),
-            CustomButton(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Konfirmasi"),
-                      content: const Text(
-                          "Apakah Anda yakin ingin menghapus notifikasi ini?"),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text("Batal"),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text("Hapus"),
-                        ),
-                      ],
-                    );
-                  },
-                );
-                if (confirm == true) {
-                  await _globalNotificationService
-                      .deleteGlobalNotification(widget.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notifikasi berhasil dihapus'),
-                    ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomButton(
+                onPressed: () {
+                  context
+                      .push('/add-global-notification',
+                          extra: AddGlobalNotification(
+                            isUpdate: true,
+                            id: widget.id,
+                          ))
+                      .then((value) {
+                    fetchData();
+                  });
+                },
+                buttonText: "Ubah Data",
+                backgroundColor: yellow2,
+                textStyle: semibold16,
+                textColor: white,
+              ),
+              const SizedBox(height: 12),
+              CustomButton(
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Konfirmasi"),
+                        content: const Text(
+                            "Apakah Anda yakin ingin menghapus notifikasi ini?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text("Batal"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text("Hapus"),
+                          ),
+                        ],
+                      );
+                    },
                   );
-                  context.pop();
-                }
-              },
-              buttonText: "Hapus Data",
-              backgroundColor: red,
-              textStyle: semibold16,
-              textColor: white,
-            ),
-          ],
+                  if (confirm == true) {
+                    await _globalNotificationService
+                        .deleteGlobalNotification(widget.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Notifikasi berhasil dihapus'),
+                      ),
+                    );
+                    context.pop();
+                  }
+                },
+                buttonText: "Hapus Data",
+                backgroundColor: red,
+                textStyle: semibold16,
+                textColor: white,
+              ),
+            ],
+          ),
         ),
       ),
     );

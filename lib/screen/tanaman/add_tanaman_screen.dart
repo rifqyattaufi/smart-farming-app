@@ -383,15 +383,17 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                 ),
               ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomButton(
-          onPressed: _submitForm,
-          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
-          backgroundColor: green1,
-          textStyle: semibold16.copyWith(color: white),
-          textColor: white,
-          isLoading: _isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            onPressed: _submitForm,
+            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
+            backgroundColor: green1,
+            textStyle: semibold16.copyWith(color: white),
+            textColor: white,
+            isLoading: _isLoading,
+          ),
         ),
       ),
     );

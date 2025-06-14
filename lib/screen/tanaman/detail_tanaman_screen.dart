@@ -367,49 +367,51 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
       bottomNavigationBar:
           _isLoading || _tanaman == null || _userRole != 'pjawab'
               ? null
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomButton(
-                        onPressed: () {
-                          if (widget.idTanaman != null) {
-                            context
-                                .push(
-                                  '/tambah-tanaman',
-                                  extra: AddTanamanScreen(
-                                    onTanamanAdded: () {
-                                      _fetchData();
-                                    },
-                                    isEdit: true,
-                                    idTanaman: widget.idTanaman,
-                                  ),
-                                )
-                                .then((value) {});
-                          }
-                        },
-                        buttonText: 'Ubah Data',
-                        backgroundColor: yellow2,
-                        textStyle: semibold16.copyWith(color: white),
-                        textColor: white,
-                      ),
-                      const SizedBox(height: 12),
-                      CustomButton(
-                        onPressed: _isDeleting
-                            ? null
-                            : () {
-                                _handleDeleteConfirmation();
-                              },
-                        buttonText: 'Hapus Data',
-                        backgroundColor: red,
-                        textStyle: semibold16.copyWith(color: white),
-                        textColor: white,
-                        isLoading: _isDeleting,
-                      ),
-                    ],
+              : SafeArea(
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CustomButton(
+                          onPressed: () {
+                            if (widget.idTanaman != null) {
+                              context
+                                  .push(
+                                    '/tambah-tanaman',
+                                    extra: AddTanamanScreen(
+                                      onTanamanAdded: () {
+                                        _fetchData();
+                                      },
+                                      isEdit: true,
+                                      idTanaman: widget.idTanaman,
+                                    ),
+                                  )
+                                  .then((value) {});
+                            }
+                          },
+                          buttonText: 'Ubah Data',
+                          backgroundColor: yellow2,
+                          textStyle: semibold16.copyWith(color: white),
+                          textColor: white,
+                        ),
+                        const SizedBox(height: 12),
+                        CustomButton(
+                          onPressed: _isDeleting
+                              ? null
+                              : () {
+                                  _handleDeleteConfirmation();
+                                },
+                          buttonText: 'Hapus Data',
+                          backgroundColor: red,
+                          textStyle: semibold16.copyWith(color: white),
+                          textColor: white,
+                          isLoading: _isDeleting,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+              ),
     );
   }
 

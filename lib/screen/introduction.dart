@@ -108,27 +108,29 @@ class _IntroductionState extends State<Introduction> {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SizedBox(
-          width: double.infinity,
-          child: CustomButton(
-            buttonText: _currentPage == 2 ? 'Masuk' : 'Selanjutnya',
-            onPressed: () {
-              if (_currentPage < 2) {
-                _currentPage++;
-                _pageController.animateToPage(
-                  _currentPage,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              } else {
-                context.push('/login');
-              }
-            },
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            width: double.infinity,
+            child: CustomButton(
+              buttonText: _currentPage == 2 ? 'Masuk' : 'Selanjutnya',
+              onPressed: () {
+                if (_currentPage < 2) {
+                  _currentPage++;
+                  _pageController.animateToPage(
+                    _currentPage,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                } else {
+                  context.push('/login');
+                }
+              },
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+            ),
           ),
         ),
       ),

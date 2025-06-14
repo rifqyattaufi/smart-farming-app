@@ -155,14 +155,16 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CustomButton(
-          onPressed: _submitForm,
-          buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Jenis Hama',
-          backgroundColor: green1,
-          textStyle: semibold16.copyWith(color: white),
-          isLoading: _isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: CustomButton(
+            onPressed: _submitForm,
+            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Jenis Hama',
+            backgroundColor: green1,
+            textStyle: semibold16.copyWith(color: white),
+            isLoading: _isLoading,
+          ),
         ),
       ),
     );

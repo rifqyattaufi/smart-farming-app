@@ -197,68 +197,70 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
       ),
       bottomNavigationBar: _isLoading
           ? null
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.id != null) ...[
-                    if (userData?['isActive'])
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: deactivateUser,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: red),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.id != null) ...[
+                      if (userData?['isActive'])
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: deactivateUser,
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          label: Text(
-                            'Deaktivasi Pengguna',
-                            style: semibold16.copyWith(color: red),
+                            label: Text(
+                              'Deaktivasi Pengguna',
+                              style: semibold16.copyWith(color: red),
+                            ),
                           ),
                         ),
-                      ),
-                    if (!userData!['isActive'])
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: _activateUser,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: green1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                      if (!userData!['isActive'])
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _activateUser,
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: green1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          label: Text(
-                            'Aktifkan Pengguna',
-                            style: semibold16.copyWith(color: green1),
+                            label: Text(
+                              'Aktifkan Pengguna',
+                              style: semibold16.copyWith(color: green1),
+                            ),
                           ),
                         ),
-                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    CustomButton(
+                      onPressed: () {
+                        context
+                            .push('/tambah-pengguna',
+                                extra: AddUserScreen(
+                                  id: widget.id,
+                                  isEdit: true,
+                                ))
+                            .then((_) {
+                          _fetchData();
+                        });
+                      },
+                      buttonText: 'Ubah Data',
+                      backgroundColor: yellow2,
+                      textStyle: semibold16,
+                      textColor: white,
+                    ),
                   ],
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    onPressed: () {
-                      context
-                          .push('/tambah-pengguna',
-                              extra: AddUserScreen(
-                                id: widget.id,
-                                isEdit: true,
-                              ))
-                          .then((_) {
-                        _fetchData();
-                      });
-                    },
-                    buttonText: 'Ubah Data',
-                    backgroundColor: yellow2,
-                    textStyle: semibold16,
-                    textColor: white,
-                  ),
-                ],
+                ),
               ),
             ),
     );

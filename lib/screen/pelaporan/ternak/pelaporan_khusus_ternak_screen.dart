@@ -141,16 +141,18 @@ class _PelaporanKhususTernakScreenState
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: CustomButton(
-          onPressed: () {
-            navigateBasedOnSelection();
-          },
-          buttonText: 'Selanjutnya',
-          backgroundColor: green1,
-          textStyle: semibold16,
-          textColor: white,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: CustomButton(
+            onPressed: () {
+              navigateBasedOnSelection();
+            },
+            buttonText: 'Selanjutnya',
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
+          ),
         ),
       ),
     );

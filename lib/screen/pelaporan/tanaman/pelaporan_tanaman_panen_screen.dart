@@ -729,14 +729,16 @@ class _PelaporanTanamanPanenScreenState
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: CustomButton(
-          onPressed: _submitForm,
-          backgroundColor: green1,
-          textStyle: semibold16,
-          textColor: white,
-          isLoading: _isLoading,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: CustomButton(
+            onPressed: _submitForm,
+            backgroundColor: green1,
+            textStyle: semibold16,
+            textColor: white,
+            isLoading: _isLoading,
+          ),
         ),
       ),
     );

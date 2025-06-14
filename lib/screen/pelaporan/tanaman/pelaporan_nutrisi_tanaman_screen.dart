@@ -670,16 +670,18 @@ class _PelaporanNutrisiTanamanScreenState
       ),
       bottomNavigationBar: _objekBudidayaList.isEmpty
           ? null
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: CustomButton(
-                onPressed: _submitForm,
-                backgroundColor: green1,
-                textStyle: semibold16,
-                textColor: white,
-                isLoading: _isLoading,
+          : SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: CustomButton(
+                  onPressed: _submitForm,
+                  backgroundColor: green1,
+                  textStyle: semibold16,
+                  textColor: white,
+                  isLoading: _isLoading,
+                ),
               ),
-            ),
+          ),
     );
   }
 }

@@ -368,45 +368,47 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
       bottomNavigationBar:
           _isLoading || _ternak == null || _userRole != 'pjawab'
               ? null
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomButton(
-                        onPressed: () {
-                          if (widget.idTernak != null) {
-                            context.push(
-                              '/tambah-ternak',
-                              extra: AddTernakScreen(
-                                onTernakAdded: () {
-                                  _fetchData();
+              : SafeArea(
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CustomButton(
+                          onPressed: () {
+                            if (widget.idTernak != null) {
+                              context.push(
+                                '/tambah-ternak',
+                                extra: AddTernakScreen(
+                                  onTernakAdded: () {
+                                    _fetchData();
+                                  },
+                                  isEdit: true,
+                                  idTernak: widget.idTernak,
+                                ),
+                              );
+                            }
+                          },
+                          buttonText: 'Ubah Data',
+                          backgroundColor: yellow2,
+                          textStyle: semibold16.copyWith(color: white),
+                        ),
+                        const SizedBox(height: 12),
+                        CustomButton(
+                          onPressed: _isDeleting
+                              ? null
+                              : () {
+                                  _handleDeleteConfirmation();
                                 },
-                                isEdit: true,
-                                idTernak: widget.idTernak,
-                              ),
-                            );
-                          }
-                        },
-                        buttonText: 'Ubah Data',
-                        backgroundColor: yellow2,
-                        textStyle: semibold16.copyWith(color: white),
-                      ),
-                      const SizedBox(height: 12),
-                      CustomButton(
-                        onPressed: _isDeleting
-                            ? null
-                            : () {
-                                _handleDeleteConfirmation();
-                              },
-                        buttonText: 'Hapus Data',
-                        backgroundColor: red,
-                        textStyle: semibold16.copyWith(color: white),
-                        isLoading: _isDeleting,
-                      ),
-                    ],
+                          buttonText: 'Hapus Data',
+                          backgroundColor: red,
+                          textStyle: semibold16.copyWith(color: white),
+                          isLoading: _isDeleting,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+              ),
     );
   }
 
