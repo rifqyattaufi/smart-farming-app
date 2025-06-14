@@ -21,7 +21,7 @@ class _TanamanScreenState extends State<TanamanScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final AuthService _authService = AuthService();
 
-  List<dynamic> _tanamanList = [];
+  final List<dynamic> _tanamanList = [];
   List<dynamic> _filteredTanamanList = [];
   String? _userRole;
 

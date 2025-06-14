@@ -339,7 +339,6 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
             response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
-      print('Error: $e');
       showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
           title: 'Error Tidak Terduga 😢');
     } finally {

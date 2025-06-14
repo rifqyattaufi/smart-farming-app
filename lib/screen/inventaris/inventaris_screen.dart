@@ -35,7 +35,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
   bool _isSearching = false;
 
   // Tab 0: Inventaris
-  List<dynamic> _allInventarisList = [];
+  final List<dynamic> _allInventarisList = [];
   List<dynamic> _filteredInventarisList = [];
   List<Map<String, dynamic>> _kategoriInvForFilterChip = [];
   String? _selectedKategoriInventarisId;
@@ -48,8 +48,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
   bool _hasNextSearchPageInventaris = true;
 
   // Tab 1: Hasil Panen (Komoditas)
-  List<dynamic> _komoditasPerkebunanList = [];
-  List<dynamic> _komoditasPeternakanList = [];
+  final List<dynamic> _komoditasPerkebunanList = [];
+  final List<dynamic> _komoditasPeternakanList = [];
 
   List<dynamic> _displayPerkebunanList = [];
   List<dynamic> _displayPeternakanList = [];

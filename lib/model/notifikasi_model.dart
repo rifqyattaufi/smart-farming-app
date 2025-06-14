@@ -48,7 +48,6 @@ class NotifikasiModel {
     try {
       return jsonDecode(payload!);
     } catch (e) {
-      print('Error decoding payload: $e');
       return null;
     }
   }

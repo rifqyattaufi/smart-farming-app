@@ -17,8 +17,6 @@ class JenisBudidayaService {
 
     final url = Uri.parse('$baseUrl?page=$page&limit=$limit');
 
-    print('Fetching URL (getJenisBudidaya): $url'); // Untuk debugging
-
     try {
       final response = await http.get(url, headers: headers);
       final body = json.decode(response.body);
@@ -69,8 +67,6 @@ class JenisBudidayaService {
     final headers = {'Authorization': 'Bearer $resolvedToken'};
 
     final url = Uri.parse('$baseUrl/tipe/$tipe?page=$page&limit=$limit');
-
-    print('Fetching URL (getJenisBudidayaByTipe): $url'); // Untuk debugging
 
     try {
       final response = await http.get(url, headers: headers);
@@ -171,8 +167,6 @@ class JenisBudidayaService {
     final encodedTipe = Uri.encodeComponent(tipe);
     final url = Uri.parse(
         '$baseUrl/search/$encodedQuery/$encodedTipe?page=$page&limit=$limit');
-
-    print('Fetching URL (getJenisBudidayaSearch): $url'); // Untuk debugging
 
     try {
       final response = await http.get(url, headers: headers);

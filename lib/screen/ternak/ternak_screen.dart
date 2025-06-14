@@ -21,7 +21,7 @@ class _TernakScreenState extends State<TernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final AuthService _authService = AuthService();
 
-  List<dynamic> _ternakList = [];
+  final List<dynamic> _ternakList = [];
   List<dynamic> _filteredTernakList = [];
   String? _userRole;
 

@@ -71,7 +71,6 @@ class InventarisService {
     }
 
     final url = Uri.parse(baseUrl).replace(queryParameters: queryParams);
-    print('Fetching Inventaris from URL: $url');
 
     try {
       final response = await http.get(url, headers: headers);

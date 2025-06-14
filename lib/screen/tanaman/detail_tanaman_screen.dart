@@ -327,12 +327,6 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                                 'category': 'Jumlah: ${item['jumlah'] ?? 0}',
                               };
                             }).toList(),
-                            onItemTap: (context, item) {
-                              final id = item['id'] as String?;
-                              if (id != null && id.isNotEmpty) {
-                                print("Tapped Unit Budidaya (Kebun) ID: $id");
-                              }
-                            },
                           )
                         else
                           Padding(

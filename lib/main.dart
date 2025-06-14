@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:path/path.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:smart_farming_app/screen/main_screen_petugas.dart';
 import 'package:toastification/toastification.dart';
@@ -101,13 +100,6 @@ import 'package:smart_farming_app/service/fcm_service.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  print("Handling a background message ID: ${message.messageId}");
-  print('Message data: ${message.data}');
-  if (message.notification != null) {
-    print(
-        'Message also contained a notification: ${message.notification?.title}');
-  }
-
   final DatabaseHelper dbHelper = DatabaseHelper.instance;
   if (message.messageId != null && message.notification != null) {
     final notifikasi = NotifikasiModel(
@@ -119,16 +111,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       notificationType: message.data['notificationType'] as String?,
       payload: jsonEncode(message.data),
     );
-    try {
-      await dbHelper.insertNotification(notifikasi);
-      print(
-          'Background Notifikasi berhasil disimpan ke database lokal: ${notifikasi.id}');
-    } catch (e) {
-      print('Background Gagal menyimpan notifikasi ke database lokal: $e');
-    }
-  } else {
-    print(
-        'Background Pesan FCM tidak memiliki messageId atau notification body, tidak disimpan.');
+    await dbHelper.insertNotification(notifikasi);
   }
 }
 
@@ -138,7 +121,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> _requestNotificationPermissions() async {
   final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationSettings settings = await messaging.requestPermission(
+  await messaging.requestPermission(
     alert: true,
     badge: true,
     sound: true,
@@ -147,14 +130,6 @@ Future<void> _requestNotificationPermissions() async {
     provisional: false,
     announcement: false,
   );
-
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
-  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print('User granted provisional permission');
-  } else {
-    print('User declined or has not accepted permission');
-  }
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'smart_farming_default_channel_id', 'Smart Farming Notifications',
@@ -187,8 +162,6 @@ void main() async {
     initializationSettings,
     onDidReceiveNotificationResponse:
         (NotificationResponse notificationResponse) async {
-      print(
-          'Foreground Local Notification Tapped - Payload: ${notificationResponse.payload}');
       if (notificationResponse.payload != null &&
           notificationResponse.payload!.isNotEmpty) {
         // Di sini Anda akan memanggil fungsi global atau fungsi dari FcmService/NavigationService

@@ -33,7 +33,6 @@ class _DetailLaporanPanenTernakScreenState
         setState(() {
           _laporanPanenTernak = response['data'];
         });
-        print('Response data: ${response['data']}');
       } else {
         showAppToast(context,
             response['message'] ?? 'Gagal memuat data laporan panen ternak.');

@@ -100,7 +100,7 @@ class DatabaseHelper {
 
   Future<int> markAllAsRead() async {
     Database db = await instance.database;
-    var response;
+    int response;
     response = await db.update(
       _tableName,
       {'isRead': 1},

@@ -13,7 +13,6 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
-import 'package:flutter/scheduler.dart';
 
 class PelaporanTernakPanenScreen extends StatefulWidget {
   final Map<String, dynamic>? data;

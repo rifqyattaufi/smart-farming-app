@@ -56,7 +56,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           showAppToast(context,
-              'ID tanaman tidak ditemukan. Pastikan Anda memilih tanaman yang benar untuk diedit.');
+              'ID tanaman tidak ditemukan. Pastikan Anda memilih tanaman yang benar untuk di edit.');
           Navigator.of(context).pop();
         }
       });
@@ -95,23 +95,17 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
               if (dataJenisBudidaya['gambar'] != null &&
                   dataJenisBudidaya['gambar'].toString().isNotEmpty) {
                 _imageUrlFromApi = dataJenisBudidaya['gambar'] as String?;
-                print(
-                    "[AddTanamanScreen] Image URL dari API: $_imageUrlFromApi");
               } else {
                 _imageUrlFromApi = null;
               }
             });
           } else {
-            print(
-                "[AddTanamanScreen] _fetchEditData: dataJenisBudidaya null atau bukan Map.");
             if (mounted) {
               showAppToast(context,
                   'Data jenis budidaya tidak ditemukan atau format tidak valid.');
             }
           }
         } else {
-          print(
-              "[AddTanamanScreen] _fetchEditData: Gagal mengambil data. Status: ${response['status']}, Pesan: ${response['message']}");
           if (mounted) {
             showAppToast(context,
                 response['message'] ?? 'Gagal mengambil data jenis tanaman.');
@@ -119,7 +113,6 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         }
       }
     } catch (e) {
-      print("[AddTanamanScreen] Error di _fetchEditData: ${e.toString()}");
       if (mounted) {
         showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
             title: 'Error Tidak Terduga 😢');
@@ -273,9 +266,6 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "[AddTanamanScreen] BUILD: Nama: ${_nameController.text}, Latin: ${_latinController.text}, Status: $statusBudidaya, ImageUrl: $_imageUrlFromApi, isFetching: $_isFetchingEditData"); // DEBUG
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(

@@ -98,8 +98,6 @@ class KomoditasService {
 
     final url = Uri.parse('$baseUrl/tipe/$tipe?page=$page&limit=$limit');
 
-    print('Fetching URL (getKomoditasByTipe): $url'); // Untuk debugging
-
     try {
       final response = await http.get(url, headers: headers);
       final body = json.decode(response.body);
@@ -151,8 +149,6 @@ class KomoditasService {
     final encodedTipe = Uri.encodeComponent(tipe);
     final url = Uri.parse(
         '$baseUrl/search/$encodedQuery/$encodedTipe?page=$page&limit=$limit');
-
-    print('Fetching URL (getKomoditasSearch): $url'); // Untuk debugging
 
     try {
       final response = await http.get(url, headers: headers);

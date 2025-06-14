@@ -63,7 +63,7 @@ class _PelaporanTanamanPanenScreenState
       TextEditingController();
   final TextEditingController _gagalPanenController = TextEditingController();
 
-  List<RincianGradeForm> _rincianGradeList = [];
+  final List<RincianGradeForm> _rincianGradeList = [];
   List<Map<String, dynamic>> _gradeMasterList = [];
   bool _isLoadingGrade = true;
 

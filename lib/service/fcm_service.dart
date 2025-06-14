@@ -15,41 +15,22 @@ class FcmService {
   FcmService(this._flutterLocalNotificationsPlugin);
 
   Future<void> getTokenAndSendToServer() async {
-    try {
-      String? token = await _firebaseMessaging.getToken();
-      print("Current FCM Token: $token");
-      if (token != null) {
-        await _updateFcmTokenOnServer(token);
-      }
-    } catch (e) {
-      print("Error getting FCM token: $e");
+    String? token = await _firebaseMessaging.getToken();
+    if (token != null) {
+      await _updateFcmTokenOnServer(token);
     }
   }
 
   Future<void> _updateFcmTokenOnServer(String token) async {
-    print("Updating FCM token on server: $token");
-    try {
-      final response = await _authService.updateFcm(token);
-
-      if (response['status'] == true) {
-        print("FCM token updated successfully on server.");
-      } else {
-        print("Failed to update FCM token: ${response['message']}");
-      }
-    } catch (e) {
-      print("Error updating FCM token on server: $e");
-    }
+    await _authService.updateFcm(token);
   }
 
   Future<void> _saveNotificationToDatabase(RemoteMessage message) async {
     if (message.messageId == null) {
-      print("Pesan FCM tidak memiliki messageId, tidak disimpan.");
       return;
     }
 
     if (message.notification == null) {
-      print(
-          "Pesan FCM tidak memiliki notification body, tidak disimpan sebagai notifikasi umum.");
       return;
     }
 
@@ -63,27 +44,16 @@ class FcmService {
       payload: jsonEncode(message.data),
     );
 
-    try {
-      await _dbHelper.insertNotification(notifikasi);
-      print("Notifikasi disimpan ke database: ${notifikasi.message}");
-    } catch (e) {
-      print("Error saving notification to database: $e");
-    }
+    await _dbHelper.insertNotification(notifikasi);
   }
 
   void _setupFCMListeners() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print('Foreground message received!');
-      print('Message Id: ${message.messageId} data: ${message.data}');
-
       await _saveNotificationToDatabase(message);
 
       RemoteNotification? notification = message.notification;
 
       if (notification != null) {
-        print('Notification Title: ${notification.title}');
-        print('Notification Body: ${notification.body}');
-
         _showLocalNotification(
           notification.hashCode,
           notification.title ?? 'Notifikasi Baru',
@@ -94,8 +64,6 @@ class FcmService {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Message opened from background!');
-      print('Message Id: ${message.messageId} data: ${message.data}');
       _handleNotificationInteraction(message.data, "background_tap");
     });
   }
@@ -104,9 +72,6 @@ class FcmService {
     RemoteMessage? initialMessage =
         await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      print('FCM App opened from terminated state via Notification!');
-      print(
-          'Message Id: ${initialMessage.messageId} data: ${initialMessage.data}');
       _handleNotificationInteraction(initialMessage.data, "terminated_tap");
     }
   }
@@ -138,7 +103,6 @@ class FcmService {
   // Fungsi untuk menangani interaksi notifikasi (tap)
   void _handleNotificationInteraction(
       Map<String, dynamic> data, String source) {
-    print('Handling notification interaction from $source with data: $data');
     // TODO: Implementasikan logika navigasi atau aksi berdasarkan `data`
     // Contoh:
     // final String? notificationType = data['notificationType'];
@@ -154,13 +118,8 @@ class FcmService {
   }
 
   Future<void> deleteToken() async {
-    try {
-      await _firebaseMessaging.deleteToken();
-      print("FCM Token deleted successfully.");
-      await _updateFcmTokenOnServer("");
-    } catch (e) {
-      print("Error deleting FCM token: $e");
-    }
+    await _firebaseMessaging.deleteToken();
+    await _updateFcmTokenOnServer("");
   }
 
   Future<void> initFCM() async {
@@ -168,7 +127,6 @@ class FcmService {
     _setupFCMListeners();
 
     _firebaseMessaging.onTokenRefresh.listen((String newToken) {
-      print("FCM Token Refreshed: $newToken");
       _updateFcmTokenOnServer(newToken);
     });
   }

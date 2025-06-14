@@ -327,12 +327,6 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                                     'Jumlah: ${item['jumlah'] ?? 0} ekor',
                               };
                             }).toList(),
-                            onItemTap: (context, item) {
-                              final id = item['id'] as String?;
-                              if (id != null && id.isNotEmpty) {
-                                print("Tapped Unit Budidaya (Kandang) ID: $id");
-                              }
-                            },
                           )
                         else
                           Padding(

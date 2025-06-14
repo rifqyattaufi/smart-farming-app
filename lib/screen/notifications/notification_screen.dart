@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
 import 'package:smart_farming_app/service/database_helper.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _NotificationScreenState extends State<NotificationScreen>
         });
       }
     } catch (e) {
-      print('Gagal mengambil notifikasi: ${e.toString()}');
+      showAppToast(context, 'Gagal memuat notifikasi: ${e.toString()}');
     } finally {
       if (mounted) {
         setState(() {
@@ -64,21 +65,25 @@ class _NotificationScreenState extends State<NotificationScreen>
 
       if (unreadIds.isNotEmpty) {
         await _dbHelper.markAllAsRead();
-        print('Semua notifikasi telah ditandai sebagai dibaca');
         await _fetchNotifications();
       }
     } catch (e) {
-      print('Gagal menandai semua notifikasi sebagai dibaca: ${e.toString()}');
+      showAppToast(
+        context,
+        'Gagal menandai semua notifikasi sebagai dibaca: ${e.toString()}',
+      );
     }
   }
 
   Future<void> _deleteAllReadNotifications() async {
     try {
       await _dbHelper.deleteReadNotifications();
-      print('Semua notifikasi telah dihapus');
       await _fetchNotifications();
     } catch (e) {
-      print('Gagal menghapus semua notifikasi: ${e.toString()}');
+      showAppToast(
+        context,
+        'Gagal menghapus semua notifikasi yang telah dibaca: ${e.toString()}',
+      );
     }
   }
 

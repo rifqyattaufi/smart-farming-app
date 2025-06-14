@@ -34,7 +34,7 @@ class _HamaScreenState extends State<HamaScreen> {
   bool _isSearching = false;
 
   // State untuk Tab 0: Laporan Hama
-  List<dynamic> _laporanHamaList = [];
+  final List<dynamic> _laporanHamaList = [];
   List<dynamic> _filteredLaporanHamaList = [];
   int _currentPageLaporan = 1;
   bool _isLoadingMoreLaporan = false;
@@ -44,7 +44,7 @@ class _HamaScreenState extends State<HamaScreen> {
   bool _hasNextSearchPageLaporan = true;
 
   // State untuk Tab 1: Daftar Hama (JenisHama)
-  List<dynamic> _daftarHamaList = [];
+  final List<dynamic> _daftarHamaList = [];
   List<dynamic> _filteredDaftarHamaList = [];
   int _currentPageDaftarHama = 1;
   bool _isLoadingMoreDaftarHama = false;
@@ -240,8 +240,9 @@ class _HamaScreenState extends State<HamaScreen> {
   // --- Daftar Hama (Tab 1) ---
   Future<void> _fetchDaftarHamaPage(
       {required int page, bool isInitialSetupOrRefresh = false}) async {
-    if (!mounted || (_isLoadingMoreDaftarHama && !isInitialSetupOrRefresh))
+    if (!mounted || (_isLoadingMoreDaftarHama && !isInitialSetupOrRefresh)) {
       return;
+    }
     if (mounted && !isInitialSetupOrRefresh) {
       setState(() {
         _isLoadingMoreDaftarHama = true;
