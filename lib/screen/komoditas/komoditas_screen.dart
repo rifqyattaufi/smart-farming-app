@@ -7,6 +7,7 @@ import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.d
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/custom_tab.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -144,11 +145,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
           if (tipe == 'hewan') _isLoadingMoreTernak = false;
           if (isInitialSetupOrRefresh) _isInitialLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Gagal memuat data $tipe: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }
@@ -287,11 +285,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
             _isLoadingMoreSearchTernak = false;
           }
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Gagal melakukan pencarian: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }
@@ -341,9 +336,8 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               (response['status'] == false || fetchedData.isEmpty)) {
             if (isNewSearch ||
                 (fetchedData.isEmpty && currentPageFromServer == 1)) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Info: ${response['message']}')),
-              );
+              showAppToast(context,
+                  response['message'] ?? 'Terjadi kesalahan tidak diketahui');
             }
           }
         }

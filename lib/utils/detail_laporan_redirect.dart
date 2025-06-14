@@ -7,6 +7,7 @@ import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_s
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_ternak_screen.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 void navigateToDetailLaporan(
   BuildContext context, {
@@ -55,9 +56,7 @@ void navigateToDetailLaporan(
       MaterialPageRoute(builder: (context) => targetScreen!),
     );
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('Tidak dapat membuka detail untuk laporan ini.')),
-    );
+    showAppToast(
+        context, 'Tidak dapat membuka detail untuk laporan ini.');
   }
 }

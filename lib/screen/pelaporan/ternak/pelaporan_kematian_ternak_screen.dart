@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -111,13 +112,8 @@ class _PelaporanKematianTernakScreenState
 
       if (_imageList[i] == null && allValid == true) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Gambar bukti kematian ${(list[i]?['name'] ?? '')} belum dipilih'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Gambar kondisi ternak pada ${list[i]?['name'] ?? 'data ke-${i + 1}'} tidak boleh kosong');
       }
     }
     if (!allValid) {
@@ -151,21 +147,14 @@ class _PelaporanKematianTernakScreenState
         final response = await _laporanService.createLaporanKematian(data);
 
         if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan Kematian ${(list[i]?['name'] ?? '')} berhasil dikirim'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Berhasil mengirim laporan Kematian ${(list[i]?['name']?['name'] ?? '')}',
+            isError: false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal mengirim laporan Kematian ${(list[i]?['name']?['name'] ?? '')}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              'Gagal mengirim laporan Kematian ${(list[i]?['name']?['name'] ?? '')}: ${response['message']}');
         }
       }
 
@@ -173,12 +162,8 @@ class _PelaporanKematianTernakScreenState
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

@@ -7,6 +7,7 @@ import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -184,12 +185,9 @@ class _PelaporanNutrisiTanamanScreenState
 
   void _showErrorSnackbar(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      showAppToast(
+        context,
+        message,
       );
     }
   }
@@ -305,14 +303,14 @@ class _PelaporanNutrisiTanamanScreenState
         submissionStatus.add(response['status'] ?? false);
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['status']
-                  ? 'Laporan untuk ${objek['name'] ?? ''} berhasil dikirim'
-                  : 'Gagal mengirim laporan untuk ${objek['name'] ?? ''}: ${response['message']}'),
-              backgroundColor: response['status'] ? Colors.green : Colors.red,
-            ),
-          );
+          if (response['status'] == true) {
+            showAppToast(context,
+                'Laporan untuk ${objek['name'] ?? 'tanaman ke-${i + 1}'} berhasil dikirim.',
+                isError: false);
+          } else {
+            _showErrorSnackbar(
+                'Gagal mengirim laporan untuk ${objek['name'] ?? 'tanaman ke-${i + 1}'}: ${response['message']}');
+          }
         }
       }
 
@@ -671,7 +669,7 @@ class _PelaporanNutrisiTanamanScreenState
       bottomNavigationBar: _objekBudidayaList.isEmpty
           ? null
           : SafeArea(
-            child: Padding(
+              child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: CustomButton(
                   onPressed: _submitForm,
@@ -681,7 +679,7 @@ class _PelaporanNutrisiTanamanScreenState
                   isLoading: _isLoading,
                 ),
               ),
-          ),
+            ),
     );
   }
 }

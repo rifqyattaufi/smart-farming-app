@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
 import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -42,23 +43,14 @@ class _PilihKomoditasTanamanScreenState
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
   Future<void> _submitForm() async {
     if (selectedKomoditas == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih komoditas terlebih dahulu'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Silakan pilih komoditas terlebih dahulu');
       return;
     }
 

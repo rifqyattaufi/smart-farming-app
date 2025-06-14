@@ -4,6 +4,7 @@ import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
@@ -35,12 +36,8 @@ class _KebunScreenState extends State<KebunScreen> {
         _filteredKebunList = _kebunList;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -58,12 +55,8 @@ class _KebunScreenState extends State<KebunScreen> {
           _filteredKebunList = response['data'] ?? [];
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error searching data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     }
   }

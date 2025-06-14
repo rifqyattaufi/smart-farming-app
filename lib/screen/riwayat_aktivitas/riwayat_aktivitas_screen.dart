@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/newest.dart';
@@ -92,12 +93,8 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
       setState(() {
         _isLoading = false;
         _isFetchingMore = false;
@@ -181,11 +178,9 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                                       jenisLaporan: item['tipe'],
                                       jenisBudidaya: item['jenisBudidaya']);
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Tidak dapat membuka detail aktivitas ini. ID tidak valid.'),
-                                    ),
+                                  showAppToast(
+                                    context,
+                                    'ID laporan tidak valid. Silakan coba lagi.',
                                   );
                                 }
                               },

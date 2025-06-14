@@ -5,6 +5,7 @@ import 'package:smart_farming_app/service/komoditas_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'dart:io';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -54,13 +55,9 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           }).toList());
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching satuan data: ${satuanResponse['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Error fetching satuan data: ${satuanResponse['message']}',
+            isError: true);
       }
 
       final jenisBudidayaResponse =
@@ -76,21 +73,13 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           }).toList());
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching jenis budidaya data: ${jenisBudidayaResponse['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Error fetching jenis ternak data: ${jenisBudidayaResponse['message']}',
+            isError: true);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -143,12 +132,9 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan pilih gambar komoditas'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Gambar komoditas tidak boleh kosong. Silakan unggah gambar.',
+            isError: true);
         return;
       }
 
@@ -173,28 +159,19 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           if (widget.onKomoditasAdded != null) {
             widget.onKomoditasAdded!();
           }
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Komoditas berhasil ditambahkan!'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Komoditas berhasil ditambahkan',
+            isError: false,
           );
           Navigator.pop(context);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error adding komoditas: ${response['message']}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error adding komoditas: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       } finally {
         setState(() {
           isLoading = false;

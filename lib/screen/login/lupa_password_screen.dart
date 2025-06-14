@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/login/otp_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
@@ -42,14 +43,12 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
         context.push('/verifikasi-otp',
             extra: OtpScreen(email: _emailController.text));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Terjadi kesalahan')),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() {

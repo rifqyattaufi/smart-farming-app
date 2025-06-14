@@ -5,6 +5,7 @@ import 'package:smart_farming_app/service/schedule_unit_notification_service.dar
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'dart:io';
 
 import 'package:smart_farming_app/widget/button.dart';
@@ -33,7 +34,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
   final ScheduleUnitNotificationService _scheduleUnitNotification =
       ScheduleUnitNotificationService();
   final ImageService _imageService = ImageService();
-  
+
   final _formKey = GlobalKey<FormState>();
   String? selectedJenisHewan;
   String statusKandang = 'Aktif';
@@ -140,12 +141,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         }).toList();
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(
+          context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
     }
   }
 
@@ -244,12 +241,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(
+          context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
     }
   }
 
@@ -269,11 +262,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
       if (!_formKey.currentState!.validate()) return;
 
       if (_image == null && !widget.isEdit) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Gambar kandang tidak boleh kosong'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Gambar kandang tidak boleh kosong');
         return;
       }
 
@@ -337,30 +326,22 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
           widget.onKandangAdded!();
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.isEdit
-                  ? 'Kandang berhasil diperbarui'
-                  : 'Kandang berhasil ditambahkan',
-            ),
-            backgroundColor: Colors.green,
-          ),
+        showAppToast(
+          context,
+          widget.isEdit
+              ? 'Berhasil memperbarui data kandang'
+              : 'Berhasil menambahkan data kandang',
+          isError: false,
         );
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

@@ -5,6 +5,7 @@ import 'package:smart_farming_app/service/schedule_unit_notification_service.dar
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'dart:io';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/day_of_month_picker.dart';
@@ -132,11 +133,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Gagal memilih gambar: $e'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isPickingImage = false;
@@ -158,10 +156,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         }).toList();
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(response['message']), backgroundColor: Colors.red),
-      );
+      showAppToast(
+          context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
     }
   }
 
@@ -257,10 +253,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(response['message']), backgroundColor: Colors.red),
-      );
+      showAppToast(
+          context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
     }
   }
 
@@ -280,11 +274,8 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
       if (!_formKey.currentState!.validate()) return;
 
       if (_image == null && !widget.isEdit) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Harap unggah gambar kebun'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            'Gambar kebun tidak boleh kosong. Silakan unggah gambar kebun.');
         return;
       }
 
@@ -348,12 +339,12 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
           widget.onKebunAdded!();
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isEdit
-                  ? 'Kebun berhasil diperbarui'
-                  : 'Kebun berhasil ditambahkan'),
-              backgroundColor: Colors.green),
+        showAppToast(
+          context,
+          widget.isEdit
+              ? 'Berhasil memperbarui data kebun'
+              : 'Berhasil menambahkan data kebun',
+          isError: false,
         );
         Navigator.pop(context);
       } else {
@@ -361,21 +352,16 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
           _isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 

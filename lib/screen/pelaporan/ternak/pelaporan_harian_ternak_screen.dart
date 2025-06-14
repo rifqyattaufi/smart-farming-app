@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -95,12 +96,8 @@ class _PelaporanHarianTernakScreenState
       if (!formKey.currentState!.validate()) return;
 
       if (_imageTernak == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Silakan unggah bukti kondisi ternak'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Silakan unggah bukti kondisi ternak terlebih dahulu');
         return;
       }
 
@@ -124,32 +121,22 @@ class _PelaporanHarianTernakScreenState
       final response = await _laporanService.createLaporanHarianTernak(data);
 
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pelaporan Harian berhasil dikirim'),
-            backgroundColor: Colors.green,
-          ),
+        showAppToast(
+          context,
+          'Berhasil mengirim laporan harian ternak',
+          isError: false,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
 
       for (int i = 0; i < widget.step; i++) {
         Navigator.pop(context);
       }
     } catch (e) {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         isLoading = false;

@@ -6,6 +6,7 @@ import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -73,12 +74,8 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
             {};
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -88,28 +85,19 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
           await _unitBudidayaService.deleteUnitBudidaya(widget.idKebun ?? '');
       if (response['status']) {
         context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
+        showAppToast(
+          context,
+          'Berhasil menghapus data kebun',
+          isError: false,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error deleting data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -328,7 +316,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
       bottomNavigationBar: _userRole != 'pjawab'
           ? null
           : SafeArea(
-            child: Padding(
+              child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -368,7 +356,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                             ],
                           ),
                         );
-            
+
                         if (confirm == true) {
                           await _deleteData();
                         }
@@ -381,7 +369,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                   ],
                 ),
               ),
-          ),
+            ),
     );
   }
 

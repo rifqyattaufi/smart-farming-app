@@ -3,6 +3,7 @@ import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'dart:io';
 
 import 'package:smart_farming_app/widget/button.dart';
@@ -54,11 +55,8 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         (widget.idTanaman == null || widget.idTanaman!.isEmpty)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('ID Tanaman tidak valid untuk mode edit.'),
-                backgroundColor: Colors.red),
-          );
+          showAppToast(context,
+              'ID tanaman tidak ditemukan. Pastikan Anda memilih tanaman yang benar untuk diedit.');
           Navigator.of(context).pop();
         }
       });
@@ -107,35 +105,24 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
             print(
                 "[AddTanamanScreen] _fetchEditData: dataJenisBudidaya null atau bukan Map.");
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Format data jenis budidaya tidak sesuai.'),
-                    backgroundColor: Colors.orange),
-              );
+              showAppToast(context,
+                  'Data jenis budidaya tidak ditemukan atau format tidak valid.');
             }
           }
         } else {
           print(
               "[AddTanamanScreen] _fetchEditData: Gagal mengambil data. Status: ${response['status']}, Pesan: ${response['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content:
-                      Text(response['message'] ?? 'Gagal memuat data tanaman'),
-                  backgroundColor: Colors.red),
-            );
+            showAppToast(context,
+                response['message'] ?? 'Gagal mengambil data jenis tanaman.');
           }
         }
       }
     } catch (e) {
       print("[AddTanamanScreen] Error di _fetchEditData: ${e.toString()}");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Terjadi kesalahan saat mengambil data: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {
@@ -201,10 +188,9 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
       }
 
       if (_imageTanaman == null && !widget.isEdit) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Gambar tanaman tidak boleh kosong'),
-              backgroundColor: Colors.red),
+        showAppToast(
+          context,
+          'Gambar tanaman tidak boleh kosong. Silakan unggah gambar.',
         );
         return;
       }
@@ -224,12 +210,9 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           finalImageUrl = imageUploadResponse['data'];
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(
-                      'Gagal mengunggah gambar: ${imageUploadResponse['message']}'),
-                  backgroundColor: Colors.red),
-            );
+            showAppToast(context,
+                imageUploadResponse['message'] ??
+                    'Gagal mengunggah gambar tanaman.');
             setState(() {
               _isLoading = false;
             });
@@ -262,34 +245,28 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
 
       if (response['status'] == true) {
         widget.onTanamanAdded?.call();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isEdit
-                  ? 'Berhasil memperbarui jenis tanaman'
-                  : 'Berhasil menambahkan jenis tanaman'),
-              backgroundColor: Colors.green),
+        showAppToast(
+          context,
+          widget.isEdit
+              ? 'Berhasil memperbarui data jenis tanaman'
+              : 'Berhasil menambahkan data jenis tanaman',
+          isError: false,
         );
         if (mounted) Navigator.pop(context);
       } else {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message'] ?? 'Gagal menyimpan data'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Terjadi kesalahan: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }

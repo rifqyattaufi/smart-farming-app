@@ -7,6 +7,7 @@ import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/service/grade_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -138,8 +139,9 @@ class _PelaporanTanamanPanenScreenState
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        showAppToast(
+          context,
+          message,
         );
       }
     });
@@ -354,12 +356,10 @@ class _PelaporanTanamanPanenScreenState
       final response = await _laporanService.createLaporanPanenKebun(payload);
       if (mounted) {
         if (response['status'] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan Panen ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${widget.data?['komoditas']?['name'] ?? ''} berhasil dikirim!'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+                  'Laporan Panen ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${widget.data?['komoditas']?['name'] ?? ''} berhasil dikirim!',
+            isError: false,
           );
 
           // Pop sebanyak step yang telah dilalui + halaman ini

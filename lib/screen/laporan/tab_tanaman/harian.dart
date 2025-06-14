@@ -176,11 +176,8 @@ class HarianTab extends StatelessWidget {
                 jenisLaporan: 'harian',
                 jenisBudidaya: 'tumbuhan');
           } else {
-            ScaffoldMessenger.of(itemContext).showSnackBar(
-              const SnackBar(
-                content: Text('ID laporan tidak ditemukan.'),
-              ),
-            );
+            showAppToast(context,
+                'ID laporan tidak ditemukan. Silakan coba lagi.');
           }
         },
         mode: NewestReportsMode.full,
@@ -245,9 +242,8 @@ class HarianTab extends StatelessWidget {
                 jenisBudidaya: 'tumbuhan',
               );
             } else {
-              ScaffoldMessenger.of(itemContext).showSnackBar(
-                const SnackBar(content: Text('ID laporan tidak ditemukan.')),
-              );
+              showAppToast(context,
+                  'ID laporan tidak ditemukan. Silakan coba lagi.');
             }
           },
         ),

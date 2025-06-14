@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -37,12 +38,9 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
     if (widget.idTernak == null || widget.idTernak!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('ID Ternak tidak valid.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              'ID ternak tidak ditemukan. Silakan kembali ke daftar ternak.',
+              title: 'Kesalahan');
           context.pop();
         }
       });
@@ -80,13 +78,8 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
             _ternak = null;
             _userRole = role;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  response['message'] ?? 'Gagal memuat data detail ternak'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              response['message'] ?? 'Gagal memuat data jenis ternak');
         }
       }
     } catch (e) {
@@ -95,12 +88,8 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
           _isLoading = false;
           _ternak = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }
@@ -146,28 +135,20 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
       if (!mounted) return;
 
       if (response['status'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data berhasil dihapus'),
-            backgroundColor: Colors.green,
-          ),
+        showAppToast(
+          context,
+          'Data jenis ternak berhasil dihapus.',
+          isError: false,
         );
         context.pop();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Gagal menghapus data'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Gagal menghapus data jenis ternak');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Error saat menghapus: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {

@@ -329,11 +329,9 @@ class PanenTab extends StatelessWidget {
                       jenisLaporan: 'panen',
                       jenisBudidaya: 'tumbuhan');
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('ID laporan tidak ditemukan.'),
-                    ),
-                  );
+                  showAppToast(
+                      context,
+                      'Tidak dapat membuka detail laporan. ID laporan tidak ditemukan.');
                 }
               },
               mode: NewestReportsMode.full,

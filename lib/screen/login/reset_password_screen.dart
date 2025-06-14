@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
@@ -59,22 +60,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       final response = await _authService.resetPassword(data);
 
       if (response['status'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(response['message'] ?? 'Password berhasil direset')),
+        showAppToast(
+          context,
+          'Password berhasil direset. Silakan login kembali.',
+          isError: false,
         );
         await _authService.logout();
         context.go('/login');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Terjadi kesalahan')),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() {

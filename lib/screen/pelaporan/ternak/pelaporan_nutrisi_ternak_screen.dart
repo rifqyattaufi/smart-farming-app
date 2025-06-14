@@ -7,6 +7,7 @@ import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -75,12 +76,9 @@ class _PelaporanNutrisiTernakScreenState
               .toList();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching vitamin data: ${responseVitamin['message']}'),
-            backgroundColor: Colors.red,
-          ),
+        showAppToast(
+          context,
+          'Error fetching vitamin data: ${responseVitamin['message']}',
         );
       }
 
@@ -95,21 +93,14 @@ class _PelaporanNutrisiTernakScreenState
               .toList();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching vaksin data: ${responseVaksin['message']}'),
-            backgroundColor: Colors.red,
-          ),
+        showAppToast(
+          context,
+          'Error fetching vaksin data: ${responseVaksin['message']}',
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -123,12 +114,9 @@ class _PelaporanNutrisiTernakScreenState
               "${response['data']['nama']} - ${response['data']['lambang']}";
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching satuan data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(
+            context, 'Error fetching satuan data: ${response['message']}',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }
@@ -152,12 +140,8 @@ class _PelaporanNutrisiTernakScreenState
 
       if (_imageList[i] == null && allValid == true) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unggah bukti pemberian dosis ke ternak'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Gambar bukti pemberian dosis ke ternak tidak boleh kosong');
       }
     }
     if (!allValid) {
@@ -190,20 +174,14 @@ class _PelaporanNutrisiTernakScreenState
 
         final response = await _laporanService.createLaporanNutrisi(data);
         if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan Pemberian Nutrisi berhasil ${(list[i]?['name'] ?? '')} dikirim'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Laporan Pemberian Nutrisi berhasil ${(list[i]?['name'] ?? '')} dikirim',
+            isError: false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${response['message']}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui');
         }
       }
 
@@ -211,12 +189,8 @@ class _PelaporanNutrisiTernakScreenState
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         isLoading = false;

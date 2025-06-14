@@ -3,6 +3,7 @@ import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'dart:io';
 
 import 'package:smart_farming_app/widget/button.dart';
@@ -77,27 +78,18 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           });
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Format data jenis budidaya tidak sesuai.'),
-                  backgroundColor: Colors.orange),
-            );
+            showAppToast(context,
+                'Data jenis hewan ternak tidak ditemukan');
           }
         }
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message'] ?? 'Gagal memuat data ternak'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Gagal mengambil data jenis hewan ternak');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {
@@ -161,11 +153,8 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       }
 
       if (_imageTernak == null && !widget.isEdit) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Gambar hewan ternak tidak boleh kosong'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            'Gambar hewan ternak tidak boleh kosong');
         return;
       }
 
@@ -184,12 +173,9 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           finalImageUrl = imageUploadResponse['data'];
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(
-                      'Gagal mengunggah gambar: ${imageUploadResponse['message']}'),
-                  backgroundColor: Colors.red),
-            );
+            showAppToast(context,
+                imageUploadResponse['message'] ??
+                    'Gagal mengunggah gambar hewan ternak');
             setState(() {
               _isLoading = false;
             });
@@ -222,34 +208,28 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
 
       if (response['status'] == true) {
         widget.onTernakAdded?.call();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isEdit
-                  ? 'Berhasil memperbarui jenis hewan ternak'
-                  : 'Berhasil menambahkan jenis hewan ternak'),
-              backgroundColor: Colors.green),
+        showAppToast(
+          context,
+          widget.isEdit
+              ? 'Berhasil memperbarui data jenis hewan ternak'
+              : 'Berhasil menambahkan data jenis hewan ternak',
+          isError: false,
         );
         if (mounted) Navigator.pop(context);
       } else {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message'] ?? 'Gagal menyimpan data'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Terjadi kesalahan: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }

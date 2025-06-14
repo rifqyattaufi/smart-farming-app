@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -37,11 +38,9 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
     if (widget.idTanaman == null || widget.idTanaman!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('ID Tanaman tidak valid.'),
-              backgroundColor: Colors.red,
-            ),
+          showAppToast(
+            context,
+            'ID tanaman tidak ditemukan. Silakan pilih tanaman terlebih dahulu.',
           );
           context.pop();
         }
@@ -79,13 +78,8 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
             _isLoading = false;
             _userRole = role;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  response['message'] ?? 'Gagal memuat data detail tanaman'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(
+              context, response['message'] ?? 'Gagal memuat detail tanaman');
         }
       }
     } catch (e) {
@@ -93,12 +87,8 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }
@@ -144,29 +134,21 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
       if (!mounted) return;
 
       if (response['status'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data berhasil dihapus'),
-            backgroundColor: Colors.green,
-          ),
+        showAppToast(
+          context,
+          'Data jenis tanaman berhasil dihapus.',
+          isError: false,
         );
 
         context.pop();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Gagal menghapus data'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Gagal menghapus data jenis tanaman');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {
@@ -368,7 +350,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
           _isLoading || _tanaman == null || _userRole != 'pjawab'
               ? null
               : SafeArea(
-                child: Padding(
+                  child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -411,7 +393,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                       ],
                     ),
                   ),
-              ),
+                ),
     );
   }
 

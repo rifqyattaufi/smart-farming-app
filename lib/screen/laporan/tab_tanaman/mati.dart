@@ -272,11 +272,8 @@ class MatiTab extends StatelessWidget {
                       jenisLaporan: 'kematian',
                       jenisBudidaya: 'tumbuhan');
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('ID laporan tidak ditemukan.'),
-                    ),
-                  );
+                  showAppToast(context,
+                      'ID laporan tidak ditemukan. Tidak dapat membuka detail laporan.');
                 }
               },
               mode: NewestReportsMode.full,

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/otp.dart'; // Ensure this path is correct
 
@@ -37,10 +38,10 @@ class _OtpScreenState extends State<OtpScreen> {
       final response = await _authService.resendOtp(data);
       if (response['status'] == true) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content:
-                    Text('Kode OTP baru telah dikirim ke ${widget.email}')),
+          showAppToast(
+            context,
+            'Kode OTP baru telah dikirim ke email ${widget.email}',
+            isError: false,
           );
           setState(() {
             _isLoading = false;
@@ -48,14 +49,13 @@ class _OtpScreenState extends State<OtpScreen> {
         }
       } else {
         // Handle error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Gagal mengirim OTP')),
-        );
+        showAppToast(
+            context, response['message'] ?? 'Gagal mengirim ulang kode OTP',
+            isError: true);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
         setState(() {
@@ -67,11 +67,9 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Future<void> _checkOtp(String otp) async {
     if (otp.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Harap masukkan 6 digit kode OTP.'),
-          backgroundColor: Colors.red,
-        ),
+      showAppToast(
+        context,
+        'Kode OTP harus terdiri dari 6 digit',
       );
       return;
     }
@@ -90,14 +88,15 @@ class _OtpScreenState extends State<OtpScreen> {
         context.push('/reset-password',
             extra: ResetPasswordScreen(email: widget.email, otp: otp));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Kode OTP salah')),
-        );
+        showAppToast(
+            context,
+            response['message'] ??
+                'Kode OTP tidak valid atau telah kedaluwarsa',
+            isError: true);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

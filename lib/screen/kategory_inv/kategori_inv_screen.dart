@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
 import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/unit_item.dart';
@@ -130,12 +131,8 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
 
   void _showError(String message, {bool isError = true}) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: isError ? Colors.red : Colors.green,
-        ),
-      );
+      showAppToast(context, message,
+          title: isError ? 'Error' : 'Success', isError: isError);
     }
   }
 

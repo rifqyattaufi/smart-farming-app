@@ -8,6 +8,7 @@ import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -111,13 +112,8 @@ class _PelaporanHarianTanamanScreenState
               .toList();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching vitamin data: ${responseVitamin['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Error fetching vitamin data: ${responseVitamin['message']}');
       }
 
       if (responsePupuk['status']) {
@@ -133,13 +129,8 @@ class _PelaporanHarianTanamanScreenState
               .toList();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('Error fetching pupuk data: ${responsePupuk['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(
+            context, 'Error fetching pupuk data: ${responsePupuk['message']}');
       }
 
       if (responseDisinfektan['status']) {
@@ -155,21 +146,12 @@ class _PelaporanHarianTanamanScreenState
               .toList();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error fetching disinfektan data: ${responseDisinfektan['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Error fetching disinfektan data: ${responseDisinfektan['message']}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
 
     // Fetch last heights
@@ -223,12 +205,8 @@ class _PelaporanHarianTanamanScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching last heights: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     }
   }
@@ -331,12 +309,8 @@ class _PelaporanHarianTanamanScreenState
               "${response['data']['nama']} - ${response['data']['lambang']}";
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching satuan data: ${response['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     }
   }
@@ -357,35 +331,27 @@ class _PelaporanHarianTanamanScreenState
       if (_imageTanamanList[i] == null) {
         allValid = false;
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('Unggah bukti kondisi tanaman untuk tanaman ${i + 1}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(
+              context, 'Harap unggah gambar tanaman untuk tanaman ${i + 1}',
+              isError: true);
         }
       }
 
       if (statusNutrisi[i] == 'Ya' && _imageDosisList[i] == null) {
         allValid = false;
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('Unggah bukti pemberian dosis untuk tanaman ${i + 1}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(
+              context, 'Harap unggah gambar dosis untuk tanaman ${i + 1}',
+              isError: true);
         }
       }
     }
 
     if (!allValid) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Harap periksa kembali semua isian form.'),
-        backgroundColor: Colors.red,
-      ));
+      showAppToast(
+        context,
+        'Harap perbaiki semua kesalahan sebelum mengirim laporan',
+      );
       setState(() => _isLoading = false);
       return;
     }
@@ -498,15 +464,14 @@ class _PelaporanHarianTanamanScreenState
 
       if (mounted) {
         if (anyReportFailed) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Beberapa laporan gagal dikirim. Silakan coba lagi.'),
-            backgroundColor: Colors.red,
-          ));
+          showAppToast(
+              context, 'Beberapa laporan gagal dikirim. Silakan coba lagi.');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Semua laporan berhasil dikirim!'),
-            backgroundColor: Colors.green,
-          ));
+          showAppToast(
+            context,
+            'Laporan harian berhasil dikirim untuk semua tanaman.',
+            isError: false,
+          );
           for (int k = 0; k < widget.step; k++) {
             if (Navigator.canPop(context)) Navigator.pop(context);
           }
@@ -514,11 +479,8 @@ class _PelaporanHarianTanamanScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Terjadi kesalahan besar saat submit: $e'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
     } finally {
       if (mounted) {

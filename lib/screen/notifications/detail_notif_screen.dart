@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/notifications/add_global_notification.dart';
 import 'package:smart_farming_app/service/global_notification_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 
@@ -37,16 +38,12 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
           _notificationData = response['data'];
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(response['message'] ?? 'Failed to load notification')),
-        );
+        showAppToast(
+            context, response['message'] ?? 'Gagal mengambil data notifikasi');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching notification: $e')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;
@@ -191,10 +188,10 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
                   if (confirm == true) {
                     await _globalNotificationService
                         .deleteGlobalNotification(widget.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notifikasi berhasil dihapus'),
-                      ),
+                    showAppToast(
+                      context,
+                      'Notifikasi berhasil dihapus',
+                      isError: false,
                     );
                     context.pop();
                   }

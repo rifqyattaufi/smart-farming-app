@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
@@ -65,12 +66,12 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
         if (widget.onKategoriInvAdded != null) {
           widget.onKategoriInvAdded!();
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(widget.isUpdate
-                  ? 'Berhasil memperbarui data kategori inventaris'
-                  : 'Berhasil menambahkan data kategori inventaris'),
-              backgroundColor: Colors.green),
+        showAppToast(
+          context,
+          widget.isUpdate
+              ? 'Kategori inventaris berhasil diperbarui'
+              : 'Kategori inventaris berhasil ditambahkan',
+          isError: false,
         );
         Navigator.pop(context);
       } else {
@@ -78,20 +79,15 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Terjadi kesalahan saat menambahkan: $e'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 

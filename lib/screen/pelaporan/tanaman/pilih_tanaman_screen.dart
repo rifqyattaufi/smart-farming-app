@@ -7,6 +7,7 @@ import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_pan
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_sakit_screen.dart';
 import 'package:smart_farming_app/service/objek_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -48,22 +49,16 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
   Future<void> _submitForm() async {
     if (_selectedTanaman.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih tanaman terlebih dahulu'),
-          backgroundColor: Colors.red,
-        ),
+      showAppToast(
+        context,
+        'Harap pilih minimal satu tanaman untuk pelaporan.',
       );
       return;
     }

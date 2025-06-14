@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/satuan/add_satuan_screen.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
 import 'package:smart_farming_app/widget/unit_item.dart';
@@ -131,11 +132,10 @@ class _SatuanScreenState extends State<SatuanScreen> {
 
   void _showError(String message, {bool isError = true}) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: isError ? Colors.red : Colors.green,
-        ),
+      showAppToast(
+          context,
+        message,
+        isError: isError,
       );
     }
   }

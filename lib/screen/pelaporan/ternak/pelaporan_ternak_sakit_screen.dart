@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -107,13 +108,9 @@ class _PelaporanTernakSakitScreenState
 
       if (_imageList[i] == null && allValid == true) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Gambar bukti sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')} belum dipilih'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Gambar bukti sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')} belum dipilih',
+            isError: true);
       }
     }
     if (!allValid) {
@@ -145,21 +142,14 @@ class _PelaporanTernakSakitScreenState
         final response = await _laporanService.createLaporanSakit(data);
 
         if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')} berhasil dikirim'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Berhasil mengirim laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}',
+            isError: false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal mengirim laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              'Gagal mengirim laporan sakit ${(list[i]?['name'] ?? widget.data['komoditas']?['name'] ?? '')}: ${response['message']}');
         }
       }
 
@@ -167,12 +157,8 @@ class _PelaporanTernakSakitScreenState
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

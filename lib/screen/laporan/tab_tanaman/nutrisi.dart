@@ -182,11 +182,9 @@ class NutrisiTab extends StatelessWidget {
                       jenisLaporan: 'vitamin',
                       jenisBudidaya: 'tumbuhan');
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('ID laporan tidak ditemukan.'),
-                    ),
-                  );
+                  showAppToast(
+                      context,
+                      'Tidak dapat membuka laporan. ID laporan tidak ditemukan.',);
                 }
               },
               mode: NewestReportsMode.full,

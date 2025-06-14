@@ -6,6 +6,7 @@ import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
@@ -61,14 +62,8 @@ class _PelaporanTernakPanenScreenState
         });
       }
     } catch (e) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -151,12 +146,10 @@ class _PelaporanTernakPanenScreenState
 
       if (imageList[i] == null && allValid == true) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Gambar bukti panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')} belum dipilih'),
-            backgroundColor: Colors.red,
-          ),
+        showAppToast(
+          context,
+          'Gambar bukti hasil panen pada objek ${list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? ''} wajib diisi',
+          isError: false,
         );
       }
     }
@@ -188,20 +181,15 @@ class _PelaporanTernakPanenScreenState
         final response = await _laporanService.createLaporanPanen(data);
 
         if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')} berhasil dikirim'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Berhasil mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}',
+            isError: false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}'),
-              backgroundColor: Colors.red,
-            ),
+          showAppToast(context,
+              'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}: ${response['message']}',
+            isError: true,
           );
         }
       }
@@ -210,12 +198,8 @@ class _PelaporanTernakPanenScreenState
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error submitting form: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         isLoading = false;

@@ -213,13 +213,6 @@ class _InfoTabState extends State<InfoTab> {
                 'id': kandangItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
-            onItemTap: (ctx, selectedKandang) {
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                SnackBar(
-                    content:
-                        Text('Kandang dipilih: ${selectedKandang['name']}')),
-              );
-            },
           ),
         ),
       );
@@ -281,13 +274,6 @@ class _InfoTabState extends State<InfoTab> {
                 'id': plantItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
-            onItemTap: (ctx, selectedPlant) {
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                SnackBar(
-                    content: Text(
-                        'Objek budidaya dipilih: ${selectedPlant['name']}')),
-              );
-            },
           ),
         ));
 

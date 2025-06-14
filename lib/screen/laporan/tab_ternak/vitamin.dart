@@ -162,11 +162,9 @@ class VitaminTab extends StatelessWidget {
                       jenisLaporan: 'vitamin',
                       jenisBudidaya: 'hewan');
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('ID laporan tidak ditemukan.'),
-                    ),
-                  );
+                  showAppToast(
+                      context,
+                      'Tidak dapat membuka detail laporan karena ID laporan tidak ditemukan.');
                 }
               },
               mode: NewestReportsMode.full,

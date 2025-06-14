@@ -10,6 +10,7 @@ import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -74,12 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
       setState(() {
         _isLoading = false;
       });

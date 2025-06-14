@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_tanaman_screen.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -49,14 +50,8 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
         });
       }
     } catch (e) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     }
   }
 
@@ -81,11 +76,9 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                 step: widget.step + 1));
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pilih kandang terlebih dahulu!'),
-          backgroundColor: Colors.red,
-        ),
+      showAppToast(
+        context,
+        'Silakan pilih kebun terlebih dahulu',
       );
     }
   }

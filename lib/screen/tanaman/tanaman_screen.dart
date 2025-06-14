@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
@@ -116,11 +117,8 @@ class _TanamanScreenState extends State<TanamanScreen> {
           _isLoadingMore = false;
           if (isInitialSetupOrRefresh) _isInitialLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Gagal memuat data: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }
@@ -212,11 +210,8 @@ class _TanamanScreenState extends State<TanamanScreen> {
           _isSearching = false;
           _isLoadingMoreSearch = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Gagal melakukan pencarian: ${e.toString()}'),
-              backgroundColor: Colors.red),
-        );
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
       }
       return;
     }

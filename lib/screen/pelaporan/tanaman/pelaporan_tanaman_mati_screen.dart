@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/banner.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -112,13 +113,9 @@ class _PelaporanTanamanMatiScreenState
 
       if (_imageList[i] == null && allValid == true) {
         allValid = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Gambar bukti tanaman ${(list[i]?['name'] ?? '')} mati belum dipilih'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showAppToast(context,
+            'Gambar bukti kondisi tanaman pada ${list[i]?['name'] ?? 'tanaman ke-${i + 1}'} tidak boleh kosong',
+            isError: true);
       }
     }
     if (!allValid) {
@@ -149,21 +146,14 @@ class _PelaporanTanamanMatiScreenState
         final response = await _laporanService.createLaporanKematian(data);
 
         if (response['status']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Laporan tanaman ${(list[i]?['name'] ?? '')} mati berhasil dikirim'),
-              backgroundColor: Colors.green,
-            ),
+          showAppToast(
+            context,
+            'Berhasil mengirim laporan tanaman ${(list[i]?['name']?['name'] ?? '')} mati',
+            isError: false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal mengirim laporan tanaman ${(list[i]?['name']?['name'] ?? '')} mati'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showAppToast(context,
+              'Gagal mengirim laporan tanaman ${(list[i]?['name']?['name'] ?? '')} mati');
         }
       }
 
@@ -171,12 +161,8 @@ class _PelaporanTanamanMatiScreenState
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

@@ -274,11 +274,9 @@ class SakitTab extends StatelessWidget {
                       jenisLaporan: 'sakit',
                       jenisBudidaya: 'hewan');
                 } else {
-                  ScaffoldMessenger.of(itemContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('ID laporan tidak ditemukan.'),
-                    ),
-                  );
+                  showAppToast(
+                      context,
+                      'Laporan tidak valid. Silakan coba lagi atau hubungi dukungan.');
                 }
               },
               mode: NewestReportsMode.full,

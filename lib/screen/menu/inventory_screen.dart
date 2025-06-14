@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/inventaris/add_inventaris_screen.dart';
 import 'package:smart_farming_app/screen/kategory_inv/add_kategori_inv_screen.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -51,10 +52,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Gagal memuat data: ${e.toString()}'),
-              backgroundColor: Colors.red),
+        showAppToast(
+          context,
+          'Gagal memuat data inventaris. Silakan coba lagi.',
         );
       }
     }

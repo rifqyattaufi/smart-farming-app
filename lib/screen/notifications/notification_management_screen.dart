@@ -5,6 +5,7 @@ import 'package:smart_farming_app/screen/notifications/add_global_notification.d
 import 'package:smart_farming_app/screen/notifications/detail_notif_screen.dart';
 import 'package:smart_farming_app/service/global_notification_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
@@ -57,9 +58,8 @@ class _NotificationManagementScreenState
       });
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     }
 

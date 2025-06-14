@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 
@@ -49,18 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         context.go('/home');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(response['message']), backgroundColor: Colors.red),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
-      // Handle unexpected errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('An unexpected error occurred: $e'),
-            backgroundColor: Colors.red),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 
 class DetailSkorTanamanListWidget extends StatelessWidget {
   final List<dynamic> detailTanamanList;
@@ -88,15 +89,10 @@ class DetailSkorTanamanListWidget extends StatelessWidget {
                       style: regular12.copyWith(color: statusColor),
                     ),
                     onTap: () {
-                      final String tanamanId =
-                          tanaman['id'] as String? ?? 'ID Tidak Ada';
-                      print(
-                          "Tanaman $tanamanId - $nama di-tap. Status: $status. Alasan: $alasan");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Detail untuk $nama: $alasan'),
-                          duration: const Duration(seconds: 3),
-                        ),
+                      showAppToast(
+                        context,
+                        'Detail untuk $nama: $alasan',
+                        isError: false,
                       );
                     },
                   ),

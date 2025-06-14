@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/global_notification_service.dart';
 import 'package:smart_farming_app/theme.dart';
+import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/widget/button.dart';
 import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
@@ -81,21 +82,23 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
       }
 
       if (response['status']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+        showAppToast(
+          context,
+          widget.isUpdate
+              ? 'Berhasil memperbarui notifikasi global'
+              : 'Berhasil menambahkan notifikasi global',
+          isError: false,
         );
         Navigator.pop(context, true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
 
       // print(data);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;
@@ -137,14 +140,12 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
               DateFormat('EEEE, dd MMMM yyyy').format(selectedDate!);
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
+        showAppToast(context,
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching data: $e')),
-      );
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
     } finally {
       setState(() {
         _isLoading = false;
