@@ -44,8 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
         if (role == 'pjawab') {
           context.go('/home');
         } else if (role == 'petugas') {
-          // await _authService.logout();
-          // context.go('/login');
           context.go('/home-petugas');
         }
         context.go('/home');
@@ -157,32 +155,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            // Action login Google
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: green1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          icon: SvgPicture.asset(
-                            'assets/icons/google.svg',
-                            width: 24,
-                            height: 24,
-                          ),
-                          label: Text(
-                            'Lanjutkan dengan Google',
-                            style: semibold16.copyWith(color: green1),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
+                      // const SizedBox(height: 16),
+                      // SizedBox(
+                      //   width: double.infinity,
+                      //   child: OutlinedButton.icon(
+                      //     onPressed: () {
+                      //       // Action login Google
+                      //     },
+                      //     style: OutlinedButton.styleFrom(
+                      //       side: BorderSide(color: green1),
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //       ),
+                      //       padding: const EdgeInsets.symmetric(vertical: 14),
+                      //     ),
+                      //     icon: SvgPicture.asset(
+                      //       'assets/icons/google.svg',
+                      //       width: 24,
+                      //       height: 24,
+                      //     ),
+                      //     label: Text(
+                      //       'Lanjutkan dengan Google',
+                      //       style: semibold16.copyWith(color: green1),
+                      //     ),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 32),
                     ],
                   ),
                 ),
