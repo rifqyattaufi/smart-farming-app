@@ -164,6 +164,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('add_satuan_fab'),
           onPressed: () {
             context.push('/tambah-satuan',
                 extra: AddSatuanScreen(
@@ -186,6 +187,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SearchField(
+                key: const Key('satuan_search_field'),
                 controller: _searchController,
                 hintText: "Cari nama atau lambang satuan...",
                 onChanged: _onSearchQueryChanged,
@@ -203,6 +205,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
                         child: _allSatuanList.isEmpty
                             ? Center(
                                 child: Text(
+                                  key: const Key('no_data_message'),
                                   'Tidak ada data satuan ditemukan.',
                                   style: medium14.copyWith(color: dark2),
                                 ),
@@ -234,6 +237,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
                                     padding:
                                         const EdgeInsets.only(bottom: 10.0),
                                     child: UnitItem(
+                                      key: Key('satuan_item_${satuan['id']}'),
                                       unitName:
                                           satuan['nama']?.toString() ?? 'N/A',
                                       unitSymbol:

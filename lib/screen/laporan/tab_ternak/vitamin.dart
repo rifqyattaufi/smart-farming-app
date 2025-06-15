@@ -135,11 +135,13 @@ class VitaminTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
+                  key: const Key('error_riwayat_vitamin'),
                   'Error memuat riwayat laporan pemberian vitamin atau vaksin: ${riwayatVitaminState.error}',
-                  style: const TextStyle(color: Colors.red)),
+                  style: regular12.copyWith(color: Colors.red)),
             )
           else if (riwayatVitaminState.items.isNotEmpty)
             NewestReports(
+              key: const Key('riwayat_pemberian_vitamin'),
               title: 'Riwayat Pemberian Vitamin & Vaksin',
               reports: riwayatVitaminState.items.map((item) {
                 return {
@@ -173,9 +175,11 @@ class VitaminTab extends StatelessWidget {
               timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
+                  key: const Key('no_riwayat_vitamin'),
+                  style: regular12.copyWith(color: dark2),
                   'Tidak ada riwayat pelaporan pemberian vitamin atau vaksin untuk ditampilkan saat ini.'),
             ),
           const SizedBox(height: 80),

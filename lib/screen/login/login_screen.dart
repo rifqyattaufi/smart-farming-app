@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       InputFieldWidget(
+                        key: const Key('emailInput'),
                         label: "Email pengguna",
                         hint: "Contoh: example@mail.com",
                         controller: _emailController,
@@ -97,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       InputFieldWidget(
+                        key: const Key('passwordInput'),
                         label: "Masukkan Password",
                         hint: "Contoh: password",
                         controller: _passwordController,
@@ -124,6 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: TextButton(
+                          key: const Key('forgotPasswordButton'),
                           onPressed: () {
                             context.push('/lupa-password');
                           },
@@ -142,22 +145,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               backgroundColor: green1,
                               textStyle: semibold16,
                               textColor: white,
+                              key: const Key('loginButton'),
                             ),
                       const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            'atau',
-                            style: medium14.copyWith(color: dark1),
-                          ),
-                        ),
-                      ),
+                      // Align(
+                      //   alignment: Alignment.center,
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.symmetric(horizontal: 8),
+                      //     child: Text(
+                      //       'atau',
+                      //       style: medium14.copyWith(color: dark1),
+                      //     ),
+                      //   ),
+                      // ),
                       // const SizedBox(height: 16),
                       // SizedBox(
                       //   width: double.infinity,
                       //   child: OutlinedButton.icon(
+                      //     key: const Key('googleLoginButton'),
                       //     onPressed: () {
                       //       // Action login Google
                       //     },

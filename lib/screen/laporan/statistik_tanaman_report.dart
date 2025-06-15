@@ -1075,6 +1075,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Tabs(
+              key: const Key('reportTabs'),
               onTabChanged: _onTabChanged,
               selectedIndex: _selectedTabIndex,
               tabTitles: tabList,
@@ -1087,6 +1088,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     setState(() => _selectedTabIndex = index),
                 children: [
                   InfoTab(
+                    key: const Key('infoTab'),
                     isLoadingInitialData: _isLoadingInitialData,
                     tanamanReport: _tanamanReport,
                     kebunList: _kebunList,
@@ -1096,6 +1098,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   PanenTab(
+                    key: const Key('panenTab'),
                     laporanPanenState: _chartStates['laporanPanen']!,
                     panenKomoditasState: _chartStates['panenKomoditas']!,
                     riwayatPanenState: _riwayatStates['panen']!,
@@ -1107,6 +1110,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   HarianTab(
+                    key: const Key('harianTab'),
                     laporanHarianState: _chartStates['laporanHarian']!,
                     penyiramanState: _chartStates['penyiraman']!,
                     nutrisiState: _chartStates['nutrisi']!,
@@ -1126,6 +1130,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   SakitTab(
+                    key: const Key('sakitTab'),
                     laporanSakitState: _chartStates['laporanSakit']!,
                     statistikPenyakitState: _chartStates['statistikPenyakit']!,
                     riwayatSakitState: _riwayatStates['sakit']!,
@@ -1137,6 +1142,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   MatiTab(
+                    key: const Key('matiTab'),
                     laporanMatiState: _chartStates['laporanMati']!,
                     statistikPenyebabState:
                         _chartStates['statistikPenyebabKematian']!,
@@ -1149,6 +1155,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                     formatDisplayTime: formatDisplayTime,
                   ),
                   NutrisiTab(
+                    key: const Key('nutrisiTab'),
                     nutrisiState: _chartStates['laporanNutrisi']!,
                     vitaminState: _chartStates['laporanVitamin']!,
                     disinfektanState: _chartStates['laporanDisinfektan']!,

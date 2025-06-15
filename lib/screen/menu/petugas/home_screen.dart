@@ -108,9 +108,12 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data perkebunan."),
+            Text("Gagal memuat data perkebunan.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_data_found')),
             const SizedBox(height: 10),
             ElevatedButton(
+              key: const Key('retry_button'),
               onPressed: () => _fetchData(isRefresh: true),
               child: const Text("Coba Lagi"),
             )
@@ -143,6 +146,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporan_harian_perkebunan'),
                           bgColor: yellow1,
                           iconColor: yellow,
                           icon: Icons.add,
@@ -165,6 +169,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporan_khusus_perkebunan'),
                           bgColor: const Color(0xFFDDE7D9),
                           iconColor: Colors.green,
                           icon: Icons.edit,
@@ -226,6 +231,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('aktivitas_terbaru_perkebunan'),
               title: 'Aktivitas Terbaru',
               reports:
                   (_perkebunanData?['aktivitasTerbaru'] as List<dynamic>? ?? [])
@@ -255,6 +261,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_kebun_perkebunan'),
               title: 'Daftar Kebun',
               items: (_perkebunanData?['daftarKebun'] as List<dynamic>? ?? [])
                   .map((kebun) => {
@@ -277,6 +284,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_tanaman_perkebunan'),
               title: 'Daftar Jenis Tanaman',
               items: (_perkebunanData?['daftarTanaman'] as List<dynamic>? ?? [])
                   .map((tanaman) => {
@@ -300,6 +308,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_komoditas_perkebunan'),
               title: 'Daftar Komoditas',
               items:
                   (_perkebunanData?['daftarKomoditas'] as List<dynamic>? ?? [])
@@ -323,9 +332,12 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Gagal memuat data perkebunan."),
+                    Text("Gagal memuat data perkebunan.",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('no_data_found')),
                     const SizedBox(height: 10),
                     ElevatedButton(
+                      key: const Key('retry_button_perkebunan'),
                       onPressed: () => _fetchData(isRefresh: true),
                       child: const Text("Coba Lagi"),
                     )
@@ -348,9 +360,12 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data peternakan."),
+            Text("Gagal memuat data peternakan.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_data_found_peternakan')),
             const SizedBox(height: 10),
             ElevatedButton(
+              key: const Key('retry_button_peternakan'),
               onPressed: () => _fetchData(isRefresh: true),
               child: const Text("Coba Lagi"),
             )
@@ -383,6 +398,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporan_harian_peternakan'),
                           bgColor: yellow1,
                           iconColor: yellow,
                           icon: Icons.add,
@@ -405,6 +421,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporan_khusus_peternakan'),
                           bgColor: const Color(0xFFDDE7D9),
                           iconColor: Colors.green,
                           icon: Icons.edit,
@@ -460,6 +477,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('aktivitas_terbaru_peternakan'),
               title: 'Aktivitas Terbaru',
               reports:
                   (_peternakanData?['aktivitasTerbaru'] as List<dynamic>? ?? [])
@@ -489,6 +507,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_kandang_peternakan'),
               title: 'Daftar Kandang',
               items: (_peternakanData?['daftarKandang'] as List<dynamic>? ?? [])
                   .map((kandang) => {
@@ -511,6 +530,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_ternak_peternakan'),
               title: 'Daftar Jenis Ternak',
               items: (_peternakanData?['daftarTernak'] as List<dynamic>? ?? [])
                   .map((ternak) => {
@@ -533,6 +553,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftar_komoditas_peternakan'),
               title: 'Daftar Komoditas',
               items:
                   (_peternakanData?['daftarKomoditas'] as List<dynamic>? ?? [])
@@ -556,9 +577,12 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Gagal memuat data peternakan."),
+                    Text("Gagal memuat data peternakan.",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('no_data_found_peternakan')),
                     const SizedBox(height: 10),
                     ElevatedButton(
+                      key: const Key('retry_button_peternakan'),
                       onPressed: () => _fetchData(isRefresh: true),
                       child: const Text("Coba Lagi"),
                     )
@@ -615,6 +639,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                               Container(
                                 color: Colors.white,
                                 child: Tabs(
+                                  key: const Key('home_tabs'),
                                   onTabChanged: _onTabChanged,
                                   selectedIndex: _selectedTabIndex,
                                   tabTitles: tabList,

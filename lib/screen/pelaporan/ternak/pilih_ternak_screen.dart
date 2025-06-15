@@ -143,6 +143,7 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data ternak terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -152,6 +153,7 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
                     ),
                   )
                 : ListItemSelectable(
+                    key: const Key('selectable_ternak_list'),
                     title: 'Daftar Ternak',
                     type: ListItemType.basic,
                     items: _listTernak
@@ -185,6 +187,7 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button_pilih_ternak')
           ),
         ),
       ),

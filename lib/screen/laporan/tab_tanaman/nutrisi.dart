@@ -156,10 +156,12 @@ class NutrisiTab extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                   'Error memuat riwayat laporan pemberian nutrisi: ${riwayatNutrisiState.error}',
-                  style: const TextStyle(color: Colors.red)),
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('error_riwayat_pemberian_nutrisi')),
             )
           else if (riwayatNutrisiState.items.isNotEmpty)
             NewestReports(
+              key: const Key('riwayat_pemberian_nutrisi'),
               title: 'Riwayat Pemberian Nutrisi',
               reports: riwayatNutrisiState.items.map((item) {
                 return {
@@ -183,8 +185,9 @@ class NutrisiTab extends StatelessWidget {
                       jenisBudidaya: 'tumbuhan');
                 } else {
                   showAppToast(
-                      context,
-                      'Tidak dapat membuka laporan. ID laporan tidak ditemukan.',);
+                    context,
+                    'Tidak dapat membuka laporan. ID laporan tidak ditemukan.',
+                  );
                 }
               },
               mode: NewestReportsMode.full,
@@ -193,9 +196,12 @@ class NutrisiTab extends StatelessWidget {
               timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
+                  key: const Key('no_riwayat_pemberian_nutrisi'),
+                  style: regular12.copyWith(color: dark2),
                   'Tidak ada riwayat pemberian nutrisi untuk ditampilkan saat ini.'),
             ),
           const SizedBox(height: 80),

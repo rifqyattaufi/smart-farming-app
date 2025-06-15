@@ -83,13 +83,14 @@ class _InfoTabState extends State<InfoTab> {
       return const Center(child: CircularProgressIndicator());
     }
     if (widget.ternakReport == null) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Text(
+            key: const Key('no_ternak_report'),
             "Laporan informasi peternakan tidak ditemukan atau gagal dimuat.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey),
+            style: regular12.copyWith(color: dark2),
           ),
         ),
       );
@@ -200,6 +201,7 @@ class _InfoTabState extends State<InfoTab> {
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: ListItem(
+            key: const Key('list_kandang'),
             title: 'Daftar Kandang',
             type: 'basic',
             items: kandangToShow.map((kandang) {
@@ -223,7 +225,8 @@ class _InfoTabState extends State<InfoTab> {
           child: TextButton(
             onPressed: _loadMoreKandang,
             child: Text("Muat lagi...",
-                style: TextStyle(color: Theme.of(context).primaryColor)),
+                key: const Key('load_more_kandang'),
+                style: regular12.copyWith(color: dark2)),
           ),
         ));
       }
@@ -232,7 +235,8 @@ class _InfoTabState extends State<InfoTab> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text("Tidak ditemukan daftar kandang untuk jenis ternak ini.",
-              style: regular14.copyWith(color: dark2)),
+              style: regular14.copyWith(color: dark2),
+              key: const Key('no_kandang_info')),
         ),
       );
     }
@@ -261,6 +265,7 @@ class _InfoTabState extends State<InfoTab> {
         listChildren.add(Padding(
           padding: const EdgeInsets.only(top: 0, bottom: 0),
           child: ListItem(
+            key: Key('list_ternak_${kandangItem['id'] ?? 'unknown'}'),
             title:
                 'Detail Ternak di ${kandangItem['nama'] ?? 'Kandang Tanpa Nama'}',
             type: 'basic',
@@ -293,6 +298,7 @@ class _InfoTabState extends State<InfoTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
+                        key: Key('load_more_ternak_${kandangItem['id'] ?? 'unknown'}'),
                         "Muat lagi ternak di ${kandangItem['nama'] ?? ''}",
                         style: regular14.copyWith(color: green1),
                       ),

@@ -424,6 +424,7 @@ class _HamaScreenState extends State<HamaScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('add_hama_button'),
                 onPressed: () {
                   if (_selectedTab == 0) {
                     context
@@ -450,9 +451,12 @@ class _HamaScreenState extends State<HamaScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
-                  controller: _searchController, onChanged: _onSearchChanged),
+                  key: const Key('search_hama'),
+                  controller: _searchController,
+                  onChanged: _onSearchChanged),
             ),
             CustomTabBar(
+              key: const Key('hama_tabs'),
               tabs: const ['Laporan Hama', 'Daftar Hama'],
               activeColor: green1,
               underlineWidth: MediaQuery.of(context).size.width / 2.5,
@@ -608,6 +612,7 @@ class _HamaScreenState extends State<HamaScreen> {
         child: Padding(
             padding: const EdgeInsets.all(32.0),
             child: Text(
+              key: const Key('empty_message'),
               message,
               style: regular14.copyWith(color: dark2),
               textAlign: TextAlign.center,
@@ -616,6 +621,7 @@ class _HamaScreenState extends State<HamaScreen> {
 
   Widget _buildLaporanHamaContent() {
     return ListItem(
+      key: const Key('laporan_hama_list'),
       items: _filteredLaporanHamaList.map((laporan) {
         final jenisHama = laporan['Hama']?['JenisHama'];
         final unitBudidaya = laporan['UnitBudidaya'];
@@ -662,6 +668,7 @@ class _HamaScreenState extends State<HamaScreen> {
       child: Column(
         children: _filteredDaftarHamaList.map((jenisHama) {
           return UnitItem(
+            key: Key('jenis_hama_${jenisHama['id'] ?? 'unknown'}'),
             unitName: jenisHama['nama'] ?? 'N/A',
             onEdit: () {
               final id = jenisHama['id'] as String?;
@@ -687,9 +694,11 @@ class _HamaScreenState extends State<HamaScreen> {
                             "Yakin ingin menghapus jenis hama '${jenisHama['nama']}'?"),
                         actions: [
                           TextButton(
+                              key: const Key('cancel_delete_button'),
                               onPressed: () => Navigator.of(ctx).pop(false),
                               child: const Text("Batal")),
                           TextButton(
+                              key: const Key('confirm_delete_button'),
                               onPressed: () => Navigator.of(ctx).pop(true),
                               child: const Text("Hapus",
                                   style: TextStyle(color: Colors.red))),

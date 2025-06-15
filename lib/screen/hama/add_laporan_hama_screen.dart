@@ -53,6 +53,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -67,6 +68,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -250,6 +252,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DropdownFieldWidget(
+                      key: const Key('jenis_hama'),
                       label: "Jenis hama",
                       hint: "Pilih jenis hama",
                       items: hamaList
@@ -276,6 +279,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                     ),
                     if (selectedHama == "lainnya")
                       InputFieldWidget(
+                        key: const Key('nama_hama_lainnya'),
                         label: "Nama hama",
                         hint: "Masukkan nama hama",
                         controller: _namaHamaController,
@@ -287,6 +291,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                         },
                       ),
                     DropdownFieldWidget(
+                      key: const Key('lokasi_hama'),
                       label: "Terlihat di",
                       hint: "Pilih lokasi",
                       items: unitList
@@ -312,6 +317,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                       },
                     ),
                     InputFieldWidget(
+                        key: const Key('jumlah_hama_input'),
                         label: "Jumlah hama",
                         hint: "Contoh: 5 (ekor)",
                         controller: _sizeController,
@@ -329,11 +335,13 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
                           return null;
                         }),
                     ImagePickerWidget(
+                      key: const Key('bukti_hama_image_picker'),
                       label: "Unggah bukti adanya hama",
                       image: _image,
                       onPickImage: _pickImage,
                     ),
                     InputFieldWidget(
+                        key: const Key('catatan_pelaporan'),
                         label: "Catatan/jurnal pelaporan",
                         hint: "Keterangan",
                         controller: _catatanController,
@@ -360,6 +368,7 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_laporan_hama_button'),
           ),
         ),
       ),

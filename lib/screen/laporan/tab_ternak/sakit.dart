@@ -106,8 +106,9 @@ class SakitTab extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
+            key: const Key('error_total_sakit'),
             "Gagal memuat total",
-            style: regular14.copyWith(color: Colors.red),
+            style: regular12.copyWith(color: Colors.red),
             textAlign: TextAlign.center,
           ),
         ),
@@ -247,11 +248,13 @@ class SakitTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
+                  key: const Key('error_riwayat_sakit'),
                   'Error memuat riwayat laporan sakit: ${riwayatSakitState.error}',
-                  style: const TextStyle(color: Colors.red)),
+                  style: regular12.copyWith(color: Colors.red)),
             )
           else if (riwayatSakitState.items.isNotEmpty)
             NewestReports(
+              key: const Key('riwayat_pelaporan_sakit'),
               title: 'Riwayat Pelaporan Ternak Sakit',
               reports: riwayatSakitState.items.map((item) {
                 return {
@@ -285,9 +288,11 @@ class SakitTab extends StatelessWidget {
               timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
+                  key: const Key('no_riwayat_sakit'),
+                  style: regular12.copyWith(color: dark2),
                   'Tidak ada riwayat pelaporan ternak sakit untuk ditampilkan saat ini.'),
             ),
           const SizedBox(height: 80),

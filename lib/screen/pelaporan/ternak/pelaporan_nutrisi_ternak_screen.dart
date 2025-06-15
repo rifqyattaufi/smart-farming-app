@@ -209,6 +209,7 @@ class _PelaporanNutrisiTernakScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -224,6 +225,7 @@ class _PelaporanNutrisiTernakScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -331,6 +333,7 @@ class _PelaporanNutrisiTernakScreenState
                           ),
                           const SizedBox(height: 12),
                           RadioField(
+                            key: Key('status_pemberian_$i'),
                             label: 'Jenis Pemberian',
                             selectedValue: statusPemberianList[i] ?? 'Vitamin',
                             options: const [
@@ -346,6 +349,7 @@ class _PelaporanNutrisiTernakScreenState
                             },
                           ),
                           DropdownFieldWidget(
+                            key: Key('bahan_pemberian_$i'),
                             label: "Nama bahan",
                             hint: "Pilih jenis bahan",
                             items: (statusPemberianList[i] == 'Vitamin'
@@ -373,6 +377,7 @@ class _PelaporanNutrisiTernakScreenState
                             },
                           ),
                           InputFieldWidget(
+                              key: Key('jumlah_dosis_$i'),
                               label: "Jumlah/dosis",
                               hint: "Contoh: 10",
                               controller: _sizeController[i],
@@ -386,6 +391,7 @@ class _PelaporanNutrisiTernakScreenState
                                 return null;
                               }),
                           InputFieldWidget(
+                            key: Key('satuan_dosis_$i'),
                             label: "Satuan dosis",
                             hint: "",
                             controller: _satuanController[i],
@@ -398,6 +404,7 @@ class _PelaporanNutrisiTernakScreenState
                             },
                           ),
                           ImagePickerWidget(
+                            key: Key('image_picker_$i'),
                             label: "Unggah bukti pemberian dosis ke ternak",
                             image: _imageList[i],
                             onPickImage: (ctx) {
@@ -405,6 +412,7 @@ class _PelaporanNutrisiTernakScreenState
                             },
                           ),
                           InputFieldWidget(
+                              key: Key('catatan_$i'),
                               label: "Catatan/jurnal pelaporan",
                               hint: "Keterangan",
                               controller: _catatanController[i],
@@ -436,6 +444,7 @@ class _PelaporanNutrisiTernakScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submit_button_pelaporan_nutrisi_ternak'),
           ),
         ),
       ),

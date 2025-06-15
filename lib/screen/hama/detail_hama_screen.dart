@@ -109,9 +109,10 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Gagal memuat detail laporan hama.'),
+                         Text('Gagal memuat detail laporan hama.', style: regular12.copyWith(color: dark2), key: const Key('error_message')),
                           const SizedBox(height: 10),
                           ElevatedButton(
+                              key: const Key('retry_button'),
                               onPressed: _fetchData,
                               child: const Text('Coba Lagi'))
                         ],

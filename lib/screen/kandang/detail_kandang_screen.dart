@@ -294,6 +294,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                 ),
                 if (_kandang['tipe'] == "individu")
                   ListItem(
+                    key: const Key('list_ternak'),
                     title: 'Daftar Ternak',
                     type: 'basic',
                     items: _ternakList
@@ -322,6 +323,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
+                      key: const Key('ubah_data_kandang_button'),
                       onPressed: () {
                         context.push('/tambah-kandang',
                             extra: AddKandangScreen(
@@ -337,6 +339,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                     ),
                     const SizedBox(height: 12), // Jarak antara tombol
                     CustomButton(
+                      key: const Key('hapus_data_kandang_button'),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
@@ -346,10 +349,12 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                                 'Apakah Anda yakin ingin menghapus kandang ini?'),
                             actions: [
                               TextButton(
+                                key: const Key('cancelButton'),
                                 onPressed: () => Navigator.pop(context, false),
                                 child: const Text('Batal'),
                               ),
                               TextButton(
+                                key: const Key('deleteButton'),
                                 onPressed: () => Navigator.pop(context, true),
                                 child: const Text('Hapus'),
                               ),

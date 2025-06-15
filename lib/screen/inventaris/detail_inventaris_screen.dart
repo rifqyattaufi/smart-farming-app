@@ -110,10 +110,12 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
               'Apakah Anda yakin ingin menghapus data inventaris ini? Tindakan ini tidak dapat dibatalkan.'),
           actions: [
             TextButton(
+              key: const Key('cancelButton'),
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Batal'),
             ),
             TextButton(
+              key: const Key('deleteButton'),
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Hapus'),
@@ -338,6 +340,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
           ),
           actions: <Widget>[
             TextButton(
+              key: const Key('tumbuhanButton'),
               child: const Text('TUMBUHAN'),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
@@ -350,6 +353,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
               },
             ),
             TextButton(
+              key: const Key('hewanButton'),
               child: const Text('HEWAN'),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
@@ -362,6 +366,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
               },
             ),
             TextButton(
+              key: const Key('cancelButtons'),
               child: Text('BATAL', style: TextStyle(color: red)),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
@@ -597,17 +602,6 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
     final String satuanLambang = satuan?['lambang'] ?? '';
     final num jumlah = _inventarisDetails?['jumlah'] ?? 0;
 
-    if (_isLoadingInitialData) {
-      return Scaffold(
-          appBar: AppBar(title: const Text("Detail Inventaris")),
-          body: const Center(child: CircularProgressIndicator()));
-    }
-    if (_inventarisDetails == null) {
-      return Scaffold(
-          appBar: AppBar(title: const Text("Detail Inventaris")),
-          body: const Center(child: Text("Data inventaris tidak ditemukan.")));
-    }
-
     List<Map<String, dynamic>> historyItemsForListItem =
         _riwayatPemakaianList.map((item) {
       return {
@@ -654,285 +648,345 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: DottedBorder(
-                  color: green1,
-                  strokeWidth: 1.5,
-                  dashPattern: const [6, 4],
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(12),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: ImageBuilder(
-                      url: _inventarisDetails?['gambar'] ?? '',
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Informasi Inventaris",
-                        style: bold18.copyWith(color: dark1)),
-                    const SizedBox(height: 12),
-                    infoItem("Nama inventaris",
-                        _inventarisDetails?['nama'] ?? 'Unknown'),
-                    infoItem(
-                        "Kategori inventaris", kategori?['nama'] ?? 'Unknown'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: _isLoadingInitialData
+            ? const Center(child: CircularProgressIndicator())
+            : _inventarisDetails == null
+                ? Center(
+                    child: Text("Data inventaris tidak ditemukan.",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('noDataText')))
+                : SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Jumlah Stok",
-                            style: medium14.copyWith(color: dark1)),
-                        _isUpdatingStock
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2))
-                            : Row(
-                                mainAxisSize: MainAxisSize.min,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: DottedBorder(
+                            color: green1,
+                            strokeWidth: 1.5,
+                            dashPattern: const [6, 4],
+                            borderType: BorderType.RRect,
+                            radius: const Radius.circular(12),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: ImageBuilder(
+                                url: _inventarisDetails?['gambar'] ?? '',
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Informasi Inventaris",
+                                  style: bold18.copyWith(color: dark1)),
+                              const SizedBox(height: 12),
+                              infoItem("Nama inventaris",
+                                  _inventarisDetails?['nama'] ?? 'Unknown'),
+                              infoItem("Kategori inventaris",
+                                  kategori?['nama'] ?? 'Unknown'),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  IconButton(
-                                    icon: Icon(Icons.remove_circle_outline,
-                                        color: (_inventarisDetails?['jumlah'] ??
-                                                    0) >
-                                                0
-                                            ? red
-                                            : grey,
-                                        size: 28),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () {
-                                      if (_inventarisDetails == null ||
-                                          widget.idInventaris == null) {
-                                        showAppToast(context,
-                                            "Data inventaris tidak ditemukan.");
-                                        return;
-                                      }
-                                      num currentStock =
-                                          _inventarisDetails!['jumlah'] ?? 0;
-                                      final String? categoryName =
-                                          _inventarisDetails![
-                                              'kategoriInventaris']?['nama'];
+                                  Text("Jumlah Stok",
+                                      style: medium14.copyWith(color: dark1)),
+                                  _isUpdatingStock
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2))
+                                      : Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              key: const Key('removeStockButton'),
+                                              icon: Icon(
+                                                  Icons.remove_circle_outline,
+                                                  color: (_inventarisDetails?[
+                                                                  'jumlah'] ??
+                                                              0) >
+                                                          0
+                                                      ? red
+                                                      : grey,
+                                                  size: 28),
+                                              padding: EdgeInsets.zero,
+                                              constraints:
+                                                  const BoxConstraints(),
+                                              onPressed: () {
+                                                if (_inventarisDetails ==
+                                                        null ||
+                                                    widget.idInventaris ==
+                                                        null) {
+                                                  showAppToast(context,
+                                                      "Data inventaris tidak ditemukan.");
+                                                  return;
+                                                }
+                                                num currentStock =
+                                                    _inventarisDetails![
+                                                            'jumlah'] ??
+                                                        0;
+                                                final String? categoryName =
+                                                    _inventarisDetails![
+                                                            'kategoriInventaris']
+                                                        ?['nama'];
 
-                                      if (currentStock > 0) {
-                                        const List<String> specialCategories = [
-                                          'Vitamin',
-                                          'Pupuk',
-                                          'Disinfektan',
-                                          'Vaksin'
-                                        ];
-                                        // Stok masih ada, arahkan ke halaman pemakaian inventaris
-                                        if (categoryName != null &&
-                                            specialCategories
-                                                .contains(categoryName)) {
-                                          // Kategori spesial, tampilkan dialog Hewan/Tumbuhan
-                                          _showHewanTumbuhanDialog(
-                                              categoryName);
-                                        } else {
-                                          // Kategori lain, langsung ke halaman tambah pemakaian
-                                          context.push(
-                                              '/tambah-pemakaian-inventaris');
-                                        }
-                                      } else {
-                                        // Stok sudah 0, tidak bisa dikurangi lagi
-                                        showAppToast(context,
-                                            'Stok sudah habis, tidak bisa dikurangi.');
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Text(
-                                      jumlah is int
-                                          ? jumlah.toString()
-                                          : jumlah.toStringAsFixed(
-                                              jumlah.truncateToDouble() ==
-                                                      jumlah
-                                                  ? 0
-                                                  : 1),
-                                      style: semibold16.copyWith(color: dark2),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.add_circle_outline,
-                                        color: green1, size: 28),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () => _updateStock(1),
-                                  ),
-                                  if (satuanLambang.isNotEmpty) ...[
-                                    const SizedBox(width: 8),
-                                    Text(satuanLambang,
-                                        style:
-                                            regular14.copyWith(color: dark2)),
-                                  ]
+                                                if (currentStock > 0) {
+                                                  const List<String>
+                                                      specialCategories = [
+                                                    'Vitamin',
+                                                    'Pupuk',
+                                                    'Disinfektan',
+                                                    'Vaksin'
+                                                  ];
+                                                  // Stok masih ada, arahkan ke halaman pemakaian inventaris
+                                                  if (categoryName != null &&
+                                                      specialCategories
+                                                          .contains(
+                                                              categoryName)) {
+                                                    // Kategori spesial, tampilkan dialog Hewan/Tumbuhan
+                                                    _showHewanTumbuhanDialog(
+                                                        categoryName);
+                                                  } else {
+                                                    // Kategori lain, langsung ke halaman tambah pemakaian
+                                                    context.push(
+                                                        '/tambah-pemakaian-inventaris');
+                                                  }
+                                                } else {
+                                                  // Stok sudah 0, tidak bisa dikurangi lagi
+                                                  showAppToast(context,
+                                                      'Stok sudah habis, tidak bisa dikurangi.');
+                                                }
+                                              },
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Text(
+                                                jumlah is int
+                                                    ? jumlah.toString()
+                                                    : jumlah.toStringAsFixed(
+                                                        jumlah.truncateToDouble() ==
+                                                                jumlah
+                                                            ? 0
+                                                            : 1),
+                                                style: semibold16.copyWith(
+                                                    color: dark2),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              key: const Key('addStockButton'),
+                                              icon: Icon(
+                                                  Icons.add_circle_outline,
+                                                  color: green1,
+                                                  size: 28),
+                                              padding: EdgeInsets.zero,
+                                              constraints:
+                                                  const BoxConstraints(),
+                                              onPressed: () => _updateStock(1),
+                                            ),
+                                            if (satuanLambang.isNotEmpty) ...[
+                                              const SizedBox(width: 8),
+                                              Text(satuanLambang,
+                                                  style: regular14.copyWith(
+                                                      color: dark2)),
+                                            ]
+                                          ],
+                                        ),
                                 ],
                               ),
+                              infoItem("Satuan",
+                                  satuanNama.isNotEmpty ? satuanNama : ""),
+                              _buildKetersediaan(
+                                  "Ketersediaan inventaris", ketersediaan),
+                              if (showExpiryInfo) ...[
+                                infoItem("Tanggal kadaluwarsa",
+                                    _formatDisplayDate(expiryDateString)),
+                                if (_formatDisplayTime(expiryDateString)
+                                    .isNotEmpty)
+                                  infoItem("Waktu kadaluwarsa",
+                                      _formatDisplayTime(expiryDateString)),
+                              ] else if (isExpiredOrTodayOrNotSet) ...[
+                                _buildKetersediaan(
+                                    "Status Kadaluwarsa", 'kadaluwarsa'),
+                                infoItem("Tanggal kadaluwarsa",
+                                    _formatDisplayDate(expiryDateString)),
+                                if (_formatDisplayTime(expiryDateString)
+                                    .isNotEmpty)
+                                  infoItem("Waktu kadaluwarsa",
+                                      _formatDisplayTime(expiryDateString)),
+                              ] else if (isKadaluwarsaTidakDiatur) ...[
+                                infoItem("Tanggal kadaluwarsa", "Tidak diatur"),
+                              ],
+                              infoItem(
+                                  "Tanggal didaftarkan",
+                                  _formatDisplayDate(
+                                      _inventarisDetails?['createdAt'])),
+                              if (_formatDisplayTime(
+                                      _inventarisDetails?['createdAt'])
+                                  .isNotEmpty)
+                                infoItem(
+                                    "Waktu didaftarkan",
+                                    _formatDisplayTime(
+                                        _inventarisDetails?['createdAt'])),
+                              const SizedBox(height: 8),
+                              Text("Deskripsi inventaris",
+                                  style: medium14.copyWith(color: dark1)),
+                              const SizedBox(height: 8),
+                              Text(
+                                  _inventarisDetails?['detail'] ??
+                                      'Tidak ada deskripsi',
+                                  style: regular14.copyWith(color: dark2)),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (_isLoadingChart)
+                                const Center(child: CircularProgressIndicator())
+                              else if (chartValues.isNotEmpty &&
+                                  _chartXLabels.isNotEmpty)
+                                ChartWidget(
+                                  titleStats: 'Statistik Pemakaian Inventaris',
+                                  data: chartValues,
+                                  xLabels: _chartXLabels,
+                                  onDateIconPressed: _showDateFilterDialog,
+                                  showFilterControls: true,
+                                  selectedChartFilterType:
+                                      _selectedChartFilterType,
+                                  displayedDateRangeText:
+                                      formattedDisplayedDateRange,
+                                  onChartFilterTypeChanged:
+                                      (ChartFilterType? newValue) {
+                                    if (newValue != null &&
+                                        newValue != _selectedChartFilterType) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _selectedChartFilterType = newValue;
+                                          final DateTime now = DateTime.now();
+                                          if (newValue ==
+                                              ChartFilterType.monthly) {
+                                            final DateTime endDateDefault =
+                                                DateTime(
+                                                    now.year, now.month + 1, 0);
+                                            final DateTime startDateDefault =
+                                                DateTime(
+                                                    now.year, now.month - 5, 1);
+                                            _selectedChartDateRange =
+                                                DateTimeRange(
+                                                    start: startDateDefault,
+                                                    end: endDateDefault);
+                                          } else if (newValue ==
+                                              ChartFilterType.yearly) {
+                                            final DateTime endDateDefault =
+                                                DateTime(now.year, 12, 31);
+                                            final DateTime startDateDefault =
+                                                DateTime(now.year - 2, 1, 1);
+                                            _selectedChartDateRange =
+                                                DateTimeRange(
+                                                    start: startDateDefault,
+                                                    end: endDateDefault);
+                                          } else if (newValue ==
+                                              ChartFilterType.weekly) {
+                                            _selectedChartDateRange =
+                                                DateTimeRange(
+                                                    start: now.subtract(
+                                                        const Duration(
+                                                            days: 6)),
+                                                    end: now);
+                                          }
+                                        });
+                                      }
+                                      _fetchFilteredChartData();
+                                    }
+                                  },
+                                )
+                              else
+                                Center(
+                                    child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20.0),
+                                  child: Text(
+                                    key: const Key('noStatsText'),
+                                    'Tidak ada statistik data untuk ditampilkan.',
+                                    style: medium14.copyWith(color: dark2),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        if (_riwayatPemakaianList.isEmpty &&
+                            _isLoadingRiwayat &&
+                            _riwayatCurrentPage == 1)
+                          const Center(
+                              child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator()))
+                        else if (_riwayatPemakaianList.isEmpty &&
+                            !_isLoadingRiwayat)
+                          Center(
+                              child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text(
+                              key: const Key('noHistoryText'),
+                              'Tidak ada riwayat pemakaian.',
+                              style: medium14.copyWith(color: dark2),
+                              textAlign: TextAlign.center,
+                            ),
+                          ))
+                        else
+                          ListItem(
+                            key: const Key('riwayatPemakaianListItem'),
+                            title: 'Riwayat Pemakaian Inventaris',
+                            items: historyItemsForListItem,
+                            type: "history",
+                            onItemTap: (context, tappedItem) {
+                              final id = tappedItem['id']?.toString();
+                              if (id != null && id.isNotEmpty) {
+                                context
+                                    .push('/detail-pemakaian-inventaris/$id');
+                              } else {
+                                showAppToast(
+                                    context, 'Detail riwayat tidak ditemukan.');
+                              }
+                            },
+                          ),
+                        if (_isLoadingRiwayat &&
+                            _riwayatPemakaianList.isNotEmpty)
+                          const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child:
+                                  Center(child: CircularProgressIndicator())),
+                        if (!_isLoadingRiwayat &&
+                            _riwayatCurrentPage < _riwayatTotalPages)
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: CustomButton(
+                              key: const Key('loadMoreHistoryButton'),
+                              buttonText: "Muat Lebih Banyak Riwayat",
+                              onPressed: () => _fetchRiwayatPemakaian(
+                                  page: _riwayatCurrentPage + 1),
+                              backgroundColor: green1,
+                              textColor: white,
+                            ),
+                          ),
+                        const SizedBox(height: 80),
                       ],
                     ),
-                    infoItem("Satuan", satuanNama.isNotEmpty ? satuanNama : ""),
-                    _buildKetersediaan("Ketersediaan inventaris", ketersediaan),
-                    if (showExpiryInfo) ...[
-                      infoItem("Tanggal kadaluwarsa",
-                          _formatDisplayDate(expiryDateString)),
-                      if (_formatDisplayTime(expiryDateString).isNotEmpty)
-                        infoItem("Waktu kadaluwarsa",
-                            _formatDisplayTime(expiryDateString)),
-                    ] else if (isExpiredOrTodayOrNotSet) ...[
-                      _buildKetersediaan("Status Kadaluwarsa", 'kadaluwarsa'),
-                      infoItem("Tanggal kadaluwarsa",
-                          _formatDisplayDate(expiryDateString)),
-                      if (_formatDisplayTime(expiryDateString).isNotEmpty)
-                        infoItem("Waktu kadaluwarsa",
-                            _formatDisplayTime(expiryDateString)),
-                    ] else if (isKadaluwarsaTidakDiatur) ...[
-                      infoItem("Tanggal kadaluwarsa", "Tidak diatur"),
-                    ],
-                    infoItem("Tanggal didaftarkan",
-                        _formatDisplayDate(_inventarisDetails?['createdAt'])),
-                    if (_formatDisplayTime(_inventarisDetails?['createdAt'])
-                        .isNotEmpty)
-                      infoItem("Waktu didaftarkan",
-                          _formatDisplayTime(_inventarisDetails?['createdAt'])),
-                    const SizedBox(height: 8),
-                    Text("Deskripsi inventaris",
-                        style: medium14.copyWith(color: dark1)),
-                    const SizedBox(height: 8),
-                    Text(_inventarisDetails?['detail'] ?? 'Tidak ada deskripsi',
-                        style: regular14.copyWith(color: dark2)),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (_isLoadingChart)
-                      const Center(child: CircularProgressIndicator())
-                    else if (chartValues.isNotEmpty && _chartXLabels.isNotEmpty)
-                      ChartWidget(
-                        titleStats: 'Statistik Pemakaian Inventaris',
-                        data: chartValues,
-                        xLabels: _chartXLabels,
-                        onDateIconPressed: _showDateFilterDialog,
-                        showFilterControls: true,
-                        selectedChartFilterType: _selectedChartFilterType,
-                        displayedDateRangeText: formattedDisplayedDateRange,
-                        onChartFilterTypeChanged: (ChartFilterType? newValue) {
-                          if (newValue != null &&
-                              newValue != _selectedChartFilterType) {
-                            if (mounted) {
-                              setState(() {
-                                _selectedChartFilterType = newValue;
-                                final DateTime now = DateTime.now();
-                                if (newValue == ChartFilterType.monthly) {
-                                  final DateTime endDateDefault =
-                                      DateTime(now.year, now.month + 1, 0);
-                                  final DateTime startDateDefault =
-                                      DateTime(now.year, now.month - 5, 1);
-                                  _selectedChartDateRange = DateTimeRange(
-                                      start: startDateDefault,
-                                      end: endDateDefault);
-                                } else if (newValue == ChartFilterType.yearly) {
-                                  final DateTime endDateDefault =
-                                      DateTime(now.year, 12, 31);
-                                  final DateTime startDateDefault =
-                                      DateTime(now.year - 2, 1, 1);
-                                  _selectedChartDateRange = DateTimeRange(
-                                      start: startDateDefault,
-                                      end: endDateDefault);
-                                } else if (newValue == ChartFilterType.weekly) {
-                                  _selectedChartDateRange = DateTimeRange(
-                                      start:
-                                          now.subtract(const Duration(days: 6)),
-                                      end: now);
-                                }
-                              });
-                            }
-                            _fetchFilteredChartData();
-                          }
-                        },
-                      )
-                    else
-                      Center(
-                          child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20.0),
-                        child: Text(
-                          'Tidak ada statistik data untuk ditampilkan.',
-                          style: medium14.copyWith(color: dark2),
-                          textAlign: TextAlign.center,
-                        ),
-                      )),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_riwayatPemakaianList.isEmpty &&
-                  _isLoadingRiwayat &&
-                  _riwayatCurrentPage == 1)
-                const Center(
-                    child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator()))
-              else if (_riwayatPemakaianList.isEmpty && !_isLoadingRiwayat)
-                Center(
-                    child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Text(
-                    'Tidak ada riwayat pemakaian.',
-                    style: medium14.copyWith(color: dark2),
-                    textAlign: TextAlign.center,
                   ),
-                ))
-              else
-                ListItem(
-                  title: 'Riwayat Pemakaian Inventaris',
-                  items: historyItemsForListItem,
-                  type: "history",
-                  onItemTap: (context, tappedItem) {
-                    final id = tappedItem['id']?.toString();
-                    if (id != null && id.isNotEmpty) {
-                      context.push('/detail-pemakaian-inventaris/$id');
-                    } else {
-                      showAppToast(context, 'Detail riwayat tidak ditemukan.');
-                    }
-                  },
-                ),
-              if (_isLoadingRiwayat && _riwayatPemakaianList.isNotEmpty)
-                const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator())),
-              if (!_isLoadingRiwayat &&
-                  _riwayatCurrentPage < _riwayatTotalPages)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: CustomButton(
-                    buttonText: "Muat Lebih Banyak Riwayat",
-                    onPressed: () =>
-                        _fetchRiwayatPemakaian(page: _riwayatCurrentPage + 1),
-                    backgroundColor: green1,
-                    textColor: white,
-                  ),
-                ),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -941,6 +995,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomButton(
+                key: const Key('ubahDataButton'),
                 onPressed: () {
                   if (_inventarisDetails != null) {
                     context.push('/tambah-inventaris',
@@ -961,6 +1016,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
               ),
               const SizedBox(height: 12),
               CustomButton(
+                key: const Key('hapusDataButton'),
                 onPressed: _isDeleting
                     ? null
                     : () {

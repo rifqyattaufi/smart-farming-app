@@ -49,10 +49,12 @@ class UnitItem extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.delete_outline, color: dark1),
                   onPressed: onDelete,
+                  key: const Key('delete_unit_button'),
                 ),
                 IconButton(
                   icon: Icon(Icons.edit_outlined, color: dark1),
                   onPressed: onEdit,
+                  key: const Key('edit_unit_button'),
                 ),
               ],
             ),

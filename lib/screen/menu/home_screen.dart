@@ -115,9 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data perkebunan."),
+            Text("Gagal memuat data perkebunan.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('perkebunanErrorText')),
             const SizedBox(height: 10),
             ElevatedButton(
+              key: const Key('retryPerkebunanButton'),
               onPressed: () => _fetchData(isRefresh: true),
               child: const Text("Coba Lagi"),
             )
@@ -191,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporanHarianPerkebunan'),
                           bgColor: yellow1,
                           iconColor: yellow,
                           icon: Icons.add,
@@ -213,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporanKhususPerkebunan'),
                           bgColor: const Color(0xFFDDE7D9),
                           iconColor: Colors.green,
                           icon: Icons.edit,
@@ -274,6 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('aktivitasTerbaruPerkebunan'),
               title: 'Aktivitas Terbaru',
               reports:
                   (_perkebunanData?['aktivitasTerbaru'] as List<dynamic>? ?? [])
@@ -303,6 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarKebunPerkebunan'),
               title: 'Daftar Kebun',
               items: (_perkebunanData?['daftarKebun'] as List<dynamic>? ?? [])
                   .map((kebun) => {
@@ -325,6 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarTanamanPerkebunan'),
               title: 'Daftar Jenis Tanaman',
               items: (_perkebunanData?['daftarTanaman'] as List<dynamic>? ?? [])
                   .map((tanaman) => {
@@ -348,6 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarKomoditasPerkebunan'),
               title: 'Daftar Komoditas',
               items:
                   (_perkebunanData?['daftarKomoditas'] as List<dynamic>? ?? [])
@@ -371,9 +380,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Gagal memuat data perkebunan."),
+                    Text("Gagal memuat data perkebunan.",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('perkebunanErrorText')),
                     const SizedBox(height: 10),
                     ElevatedButton(
+                      key: const Key('retryPerkebunanButton'),
                       onPressed: () => _fetchData(isRefresh: true),
                       child: const Text("Coba Lagi"),
                     )
@@ -396,9 +408,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data peternakan."),
+            Text("Gagal memuat data peternakan.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('peternakanErrorText')),
             const SizedBox(height: 10),
             ElevatedButton(
+              key: const Key('retryPeternakanButton'),
               onPressed: () => _fetchData(isRefresh: true),
               child: const Text("Coba Lagi"),
             )
@@ -472,6 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporanHarianPeternakan'),
                           bgColor: yellow1,
                           iconColor: yellow,
                           icon: Icons.add,
@@ -494,6 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: cardWidth,
                         child: MenuCard(
+                          key: const Key('pelaporanKhususPeternakan'),
                           bgColor: const Color(0xFFDDE7D9),
                           iconColor: Colors.green,
                           icon: Icons.edit,
@@ -549,6 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('aktivitasTerbaruPeternakan'),
               title: 'Aktivitas Terbaru',
               reports:
                   (_peternakanData?['aktivitasTerbaru'] as List<dynamic>? ?? [])
@@ -578,6 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarKandangPeternakan'),
               title: 'Daftar Kandang',
               items: (_peternakanData?['daftarKandang'] as List<dynamic>? ?? [])
                   .map((kandang) => {
@@ -600,6 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarTernakPeternakan'),
               title: 'Daftar Jenis Ternak',
               items: (_peternakanData?['daftarTernak'] as List<dynamic>? ?? [])
                   .map((ternak) => {
@@ -622,6 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             ListItem(
+              key: const Key('daftarKomoditasPeternakan'),
               title: 'Daftar Komoditas',
               items:
                   (_peternakanData?['daftarKomoditas'] as List<dynamic>? ?? [])
@@ -645,9 +666,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Gagal memuat data peternakan."),
+                    Text("Gagal memuat data peternakan.",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('peternakanErrorText')),
                     const SizedBox(height: 10),
                     ElevatedButton(
+                      key: const Key('retryPeternakanButton'),
                       onPressed: () => _fetchData(isRefresh: true),
                       child: const Text("Coba Lagi"),
                     )
@@ -703,16 +727,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Aksi",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        Text("Aksi Cepat",
+                            style: semibold16.copyWith(
+                              color: dark1,
+                            )),
                         const SizedBox(height: 10),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahKebun'),
                           leading: Icon(Icons.warehouse, color: green1),
                           title: const Text("Tambah Kebun"),
                           onTap: () {
@@ -726,6 +748,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahTanaman'),
                           leading: Icon(Icons.yard_outlined, color: green1),
                           title: const Text("Tambah Jenis Tanaman"),
                           onTap: () {
@@ -739,6 +762,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahKomoditasTanaman'),
                           leading:
                               Icon(Icons.inventory_outlined, color: green1),
                           title: const Text("Tambah Komoditas Tanaman"),
@@ -767,16 +791,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Aksi",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        Text(
+                          "Aksi Cepat",
+                          style: semibold16.copyWith(
+                            color: dark1,
                           ),
                         ),
                         const SizedBox(height: 10),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahKandang'),
                           leading:
                               Icon(Icons.warehouse_outlined, color: green1),
                           title: const Text("Tambah Kandang"),
@@ -791,6 +815,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahTernak'),
                           leading:
                               Icon(Icons.cruelty_free_rounded, color: green1),
                           title: const Text("Tambah Jenis Ternak"),
@@ -805,6 +830,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Divider(height: 1, color: Color(0xFFE8E8E8)),
                         ListTile(
+                          key: const Key('tambahKomoditasTernak'),
                           leading:
                               Icon(Icons.inventory_outlined, color: green1),
                           title: const Text("Tambah Komoditas Ternak"),
@@ -857,6 +883,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Container(
                                 color: Colors.white,
                                 child: Tabs(
+                                  key: const Key('homeTabs'),
                                   onTabChanged: _onTabChanged,
                                   selectedIndex: _selectedTabIndex,
                                   tabTitles: tabList,

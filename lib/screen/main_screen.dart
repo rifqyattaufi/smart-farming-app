@@ -62,6 +62,7 @@ class MainScreen extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () => context.go(tab['location']!),
+                key: Key('bottom_nav_${tab['label']!.toLowerCase()}'),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

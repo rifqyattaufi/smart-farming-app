@@ -82,11 +82,13 @@ class _DetailLaporanMatiScreenState extends State<DetailLaporanMatiScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
+                          key: const Key('no_data_found'),
                           'Data laporan tidak ditemukan.',
                           style: medium14.copyWith(color: dark2),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton.icon(
+                          key: const Key('reload_button'),
                           onPressed: _fetchData,
                           icon: const Icon(Icons.refresh),
                           label: const Text('Muat Ulang'),

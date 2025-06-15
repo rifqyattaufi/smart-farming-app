@@ -166,6 +166,7 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                           }
                           if (index == 0) {
                             return NewestReports(
+                              key: const Key('riwayat_aktivitas_reports'),
                               title: 'Semua Aktivitas Pelaporan',
                               reports: reportItems,
                               onItemTap: (context, item) {

@@ -140,6 +140,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
                     label: "Nama grade hasil panen",
                     hint: "Contoh: Grade A",
                     controller: _nameController,
+                    key: const Key('nama_grade_input'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Nama grade hasil panen tidak boleh kosong';
@@ -152,6 +153,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
                     label: "Deskripsi grade hasil panen",
                     hint: "Keterangan",
                     controller: _deskripsiController,
+                    key: const Key('deskripsi_grade_input'),
                     maxLines: 5,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -175,6 +177,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submit_grade_button'),
           ),
         ),
       ),

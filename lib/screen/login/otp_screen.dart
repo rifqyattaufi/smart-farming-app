@@ -179,6 +179,7 @@ class _OtpScreenState extends State<OtpScreen> {
             textStyle: semibold16.copyWith(color: white),
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('verify_button'),
           ),
         ),
       ),

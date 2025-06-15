@@ -118,8 +118,11 @@ class _NotificationScreenState extends State<NotificationScreen>
                 child: CircularProgressIndicator(),
               )
             : _unreadNotifications.isEmpty && _allNotifications.isEmpty
-                ? const Center(
-                    child: Text("No Notification Found",
+                ? Center(
+                    child: Text(
+                        key: const Key('no_notification_found'),
+                        "No Notification Found",
+                        style: regular12.copyWith(color: dark2),
                         textAlign: TextAlign.center),
                   )
                 : SafeArea(
@@ -153,6 +156,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                                 style: bold18.copyWith(
                                                     color: dark1)),
                                             // GestureDetector(
+                                            //   key: const Key('mark_all_as_read'),
                                             //   onTap: () async {
                                             //     await _markAllAsRead();
                                             //   },
@@ -170,6 +174,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                             //   ),
                                             // ),
                                             IconButton(
+                                              key: const Key('mark_all_as_read'),
                                               onPressed: () async {
                                                 await _markAllAsRead();
                                               },
@@ -183,6 +188,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                         ),
                                         ..._unreadNotifications.map(
                                           (notif) => InkWell(
+                                            key: Key('notification_${notif.id}'),
                                             child: Container(
                                               padding: const EdgeInsets.all(8),
                                               margin:
@@ -276,6 +282,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                                 style: bold18.copyWith(
                                                     color: dark1)),
                                             IconButton(
+                                              key: const Key('delete_all_read_notifications'),
                                               onPressed:
                                                   _deleteAllReadNotifications,
                                               icon: Icon(
@@ -288,6 +295,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                         ),
                                         ..._allNotifications.map((notif) =>
                                             InkWell(
+                                              key: Key('notification_${notif.id}'),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,

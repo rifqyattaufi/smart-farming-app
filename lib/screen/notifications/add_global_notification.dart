@@ -191,6 +191,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     InputFieldWidget(
+                      key: const Key('notification_title'),
                       label: "Judul Notifikasi",
                       hint: "Contoh: Pemberitahuan Penting",
                       controller: titleController,
@@ -202,6 +203,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                       },
                     ),
                     InputFieldWidget(
+                        key: const Key('notification_message'),
                         label: "Pesan Notifikasi",
                         hint: "Contoh: Akan ada pemeliharaan sistem siang ini",
                         controller: messageController,
@@ -213,6 +215,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                           return null;
                         }),
                     DropdownFieldWidget(
+                      key: const Key('target_role_dropdown'),
                       label: "Target Pengguna",
                       hint: "Pilih pengguna yang akan dituju",
                       items: targetRole.keys.toList(),
@@ -230,6 +233,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                       },
                     ),
                     RadioField(
+                      key: const Key('notification_status_radio'),
                       label: "Status Notifikasi",
                       selectedValue: isActive,
                       options: const ['Aktif', 'Tidak Aktif'],
@@ -240,6 +244,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                       },
                     ),
                     RadioField(
+                      key: const Key('notification_type_radio'),
                       label: "Tipe Notifikasi",
                       selectedValue: selectedType,
                       options: const ['Berulang', 'Sekali'],
@@ -250,6 +255,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                       },
                     ),
                     InputFieldWidget(
+                      key: const Key('notification_time_input'),
                       label: "Waktu Notifikasi",
                       hint: "Contoh: 08:00",
                       controller: _waktuNotifikasi,
@@ -288,6 +294,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
                     ),
                     if (selectedType == 'Sekali')
                       InputFieldWidget(
+                        key: const Key('notification_date_input'),
                         label: "Tanggal Notifikasi",
                         hint: "Pilih tanggal untuk notifikasi sekali",
                         controller: _tanggalNotifikasi,
@@ -329,6 +336,7 @@ class _AddGlobalNotificationState extends State<AddGlobalNotification> {
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_global_notification_button'),
           ),
         ),
       ),

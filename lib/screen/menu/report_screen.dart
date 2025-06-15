@@ -102,9 +102,12 @@ class _ReportScreenState extends State<ReportScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Gagal memuat data perkebunan."),
+            Text("Gagal memuat data perkebunan.", 
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_data_found')),
             const SizedBox(height: 10),
             ElevatedButton(
+              key: const Key('retry_button'),
               onPressed: () {
                 _fetchData(isRefresh: true);
               },

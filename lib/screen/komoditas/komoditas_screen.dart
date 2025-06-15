@@ -384,6 +384,7 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('add_komoditas'),
                 onPressed: () {
                   void handleKomoditasUpdate() {
                     _handleRefresh();
@@ -416,11 +417,13 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
+                  key: const Key('search_komoditas'),
                   hintText: 'Cari komoditas berdasarkan nama',
                   controller: _searchController,
                   onChanged: _onSearchChanged),
             ),
             CustomTabBar(
+              key: const Key('komoditas_tabs'),
               tabs: const ['Komoditas Perkebunan', 'Komoditas Peternakan'],
               activeColor: green1,
               activeIndex: _selectedTab,
@@ -519,20 +522,24 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
           _komoditasKebunListFiltered.isEmpty &&
           !_isSearching &&
           !_isLoadingMoreSearchKebun) {
-        return const Center(
+        return Center(
             child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text("Komoditas tanaman tidak ditemukan.")));
+                padding: const EdgeInsets.all(16.0),
+                child: Text("Komoditas tanaman tidak ditemukan.",
+                    style: regular12.copyWith(color: dark2),
+                    key: const Key('noKomoditasKebunMessage'))));
       }
       if (!isCurrentlySearching &&
           _komoditasKebunList.isEmpty &&
           !_isInitialLoading &&
           !_isLoadingMoreKebun &&
           !_hasNextPageKebun) {
-        return const Center(
+        return Center(
             child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text("Tidak ada komoditas tanaman yang tersedia.")));
+                padding: const EdgeInsets.all(16.0),
+                child: Text("Tidak ada komoditas tanaman yang tersedia.",
+                    style: regular12.copyWith(color: dark2),
+                    key: const Key('noKomoditasKebunMessage'))));
       }
 
       if (_komoditasKebunListFiltered.isEmpty &&
@@ -549,20 +556,24 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
           _komoditasTernakListFiltered.isEmpty &&
           !_isSearching &&
           !_isLoadingMoreSearchTernak) {
-        return const Center(
+        return Center(
             child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text("Komoditas ternak tidak ditemukan.")));
+                padding: const EdgeInsets.all(16.0),
+                child: Text("Komoditas ternak tidak ditemukan.",
+                    style: regular12.copyWith(color: dark2),
+                    key: const Key('noKomoditasTernakMessage'))));
       }
       if (!isCurrentlySearching &&
           _komoditasTernakList.isEmpty &&
           !_isInitialLoading &&
           !_isLoadingMoreTernak &&
           !_hasNextPageTernak) {
-        return const Center(
+        return Center(
             child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text("Tidak ada komoditas ternak yang tersedia.")));
+                padding: const EdgeInsets.all(16.0),
+                child: Text("Tidak ada komoditas ternak yang tersedia.",
+                    style: regular12.copyWith(color: dark2),
+                    key: const Key('noKomoditasTernakMessage'))));
       }
       if (_komoditasTernakListFiltered.isEmpty &&
           (_isInitialLoading ||
@@ -577,6 +588,7 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
 
   Widget _buildPerkebunanContent() {
     return ListItem(
+      key: const Key('komoditas_kebun_list'),
       items: _komoditasKebunListFiltered
           .map((komoditas) => {
                 'name': komoditas['nama'] ?? 'N/A',
@@ -591,6 +603,7 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
 
   Widget _buildPeternakanContent() {
     return ListItem(
+      key: const Key('komoditas_ternak_list'),
       items: _komoditasTernakListFiltered
           .map((komoditas) => {
                 'name': komoditas['nama'] ?? 'N/A',

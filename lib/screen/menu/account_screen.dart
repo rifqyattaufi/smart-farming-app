@@ -26,10 +26,12 @@ class _AccountScreenState extends State<AccountScreen> {
         content: const Text('Apakah Anda yakin ingin keluar dari akun?'),
         actions: [
           TextButton(
+            key: const Key('cancelButton'),
             onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Batal'),
           ),
           TextButton(
+            key: const Key('logoutButton'),
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Keluar'),
@@ -116,6 +118,7 @@ class _AccountScreenState extends State<AccountScreen> {
           children: [
             const SizedBox(height: 16),
             NewestReports(
+              key: const Key('main_settings'),
               title: 'Pengaturan Utama',
               reports: [
                 {
@@ -141,6 +144,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('other_settings'),
               title: 'Pengaturan Lainnya',
               reports: report,
               onItemTap: (context, item) {
@@ -156,6 +160,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
             const SizedBox(height: 12),
             NewestReports(
+              key: const Key('logout_settings'),
               title: 'Keluar',
               reports: [
                 {'text': 'Keluar Akun', 'onTap': _showLogoutConfirmation},

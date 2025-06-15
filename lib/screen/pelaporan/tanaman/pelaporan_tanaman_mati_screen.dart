@@ -58,6 +58,7 @@ class _PelaporanTanamanMatiScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -73,6 +74,7 @@ class _PelaporanTanamanMatiScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -264,6 +266,7 @@ class _PelaporanTanamanMatiScreenState
                           ),
                           const SizedBox(height: 12),
                           InputFieldWidget(
+                            key: Key('tanggal_waktu_kematian_$i'),
                             label: "Tanggal & waktu kematian",
                             hint: "Contoh: Senin, 17 Februari 2025 10:00",
                             controller: _dateController[i],
@@ -309,6 +312,7 @@ class _PelaporanTanamanMatiScreenState
                             },
                           ),
                           InputFieldWidget(
+                            key: Key('penyebab_kematian_$i'),
                             label: "Penyebab kematian",
                             hint: "Contoh: Sakit",
                             controller: _nameController[i],
@@ -320,12 +324,14 @@ class _PelaporanTanamanMatiScreenState
                             },
                           ),
                           ImagePickerWidget(
+                              key: Key('image_picker_tanaman_$i'),
                               label: "Unggah bukti kondisi tanaman",
                               image: _imageList[i],
                               onPickImage: (ctx) async {
                                 _pickImageTanaman(context, i);
                               }),
                           InputFieldWidget(
+                            key: Key('catatan_jurnal_$i'),
                             label: "Catatan/jurnal pelaporan",
                             hint: "Keterangan",
                             controller: _catatanController[i],
@@ -357,6 +363,7 @@ class _PelaporanTanamanMatiScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_pelaporan_tanaman_mati_button')
           ),
         ),
       ),

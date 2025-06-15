@@ -55,6 +55,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera_image_picker'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -70,6 +71,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
               },
             ),
             ListTile(
+              key: const Key('gallery_image_picker'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -261,6 +263,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ProfileImagePicker(
+                          key: const Key('profile_image_picker'),
                           image: _selectedImage,
                           imageUrl: _imageUrl,
                           onPickImage: (ctx) => _pickImage(ctx),
@@ -271,6 +274,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                     ),
                     const SizedBox(height: 20),
                     DropdownFieldWidget(
+                      key: const Key('role_dropdown'),
                       label: "Pilih role",
                       hint: "Pilih role",
                       items: const [
@@ -292,6 +296,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       },
                     ),
                     InputFieldWidget(
+                        key: const Key('nama_pengguna_input'),
                         label: "Nama pengguna",
                         hint: "Contoh: James Doe",
                         controller: _namaController,
@@ -305,6 +310,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           return null;
                         }),
                     InputFieldWidget(
+                      key: const Key('email_pengguna_input'),
                       label: "Email pengguna",
                       hint: "Contoh: example@mail.com",
                       controller: _emailController,
@@ -324,6 +330,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       },
                     ),
                     InputFieldWidget(
+                      key: const Key('nomor_telepon_input'),
                       label: "Nomor telepon",
                       hint: "Contoh: 08**********",
                       controller: _nomorController,
@@ -374,6 +381,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
               textStyle: semibold16,
               textColor: white,
               isLoading: _isLoading,
+              key: const Key('submit_user_button'),
             ),
           ),
         ));

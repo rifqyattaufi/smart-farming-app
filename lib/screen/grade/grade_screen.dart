@@ -163,6 +163,7 @@ class _GradeScreenState extends State<GradeScreen> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('add_grade_button'),
           onPressed: () {
             context.push('/tambah-grade',
                 extra: AddGradeScreen(
@@ -187,6 +188,7 @@ class _GradeScreenState extends State<GradeScreen> {
                 controller: searchController,
                 hintText: "Cari nama grade hasil panen...",
                 onChanged: _onSearchQueryChanged,
+                key: const Key('search_grade_input'),
               ),
               const SizedBox(height: 16),
               Text('Daftar Grade Hasil Panen',
@@ -204,6 +206,7 @@ class _GradeScreenState extends State<GradeScreen> {
                                 child: Text(
                                   'Tidak ada data grade hasil panen ditemukan',
                                   style: medium14.copyWith(color: dark2),
+                                  key: const Key('no_data_message'),
                                 ),
                               )
                             : ListView.builder(
@@ -233,6 +236,7 @@ class _GradeScreenState extends State<GradeScreen> {
                                   return Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: UnitItem(
+                                      key: Key('grade_item_${grade['id']}'),
                                       unitName:
                                           grade['nama']?.toString() ?? 'N/A',
                                       unitDescription:
@@ -266,12 +270,14 @@ class _GradeScreenState extends State<GradeScreen> {
                                                     'Apakah Anda yakin ingin menghapus grade "${grade['nama']}"?'),
                                                 actions: [
                                                   TextButton(
+                                                    key: const Key('cancel_button'),
                                                     onPressed: () =>
                                                         Navigator.of(context)
                                                             .pop(),
                                                     child: const Text('Batal'),
                                                   ),
                                                   TextButton(
+                                                    key: const Key('delete_button'),
                                                     onPressed: () async {
                                                       Navigator.of(context)
                                                           .pop();

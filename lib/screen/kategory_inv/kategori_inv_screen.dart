@@ -168,6 +168,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('add_kategori_inventaris'),
           onPressed: () {
             context.push('/tambah-kategori-inventaris',
                 extra: AddKategoriInvScreen(
@@ -190,6 +191,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SearchField(
+                key: const Key('search_kategori_inventaris'),
                 controller: searchController,
                 hintText: "Cari nama kategori inventaris...",
                 onChanged: _onSearchQueryChanged,
@@ -207,7 +209,8 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                         child: kategoriInvList.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Tidak ada kategori inventaris ditemukan',
+                                  key: const Key('no_data_kategori_inventaris'),
+                                  'Tidak ada data kategori inventaris ditemukan.',
                                   style: medium14.copyWith(color: dark2),
                                 ),
                               )
@@ -238,6 +241,7 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                   return Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: UnitItem(
+                                      key: Key('kategori_inv_item_${kategori['id']}'),
                                       unitName:
                                           kategori['nama']?.toString() ?? 'N/A',
                                       onEdit: () {
@@ -268,12 +272,14 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                     'Apakah Anda yakin ingin menghapus kategori "${kategori['nama']}"?'),
                                                 actions: [
                                                   TextButton(
+                                                    key: const Key('cancel_delete_kategori'),
                                                     onPressed: () =>
                                                         Navigator.of(context)
                                                             .pop(),
                                                     child: const Text('Batal'),
                                                   ),
                                                   TextButton(
+                                                    key: const Key('confirm_delete_kategori'),
                                                     onPressed: () async {
                                                       Navigator.of(context)
                                                           .pop();

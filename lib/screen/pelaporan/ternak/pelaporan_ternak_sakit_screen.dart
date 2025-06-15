@@ -54,6 +54,7 @@ class _PelaporanTernakSakitScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -69,6 +70,7 @@ class _PelaporanTernakSakitScreenState
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -243,6 +245,7 @@ class _PelaporanTernakSakitScreenState
                             height: 12,
                           ),
                           InputFieldWidget(
+                            key: Key('nama_penyakit_ternak_$i'),
                             label: "Nama penyakit ternak",
                             hint: "Contoh: Cacingan",
                             controller: _nameController[i],
@@ -254,12 +257,14 @@ class _PelaporanTernakSakitScreenState
                             },
                           ),
                           ImagePickerWidget(
+                              key: Key('image_picker_ternak_$i'),
                               label: "Unggah bukti kondisi ternak",
                               image: _imageList[i],
                               onPickImage: (ctx) async {
                                 _pickImageTernak(context, i);
                               }),
                           InputFieldWidget(
+                            key: Key('catatan_ternak_$i'),
                             label: "Catatan/jurnal pelaporan",
                             hint: "Keterangan",
                             controller: _catatanController[i],
@@ -292,6 +297,7 @@ class _PelaporanTernakSakitScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_pelaporan_ternak_sakit_button')
           ),
         ),
       ),

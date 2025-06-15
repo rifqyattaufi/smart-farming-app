@@ -29,6 +29,7 @@ class _ChipFilterState extends State<ChipFilter> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ChoiceChip(
+              key: ValueKey(category),
               label: Text(category),
               selected: isSelected,
               onSelected: (_) {

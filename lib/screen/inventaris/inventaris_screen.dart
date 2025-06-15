@@ -584,6 +584,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('addInventarisButton'),
                 onPressed: () {
                   context
                       .push('/tambah-inventaris',
@@ -606,9 +607,12 @@ class _InventarisScreenState extends State<InventarisScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
-                  controller: _searchController, onChanged: _onSearchChanged),
+                  key: const Key('inventarisSearchField'),
+                  controller: _searchController,
+                  onChanged: _onSearchChanged),
             ),
             CustomTabBar(
+              key: const Key('inventarisTabs'),
               tabs: const ['Inventaris', 'Hasil Panen'],
               activeColor: green1,
               activeIndex: _selectedTab,
@@ -646,6 +650,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ChipFilter(
+                  key: const Key('kategoriInventarisFilterChip'),
                   categories: _kategoriInvForFilterChip
                       .map((kat) => kat['nama'] as String)
                       .toList(),
@@ -677,6 +682,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ChipFilter(
+                  key: const Key('hasilPanenFilterChip'),
                   categories: const [
                     'Semua Hasil Panen',
                     'Perkebunan',
@@ -774,6 +780,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
         child: Padding(
             padding: const EdgeInsets.all(32.0),
             child: Text(
+              key: const Key('emptyContentMessage'),
               message,
               style: regular14.copyWith(color: dark2),
               textAlign: TextAlign.center,
@@ -970,6 +977,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
       children: [
         if (itemBaru.isNotEmpty)
           ListItem(
+            key: const Key('itemBaruListItem'),
             title: 'Item Baru (7 Hari Terakhir)',
             type: 'basic',
             items: itemBaru
@@ -987,6 +995,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
           ),
         if (itemYangSudahKadaluwarsa.isNotEmpty)
           ListItem(
+            key: const Key('itemKadaluwarsaListItem'),
             title: 'Item Kadaluwarsa',
             type: 'basic',
             items: itemYangSudahKadaluwarsa
@@ -1005,6 +1014,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
           ),
         if (stokRendah.isNotEmpty)
           ListItem(
+            key: const Key('stokRendahListItem'),
             title: 'Stok Rendah',
             type: 'basic',
             items: stokRendah
@@ -1022,6 +1032,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
           ),
         if (stokHabis.isNotEmpty)
           ListItem(
+            key: const Key('stokHabisListItem'),
             title: 'Stok Habis',
             type: 'basic',
             items: stokHabis
@@ -1038,6 +1049,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
           ),
         if (showSemuaInventarisSection)
           ListItem(
+            key: const Key('semuaInventarisListItem'),
             title: 'Semua Stok Inventaris',
             items: _filteredInventarisList
                 .map((inventaris) => {
@@ -1112,16 +1124,19 @@ class _InventarisScreenState extends State<InventarisScreen> {
             child: Text("Perkebunan", style: bold18.copyWith(color: dark1)),
           ),
           if (isPerkebunanCurrentlyLoading)
-            const Center(
+            Center(
                 child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text("Memuat data perkebunan...")))
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text("Memuat data perkebunan...",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('loadingPerkebunanMessage'))))
           else if (currentPerkebunanList.isEmpty)
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Center(
                 child: Text(
+                  key: const Key('noPerkebunanDataMessage'),
                   "Tidak ada data perkebunan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua Hasil Panen' ? ' pada filter ini' : '')}.",
                   style: regular14.copyWith(color: dark2),
                 ),
@@ -1129,6 +1144,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
             )
           else
             ListItem(
+              key: const Key('perkebunanListItem'),
               items: currentPerkebunanList.map((komoditas) {
                 final satuan = komoditas['Satuan'];
                 return {
@@ -1155,10 +1171,12 @@ class _InventarisScreenState extends State<InventarisScreen> {
             child: Text("Peternakan", style: bold18.copyWith(color: dark1)),
           ),
           if (isPeternakanCurrentlyLoading) // Jika sedang loading aktif untuk Peternakan dan listnya masih kosong
-            const Center(
+            Center(
                 child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text("Memuat data peternakan...")))
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text("Memuat data peternakan...",
+                        style: regular12.copyWith(color: dark2),
+                        key: const Key('loadingPeternakanMessage'))))
           else if (currentPeternakanList
               .isEmpty) // Jika tidak loading dan list kosong
             Padding(
@@ -1166,6 +1184,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Center(
                 child: Text(
+                  key: const Key('noPeternakanDataMessage'),
                   "Tidak ada data peternakan${isSearchingActive ? ' untuk pencarian ini' : (_selectedHasilPanenFilter != 'Semua Hasil Panen' ? ' pada filter ini' : '')}.",
                   style: regular14.copyWith(color: dark2),
                 ),
@@ -1173,6 +1192,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
             )
           else
             ListItem(
+              key: const Key('peternakanListItem'),
               items: currentPeternakanList.map((komoditas) {
                 final satuan = komoditas['Satuan'];
                 return {

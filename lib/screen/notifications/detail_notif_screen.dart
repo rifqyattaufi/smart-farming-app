@@ -146,6 +146,7 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomButton(
+                key: const Key('edit_notification_button'),
                 onPressed: () {
                   context
                       .push('/add-global-notification',
@@ -164,6 +165,7 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
               ),
               const SizedBox(height: 12),
               CustomButton(
+                key: const Key('delete_notification_button'),
                 onPressed: () async {
                   final confirm = await showDialog<bool>(
                     context: context,

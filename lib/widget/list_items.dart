@@ -36,6 +36,7 @@ class ListItem extends StatelessWidget {
                   Text(title!, style: bold18.copyWith(color: dark1)),
                   if (onViewAll != null)
                     GestureDetector(
+                      key: const Key('view_all_button'),
                       onTap: onViewAll,
                       child: Text(
                         "Lihat semua",
@@ -57,6 +58,7 @@ class ListItem extends StatelessWidget {
             Column(
               children: items.map((item) {
                 return GestureDetector(
+                  key: Key('list_item_${item['id'] ?? item['name']}'),
                   onTap: () {
                     if (onItemTap != null) {
                       onItemTap!(context, item);

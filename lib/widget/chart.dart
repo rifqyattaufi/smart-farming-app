@@ -118,6 +118,7 @@ class ChartWidget extends StatelessWidget {
               ),
               if (hasDateIcon)
                 IconButton(
+                  key: const Key('dateIconButton'),
                   onPressed: onDateIconPressed,
                   icon: SvgPicture.asset(
                     'assets/icons/calendar.svg',

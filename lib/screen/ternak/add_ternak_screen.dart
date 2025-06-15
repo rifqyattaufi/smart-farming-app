@@ -78,8 +78,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           });
         } else {
           if (mounted) {
-            showAppToast(context,
-                'Data jenis hewan ternak tidak ditemukan');
+            showAppToast(context, 'Data jenis hewan ternak tidak ditemukan');
           }
         }
       } else if (mounted) {
@@ -113,6 +112,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
             ListTile(
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
+              key: const Key('open_camera'),
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile =
@@ -127,6 +127,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
             ListTile(
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
+              key: const Key('open_gallery'),
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile =
@@ -153,8 +154,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
       }
 
       if (_imageTernak == null && !widget.isEdit) {
-        showAppToast(context,
-            'Gambar hewan ternak tidak boleh kosong');
+        showAppToast(context, 'Gambar hewan ternak tidak boleh kosong');
         return;
       }
 
@@ -173,7 +173,8 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
           finalImageUrl = imageUploadResponse['data'];
         } else {
           if (mounted) {
-            showAppToast(context,
+            showAppToast(
+                context,
                 imageUploadResponse['message'] ??
                     'Gagal mengunggah gambar hewan ternak');
             setState(() {
@@ -265,6 +266,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         InputFieldWidget(
+                          key: const Key('nama_hewan_ternak'),
                           label: "Nama hewan ternak",
                           hint: "Contoh: Ayam Kampung",
                           controller: _nameController,
@@ -276,6 +278,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
                           },
                         ),
                         InputFieldWidget(
+                            key: const Key('nama_latin_hewan_ternak'),
                             label: "Nama latin",
                             hint: "Contoh: Gallus gallus domesticus",
                             controller: _latinController,
@@ -286,6 +289,7 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
                               return null;
                             }),
                         RadioField(
+                          key: const Key('status_ternak'),
                           label: 'Status ternak',
                           selectedValue: statusTernak,
                           options: const ['Aktif', 'Tidak Aktif'],
@@ -296,12 +300,14 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
                           },
                         ),
                         ImagePickerWidget(
+                          key: const Key('image_picker_hewan_ternak'),
                           label: "Unggah gambar hewan ternak",
                           image: _imageTernak,
                           imageUrl: _imageUrlFromApi,
                           onPickImage: (ctx) => _pickImageTernak(ctx),
                         ),
                         InputFieldWidget(
+                            key: const Key('deskripsi_hewan_ternak'),
                             label: "Deskripsi hewan ternak",
                             hint:
                                 "Keterangan umum mengenai jenis hewan ternak ini",
@@ -323,12 +329,12 @@ class _AddTernakScreenState extends State<AddTernakScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
-            onPressed: _submitForm,
-            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Ternak',
-            backgroundColor: green1,
-            textStyle: semibold16.copyWith(color: white),
-            isLoading: _isLoading,
-          ),
+              onPressed: _submitForm,
+              buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Ternak',
+              backgroundColor: green1,
+              textStyle: semibold16.copyWith(color: white),
+              isLoading: _isLoading,
+              key: const Key('submit_ternak_button')),
         ),
       ),
     );

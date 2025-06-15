@@ -107,6 +107,7 @@ class _PilihKomoditasTanamanScreenState
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data komoditas terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -116,6 +117,7 @@ class _PilihKomoditasTanamanScreenState
                     ),
                   )
                 : ListItemSelectable(
+                    key: const Key('list_komoditas'),
                     title: 'Daftar Komoditas',
                     type: ListItemType.simple,
                     items: _listKomoditas
@@ -151,6 +153,7 @@ class _PilihKomoditasTanamanScreenState
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button')
           ),
         ),
       ),

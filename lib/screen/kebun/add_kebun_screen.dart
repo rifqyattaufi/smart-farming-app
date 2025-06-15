@@ -96,6 +96,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera_option'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -104,6 +105,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
               },
             ),
             ListTile(
+              key: const Key('gallery_option'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -387,12 +389,14 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
             ),
             actions: <Widget>[
               TextButton(
+                key: const Key('cancel_button'),
                 child: const Text('Batal'),
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
                 },
               ),
               TextButton(
+                key: const Key('select_button'),
                 child: const Text('Pilih'),
                 onPressed: () {
                   Navigator.of(dialogContext).pop(tempPickedDay);
@@ -433,6 +437,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
+                    key: const Key('nama_kebun'),
                     label: "Nama kebun",
                     hint: "Contoh: Kebun A",
                     controller: _nameController,
@@ -444,6 +449,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     },
                   ),
                   InputFieldWidget(
+                      key: const Key('lokasi_kebun'),
                       label: "Lokasi kebun",
                       hint: "Contoh: Rooftop",
                       controller: _locationController,
@@ -454,6 +460,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                         return null;
                       }),
                   InputFieldWidget(
+                    key: const Key('luas_kebun'),
                     label: "Luas kebun",
                     hint: "Contoh: 30 m²",
                     controller: _sizeController,
@@ -472,6 +479,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     },
                   ),
                   DropdownFieldWidget(
+                    key: const Key('jenis_tanaman'),
                     label: "Pilih jenis tanaman yang ditanam",
                     hint: "Pilih jenis tanaman",
                     items: jenisTanamanList
@@ -497,6 +505,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     },
                   ),
                   InputFieldWidget(
+                    key: const Key('jumlah_tanaman'),
                     label: "Jumlah tanaman",
                     hint: "Contoh: 20 (satuan tanaman)",
                     controller: _jumlahController,
@@ -515,6 +524,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     },
                   ),
                   RadioField(
+                    key: const Key('status_kebun'),
                     label: 'Status kebun',
                     selectedValue: statusKebun,
                     options: const ['Aktif', 'Tidak aktif'],
@@ -525,12 +535,14 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     },
                   ),
                   ImagePickerWidget(
+                    key: const Key('image_picker_kebun'),
                     label: "Unggah gambar kebun",
                     image: _image,
                     imageUrl: imageUrl['data'],
                     onPickImage: _pickImage,
                   ),
                   InputFieldWidget(
+                    key: const Key('deskripsi_kebun'),
                     label: "Deskripsi kebun",
                     hint: "Keterangan",
                     controller: _descriptionController,
@@ -547,6 +559,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       style: bold18.copyWith(color: dark1)),
                   const SizedBox(height: 16),
                   RadioField(
+                    key: const Key('notifikasi_panen'),
                     label: 'Notifikasi Pengingat Panen',
                     selectedValue: notifikasiPanen,
                     options: const ['Aktif', 'Tidak Aktif'],
@@ -562,6 +575,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                   ),
                   if (notifikasiPanen == 'Aktif') ...[
                     DropdownFieldWidget(
+                      key: const Key('tipe_notifikasi_panen'),
                       label: "Tipe Notifikasi",
                       hint: "Pilih Tipe Notifikasi",
                       items: notificationType.keys.toList(),
@@ -582,6 +596,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       },
                     ),
                     InputFieldWidget(
+                      key: const Key('waktu_notifikasi_panen'),
                       label: "Waktu Notifikasi",
                       hint: "Contoh: 08:00",
                       controller: _waktuNotifikasiPanenController,
@@ -623,6 +638,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     ),
                     if (selectedTipePanen == 'Mingguan')
                       DropdownFieldWidget(
+                        key: const Key('hari_notifikasi_panen'),
                         label: "Hari Notifikasi",
                         hint: "Pilih Hari Notifikasi",
                         items: dayToInt.keys.toList(),
@@ -643,6 +659,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       ),
                     if (selectedTipePanen == 'Bulanan') ...[
                       InputFieldWidget(
+                        key: const Key('tanggal_notifikasi_panen'),
                         label: "Tanggal Notifikasi",
                         hint: "Contoh: 1 (tanggal dalam bulan)",
                         controller: _tanggalNotifikasiPanenController,
@@ -674,6 +691,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     ]
                   ],
                   RadioField(
+                    key: const Key('notifikasi_nutrisi'),
                     label: 'Notifikasi Pengingat Pemberian Nutrisi',
                     selectedValue: notifikasiNutrisi,
                     options: const ['Aktif', 'Tidak Aktif'],
@@ -689,6 +707,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                   ),
                   if (notifikasiNutrisi == 'Aktif') ...[
                     DropdownFieldWidget(
+                      key: const Key('tipe_notifikasi_nutrisi'),
                       label: "Tipe Notifikasi",
                       hint: "Pilih Tipe Notifikasi",
                       items: notificationType.keys.toList(),
@@ -709,6 +728,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       },
                     ),
                     InputFieldWidget(
+                      key: const Key('waktu_notifikasi_nutrisi'),
                       label: "Waktu Notifikasi",
                       hint: "Contoh: 08:00",
                       controller: _waktuNotifikasiNutrisiController,
@@ -750,6 +770,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     ),
                     if (selectedTipeNutrisi == 'Mingguan')
                       DropdownFieldWidget(
+                        key: const Key('hari_notifikasi_nutrisi'),
                         label: "Hari Notifikasi",
                         hint: "Pilih Hari Notifikasi",
                         items: dayToInt.keys.toList(),
@@ -770,6 +791,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       ),
                     if (selectedTipeNutrisi == 'Bulanan')
                       InputFieldWidget(
+                        key: const Key('tanggal_notifikasi_nutrisi'),
                         label: "Tanggal Notifikasi",
                         hint: "Contoh: 1 (tanggal dalam bulan)",
                         controller: _tanggalNotifikasiNutrisiController,
@@ -814,6 +836,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_kebun'),
           ),
         ),
       ),

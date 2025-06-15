@@ -104,10 +104,12 @@ class HarianTab extends StatelessWidget {
                     (laporanHarianState.dataPoints.isEmpty &&
                         pakanState.dataPoints.isEmpty &&
                         cekKandangState.dataPoints.isEmpty)
-                ? const Center(
+                ? Center(
                     child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.0),
-                        child: Text("Memuat rangkuman statistik...")))
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Text("Memuat rangkuman statistik...",
+                            style: regular12.copyWith(color: dark2),
+                            key: const Key('loading_rangkuman_statistik'))))
                 : Text(generatedStatistikRangkumanText,
                     style: regular14.copyWith(color: dark2)),
           ],
@@ -126,6 +128,7 @@ class HarianTab extends StatelessWidget {
           _paddedError('Error Riwayat Pelaporan: ${riwayatUmumState.error}'));
     } else if (riwayatUmumState.items.isNotEmpty) {
       listChildren.add(NewestReports(
+        key: const Key('riwayat_pelaporan_harian'),
         title: 'Riwayat Pelaporan',
         reports: riwayatUmumState.items
             .map((item) => {
@@ -157,8 +160,10 @@ class HarianTab extends StatelessWidget {
         timeTextStyle: regular12.copyWith(color: dark2),
       ));
     } else {
-      listChildren.add(_paddedItem(
-          const Text('Tidak ada riwayat pelaporan harian untuk ditampilkan.')));
+      listChildren.add(_paddedItem(Text(
+          'Tidak ada riwayat pelaporan harian untuk ditampilkan.',
+          style: regular12.copyWith(color: dark2),
+          key: const Key('no_riwayat_pelaporan_harian'))));
     }
     listChildren.add(const SizedBox(height: 12));
 

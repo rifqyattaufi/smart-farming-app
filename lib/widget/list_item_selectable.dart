@@ -87,6 +87,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
             Column(
               children: [
                 Text(
+                  key: const Key('batch_mode_instruction'),
                   "Tekan dan tahan untuk mengaktifkan mode pelaporan batch.",
                   style: medium12.copyWith(color: green1),
                 ),
@@ -98,6 +99,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Checkbox(
+                            key: const Key('select_all_checkbox'),
                             value:
                                 selectedIndexes.length == widget.items.length,
                             onChanged: (value) {
@@ -118,10 +120,12 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
                             visualDensity: VisualDensity.compact,
                           ),
                           Text("Pilih semua",
+                              key: const Key('select_all_text'),
                               style: medium12.copyWith(color: dark2)),
                         ],
                       ),
                       GestureDetector(
+                        key: const Key('close_batch_mode_button'),
                         onTap: () => _toggleBatchMode(false),
                         child: Icon(Icons.close, size: 20, color: red),
                       )
@@ -148,6 +152,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
                 : cardContent;
 
             return GestureDetector(
+              key: Key('list_item_${item['name'] ?? index}'),
               onTap: () {
                 if (widget.onItemTap != null) {
                   widget.onItemTap!(context, item);
@@ -211,6 +216,8 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
           ),
           if (widget.type == ListItemType.basic && isBatchMode)
             Checkbox(
+              key: Key(
+                  'checkbox_${item['name'] ?? item['id'] ?? widget.items.indexOf(item)}'),
               value: selectedIndexes.contains(widget.items.indexOf(item)),
               onChanged: (_) => _handleTap(widget.items.indexOf(item)),
               activeColor: green1,

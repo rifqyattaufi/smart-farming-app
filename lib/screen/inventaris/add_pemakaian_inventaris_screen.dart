@@ -69,6 +69,7 @@ class _AddPemakaianInventarisScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -85,6 +86,7 @@ class _AddPemakaianInventarisScreenState
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -287,6 +289,7 @@ class _AddPemakaianInventarisScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DropdownFieldWidget(
+                    key: const Key('kategori_inventaris'),
                     label: "Kategori Inventaris",
                     hint: "Pilih kategori",
                     items: _kategoriList
@@ -319,6 +322,7 @@ class _AddPemakaianInventarisScreenState
                     },
                   ),
                   DropdownFieldWidget(
+                    key: const Key('nama_inventaris'),
                     label: "Nama inventaris",
                     hint: selectedKategoriId == null
                         ? "Pilih kategori terlebih dahulu"
@@ -360,6 +364,7 @@ class _AddPemakaianInventarisScreenState
                     },
                   ),
                   InputFieldWidget(
+                      key: const Key('jumlah_digunakan_input'),
                       label: "Jumlah digunakan",
                       hint: "Contoh: 20",
                       controller: _sizeController,
@@ -378,12 +383,14 @@ class _AddPemakaianInventarisScreenState
                       }),
                   ImagePickerWidget(
                     label: "Unggah bukti pemakaian",
+                    key: const Key('bukti_pemakaian_input'),
                     image: _image,
                     onPickImage: (BuildContext imagePickerContext) {
                       _pickImage(context);
                     },
                   ),
                   InputFieldWidget(
+                      key: const Key('catatan_input'),
                       label: "Deskripsi keperluan pemakaian",
                       hint: "Keterangan",
                       controller: _catatanController,
@@ -409,6 +416,7 @@ class _AddPemakaianInventarisScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_pemakaian_inventaris_button'),
           ),
         ),
       ),

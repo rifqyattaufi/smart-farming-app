@@ -294,6 +294,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                   ),
                 ),
                 ListItem(
+                  key: const Key('list_tanaman'),
                   title: 'Daftar Tanaman',
                   type: 'basic',
                   items: (_tanamanList ?? [])
@@ -322,6 +323,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
+                      key: const Key('ubah_data_kebun'),
                       onPressed: () {
                         context.push('/tambah-kebun',
                             extra: AddKebunScreen(
@@ -337,6 +339,7 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                     ),
                     const SizedBox(height: 12),
                     CustomButton(
+                      key: const Key('hapus_data_kebun'),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
@@ -346,10 +349,12 @@ class _DetailKebunScreenState extends State<DetailKebunScreen> {
                                 'Apakah Anda yakin ingin menghapus kebun ini?'),
                             actions: [
                               TextButton(
+                                key: const Key('cancel_delete_kebun'),
                                 onPressed: () => Navigator.pop(context, false),
                                 child: const Text('Batal'),
                               ),
                               TextButton(
+                                key: const Key('confirm_delete_kebun'),
                                 onPressed: () => Navigator.pop(context, true),
                                 child: const Text('Hapus'),
                               ),

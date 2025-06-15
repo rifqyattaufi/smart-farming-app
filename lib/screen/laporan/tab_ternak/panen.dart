@@ -109,8 +109,9 @@ class PanenTab extends StatelessWidget {
     if (panenKomoditasState.error != null) {
       return Center(
         child: Text(
+          key: const Key('error_loading_panen_komoditas'),
           "Gagal memuat total panen: ${panenKomoditasState.error}",
-          style: regular14.copyWith(color: Colors.red),
+          style: regular12.copyWith(color: Colors.red),
         ),
       );
     }
@@ -122,10 +123,12 @@ class PanenTab extends StatelessWidget {
 
     if (komoditasData.isEmpty) {
       // Jika tidak ada data panen komoditas, tampilkan pesan
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Center(
           child: Text(
+            key: const Key('no_panen_data'),
+            style: regular12.copyWith(color: dark2),
             'Belum ada hasil panen yang tercatat untuk periode ini.',
             textAlign: TextAlign.center,
           ),
@@ -304,13 +307,14 @@ class PanenTab extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2)))
           else if (riwayatPanenState.error != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                  'Error memuat riwayat laporan panen: ${riwayatPanenState.error}',
-                  style: const TextStyle(color: Colors.red)),
-            )
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                    key: const Key('error_riwayat_panen'),
+                    'Error memuat riwayat laporan panen: ${riwayatPanenState.error}',
+                    style: regular12.copyWith(color: red)))
           else if (riwayatPanenState.items.isNotEmpty)
             NewestReports(
+              key: const Key('riwayat_panen'),
               title: 'Riwayat Pelaporan Panen',
               reports: riwayatPanenState.items.map((item) {
                 return {
@@ -331,8 +335,7 @@ class PanenTab extends StatelessWidget {
                     jenisBudidaya: 'hewan',
                   );
                 } else {
-                  showAppToast(
-                      context,
+                  showAppToast(context,
                       'Tidak dapat membuka detail laporan. ID laporan tidak ditemukan.');
                 }
               },
@@ -342,9 +345,12 @@ class PanenTab extends StatelessWidget {
               timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
+                  key: const Key('no_riwayat_panen'),
+                  style: regular12.copyWith(color: dark2),
                   'Tidak ada riwayat pelaporan panen ternak untuk ditampilkan saat ini.'),
             ),
           const SizedBox(height: 80),

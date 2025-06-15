@@ -276,11 +276,11 @@ class _TanamanScreenState extends State<TanamanScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key("add_tanaman_button"),
                 onPressed: () {
                   void handleTanamanUpdate() {
                     _handleRefresh();
                   }
-
                   context.push('/tambah-tanaman',
                       extra: AddTanamanScreen(
                         isEdit: false,
@@ -300,6 +300,7 @@ class _TanamanScreenState extends State<TanamanScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
+                  key: const Key('search_tanaman_field'),
                   hintText: 'Cari jenis tanaman berdasarkan nama',
                   controller: _searchController,
                   onChanged: _onSearchChanged),
@@ -361,10 +362,10 @@ class _TanamanScreenState extends State<TanamanScreen> {
         _filteredTanamanList.isEmpty &&
         !_isSearching &&
         !_isLoadingMoreSearch) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Jenis tanaman tidak ditemukan.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text("Jenis tanaman tidak ditemukan.", style: regular12.copyWith(color: dark2), key: const Key('no_search_results'))));
     }
 
     if (!isCurrentlySearching &&
@@ -372,10 +373,10 @@ class _TanamanScreenState extends State<TanamanScreen> {
         !_isInitialLoading &&
         !_isLoadingMore &&
         !_hasNextPage) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Tidak ada jenis tanaman yang tersedia.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text("Tidak ada jenis tanaman yang tersedia.", style: regular12.copyWith(color: dark2), key: const Key('no_tanaman_available'))));
     }
 
     if (_filteredTanamanList.isEmpty &&
@@ -383,21 +384,22 @@ class _TanamanScreenState extends State<TanamanScreen> {
             _isLoadingMore ||
             _isLoadingMoreSearch ||
             _isSearching)) {
-      return const SizedBox(
-          height: 200, child: Center(child: Text("Memuat data...")));
+      return SizedBox(
+          height: 200, child: Center(child: Text("Memuat data...", style: regular12.copyWith(color: dark2), key: const Key('loading_tanaman'))));
     }
 
     if (_filteredTanamanList.isEmpty &&
         !isCurrentlySearching &&
         !_isInitialLoading &&
         !_isLoadingMore) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Tidak ada jenis tanaman.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text("Tidak ada jenis tanaman.", style: regular12.copyWith(color: dark2), key: const Key('no_tanaman'))));
     }
 
     return ListItem(
+      key: const Key('tanaman_list_item'),
       title: 'Daftar Jenis Tanaman',
       items: _filteredTanamanList.map((item) {
         return {

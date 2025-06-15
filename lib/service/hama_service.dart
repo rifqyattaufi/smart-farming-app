@@ -8,7 +8,7 @@ class HamaService {
 
   final String _jenisHamaBaseUrl = '${dotenv.env['BASE_URL']}/jenis-hama';
 
-  final String _BaseUrl = '${dotenv.env['BASE_URL']}';
+  final String _baseUrl = '${dotenv.env['BASE_URL']}';
 
   Future<Map<String, dynamic>> getDaftarHama({
     int page = 1,
@@ -244,7 +244,7 @@ class HamaService {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
 
-    final url = Uri.parse('$_BaseUrl/laporan-hama?page=$page&limit=$limit');
+    final url = Uri.parse('$_baseUrl/laporan-hama?page=$page&limit=$limit');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -297,7 +297,7 @@ class HamaService {
     final encodedQuery = Uri.encodeComponent(query);
 
     final url = Uri.parse(
-        '$_BaseUrl/hama/search/$encodedQuery?page=$page&limit=$limit');
+        '$_baseUrl/hama/search/$encodedQuery?page=$page&limit=$limit');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -352,7 +352,7 @@ class HamaService {
   Future<Map<String, dynamic>> getLaporanHamaById(String id) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$_BaseUrl/laporan-hama/$id');
+    final url = Uri.parse('$_baseUrl/laporan-hama/$id');
 
     try {
       final response = await http.get(url, headers: headers);

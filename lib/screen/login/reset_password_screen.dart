@@ -120,6 +120,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         const SizedBox(height: 24),
                         // Input field for new password
                         InputFieldWidget(
+                          key: const Key('newPasswordInput'),
                           label: "Password Baru",
                           hint: "Masukkan Password Baru",
                           controller: _passwordController,
@@ -149,6 +150,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         const SizedBox(height: 16),
                         // Input field for confirm password
                         InputFieldWidget(
+                            key: const Key('confirmPasswordInput'),
                             label: "Konfirmasi Password",
                             hint: "Konfirmasi Password",
                             controller: _confirmPasswordController,
@@ -193,6 +195,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               textStyle: semibold16,
               textColor: white,
               isLoading: _isLoading,
+              key: const Key('resetPasswordButton')
             ),
           ),
         ));

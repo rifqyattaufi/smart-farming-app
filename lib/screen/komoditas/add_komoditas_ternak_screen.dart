@@ -94,6 +94,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('cameraTile'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -108,6 +109,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
               },
             ),
             ListTile(
+              key: const Key('galleryTile'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -214,6 +216,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
+                    key: const Key('nameField'),
                       label: "Nama komoditas",
                       hint: "Contoh: Telur Ayam",
                       controller: _nameController,
@@ -224,6 +227,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                         return null;
                       }),
                   DropdownFieldWidget(
+                    key: const Key('jenisTernakField'),
                     label: "Pilih jenis ternak",
                     hint: "Pilih jenis ternak",
                     items: jenisHewanList
@@ -247,6 +251,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                     },
                   ),
                   DropdownFieldWidget(
+                    key: const Key('satuanField'),
                     label: "Satuan",
                     hint: "Pilih satuan",
                     items: satuanList
@@ -270,6 +275,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                     },
                   ),
                   ImagePickerWidget(
+                    key: const Key('imagePicker'),
                     label: "Unggah gambar komoditas",
                     image: _image,
                     onPickImage: _pickImage,
@@ -289,6 +295,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submitKomoditasButton'),
           ),
         ),
       ),

@@ -94,6 +94,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -108,6 +109,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -370,12 +372,14 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
             ),
             actions: <Widget>[
               TextButton(
+                key: const Key('cancelButton'),
                 child: const Text('Batal'),
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
                 },
               ),
               TextButton(
+                key: const Key('selectButton'),
                 child: const Text('Pilih'),
                 onPressed: () {
                   Navigator.of(dialogContext).pop(tempPickedDay);
@@ -422,6 +426,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             style: bold18.copyWith(color: dark1)),
                         const SizedBox(height: 16),
                         InputFieldWidget(
+                          key: const Key('nama_kandang_input'),
                           label: "Nama kandang",
                           hint: "Contoh: kandang A",
                           controller: _nameController,
@@ -433,6 +438,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           },
                         ),
                         InputFieldWidget(
+                            key: const Key('lokasi_kandang_input'),
                             label: "Lokasi kandang",
                             hint: "Contoh: Rooftop",
                             controller: _locationController,
@@ -443,6 +449,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                               return null;
                             }),
                         InputFieldWidget(
+                            key: const Key('luas_kandang_input'),
                             label: "Luas kandang",
                             hint: "Contoh: 30m²",
                             controller: _sizeController,
@@ -456,6 +463,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                               return null;
                             }),
                         DropdownFieldWidget(
+                          key: const Key('jenis_hewan_dropdown'),
                           label: "Pilih jenis hewan yang diternak",
                           hint: "Pilih jenis hewan ternak",
                           items: jenisHewanList
@@ -481,6 +489,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           isEdit: widget.isEdit,
                         ),
                         InputFieldWidget(
+                            key: const Key('jumlah_hewan_input'),
                             label: "Jumlah hewan ternak",
                             hint: "Contoh: 20 (satuan ekor)",
                             controller: _jumlahController,
@@ -494,6 +503,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                               return null;
                             }),
                         RadioField(
+                          key: const Key('status_kandang_radio'),
                           label: 'Status kandang',
                           selectedValue: statusKandang,
                           options: const ['Aktif', 'Tidak aktif'],
@@ -504,6 +514,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           },
                         ),
                         RadioField(
+                          key: const Key('jenis_pencatatan_radio'),
                           label: 'Jenis Pencatatan',
                           selectedValue: jenisPencatatan,
                           options: const ['Individu', 'Kolektif'],
@@ -514,11 +525,13 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           },
                         ),
                         ImagePickerWidget(
+                          key: const Key('image_picker_kandang'),
                           label: "Unggah gambar kandang",
                           image: _image,
                           onPickImage: _pickImage,
                         ),
                         InputFieldWidget(
+                            key: const Key('deskripsi_kandang_input'),
                             label: "Deskripsi kandang",
                             hint: "Keterangan",
                             controller: _descriptionController,
@@ -534,6 +547,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             style: bold18.copyWith(color: dark1)),
                         const SizedBox(height: 16),
                         RadioField(
+                          key: const Key('notifikasi_panen_radio'),
                           label: 'Notifikasi Pengingat Panen',
                           selectedValue: notifikasiPanen,
                           options: const ['Aktif', 'Tidak Aktif'],
@@ -549,6 +563,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                         ),
                         if (notifikasiPanen == 'Aktif') ...[
                           DropdownFieldWidget(
+                            key: const Key('tipe_notifikasi_dropdown'),
                             label: "Tipe Notifikasi",
                             hint: "Pilih Tipe Notifikasi",
                             items: notificationType.keys.toList(),
@@ -569,6 +584,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             },
                           ),
                           InputFieldWidget(
+                            key: const Key('waktu_notifikasi_input'),
                             label: "Waktu Notifikasi",
                             hint: "Contoh: 08:00",
                             controller: _waktuNotifikasiPanenController,
@@ -615,6 +631,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           ),
                           if (selectedTipePanen == 'Mingguan')
                             DropdownFieldWidget(
+                              key: const Key('hari_notifikasi_dropdown'),
                               label: "Hari Notifikasi",
                               hint: "Pilih Hari Notifikasi",
                               items: dayToInt.keys.toList(),
@@ -635,6 +652,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             ),
                           if (selectedTipePanen == 'Bulanan') ...[
                             InputFieldWidget(
+                              key: const Key('tanggal_notifikasi_input'),
                               label: "Tanggal Notifikasi",
                               hint: "Contoh: 1 (tanggal dalam bulan)",
                               controller: _tanggalNotifikasiPanenController,
@@ -667,6 +685,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           ]
                         ],
                         RadioField(
+                          key: const Key('notifikasi_nutrisi_radio'),
                           label: 'Notifikasi Pengingat Pemberian Nutrisi',
                           selectedValue: notifikasiNutrisi,
                           options: const ['Aktif', 'Tidak Aktif'],
@@ -682,6 +701,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                         ),
                         if (notifikasiNutrisi == 'Aktif') ...[
                           DropdownFieldWidget(
+                            key: const Key('tipe_notifikasi_nutrisi_dropdown'),
                             label: "Tipe Notifikasi",
                             hint: "Pilih Tipe Notifikasi",
                             items: notificationType.keys.toList(),
@@ -702,6 +722,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             },
                           ),
                           InputFieldWidget(
+                            key: const Key('waktu_notifikasi_nutrisi_input'),
                             label: "Waktu Notifikasi",
                             hint: "Contoh: 08:00",
                             controller: _waktuNotifikasiNutrisiController,
@@ -748,6 +769,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           ),
                           if (selectedTipeNutrisi == 'Mingguan')
                             DropdownFieldWidget(
+                              key: const Key('hari_notifikasi_nutrisi_dropdown'),
                               label: "Hari Notifikasi",
                               hint: "Pilih Hari Notifikasi",
                               items: dayToInt.keys.toList(),
@@ -768,6 +790,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             ),
                           if (selectedTipeNutrisi == 'Bulanan')
                             InputFieldWidget(
+                              key: const Key('tanggal_notifikasi_nutrisi_input'),
                               label: "Tanggal Notifikasi",
                               hint: "Contoh: 1 (tanggal dalam bulan)",
                               controller: _tanggalNotifikasiNutrisiController,
@@ -813,6 +836,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                 textStyle: semibold16,
                 textColor: white,
                 isLoading: _isLoading,
+                key: const Key('submit_kandang_button'),
               ),
             ),
           ],

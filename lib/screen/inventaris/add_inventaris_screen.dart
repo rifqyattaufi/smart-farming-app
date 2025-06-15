@@ -69,6 +69,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -83,6 +84,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -355,6 +357,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         InputFieldWidget(
+                          key: const Key('nama_inventaris_input'),
                           label: "Nama inventaris",
                           hint: "Contoh: Bibit A",
                           controller: _nameController,
@@ -366,6 +369,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                           },
                         ),
                         DropdownFieldWidget(
+                          key: const Key('kategori_inventaris_dropdown'),
                           label: "Kategori inventaris",
                           hint: "Pilih kategori inventaris",
                           items: kategoriList
@@ -392,6 +396,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                           },
                         ),
                         InputFieldWidget(
+                            key: const Key('jumlah_stok_input'),
                             label: "Jumlah stok",
                             hint: "Contoh: 20",
                             controller: _sizeController,
@@ -409,6 +414,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                               return null;
                             }),
                         InputFieldWidget(
+                            key: const Key('stok_minim_input'),
                             label: "Stok minim (untuk perhitungan stok rendah)",
                             hint: "Contoh: 5",
                             controller: _minimController,
@@ -422,6 +428,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                               return null;
                             }),
                         DropdownFieldWidget(
+                          key: const Key('satuan_inventaris_dropdown'),
                           label: "Satuan",
                           hint: "Pilih satuan",
                           items: satuanList
@@ -448,6 +455,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                           },
                         ),
                         InputFieldWidget(
+                          key: const Key('tanggal_kadaluwarsa_input'),
                           label: "Tanggal kadaluwarsa",
                           hint: "Contoh:  Senin, 17 Februari 2025",
                           controller: _dateController,
@@ -492,12 +500,14 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                               : null,
                         ),
                         ImagePickerWidget(
+                          key: const Key('gambar_inventaris_picker'),
                           label: "Unggah gambar inventaris",
                           image: _image,
                           imageUrl: _existingImageUrl,
                           onPickImage: _pickImage,
                         ),
                         InputFieldWidget(
+                            key: const Key('deskripsi_inventaris_input'),
                             label: "Deskripsi inventaris",
                             hint: "Keterangan",
                             controller: _descriptionController,
@@ -524,6 +534,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_inventaris_button')
           ),
         ),
       ),

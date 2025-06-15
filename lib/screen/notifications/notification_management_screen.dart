@@ -93,6 +93,7 @@ class _NotificationManagementScreenState
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('add_notification_button'),
           onPressed: () {
             context
                 .push('/add-global-notification',
@@ -133,6 +134,7 @@ class _NotificationManagementScreenState
                       child: ListView(
                         children: [
                           NewestReports(
+                            key: const Key('notification_list'),
                             reports: _notifications,
                             onItemTap: (context, item) {
                               final id = item['id'] ?? '';

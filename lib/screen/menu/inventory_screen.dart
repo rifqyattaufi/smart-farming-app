@@ -82,6 +82,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('tambah_inventaris'),
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -101,16 +102,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Aksi",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text("Aksi Cepat",
+                          style: semibold16.copyWith(
+                            color: dark1,
+                          )),
                       const SizedBox(height: 10),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
+                        key: const Key('tambah_pemakaian_inventaris'),
                         leading: Icon(Icons.history_outlined, color: green1),
                         title: const Text("Tambah Pemakaian Inventaris"),
                         onTap: () {
@@ -120,6 +119,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
+                        key: const Key('tambah_inventaris'),
                         leading:
                             Icon(Icons.inventory_2_outlined, color: green1),
                         title: const Text("Tambah Inventaris"),
@@ -136,6 +136,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       ),
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
+                        key: const Key('tambah_kategori_inventaris'),
                         leading: Icon(Icons.category_outlined, color: green1),
                         title: const Text("Tambah Kategori Inventaris"),
                         onTap: () {
@@ -275,6 +276,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ),
                           const SizedBox(height: 12),
                           ListItem(
+                            key: const Key('riwayat_pemakaian_terbaru'),
                             title: 'Riwayat Pemakaian Terbaru',
                             type: 'history',
                             items: (_inventarisData?['daftarPemakaianTerbaru']
@@ -299,6 +301,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           const SizedBox(height: 12),
                           ListItem(
                             title: 'Daftar Inventaris',
+                            key: const Key('daftar_inventaris'),
                             items: (_inventarisData?['daftarInventaris']
                                         as List<dynamic>? ??
                                     [])
@@ -327,9 +330,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text("Gagal memuat data dashboard."),
+                                  Text("Gagal memuat data dashboard.", style: regular12.copyWith(color: dark2), key: const Key('error_message')),
                                   const SizedBox(height: 10),
                                   ElevatedButton(
+                                    key: const Key('retry_button'),
                                     onPressed: () =>
                                         _fetchInventarisData(isRefresh: true),
                                     child: const Text("Coba Lagi"),

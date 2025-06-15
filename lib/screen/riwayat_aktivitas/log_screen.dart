@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/search_field.dart';
-import 'package:smart_farming_app/widget/newest.dart';
 
 class LogScreen extends StatefulWidget {
   const LogScreen({super.key});
@@ -47,6 +45,7 @@ class _LogScreenState extends State<LogScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SearchField(
+                    key: const Key('search_log_field'),
                     controller: searchController,
                     onChanged: (value) {
                       setState(() {});
@@ -54,31 +53,6 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                NewestReports(
-                  reports: const [
-                    {
-                      'text': 'Pak Adi telah melaporkan kondisi tanaman',
-                      'action': 'CREATE',
-                    },
-                    {
-                      'text': 'Pak Adi telah melaporkan kondisi ternak',
-                      'action': 'UPDATE',
-                    },
-                    {
-                      'text': 'Pak Adi telah melaporkan tanaman sakit',
-                      'action': 'DELETE',
-                    },
-                  ],
-                  onItemTap: (context, item) {
-                    final name = item['text'] ?? '';
-                    context.push('/detail-laporan/$name');
-                  },
-                  showIcon: false,
-                  mode: NewestReportsMode.log,
-                  titleTextStyle: bold18.copyWith(color: dark1),
-                  reportTextStyle: medium12.copyWith(color: dark1),
-                  timeTextStyle: regular12.copyWith(color: dark2),
-                ),
               ],
             ),
           ),

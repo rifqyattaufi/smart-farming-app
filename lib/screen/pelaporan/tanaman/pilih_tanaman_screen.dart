@@ -151,6 +151,7 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data tanaman terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -160,6 +161,7 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
                     ),
                   )
                 : ListItemSelectable(
+                    key: const Key('list_tanaman'),
                     title: 'Daftar Tanaman', // or 'Pelaporan Per Tanaman'
                     type: ListItemType.basic,
                     items: _listTanaman
@@ -192,6 +194,7 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button')
           ),
         ),
       ),

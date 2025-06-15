@@ -121,6 +121,7 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
+                    key: const Key('nama_kategori_inventaris'),
                     label: "Nama kategori inventaris",
                     hint: "Contoh: Bibit tanaman",
                     controller: _nameController,
@@ -146,6 +147,7 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submit_kategori_inventaris'),
           ),
         ),
       ),

@@ -95,6 +95,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('cameraTile'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -109,6 +110,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
               },
             ),
             ListTile(
+              key: const Key('galleryTile'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -216,6 +218,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
+                      key: const Key('nameField'),
                       label: "Nama komoditas",
                       hint: "Contoh: Buah Melon",
                       controller: _nameController,
@@ -226,6 +229,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                         return null;
                       }),
                   DropdownFieldWidget(
+                    key: const Key('jenisTanamanDropdown'),
                     label: "Pilih jenis tanaman",
                     hint: "Pilih jenis tanaman",
                     items: _jenisTanamanList
@@ -250,6 +254,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                     },
                   ),
                   DropdownFieldWidget(
+                    key: const Key('satuanDropdown'),
                     label: "Satuan",
                     hint: "Pilih satuan",
                     items: _satuanList
@@ -274,6 +279,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                     },
                   ),
                   ImagePickerWidget(
+                    key: const Key('imagePicker'),
                     label: "Unggah gambar komoditas",
                     image: _image,
                     onPickImage: _pickImage,
@@ -293,6 +299,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submitKomoditasButton'),
           ),
         ),
       ),

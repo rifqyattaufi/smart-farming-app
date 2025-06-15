@@ -156,6 +156,7 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data kandang terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -165,6 +166,7 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                     ),
                   )
                 : ListItemSelectable(
+                    key: const Key('pilih_kandang_list_item'),
                     title: 'Daftar Kandang',
                     type: ListItemType.simple,
                     items: _listKandang
@@ -196,6 +198,7 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('submit_pilih_kandang_button')
           ),
         ),
       ),

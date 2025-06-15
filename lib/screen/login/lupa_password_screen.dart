@@ -79,6 +79,7 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
                   child: Column(
                     children: [
                       InputFieldWidget(
+                        key: const Key('email_input'),
                         label: "Email pengguna",
                         hint: "Contoh: example@mail.com",
                         controller: _emailController,
@@ -114,6 +115,7 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_button')
           ),
         ),
       ),

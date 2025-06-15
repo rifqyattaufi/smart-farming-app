@@ -55,6 +55,7 @@ class _PelaporanTanamanSakitScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -70,6 +71,7 @@ class _PelaporanTanamanSakitScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -261,6 +263,7 @@ class _PelaporanTanamanSakitScreenState
                           ),
                           const SizedBox(height: 12),
                           InputFieldWidget(
+                            key: Key('nama_penyakit_tanaman_$i'),
                             label: "Nama penyakit tanaman",
                             hint: "Contoh: Embun tepung",
                             controller: _nameController[i],
@@ -272,12 +275,14 @@ class _PelaporanTanamanSakitScreenState
                             },
                           ),
                           ImagePickerWidget(
+                              key: Key('image_picker_tanaman_$i'),
                               label: "Unggah bukti kondisi tanaman",
                               image: _imageList[i],
                               onPickImage: (ctx) async {
                                 _pickImageTanaman(context, i);
                               }),
                           InputFieldWidget(
+                            key: Key('catatan_jurnal_tanaman_$i'),
                             label: "Catatan/jurnal pelaporan",
                             hint: "Keterangan",
                             controller: _catatanController[i],
@@ -310,6 +315,7 @@ class _PelaporanTanamanSakitScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_pelaporan_tanaman_sakit_button'),
           ),
         ),
       ),

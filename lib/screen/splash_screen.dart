@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_farming_app/service/user_service.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
+import 'package:smart_farming_app/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -148,17 +149,14 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           // Pesan error di bawah logo, tetap di tengah layar
           if (_noInternet)
-            const Align(
+            Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.only(bottom: 64),
+                padding: const EdgeInsets.only(bottom: 64),
                 child: Text(
                   'Ups! Tidak ada koneksi internet.\nSilakan periksa jaringan Anda dan coba lagi.',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  key: const Key('no_internet_message'),
+                  style: bold16.copyWith(color: Colors.red),
                   textAlign: TextAlign.center,
                 ),
               ),

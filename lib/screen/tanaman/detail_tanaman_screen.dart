@@ -105,10 +105,12 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
               'Apakah Anda yakin ingin menghapus data jenis tanaman ini beserta data terkait (unit budidaya dan objek budidaya)? Tindakan ini tidak dapat dibatalkan.'),
           actions: [
             TextButton(
+              key: const Key('cancelButton'),
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Batal'),
             ),
             TextButton(
+              key: const Key('deleteButton'),
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Hapus'),
@@ -214,11 +216,17 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Gagal memuat detail tanaman.'),
+                          Text(
+                            'Gagal memuat detail tanaman.',
+                            style: regular12.copyWith(color: dark2),
+                            key: const Key('error_message'),
+                          ),
                           const SizedBox(height: 10),
                           ElevatedButton(
                               onPressed: _fetchData,
-                              child: const Text('Coba Lagi'))
+                              child: Text('Coba Lagi',
+                                  style: regular12.copyWith(color: dark2),
+                                  key: const Key('retry_button')))
                         ],
                       ),
                     ),
@@ -317,6 +325,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                         ),
                         if (_kebunList.isNotEmpty)
                           ListItem(
+                            key: const Key('kebun_list_item'),
                             title: 'Terdaftar pada kebun',
                             type: 'basic',
                             items: _kebunList.map((item) {
@@ -333,7 +342,8 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16.0, vertical: 8.0),
                             child: Text("Tidak terdaftar pada kebun manapun.",
-                                style: regular14.copyWith(color: dark2)),
+                                style: regular14.copyWith(color: dark2),
+                                key: const Key('no_kebun_message'))
                           ),
                         const SizedBox(height: 90),
                       ],
@@ -350,6 +360,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CustomButton(
+                          key: const Key('ubah_data_button'),
                           onPressed: () {
                             if (widget.idTanaman != null) {
                               context
@@ -373,6 +384,7 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                         ),
                         const SizedBox(height: 12),
                         CustomButton(
+                          key: const Key('hapus_data_button'),
                           onPressed: _isDeleting
                               ? null
                               : () {

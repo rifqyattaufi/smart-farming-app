@@ -352,10 +352,11 @@ class _PelaporanNutrisiTanamanScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera_option'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
-                Navigator.pop(_);
+                Navigator.pop(parentContext);
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.camera);
                 if (pickedFile != null) {
@@ -368,10 +369,11 @@ class _PelaporanNutrisiTanamanScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery_option'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
-                Navigator.pop(_);
+                Navigator.pop(parentContext);
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.gallery);
                 if (pickedFile != null) {
@@ -416,6 +418,7 @@ class _PelaporanNutrisiTanamanScreenState
         child: _objekBudidayaList.isEmpty
             ? Center(
                 child: Text(
+                  key: const Key('no_data_available'),
                   "Tidak ada data tanaman untuk dilaporkan.",
                   style: regular16.copyWith(color: dark1),
                 ),
@@ -529,6 +532,7 @@ class _PelaporanNutrisiTanamanScreenState
                                       ],
                                     ),
                                   RadioField(
+                                    key: Key('status_pemberian_$i'),
                                     label: 'Jenis Pemberian',
                                     selectedValue:
                                         statusPemberianList[i] ?? 'Pupuk',
@@ -547,6 +551,7 @@ class _PelaporanNutrisiTanamanScreenState
                                     },
                                   ),
                                   DropdownFieldWidget(
+                                    key: Key('bahan_dropdown_$i'),
                                     label: "Nama bahan",
                                     hint: "Pilih jenis bahan",
                                     items: currentBahanList
@@ -591,6 +596,7 @@ class _PelaporanNutrisiTanamanScreenState
                                     },
                                   ),
                                   InputFieldWidget(
+                                      key: Key('jumlah_dosis_$i'),
                                       label: labelUntukJumlah,
                                       hint: "Contoh: 10",
                                       controller: _sizeControllers[i],
@@ -622,6 +628,7 @@ class _PelaporanNutrisiTanamanScreenState
                                         return null;
                                       }),
                                   InputFieldWidget(
+                                      key: Key('satuan_dosis_$i'),
                                       label: "Satuan dosis",
                                       hint: "Pilih bahan untuk melihat satuan",
                                       controller: _satuanControllers[i],
@@ -634,6 +641,7 @@ class _PelaporanNutrisiTanamanScreenState
                                         return null;
                                       }),
                                   ImagePickerWidget(
+                                    key: Key('image_picker_$i'),
                                     label:
                                         "Unggah bukti pemberian dosis ke tanaman",
                                     image: _imageList[i],
@@ -642,6 +650,7 @@ class _PelaporanNutrisiTanamanScreenState
                                     },
                                   ),
                                   InputFieldWidget(
+                                      key: Key('catatan_jurnal_$i'),
                                       label: "Catatan/jurnal pelaporan",
                                       hint: "Keterangan",
                                       controller: _catatanControllers[i],
@@ -677,6 +686,7 @@ class _PelaporanNutrisiTanamanScreenState
                   textStyle: semibold16,
                   textColor: white,
                   isLoading: _isLoading,
+                  key: const Key('submit_pelaporan_nutrisi_tanaman_button'),
                 ),
               ),
             ),

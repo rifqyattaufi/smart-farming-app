@@ -56,6 +56,7 @@ class _PelaporanHarianTernakScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Ambil dari Kamera'),
               onTap: () async {
@@ -68,6 +69,7 @@ class _PelaporanHarianTernakScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -206,6 +208,7 @@ class _PelaporanHarianTernakScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         RadioField(
+                          key: const Key('status_pakan'),
                           label: 'Dilakukan pemberian pakan?',
                           selectedValue: statusPakan,
                           options: const ['Ya', 'Belum'],
@@ -216,6 +219,7 @@ class _PelaporanHarianTernakScreenState
                           },
                         ),
                         RadioField(
+                          key: const Key('status_kandang'),
                           label: 'Dilakukan pengecekan kandang?',
                           selectedValue: statusKandang,
                           options: const ['Ya', 'Tidak'],
@@ -226,6 +230,7 @@ class _PelaporanHarianTernakScreenState
                           },
                         ),
                         ImagePickerWidget(
+                          key: const Key('image_picker_ternak'),
                           label: "Unggah bukti kondisi ternak",
                           image: _imageTernak,
                           onPickImage: (context) {
@@ -237,6 +242,7 @@ class _PelaporanHarianTernakScreenState
                           },
                         ),
                         InputFieldWidget(
+                            key: const Key('catatan_jurnal'),
                             label: "Catatan/jurnal pelaporan",
                             hint: "Keterangan",
                             controller: _catatanController,
@@ -268,6 +274,7 @@ class _PelaporanHarianTernakScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submit_pelaporan_harian_ternak_button'),
           ),
         ),
       ),

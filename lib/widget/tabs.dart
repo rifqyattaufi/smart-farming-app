@@ -35,6 +35,7 @@ class _TabsState extends State<Tabs> {
     bool isActive = widget.selectedIndex == index;
 
     return GestureDetector(
+      key: Key('tabItem_$index'),
       onTap: () => widget.onTabChanged(index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

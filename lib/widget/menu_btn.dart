@@ -46,6 +46,7 @@ class _MenuButtonState extends State<MenuButton> {
                 Text(widget.title, style: semibold16.copyWith(color: dark1)),
                 const SizedBox(width: 4),
                 GestureDetector(
+                  key: Key('menu_button_info_${widget.title}'),
                   onTap: () {
                     showPopover(
                       context: context,
@@ -78,6 +79,7 @@ class _MenuButtonState extends State<MenuButton> {
     );
 
     return GestureDetector(
+      key: Key('menu_button_${widget.title}'),
       onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

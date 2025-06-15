@@ -91,6 +91,7 @@ class _KebunScreenState extends State<KebunScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('add_kebun'),
                 onPressed: () {
                   context.push('/tambah-kebun',
                       extra: AddKebunScreen(
@@ -121,6 +122,7 @@ class _KebunScreenState extends State<KebunScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SearchField(
+                        key: const Key('search_kebun'),
                         controller: searchController,
                         onChanged: _searchKebun,
                       ),
@@ -128,6 +130,7 @@ class _KebunScreenState extends State<KebunScreen> {
                   ),
                 ),
                 ListItem(
+                  key: const Key('daftar_kebun'),
                   title: 'Daftar Kebun',
                   items: _filteredKebunList
                       .map((kebun) => {

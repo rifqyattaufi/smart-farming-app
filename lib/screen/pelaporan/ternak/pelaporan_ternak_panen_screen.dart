@@ -91,6 +91,7 @@ class _PelaporanTernakPanenScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera_option'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -106,6 +107,7 @@ class _PelaporanTernakPanenScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery_option'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -186,8 +188,9 @@ class _PelaporanTernakPanenScreenState
             isError: false,
           );
         } else {
-          showAppToast(context,
-              'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}: ${response['message']}',
+          showAppToast(
+            context,
+            'Gagal mengirim laporan panen ${(list[i]?['name'] ?? widget.data?['komoditas']?['name'] ?? '')}: ${response['message']}',
             isError: true,
           );
         }
@@ -269,6 +272,7 @@ class _PelaporanTernakPanenScreenState
                           ),
                           const SizedBox(height: 12),
                           InputFieldWidget(
+                            key: Key('jumlah_panen_input_$i'),
                             label: "Jumlah panen",
                             hint: "Contoh: 20",
                             controller: sizeControllers[i],
@@ -284,6 +288,7 @@ class _PelaporanTernakPanenScreenState
                             },
                           ),
                           DropdownFieldWidget(
+                            key: Key('satuan_panen_dropdown_$i'),
                             label: "Satuan panen",
                             hint: "Pilih satuan panen",
                             items: [satuanList?['nama'] ?? '-'],
@@ -298,6 +303,7 @@ class _PelaporanTernakPanenScreenState
                             },
                           ),
                           ImagePickerWidget(
+                            key: Key('image_picker_$i'),
                             label: "Unggah bukti hasil panen",
                             image: imageList[i],
                             onPickImage: (ctx) async {
@@ -305,6 +311,7 @@ class _PelaporanTernakPanenScreenState
                             },
                           ),
                           InputFieldWidget(
+                            key: Key('catatan_input_$i'),
                             label: "Catatan/jurnal pelaporan",
                             hint: "Keterangan",
                             controller: catatanControllers[i],
@@ -337,6 +344,7 @@ class _PelaporanTernakPanenScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key('submit_panen_button'),
           ),
         ),
       ),

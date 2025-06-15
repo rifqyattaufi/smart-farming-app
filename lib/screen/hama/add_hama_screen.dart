@@ -141,6 +141,7 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
                     label: "Nama Jenis Hama",
                     hint: "Contoh: Tikus",
                     controller: _nameController,
+                    key: const Key('nama_jenis_hama_input'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Nama jenis hama tidak boleh kosong';
@@ -164,6 +165,7 @@ class _AddHamaScreenState extends State<AddHamaScreen> {
             backgroundColor: green1,
             textStyle: semibold16.copyWith(color: white),
             isLoading: _isLoading,
+            key: const Key('submit_hama_button'),
           ),
         ),
       ),

@@ -208,6 +208,7 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
+                            key: const Key('deactivate_user_button'),
                             onPressed: deactivateUser,
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: red),
@@ -226,6 +227,7 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
+                            key: const Key('activate_user_button'),
                             onPressed: _activateUser,
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: green1),
@@ -243,6 +245,7 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                     ],
                     const SizedBox(height: 16),
                     CustomButton(
+                      key: const Key('edit_user_button'),
                       onPressed: () {
                         context
                             .push('/tambah-pengguna',

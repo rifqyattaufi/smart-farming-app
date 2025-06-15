@@ -98,6 +98,7 @@ class _HeaderState extends State<Header> {
                   height: 50,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: IconButton(
+                    key: const Key('backButton'),
                     onPressed: () {
                       context.pop();
                     },

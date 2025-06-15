@@ -68,7 +68,6 @@ import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.d
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_khusus_tanaman_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:smart_farming_app/screen/detail_laporan_screen.dart';
 import 'package:smart_farming_app/screen/menu/privacy_policy_screen.dart';
 import 'package:smart_farming_app/screen/menu/report_screen.dart';
 import 'package:smart_farming_app/screen/menu/inventory_screen.dart';
@@ -438,13 +437,6 @@ final _router = GoRouter(
     GoRoute(
       path: '/detail',
       builder: (context, state) => const BlankScreen(),
-    ),
-    GoRoute(
-      path: '/detail-laporan/:name',
-      builder: (context, state) {
-        final name = state.pathParameters['name']!;
-        return DetailLaporanScreen(name: name);
-      },
     ),
     GoRoute(
       path: '/statistik-laporan-tanaman/:id',

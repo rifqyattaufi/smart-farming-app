@@ -106,6 +106,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data komoditas terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -117,6 +118,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
                 : ListItemSelectable(
                     title: 'Daftar Komoditas',
                     type: ListItemType.simple,
+                    key: const Key('pilih_komoditas_list'),
                     items: _listKomoditas
                         .map((item) => {
                               'name': item['nama'],
@@ -150,6 +152,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button_pilih_komoditas')
           ),
         ),
       ),

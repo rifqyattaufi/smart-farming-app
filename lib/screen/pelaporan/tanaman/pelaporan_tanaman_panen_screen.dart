@@ -254,6 +254,7 @@ class _PelaporanTanamanPanenScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -268,6 +269,7 @@ class _PelaporanTanamanPanenScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -473,6 +475,7 @@ class _PelaporanTanamanPanenScreenState
                             style: bold18.copyWith(color: dark1)),
                         const SizedBox(height: 12),
                         InputFieldWidget(
+                          key: const Key('tanggal_panen'),
                           label: "Tanggal panen dilakukan",
                           hint: "Contoh: Senin, 17 Februari 2025",
                           controller: TextEditingController(
@@ -500,6 +503,7 @@ class _PelaporanTanamanPanenScreenState
                               : null,
                         ),
                         InputFieldWidget(
+                          key: const Key('umur_tanaman'),
                           label: "Umur tanaman saat panen (hari)",
                           hint: "Contoh: 90",
                           controller: _umurTanamanController,
@@ -539,6 +543,7 @@ class _PelaporanTanamanPanenScreenState
                           },
                         ),
                         InputFieldWidget(
+                          key: const Key('gagal_panen'),
                           label: "Kuantitas gagal panen (jika ada)",
                           hint: "Contoh: 5",
                           controller: _gagalPanenController,
@@ -555,6 +560,7 @@ class _PelaporanTanamanPanenScreenState
                           onChanged: (value) => setState(() {}),
                         ),
                         DropdownFieldWidget(
+                          key: const Key('satuan_panen'),
                           label: "Satuan panen",
                           hint: "Pilih satuan panen",
                           items:
@@ -571,6 +577,7 @@ class _PelaporanTanamanPanenScreenState
                           },
                         ),
                         ImagePickerWidget(
+                          key: const Key('image_picker_panen'),
                           label: "Unggah bukti hasil panen",
                           image: _image,
                           onPickImage: (ctx) async {
@@ -578,6 +585,7 @@ class _PelaporanTanamanPanenScreenState
                           },
                         ),
                         InputFieldWidget(
+                          key: const Key('catatan_jurnal'),
                           label: "Catatan/jurnal pelaporan",
                           hint: "Keterangan",
                           controller: _catatanController,
@@ -597,6 +605,7 @@ class _PelaporanTanamanPanenScreenState
                             Text("Rincian Hasil Panen per Grade",
                                 style: bold18.copyWith(color: dark1)),
                             IconButton(
+                              key: const Key('tambah_rincian_grade'),
                               icon: Icon(Icons.add_circle, color: green1),
                               onPressed: _tambahRincianGrade,
                               tooltip: "Tambah Rincian Grade",
@@ -607,7 +616,9 @@ class _PelaporanTanamanPanenScreenState
                         if (_isLoadingGrade)
                           const Center(child: CircularProgressIndicator())
                         else if (_gradeMasterList.isEmpty)
-                          const Text(
+                          Text(
+                              key: const Key('no_grade_found'),
+                              style: regular12.copyWith(color: dark2),
                               "Data master grade tidak ditemukan. Tidak dapat menambahkan rincian.")
                         else
                           ListView.builder(
@@ -738,6 +749,7 @@ class _PelaporanTanamanPanenScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_panen_button'),
           ),
         ),
       ),

@@ -57,6 +57,7 @@ class _PelaporanKematianTernakScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -72,6 +73,7 @@ class _PelaporanKematianTernakScreenState
               },
             ),
             ListTile(
+              key: const Key('gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -244,6 +246,7 @@ class _PelaporanKematianTernakScreenState
                         ),
                         const SizedBox(height: 12),
                         InputFieldWidget(
+                          key: Key('tanggal_waktu_kematian_$i'),
                           label: "Tanggal & waktu kematian",
                           hint: "Contoh: Senin, 17 Februari 2025 10:00",
                           controller: _dateController[i],
@@ -290,6 +293,7 @@ class _PelaporanKematianTernakScreenState
                         ),
                         if (objek == null)
                           InputFieldWidget(
+                            key: Key('jumlah_kematian_$i'),
                             label: "Jumlah Kematian",
                             hint: "Contoh: 2",
                             controller: _jumlahController,
@@ -305,6 +309,7 @@ class _PelaporanKematianTernakScreenState
                             },
                           ),
                         InputFieldWidget(
+                          key: Key('penyebab_kematian_$i'),
                           label: "Penyebab kematian",
                           hint: "Contoh: Sakit",
                           controller: _nameController[i],
@@ -316,12 +321,14 @@ class _PelaporanKematianTernakScreenState
                           },
                         ),
                         ImagePickerWidget(
+                            key: Key('image_picker_$i'),
                             label: "Unggah bukti kondisi ternak",
                             image: _imageList[i],
                             onPickImage: (ctx) async {
                               _pickImageTernak(context, i);
                             }),
                         InputFieldWidget(
+                          key: Key('catatan_kematian_$i'),
                           label: "Catatan/jurnal pelaporan",
                           hint: "Keterangan",
                           controller: _catatanController[i],
@@ -353,6 +360,7 @@ class _PelaporanKematianTernakScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_button_pelaporan_kematian_ternak'),
           ),
         ),
       ),

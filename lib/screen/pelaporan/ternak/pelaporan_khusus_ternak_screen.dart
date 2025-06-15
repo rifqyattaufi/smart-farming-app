@@ -124,6 +124,7 @@ class _PelaporanKhususTernakScreenState
                 const SizedBox(height: 12),
                 for (var item in reports)
                   MenuButton(
+                    key: Key(item['title']),
                     title: item['title'],
                     subtext: item['description'],
                     icon: Icons.cruelty_free_rounded,
@@ -152,6 +153,7 @@ class _PelaporanKhususTernakScreenState
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button')
           ),
         ),
       ),

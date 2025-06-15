@@ -124,6 +124,7 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                       children: [
                         Center(
                           child: Text(
+                            key: const Key('no_data_available'),
                             'Tidak ada data yang tersedia. Harap tambahkan data kebun terlebih dahulu.',
                             style: medium14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
@@ -133,7 +134,8 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                     ),
                   )
                 : ListItemSelectable(
-                    title: 'Daftar Kandang',
+                    key: const Key('pilih_kebun'),
+                    title: 'Daftar Kebun',
                     type: ListItemType.simple,
                     items: _listKebun
                         .map((item) => {
@@ -165,6 +167,7 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button')
           ),
         ),
       ),

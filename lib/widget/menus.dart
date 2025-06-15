@@ -67,6 +67,7 @@ class MenuGrid extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: menuItems.map((item) {
               return GestureDetector(
+                key: Key('menu_item_${item.title.toLowerCase().replaceAll(" ", "_")}'),
                 onTap: item.onTap,
                 behavior: HitTestBehavior.opaque,
                 child: Column(

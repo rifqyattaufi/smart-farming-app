@@ -277,6 +277,7 @@ class _TernakScreenState extends State<TernakScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('add_ternak_button'),
                 onPressed: () {
                   void handleTernakUpdate() {
                     _handleRefresh();
@@ -301,6 +302,7 @@ class _TernakScreenState extends State<TernakScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SearchField(
+                  key: const Key('search_ternak_field'),
                   hintText: 'Cari ternak berdasarkan nama',
                   controller: _searchController,
                   onChanged: _onSearchChanged),
@@ -362,10 +364,14 @@ class _TernakScreenState extends State<TernakScreen> {
         _filteredTernakList.isEmpty &&
         !_isSearching &&
         !_isLoadingMoreSearch) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Ternak tidak ditemukan.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Ternak tidak ditemukan.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_search_results'),
+              )));
     }
 
     if (!isCurrentlySearching &&
@@ -373,10 +379,14 @@ class _TernakScreenState extends State<TernakScreen> {
         !_isInitialLoading &&
         !_isLoadingMore &&
         !_hasNextPage) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text("Tidak ada ternak yang tersedia.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Tidak ada ternak yang tersedia.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_ternak_available'),
+              )));
     }
 
     if (_filteredTernakList.isEmpty &&
@@ -384,21 +394,31 @@ class _TernakScreenState extends State<TernakScreen> {
             _isLoadingMore ||
             _isLoadingMoreSearch ||
             _isSearching)) {
-      return const SizedBox(
-          height: 200, child: Center(child: Text("Memuat data...")));
+      return SizedBox(
+          height: 200,
+          child: Center(
+              child: Text("Memuat data...",
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('loading_ternak'))));
     }
 
     if (_filteredTernakList.isEmpty &&
         !isCurrentlySearching &&
         !_isInitialLoading &&
         !_isLoadingMore) {
-      return const Center(
+      return Center(
           child: Padding(
-              padding: EdgeInsets.all(16.0), child: Text("Tidak ada ternak.")));
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Tidak ada ternak.",
+                style: regular12.copyWith(color: dark2),
+                key: const Key('no_ternak'),
+              )));
     }
 
     return ListItem(
       title: 'Daftar Ternak',
+      key: const Key('ternak_list_items'),
       items: _filteredTernakList.map((item) {
         return {
           'name': item['nama'] ?? 'N/A',

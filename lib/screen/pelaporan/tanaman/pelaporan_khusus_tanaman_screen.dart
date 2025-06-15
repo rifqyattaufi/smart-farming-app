@@ -137,6 +137,7 @@ class _PelaporanKhususTanamanScreenState
                 const SizedBox(height: 12),
                 for (var item in reports)
                   MenuButton(
+                    key: Key(item['title']),
                     title: item['title'],
                     subtext: item['description'],
                     icon: Icons.yard,
@@ -165,6 +166,7 @@ class _PelaporanKhususTanamanScreenState
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
+            key: const Key('next_button'),
           ),
         ),
       ),

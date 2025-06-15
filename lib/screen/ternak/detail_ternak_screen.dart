@@ -78,8 +78,8 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
             _ternak = null;
             _userRole = role;
           });
-          showAppToast(context,
-              response['message'] ?? 'Gagal memuat data jenis ternak');
+          showAppToast(
+              context, response['message'] ?? 'Gagal memuat data jenis ternak');
         }
       }
     } catch (e) {
@@ -106,10 +106,12 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
               'Apakah Anda yakin ingin menghapus data jenis ternak ini beserta data terkait (unit budidaya/kandang dan objek budidaya)? Tindakan ini tidak dapat dibatalkan.'),
           actions: [
             TextButton(
+              key: const Key('cancelButton'),
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Batal'),
             ),
             TextButton(
+              key: const Key('deleteButton'),
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Hapus'),
@@ -214,11 +216,16 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Gagal memuat detail ternak.'),
+                          Text('Gagal memuat detail ternak.',
+                              style: regular12.copyWith(color: dark2),
+                              key: const Key('errorText')),
                           const SizedBox(height: 10),
                           ElevatedButton(
+                              key: const Key('retryButton'),
                               onPressed: _fetchData,
-                              child: const Text('Coba Lagi'))
+                              child: Text('Coba Lagi',
+                                  style: regular12.copyWith(color: dark2),
+                                  key: const Key('retryButtonText'))),
                         ],
                       ),
                     ),
@@ -316,6 +323,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                         ),
                         if (_kandangList.isNotEmpty)
                           ListItem(
+                            key: const Key('kandangList'),
                             title: 'Terdaftar pada kandang',
                             type: 'basic',
                             items: _kandangList.map((item) {
@@ -333,6 +341,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16.0, vertical: 8.0),
                             child: Text("Tidak terdaftar pada kandang manapun.",
+                                key: const Key('noKandangText'),
                                 style: regular14.copyWith(color: dark2)),
                           ),
                         const SizedBox(height: 90),
@@ -344,12 +353,13 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
           _isLoading || _ternak == null || _userRole != 'pjawab'
               ? null
               : SafeArea(
-                child: Padding(
+                  child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CustomButton(
+                          key: const Key('editTernakButton'),
                           onPressed: () {
                             if (widget.idTernak != null) {
                               context.push(
@@ -370,6 +380,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                         ),
                         const SizedBox(height: 12),
                         CustomButton(
+                          key: const Key('deleteTernakButton'),
                           onPressed: _isDeleting
                               ? null
                               : () {
@@ -383,7 +394,7 @@ class _DetailTernakScreenState extends State<DetailTernakScreen> {
                       ],
                     ),
                   ),
-              ),
+                ),
     );
   }
 

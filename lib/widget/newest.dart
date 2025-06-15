@@ -43,6 +43,7 @@ class NewestReports extends StatelessWidget {
               if (title != null) Text(title!, style: titleTextStyle),
               if (mode == NewestReportsMode.full && onViewAll != null)
                 GestureDetector(
+                  key: const Key('view_all_reports'),
                   onTap: onViewAll,
                   child: Text(
                     'Lihat semua',
@@ -65,6 +66,7 @@ class NewestReports extends StatelessWidget {
                 return Column(
                   children: [
                     InkWell(
+                      key: Key('report_item_${report['id'] ?? index}'),
                       onTap: () {
                         if (customTap != null) {
                           customTap();

@@ -107,7 +107,8 @@ class MatiTab extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             "Gagal memuat total",
-            style: regular14.copyWith(color: Colors.red),
+            key: const Key('error_total_tanaman_mati'),
+            style: regular12.copyWith(color: Colors.red),
             textAlign: TextAlign.center,
           ),
         ),
@@ -246,10 +247,12 @@ class MatiTab extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                   'Error memuat riwayat laporan kematian: ${riwayatMatiState.error}',
-                  style: const TextStyle(color: Colors.red)),
+                  style: regular12.copyWith(color: Colors.red),
+                  key: const Key('error_riwayat_laporan_mati')),
             )
           else if (riwayatMatiState.items.isNotEmpty)
             NewestReports(
+              key: const Key('riwayat_pelaporan_mati'),
               title: 'Riwayat Pelaporan Kematian Tanaman',
               reports: riwayatMatiState.items.map((item) {
                 return {
@@ -282,9 +285,12 @@ class MatiTab extends StatelessWidget {
               timeTextStyle: regular12.copyWith(color: dark2),
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
+                  key: const Key('no_riwayat_pelaporan_mati'),
+                  style: regular12.copyWith(color: dark2),
                   'Tidak ada riwayat pelaporan kematian tanaman untuk ditampilkan saat ini.'),
             ),
           const SizedBox(height: 80),

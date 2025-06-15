@@ -91,6 +91,7 @@ class _KandangScreenState extends State<KandangScreen> {
               width: 70,
               height: 70,
               child: FloatingActionButton(
+                key: const Key('add_kandang'),
                 onPressed: () {
                   context.push('/tambah-kandang',
                       extra: AddKandangScreen(
@@ -121,6 +122,7 @@ class _KandangScreenState extends State<KandangScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SearchField(
+                        key: const Key('search_kandang'),
                         controller: searchController,
                         onChanged: _searchKandang,
                       ),
@@ -128,6 +130,7 @@ class _KandangScreenState extends State<KandangScreen> {
                   ),
                 ),
                 ListItem(
+                  key: const Key('list_kandang'),
                   title: 'Daftar Kandang',
                   items: _filteredKandangList
                       .map((kandang) => {

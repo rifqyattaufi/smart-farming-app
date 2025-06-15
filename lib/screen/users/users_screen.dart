@@ -79,6 +79,7 @@ class _UsersScreenState extends State<UsersScreen> {
           width: 70,
           height: 70,
           child: FloatingActionButton(
+            key: const Key('add_user_button'),
             onPressed: () {
               context
                   .push('/tambah-pengguna', extra: const AddUserScreen())
@@ -103,6 +104,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SearchField(
+                    key: const Key('search_user_field'),
                     controller: searchController,
                     onChanged: (value) {
                       setState(() {});
@@ -111,6 +113,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
                 const SizedBox(height: 20),
                 NewestReports(
+                  key: const Key('penanggung_jawab_rfc'),
                   title: 'Penanggung Jawab RFC',
                   reports: pjawab
                       .map((user) => {
@@ -140,6 +143,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
                 const SizedBox(height: 12),
                 NewestReports(
+                  key: const Key('petugas_pelaporan_rfc'),
                   title: 'Petugas Pelaporan',
                   reports: petugas
                       .map((user) => {
@@ -169,6 +173,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
                 const SizedBox(height: 12),
                 NewestReports(
+                  key: const Key('inventor_rfc'),
                   title: 'Inventor RFC',
                   reports: inventor
                       .map((user) => {

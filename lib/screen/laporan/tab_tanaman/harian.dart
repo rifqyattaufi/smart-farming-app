@@ -133,10 +133,12 @@ class HarianTab extends StatelessWidget {
                     (laporanHarianState.dataPoints.isEmpty &&
                         penyiramanState.dataPoints.isEmpty &&
                         nutrisiState.dataPoints.isEmpty)
-                ? const Center(
+                ? Center(
                     child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.0),
-                        child: Text("Memuat rangkuman statistik...")))
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Text("Memuat rangkuman statistik...",
+                            style: regular12.copyWith(color: dark2),
+                            key: const Key('loading_rangkuman_statistik'))))
                 : Text(generatedStatistikRangkumanText,
                     style: regular14.copyWith(color: dark2)),
           ],
@@ -155,6 +157,7 @@ class HarianTab extends StatelessWidget {
           _paddedError('Error Riwayat Pelaporan: ${riwayatUmumState.error}'));
     } else if (riwayatUmumState.items.isNotEmpty) {
       listChildren.add(NewestReports(
+        key: const Key('riwayat_pelaporan_harian'),
         title: 'Riwayat Pelaporan',
         reports: riwayatUmumState.items
             .map((item) => {
@@ -176,8 +179,8 @@ class HarianTab extends StatelessWidget {
                 jenisLaporan: 'harian',
                 jenisBudidaya: 'tumbuhan');
           } else {
-            showAppToast(context,
-                'ID laporan tidak ditemukan. Silakan coba lagi.');
+            showAppToast(
+                context, 'ID laporan tidak ditemukan. Silakan coba lagi.');
           }
         },
         mode: NewestReportsMode.full,
@@ -186,8 +189,10 @@ class HarianTab extends StatelessWidget {
         timeTextStyle: regular12.copyWith(color: dark2),
       ));
     } else {
-      listChildren.add(_paddedItem(
-          const Text('Tidak ada riwayat pelaporan harian untuk ditampilkan.')));
+      listChildren.add(_paddedItem(Text(
+          'Tidak ada riwayat pelaporan harian untuk ditampilkan.',
+          style: regular12.copyWith(color: dark2),
+          key: const Key('no_riwayat_pelaporan_harian'))));
     }
     listChildren.add(const SizedBox(height: 12));
 
@@ -208,6 +213,7 @@ class HarianTab extends StatelessWidget {
     } else if (riwayatPupukState.items.isNotEmpty) {
       listChildren.add(
         ListItem(
+          key: const Key('riwayat_pemberian_pupuk'),
           title: 'Riwayat Pemberian Pupuk',
           type: 'history',
           items: riwayatPupukState.items
@@ -242,17 +248,17 @@ class HarianTab extends StatelessWidget {
                 jenisBudidaya: 'tumbuhan',
               );
             } else {
-              showAppToast(context,
-                  'ID laporan tidak ditemukan. Silakan coba lagi.');
+              showAppToast(
+                  context, 'ID laporan tidak ditemukan. Silakan coba lagi.');
             }
           },
         ),
       );
     } else {
       listChildren.add(
-        _paddedItem(
-          const Text('Tidak ada riwayat pemberian pupuk untuk ditampilkan.'),
-        ),
+        _paddedItem(Text('Tidak ada riwayat pemberian pupuk untuk ditampilkan.',
+            style: regular12.copyWith(color: dark2),
+            key: const Key('no_riwayat_pemberian_pupuk'))),
       );
     }
 

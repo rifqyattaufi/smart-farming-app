@@ -137,6 +137,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: const Key('open_camera'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -152,6 +153,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
               },
             ),
             ListTile(
+              key: const Key('open_gallery'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -203,7 +205,8 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
           finalImageUrl = imageUploadResponse['data'];
         } else {
           if (mounted) {
-            showAppToast(context,
+            showAppToast(
+                context,
                 imageUploadResponse['message'] ??
                     'Gagal mengunggah gambar tanaman.');
             setState(() {
@@ -296,6 +299,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         InputFieldWidget(
+                          key: const Key('nama_jenis_tanaman'),
                           label: "Nama jenis tanaman",
                           hint: "Contoh: Melon",
                           controller: _nameController,
@@ -307,6 +311,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                           },
                         ),
                         InputFieldWidget(
+                            key: const Key('nama_latin_tanaman'),
                             label: "Nama latin",
                             hint: "Contoh: Cucumis melo",
                             controller: _latinController,
@@ -317,6 +322,7 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                               return null;
                             }),
                         RadioField(
+                          key: const Key('status_budidaya'),
                           label: 'Status budidaya',
                           selectedValue: statusBudidaya,
                           options: const ['Aktif', 'Tidak aktif'],
@@ -327,12 +333,14 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
                           },
                         ),
                         ImagePickerWidget(
+                          key: const Key('image_picker_tanaman'),
                           label: "Unggah gambar tanaman",
                           image: _imageTanaman,
                           imageUrl: _imageUrlFromApi,
                           onPickImage: (ctx) => _pickImageTanaman(ctx),
                         ),
                         InputFieldWidget(
+                          key: const Key('deskripsi_tanaman'),
                           label: "Deskripsi tanaman",
                           hint: "Keterangan umum mengenai jenis tanaman ini",
                           controller: _descriptionController,
@@ -354,13 +362,13 @@ class _AddTanamanScreenState extends State<AddTanamanScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
-            onPressed: _submitForm,
-            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
-            backgroundColor: green1,
-            textStyle: semibold16.copyWith(color: white),
-            textColor: white,
-            isLoading: _isLoading,
-          ),
+              onPressed: _submitForm,
+              buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
+              backgroundColor: green1,
+              textStyle: semibold16.copyWith(color: white),
+              textColor: white,
+              isLoading: _isLoading,
+              key: const Key('submit_tanaman_button')),
         ),
       ),
     );

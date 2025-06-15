@@ -127,7 +127,8 @@ class OTPInputWidgetState extends State<OTPInputWidget> {
           contentPadding:
               EdgeInsets.zero, // Adjust padding to center text if needed
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: green1.withOpacity(0.5), width: 1.2),
+            borderSide:
+                BorderSide(color: green1.withValues(alpha: .5), width: 1.2),
             borderRadius: BorderRadius.circular(8),
           ),
           focusedBorder: OutlineInputBorder(

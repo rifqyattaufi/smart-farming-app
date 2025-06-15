@@ -61,6 +61,7 @@ class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
+          key: const Key('add_pemakaian_inventaris'),
           onPressed: () {
             context.push('/tambah-pemakaian-inventaris');
           },
@@ -85,6 +86,7 @@ class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListItem(
+                        key: const Key('riwayat_pemakaian_terbaru'),
                         title: 'Riwayat Pemakaian Terbaru',
                         type: 'history',
                         items: (_inventarisData?['daftarPemakaianTerbaru']
@@ -106,6 +108,7 @@ class _RiwayatPemakaianScreenState extends State<RiwayatPemakaianScreen> {
                       ),
                       const SizedBox(height: 12),
                       ListItem(
+                        key: const Key('semua_riwayat_pemakaian'),
                         title: 'Semua Riwayat Pemakaian',
                         type: 'history',
                         items: (_inventarisData?['daftarPemakaian']

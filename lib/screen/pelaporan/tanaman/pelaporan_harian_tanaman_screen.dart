@@ -222,6 +222,7 @@ class _PelaporanHarianTanamanScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: Key('camera_$index'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -236,6 +237,7 @@ class _PelaporanHarianTanamanScreenState
               },
             ),
             ListTile(
+              key: Key('gallery_$index'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -266,6 +268,7 @@ class _PelaporanHarianTanamanScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              key: Key('camera_dosis_$index'),
               leading: const Icon(Icons.camera_alt),
               title: const Text('Buka Kamera'),
               onTap: () async {
@@ -280,6 +283,7 @@ class _PelaporanHarianTanamanScreenState
               },
             ),
             ListTile(
+              key: Key('gallery_dosis_$index'),
               leading: const Icon(Icons.photo),
               title: const Text('Pilih dari Galeri'),
               onTap: () async {
@@ -635,6 +639,7 @@ class _PelaporanHarianTanamanScreenState
                           ),
                           const SizedBox(height: 12),
                           RadioField(
+                            key: Key('status_penyiraman_$i'),
                             label: 'Dilakukan penyiraman?',
                             selectedValue: statusPenyiraman[i],
                             options: const ['Ya', 'Tidak'],
@@ -645,6 +650,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           RadioField(
+                            key: Key('status_pruning_$i'),
                             label: 'Dilakukan pruning?',
                             selectedValue: statusPruning[i],
                             options: const ['Ya', 'Tidak'],
@@ -655,6 +661,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           RadioField(
+                            key: Key('status_nutrisi_$i'),
                             label:
                                 'Dilakukan pemberian pupuk/vitamin/disinfektan?',
                             selectedValue: statusNutrisi[i],
@@ -666,6 +673,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           RadioField(
+                            key: Key('status_repotting_$i'),
                             label:
                                 'Dilakukan repotting (pemindahan pot/mengganti media tanam)?',
                             selectedValue: statusRepotting[i],
@@ -677,6 +685,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           InputFieldWidget(
+                              key: Key('tinggi_tanaman_$i'),
                               label: "Pertumbuhan tinggi tanaman (cm)",
                               hint:
                                   "Contoh: ${_lastHeights[i].toStringAsFixed(1)} atau lebih",
@@ -698,6 +707,7 @@ class _PelaporanHarianTanamanScreenState
                                 return null;
                               }),
                           DropdownFieldWidget(
+                            key: Key('kondisi_daun_$i'),
                             label: "Kondisi daun",
                             hint: "Pilih kondisi daun",
                             items: kondisiDaunDisplayMap.values.toList(),
@@ -722,6 +732,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           DropdownFieldWidget(
+                            key: Key('status_tumbuh_$i'),
                             label: "Status pertumbuhan tanaman",
                             hint: "Pilih status tumbuh",
                             items: statusTumbuhDisplayMap.values.toList(),
@@ -746,6 +757,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           ImagePickerWidget(
+                            key: Key('image_tanaman_$i'),
                             label: "Unggah bukti kondisi tanaman",
                             image: _imageTanamanList[i],
                             onPickImage: (ctx) {
@@ -753,6 +765,7 @@ class _PelaporanHarianTanamanScreenState
                             },
                           ),
                           InputFieldWidget(
+                              key: Key('catatan_$i'),
                               label: "Catatan/jurnal pelaporan",
                               hint: "Keterangan",
                               controller: _catatanController[i],
@@ -765,6 +778,7 @@ class _PelaporanHarianTanamanScreenState
                               }),
                           if (statusNutrisi[i] == 'Ya') ...[
                             RadioField(
+                              key: Key('status_pemberian_$i'),
                               label: 'Jenis Pemberian',
                               selectedValue: statusPemberianList[i] ?? 'Pupuk',
                               options: const [
@@ -782,6 +796,7 @@ class _PelaporanHarianTanamanScreenState
                               },
                             ),
                             DropdownFieldWidget(
+                              key: Key('bahan_pemberian_$i'),
                               label: "Nama bahan",
                               hint: "Pilih jenis bahan",
                               items: (() {
@@ -850,6 +865,7 @@ class _PelaporanHarianTanamanScreenState
                               },
                             ),
                             InputFieldWidget(
+                                key: Key('jumlah_dosis_$i'),
                                 label: labelUntukJumlah,
                                 hint: "Contoh: 10",
                                 controller: _sizeController[i],
@@ -879,6 +895,7 @@ class _PelaporanHarianTanamanScreenState
                                   return null;
                                 }),
                             InputFieldWidget(
+                              key: Key('satuan_dosis_$i'),
                               label: "Satuan dosis",
                               hint: "",
                               controller: _satuanController[i],
@@ -891,6 +908,7 @@ class _PelaporanHarianTanamanScreenState
                               },
                             ),
                             ImagePickerWidget(
+                              key: Key('image_dosis_$i'),
                               label: "Unggah bukti pemberian dosis ke tanaman",
                               image: _imageDosisList[i],
                               onPickImage: (ctx) {
@@ -918,6 +936,7 @@ class _PelaporanHarianTanamanScreenState
             textStyle: semibold16,
             textColor: white,
             isLoading: _isLoading,
+            key: const Key('submit_pelaporan_harian_tanaman_button')
           ),
         ),
       ),

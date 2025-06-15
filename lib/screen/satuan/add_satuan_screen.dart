@@ -127,6 +127,7 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InputFieldWidget(
+                    key: const Key("add_satuan_name_field"),
                     label: "Nama satuan",
                     hint: "Contoh: Kilogram",
                     controller: _nameController,
@@ -138,6 +139,7 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
                     },
                   ),
                   InputFieldWidget(
+                    key: const Key("add_satuan_lambang_field"),
                     label: "Lambang satuan",
                     hint: "Contoh: Kg",
                     controller: _lambangController,
@@ -163,6 +165,7 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,
+            key: const Key("submit_satuan_button"),
           ),
         ),
       ),
