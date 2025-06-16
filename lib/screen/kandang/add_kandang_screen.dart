@@ -43,6 +43,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
   String notifikasiNutrisi = 'Tidak Aktif';
   String? selectedHariPanen;
   String? selectedHariNutrisi;
+  String? initialJumlahHewan;
   List<Map<String, dynamic>> jenisHewanList = [];
 
   final TextEditingController _nameController = TextEditingController();
@@ -159,6 +160,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
         _locationController.text = data['lokasi'] ?? '';
         _sizeController.text = data['luas']?.toString() ?? '';
         _jumlahController.text = data['jumlah']?.toString() ?? '';
+        initialJumlahHewan = data['jumlah']?.toString();
         _descriptionController.text = data['deskripsi'] ?? '';
         statusKandang = data['status'] == true ? 'Aktif' : 'Tidak aktif';
         jenisPencatatan = data['tipe'] == 'individu' ? 'Individu' : 'Kolektif';
@@ -493,6 +495,14 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             label: "Jumlah hewan ternak",
                             hint: "Contoh: 20 (satuan ekor)",
                             controller: _jumlahController,
+                            isDisabled: initialJumlahHewan == null ||
+                                    int.tryParse(initialJumlahHewan ?? '') == 0
+                                ? false
+                                : true,
+                            isGrayed: initialJumlahHewan == null ||
+                                    int.tryParse(initialJumlahHewan ?? '') == 0
+                                ? false
+                                : true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah hewan tidak boleh kosong';
@@ -769,7 +779,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           ),
                           if (selectedTipeNutrisi == 'Mingguan')
                             DropdownFieldWidget(
-                              key: const Key('hari_notifikasi_nutrisi_dropdown'),
+                              key:
+                                  const Key('hari_notifikasi_nutrisi_dropdown'),
                               label: "Hari Notifikasi",
                               hint: "Pilih Hari Notifikasi",
                               items: dayToInt.keys.toList(),
@@ -790,7 +801,8 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                             ),
                           if (selectedTipeNutrisi == 'Bulanan')
                             InputFieldWidget(
-                              key: const Key('tanggal_notifikasi_nutrisi_input'),
+                              key:
+                                  const Key('tanggal_notifikasi_nutrisi_input'),
                               label: "Tanggal Notifikasi",
                               hint: "Contoh: 1 (tanggal dalam bulan)",
                               controller: _tanggalNotifikasiNutrisiController,

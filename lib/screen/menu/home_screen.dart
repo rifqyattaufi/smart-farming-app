@@ -4,8 +4,6 @@ import 'package:smart_farming_app/screen/kandang/add_kandang_screen.dart';
 import 'package:smart_farming_app/screen/kebun/add_kebun_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_kebun_screen.dart';
-import 'package:smart_farming_app/screen/pelaporan/ternak/pilih_kandang_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
@@ -19,7 +17,6 @@ import 'package:smart_farming_app/widget/menus.dart';
 import 'package:smart_farming_app/widget/newest.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
 import 'package:smart_farming_app/widget/banner.dart';
-import 'package:smart_farming_app/widget/menu_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -179,62 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
               crossAxisCount: 2,
               valueFontSize: 60,
-            ),
-            const SizedBox(height: 12),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                double cardWidth = (constraints.maxWidth / 2) - 24;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: cardWidth,
-                        child: MenuCard(
-                          key: const Key('pelaporanHarianPerkebunan'),
-                          bgColor: yellow1,
-                          iconColor: yellow,
-                          icon: Icons.add,
-                          title: 'Pelaporan Harian',
-                          subtitle:
-                              'Pelaporan rutin kondisi tanaman setiap hari',
-                          onTap: () {
-                            context
-                                .push('/pilih-kebun',
-                                    extra: const PilihKebunScreen(
-                                      greeting: "Pelaporan Harian",
-                                      tipe: "harian",
-                                    ))
-                                .then((_) {
-                              _fetchData(isRefresh: true);
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: MenuCard(
-                          key: const Key('pelaporanKhususPerkebunan'),
-                          bgColor: const Color(0xFFDDE7D9),
-                          iconColor: Colors.green,
-                          icon: Icons.edit,
-                          title: 'Pelaporan Khusus',
-                          subtitle:
-                              'Pelaporan khusus kondisi tanaman seperti sakit, mati, atau panen',
-                          onTap: () {
-                            context.push('/pelaporan-khusus-tanaman').then((_) {
-                              _fetchData(isRefresh: true);
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
             const SizedBox(height: 12),
             MenuGrid(
@@ -472,62 +413,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
               crossAxisCount: 2,
               valueFontSize: 60,
-            ),
-            const SizedBox(height: 12),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                double cardWidth = (constraints.maxWidth / 2) - 24;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: cardWidth,
-                        child: MenuCard(
-                          key: const Key('pelaporanHarianPeternakan'),
-                          bgColor: yellow1,
-                          iconColor: yellow,
-                          icon: Icons.add,
-                          title: 'Pelaporan Harian',
-                          subtitle:
-                              'Pelaporan rutin kondisi ternak setiap hari',
-                          onTap: () {
-                            context
-                                .push('/pilih-kandang',
-                                    extra: const PilihKandangScreen(
-                                      greeting: "Pelaporan Harian",
-                                      tipe: "harian",
-                                    ))
-                                .then((_) {
-                              _fetchData(isRefresh: true);
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: MenuCard(
-                          key: const Key('pelaporanKhususPeternakan'),
-                          bgColor: const Color(0xFFDDE7D9),
-                          iconColor: Colors.green,
-                          icon: Icons.edit,
-                          title: 'Pelaporan Khusus',
-                          subtitle:
-                              'Pelaporan khusus kondisi ternak seperti sakit, mati, atau panen',
-                          onTap: () {
-                            context.push('/pelaporan-khusus-ternak').then((_) {
-                              _fetchData(isRefresh: true);
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
             const SizedBox(height: 12),
             MenuGrid(

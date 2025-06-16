@@ -42,6 +42,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
   String notifikasiNutrisi = 'Tidak Aktif';
   String? selectedHariPanen;
   String? selectedHariNutrisi;
+  String? initialJumlahTanaman;
 
   File? _image;
   final picker = ImagePicker();
@@ -174,6 +175,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
         _locationController.text = data['lokasi'];
         _sizeController.text = data['luas'].toString();
         _jumlahController.text = data['jumlah'].toString();
+        initialJumlahTanaman = data['jumlah'].toString();
         statusKebun = data['status'] ? 'Aktif' : 'Tidak Aktif';
         _descriptionController.text = data['deskripsi'];
         selectedJenisTanaman = data['JenisBudidayaId'].toString();
@@ -510,6 +512,14 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     hint: "Contoh: 20 (satuan tanaman)",
                     controller: _jumlahController,
                     keyboardType: TextInputType.number,
+                    isDisabled: initialJumlahTanaman == null ||
+                            int.tryParse(initialJumlahTanaman ?? '') == 0
+                        ? false
+                        : true,
+                    isGrayed: initialJumlahTanaman == null ||
+                            int.tryParse(initialJumlahTanaman ?? '') == 0
+                        ? false
+                        : true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Jumlah tanaman tidak boleh kosong';

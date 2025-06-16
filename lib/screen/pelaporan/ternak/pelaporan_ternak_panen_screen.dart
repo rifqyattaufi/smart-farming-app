@@ -128,7 +128,7 @@ class _PelaporanTernakPanenScreenState
     );
   }
 
-  Future<void> _submitForm() async {
+  Future<void> _submitForm(bool isDeleted) async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
@@ -176,7 +176,8 @@ class _PelaporanTernakPanenScreenState
           'panen': {
             'komoditasId': widget.data?['komoditas']?['id'],
             'jumlah': double.parse(sizeControllers[i].text),
-          }
+          },
+          'isDeleted': isDeleted,
         };
 
         final response = await _laporanService.createLaporanPanen(data);
@@ -339,7 +340,26 @@ class _PelaporanTernakPanenScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  content: const Text(
+                      'Apakah anda ingin menghapus data hewan yang dipanen?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      child: const Text('Tidak'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: const Text('Ya'),
+                    ),
+                  ],
+                ),
+              );
+              _submitForm(confirm!);
+            },
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
