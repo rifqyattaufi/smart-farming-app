@@ -40,12 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response['status'] == true) {
         String? role = await _authService.getUserRole();
 
-        if (role == 'pjawab') {
-          context.go('/home');
-        } else if (role == 'petugas') {
-          context.go('/home-petugas');
+        if (role == 'petugas') {
+          context.push('/home-petugas');
+        } else {
+          context.push('/home');
         }
-        context.go('/home');
       } else {
         showAppToast(context,
             response['message'] ?? 'Terjadi kesalahan tidak diketahui');

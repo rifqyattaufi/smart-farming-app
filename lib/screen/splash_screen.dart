@@ -110,12 +110,10 @@ class _SplashScreenState extends State<SplashScreen>
     // Cek role pengguna dan arahkan ke halaman sesuai role
     final role = await _authService.getUserRole();
     if (!mounted) return;
-    if (role == 'pjawab') {
-      context.go('/home');
-    } else if (role == 'petugas') {
-      // await _authService.logout();
-      // context.go('/login');
-      context.go('/home-petugas');
+    if (role == 'petugas') {
+      context.push('/home-petugas');
+    } else {
+      context.push('/home');
     }
   }
 

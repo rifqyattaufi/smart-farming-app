@@ -6,6 +6,7 @@ import 'package:smart_farming_app/screen/komoditas/add_komoditas_tanaman_screen.
 import 'package:smart_farming_app/screen/komoditas/add_komoditas_ternak_screen.dart';
 import 'package:smart_farming_app/screen/tanaman/add_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/ternak/add_ternak_screen.dart';
+import 'package:smart_farming_app/service/auth_service.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -27,9 +28,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final DashboardService _dashboardService = DashboardService();
+  final AuthService _authService = AuthService();
   Map<String, dynamic>? _perkebunanData;
   Map<String, dynamic>? _peternakanData;
   bool _isLoading = true;
+  String? _userRole;
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorPerkebunanKey =
       GlobalKey<RefreshIndicatorState>();
@@ -51,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
+      final role = await _authService.getUserRole();
       final results = await Future.wait([
         _dashboardService.getDashboardPerkebunan(),
         _dashboardService.getDashboardPeternakan(),
@@ -58,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (!mounted) return;
       setState(() {
+        _userRole = role;
         _perkebunanData = results[0];
         _peternakanData = results[1];
         _isLoading = false;
@@ -590,157 +595,167 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: SizedBox(
         width: 70,
         height: 70,
-        child: FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) {
-                if (_selectedTabIndex == 0) {
-                  // Perkebunan
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: white,
+        child: _userRole == "pjawab"
+            ? FloatingActionButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(20)),
+                          BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Aksi Cepat",
-                            style: semibold16.copyWith(
-                              color: dark1,
-                            )),
-                        const SizedBox(height: 10),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahKebun'),
-                          leading: Icon(Icons.warehouse, color: green1),
-                          title: const Text("Tambah Kebun"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-kebun',
-                                extra: AddKebunScreen(
-                                  isEdit: false,
-                                  onKebunAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahTanaman'),
-                          leading: Icon(Icons.yard_outlined, color: green1),
-                          title: const Text("Tambah Jenis Tanaman"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-tanaman',
-                                extra: AddTanamanScreen(
-                                  isEdit: false,
-                                  onTanamanAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahKomoditasTanaman'),
-                          leading:
-                              Icon(Icons.inventory_outlined, color: green1),
-                          title: const Text("Tambah Komoditas Tanaman"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-komoditas-tanaman',
-                                extra: AddKomoditasTanamanScreen(
-                                  isEdit: false,
-                                  onKomoditasTanamanAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  // Peternakan
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: white,
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Aksi Cepat",
-                          style: semibold16.copyWith(
-                            color: dark1,
+                    builder: (context) {
+                      if (_selectedTabIndex == 0) {
+                        // Perkebunan
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(20)),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahKandang'),
-                          leading:
-                              Icon(Icons.warehouse_outlined, color: green1),
-                          title: const Text("Tambah Kandang"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-kandang',
-                                extra: AddKandangScreen(
-                                  isEdit: false,
-                                  onKandangAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahTernak'),
-                          leading:
-                              Icon(Icons.cruelty_free_rounded, color: green1),
-                          title: const Text("Tambah Jenis Ternak"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-ternak',
-                                extra: AddTernakScreen(
-                                  isEdit: false,
-                                  onTernakAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                        const Divider(height: 1, color: Color(0xFFE8E8E8)),
-                        ListTile(
-                          key: const Key('tambahKomoditasTernak'),
-                          leading:
-                              Icon(Icons.inventory_outlined, color: green1),
-                          title: const Text("Tambah Komoditas Ternak"),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.push('/tambah-komoditas-ternak',
-                                extra: AddKomoditasTernakScreen(
-                                  isEdit: false,
-                                  onKomoditasAdded: _fetchData,
-                                ));
-                          },
-                        ),
-                      ],
-                    ),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Aksi Cepat",
+                                  style: semibold16.copyWith(
+                                    color: dark1,
+                                  )),
+                              const SizedBox(height: 10),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahKebun'),
+                                leading: Icon(Icons.warehouse, color: green1),
+                                title: const Text("Tambah Kebun"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-kebun',
+                                      extra: AddKebunScreen(
+                                        isEdit: false,
+                                        onKebunAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahTanaman'),
+                                leading:
+                                    Icon(Icons.yard_outlined, color: green1),
+                                title: const Text("Tambah Jenis Tanaman"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-tanaman',
+                                      extra: AddTanamanScreen(
+                                        isEdit: false,
+                                        onTanamanAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahKomoditasTanaman'),
+                                leading: Icon(Icons.inventory_outlined,
+                                    color: green1),
+                                title: const Text("Tambah Komoditas Tanaman"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-komoditas-tanaman',
+                                      extra: AddKomoditasTanamanScreen(
+                                        isEdit: false,
+                                        onKomoditasTanamanAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        // Peternakan
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(20)),
+                          ),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Aksi Cepat",
+                                style: semibold16.copyWith(
+                                  color: dark1,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahKandang'),
+                                leading: Icon(Icons.warehouse_outlined,
+                                    color: green1),
+                                title: const Text("Tambah Kandang"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-kandang',
+                                      extra: AddKandangScreen(
+                                        isEdit: false,
+                                        onKandangAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahTernak'),
+                                leading: Icon(Icons.cruelty_free_rounded,
+                                    color: green1),
+                                title: const Text("Tambah Jenis Ternak"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-ternak',
+                                      extra: AddTernakScreen(
+                                        isEdit: false,
+                                        onTernakAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                              const Divider(
+                                  height: 1, color: Color(0xFFE8E8E8)),
+                              ListTile(
+                                key: const Key('tambahKomoditasTernak'),
+                                leading: Icon(Icons.inventory_outlined,
+                                    color: green1),
+                                title: const Text("Tambah Komoditas Ternak"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push('/tambah-komoditas-ternak',
+                                      extra: AddKomoditasTernakScreen(
+                                        isEdit: false,
+                                        onKomoditasAdded: _fetchData,
+                                      ));
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
                   );
-                }
-              },
-            );
-          },
-          backgroundColor: green1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: const Icon(Icons.add, size: 30, color: Colors.white),
-        ),
+                },
+                backgroundColor: green1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: const Icon(Icons.add, size: 30, color: Colors.white),
+              )
+            : null,
       ),
       body: _isLoading
           ? const Center(
