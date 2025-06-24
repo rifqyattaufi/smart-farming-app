@@ -330,7 +330,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("Gagal memuat data dashboard.", style: regular12.copyWith(color: dark2), key: const Key('error_message')),
+                                  Text("Gagal memuat data dashboard.",
+                                      style: regular12.copyWith(color: dark2),
+                                      key: const Key('error_message')),
                                   const SizedBox(height: 10),
                                   ElevatedButton(
                                     key: const Key('retry_button'),

@@ -919,13 +919,16 @@ class _InventarisScreenState extends State<InventarisScreen> {
         .toList();
 
     final stokRendah = _filteredInventarisList.where((inventaris) {
-      final jumlah = inventaris['jumlah'] as int? ?? 0;
-      final stokMinim = inventaris['stokMinim'] as int? ?? 0;
+      final dynamic rawJumlah = inventaris['jumlah'];
+      final dynamic rawStokMinim = inventaris['stokMinim'];
+      final jumlah = (rawJumlah is num ? rawJumlah.toInt() : 0);
+      final stokMinim = (rawStokMinim is num ? rawStokMinim.toInt() : 0);
       return jumlah > 0 && stokMinim > 0 && jumlah < stokMinim;
     }).toList();
 
     final stokHabis = _filteredInventarisList.where((inventaris) {
-      final jumlah = inventaris['jumlah'] as int? ?? 0;
+      final dynamic rawJumlah = inventaris['jumlah'];
+      final jumlah = (rawJumlah is num ? rawJumlah.toInt() : 0);
       return jumlah == 0;
     }).toList();
 
