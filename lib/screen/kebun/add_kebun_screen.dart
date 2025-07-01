@@ -505,6 +505,7 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                       }
                       return null;
                     },
+                    isEdit: widget.isEdit,
                   ),
                   InputFieldWidget(
                     key: const Key('jumlah_tanaman'),
