@@ -111,9 +111,9 @@ class _SplashScreenState extends State<SplashScreen>
     final role = await _authService.getUserRole();
     if (!mounted) return;
     if (role == 'petugas') {
-      context.push('/home-petugas');
+      context.go('/home-petugas');
     } else {
-      context.push('/home');
+      context.go('/home');
     }
   }
 

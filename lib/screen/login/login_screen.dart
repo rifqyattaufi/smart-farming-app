@@ -40,10 +40,16 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response['status'] == true) {
         String? role = await _authService.getUserRole();
 
+        if (_emailController.text == _passwordController.text) {
+          showAppToast(context,
+              'Anda menggunakan password default, silakan ubah password Anda segera.',
+              title: 'Perhatian ⚠️');
+        }
+
         if (role == 'petugas') {
-          context.push('/home-petugas');
+          context.go('/home-petugas');
         } else {
-          context.push('/home');
+          context.go('/home');
         }
       } else {
         showAppToast(context,
