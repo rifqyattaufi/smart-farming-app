@@ -416,6 +416,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         InputFieldWidget(
                             key: const Key('stok_minim_input'),
                             label: "Stok minim (untuk perhitungan stok rendah)",
+                            keyboardType: TextInputType.number,
                             hint: "Contoh: 5",
                             controller: _minimController,
                             validator: (value) {
