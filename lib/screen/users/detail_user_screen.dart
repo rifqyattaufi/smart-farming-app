@@ -82,6 +82,61 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
     }
   }
 
+  Future<void> _showConfirmationDialog({
+    required String title,
+    required String message,
+    required String confirmText,
+    required VoidCallback onConfirm,
+    required Color confirmColor,
+  }) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            title,
+            style: semibold18.copyWith(color: dark1),
+          ),
+          content: Text(
+            message,
+            style: regular14.copyWith(color: dark2),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Batal',
+                style: medium14.copyWith(color: dark2),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onConfirm();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                confirmText,
+                style: medium14.copyWith(color: white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deactivateUser() async {
     try {
       final response = await _userService.deactivateUser(userData!['id']);
@@ -209,7 +264,16 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             key: const Key('deactivate_user_button'),
-                            onPressed: deactivateUser,
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                title: 'Konfirmasi Deaktivasi',
+                                message:
+                                    'Apakah Anda yakin ingin menonaktifkan pengguna "${userData?['name']}"? Pengguna tidak akan dapat mengakses sistem setelah dinonaktifkan.',
+                                confirmText: 'Deaktivasi',
+                                confirmColor: red,
+                                onConfirm: deactivateUser,
+                              );
+                            },
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: red),
                               shape: RoundedRectangleBorder(
@@ -228,7 +292,16 @@ class _DetailUserScreenState extends State<DetailUserScreen> {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             key: const Key('activate_user_button'),
-                            onPressed: _activateUser,
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                title: 'Konfirmasi Aktivasi',
+                                message:
+                                    'Apakah Anda yakin ingin mengaktifkan pengguna "${userData?['name']}"? Pengguna akan dapat mengakses sistem setelah diaktifkan.',
+                                confirmText: 'Aktifkan',
+                                confirmColor: green1,
+                                onConfirm: _activateUser,
+                              );
+                            },
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: green1),
                               shape: RoundedRectangleBorder(
