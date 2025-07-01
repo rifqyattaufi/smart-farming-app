@@ -538,6 +538,7 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                           key: const Key('image_picker_kandang'),
                           label: "Unggah gambar kandang",
                           image: _image,
+                          imageUrl: imageUrl['data'],
                           onPickImage: _pickImage,
                         ),
                         InputFieldWidget(
