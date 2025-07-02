@@ -1159,6 +1159,14 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 };
               }).toList(),
               type: 'basic',
+              onItemTap: (context, komoditas) {
+                final id = komoditas['id'] as String;
+                if (id.isNotEmpty) {
+                  context.push('/detail-komoditas/$id').then((_) {
+                    _handleRefresh();
+                  });
+                }
+              },
             ),
           const SizedBox(height: 16),
         ],
@@ -1207,6 +1215,14 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 };
               }).toList(),
               type: 'basic',
+              onItemTap: (context, komoditas) {
+                final id = komoditas['id'] as String;
+                if (id.isNotEmpty) {
+                  context.push('/detail-komoditas/$id').then((_) {
+                    _handleRefresh();
+                  });
+                }
+              },
             ),
         ],
       ],
