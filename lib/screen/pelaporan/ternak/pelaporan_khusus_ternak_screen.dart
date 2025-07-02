@@ -65,21 +65,25 @@ class _PelaporanKhususTernakScreenState
     List<Map<String, dynamic>> reports = [
       {
         'title': 'Pelaporan Panen Ternak',
+        'icon': 'assets/icons/set/panen-filled.png',
         'description':
             'Catat hasil panen ternak untuk evaluasi dan perencanaan produksi yang lebih baik.',
       },
       {
         'title': 'Pelaporan Ternak Sakit',
+        'icon': 'assets/icons/set/sick-chicken-filled.png',
         'description':
             'Catat gejala dan kondisi ternak yang mengalami gangguan kesehatan.',
       },
       {
         'title': 'Pelaporan Kematian Ternak',
+        'icon': 'assets/icons/set/dead-chicken-filled.png',
         'description':
             'Dokumentasikan ternak yang tidak bertahan sebagai bagian dari evaluasi perawatan.',
       },
       {
         'title': 'Pelaporan Pemberian Nutrisi',
+        'icon': 'assets/icons/set/feedingChicken-filled.png',
         'description':
             'Laporkan aktivitas pemberian vitamin untuk memastikan kesehatan ternak.',
       },
@@ -127,7 +131,7 @@ class _PelaporanKhususTernakScreenState
                     key: Key(item['title']),
                     title: item['title'],
                     subtext: item['description'],
-                    icon: Icons.cruelty_free_rounded,
+                    icon: item['icon'],
                     backgroundColor: Colors.grey.shade200,
                     iconColor: green1,
                     isSelected: selectedReport == item['title'],
@@ -146,15 +150,14 @@ class _PelaporanKhususTernakScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: () {
-              navigateBasedOnSelection();
-            },
-            buttonText: 'Selanjutnya',
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            key: const Key('next_button')
-          ),
+              onPressed: () {
+                navigateBasedOnSelection();
+              },
+              buttonText: 'Selanjutnya',
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              key: const Key('next_button')),
         ),
       ),
     );

@@ -110,7 +110,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
                         key: const Key('tambah_pemakaian_inventaris'),
-                        leading: Icon(Icons.history_outlined, color: green1),
+                        leading: Image.asset(
+                          'assets/icons/set/history.png',
+                          width: 30,
+                          color: green1,
+                        ),
                         title: const Text("Tambah Pemakaian Inventaris"),
                         onTap: () {
                           Navigator.pop(context);
@@ -120,8 +124,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
                         key: const Key('tambah_inventaris'),
-                        leading:
-                            Icon(Icons.inventory_2_outlined, color: green1),
+                        leading: Image.asset(
+                          'assets/icons/set/box-filled.png',
+                          width: 30,
+                          color: green1,
+                        ),
                         title: const Text("Tambah Inventaris"),
                         onTap: () {
                           Navigator.pop(context);
@@ -137,7 +144,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       const Divider(height: 1, color: Color(0xFFE8E8E8)),
                       ListTile(
                         key: const Key('tambah_kategori_inventaris'),
-                        leading: Icon(Icons.category_outlined, color: green1),
+                        leading: Image.asset(
+                          'assets/icons/set/category.png',
+                          width: 30,
+                          color: green1,
+                        ),
                         title: const Text("Tambah Kategori Inventaris"),
                         onTap: () {
                           Navigator.pop(context);
@@ -195,7 +206,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   value: _inventarisData?['totalItem']
                                           .toString() ??
                                       '0',
-                                  icon: 'other',
+                                  icon: 'assets/icons/set/boxes.png',
                                   bgColor: green3,
                                   iconColor: yellow),
                               DashboardItem(
@@ -203,7 +214,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   value: _inventarisData?['stokRendah']
                                           .toString() ??
                                       '0',
-                                  icon: 'other',
+                                  icon: 'assets/icons/set/box-remove.png',
                                   bgColor: yellow1,
                                   iconColor: yellow2),
                               DashboardItem(
@@ -211,7 +222,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   value: _inventarisData?['stokHabis']
                                           .toString() ??
                                       '0',
-                                  icon: 'other',
+                                  icon: 'assets/icons/set/empty-box.png',
                                   bgColor: red2,
                                   iconColor: red),
                             ],
@@ -242,7 +253,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             menuItems: [
                               MenuItem(
                                 title: 'Kategori Inventaris',
-                                icon: Icons.category_outlined,
+                                icon: 'set/category.png',
                                 backgroundColor: Colors.orange,
                                 iconColor: Colors.white,
                                 onTap: () => context
@@ -253,7 +264,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ),
                               MenuItem(
                                 title: 'Manajemen Inventaris',
-                                icon: Icons.inventory_2_outlined,
+                                icon: 'set/box-filled.png',
                                 backgroundColor: Colors.brown,
                                 iconColor: Colors.white,
                                 onTap: () =>
@@ -263,7 +274,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ),
                               MenuItem(
                                 title: 'Riwayat Pemakaian',
-                                icon: Icons.history_outlined,
+                                icon: 'set/history.png',
                                 backgroundColor: Colors.blue,
                                 iconColor: Colors.white,
                                 onTap: () => context

@@ -7,7 +7,7 @@ enum DashboardGridType { basic, none }
 class DashboardItem {
   final String title;
   final String value;
-  final String icon;
+  final dynamic icon; // Changed to dynamic to support both String and IconData
   final Color bgColor;
   final Color iconColor;
 
@@ -115,14 +115,28 @@ class DashboardGrid extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
-                              child: SvgPicture.asset(
-                                'assets/icons/${item.icon}.svg',
-                                colorFilter: ColorFilter.mode(
-                                  white,
-                                  BlendMode.srcIn,
-                                ),
-                                width: 24,
-                              ),
+                              child: item.icon is IconData
+                                  ? Icon(
+                                      item.icon,
+                                      color: white,
+                                      size: 24,
+                                    )
+                                  : item.icon is String &&
+                                          item.icon.contains('.')
+                                      ? Image.asset(
+                                          item.icon,
+                                          width: 24,
+                                          height: 24,
+                                          color: white,
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/icons/${item.icon}.svg',
+                                          colorFilter: ColorFilter.mode(
+                                            white,
+                                            BlendMode.srcIn,
+                                          ),
+                                          width: 24,
+                                        ),
                             ),
                           ),
                         ),

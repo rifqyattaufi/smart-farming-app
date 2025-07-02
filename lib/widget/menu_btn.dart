@@ -6,7 +6,7 @@ import 'package:dotted_border/dotted_border.dart';
 class MenuButton extends StatefulWidget {
   final String title;
   final String subtext;
-  final IconData icon;
+  final dynamic icon; // Changed to dynamic to accept both IconData and String
   final Color backgroundColor;
   final Color iconColor;
   final bool isSelected;
@@ -38,7 +38,15 @@ class _MenuButtonState extends State<MenuButton> {
       ),
       child: Row(
         children: [
-          Icon(widget.icon, color: widget.iconColor, size: 32),
+          // Handle both IconData and asset image paths
+          widget.icon is IconData
+              ? Icon(widget.icon, color: widget.iconColor, size: 32)
+              : Image.asset(
+                  widget.icon,
+                  width: 32,
+                  height: 32,
+                  color: widget.iconColor,
+                ),
           const SizedBox(width: 12),
           Expanded(
             child: Row(

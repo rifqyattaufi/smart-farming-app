@@ -68,30 +68,35 @@ class _PelaporanKhususTanamanScreenState
     List<Map<String, dynamic>> reports = [
       {
         'title': 'Pelaporan Hasil Panen',
+        'icon': 'assets/icons/set/fruitbag-filled.png',
         'description':
             'Catat jumlah dan kondisi hasil panen untuk evaluasi dan perencanaan produksi yang lebih baik.',
         'route': '/pelaporan-panen-tanaman',
       },
       {
         'title': 'Pelaporan Tanaman Sakit',
+        'icon': 'assets/icons/set/orchid-filled.png',
         'description':
             'Catat gejala dan kondisi tanaman yang mengalami gangguan kesehatan.',
         'route': '/pelaporan-tanaman-sakit',
       },
       {
         'title': 'Pelaporan Tanaman Mati',
+        'icon': 'assets/icons/set/forageMixed-filled.png',
         'description':
             'Dokumentasikan tanaman yang tidak bertahan sebagai bagian dari evaluasi perawatan.',
         'route': '/pelaporan-tanaman-mati',
       },
       {
         'title': 'Pelaporan Pemberian Nutrisi',
+        'icon': 'assets/icons/set/garden-filled.png',
         'description':
             'Laporkan aktivitas pemberian pupuk atau vitamin untuk memastikan tanaman tumbuh optimal dan sehat.',
         'route': '/pelaporan-nutrisi-tanaman',
       },
       {
         'title': 'Pelaporan Hama Tanaman',
+        'icon': 'assets/icons/set/slugEating-filled.png',
         'description':
             'Laporkan temuan hama untuk tindakan pencegahan dan penanggulangan cepat.',
         'route': '/pelaporan-hama',
@@ -140,7 +145,7 @@ class _PelaporanKhususTanamanScreenState
                     key: Key(item['title']),
                     title: item['title'],
                     subtext: item['description'],
-                    icon: Icons.yard,
+                    icon: item['icon'],
                     backgroundColor: Colors.grey.shade200,
                     iconColor: green1,
                     isSelected: selectedReport == item['title'],

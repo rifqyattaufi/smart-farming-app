@@ -194,7 +194,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
               menuItems: [
                 MenuItem(
                   title: 'Manajamen Kebun',
-                  icon: Icons.warehouse,
+                  icon: 'set/hydroponics-filled.png',
                   backgroundColor: Colors.green,
                   iconColor: Colors.white,
                   onTap: () => context.push('/manajemen-kebun').then((_) {
@@ -203,7 +203,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 ),
                 MenuItem(
                   title: 'Manajamen Jenis Tanaman',
-                  icon: Icons.yard,
+                  icon: 'set/appleSeed-filled.png',
                   backgroundColor: Colors.blue,
                   iconColor: Colors.white,
                   onTap: () =>
@@ -213,7 +213,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 ),
                 MenuItem(
                   title: 'Manajamen Komoditas',
-                  icon: Icons.inventory,
+                  icon: 'set/fruitbag-filled.png',
                   backgroundColor: Colors.cyan,
                   iconColor: Colors.white,
                   onTap: () => context.push('/manajemen-komoditas').then((_) {
@@ -222,7 +222,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 ),
                 MenuItem(
                   title: 'Manajemen Hama Kebun',
-                  icon: Icons.pest_control,
+                  icon: 'set/slugEating-filled.png',
                   backgroundColor: Colors.amber,
                   iconColor: Colors.white,
                   onTap: () => context.push('/laporan-hama'),
@@ -448,7 +448,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
               menuItems: [
                 MenuItem(
                   title: 'Manajemen Kandang',
-                  icon: Icons.warehouse,
+                  icon: 'set/farm-filled.png',
                   backgroundColor: Colors.brown,
                   iconColor: Colors.white,
                   onTap: () => context.push('/manajemen-kandang').then((_) {
@@ -457,7 +457,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 ),
                 MenuItem(
                   title: 'Manajemen Jenis Ternak',
-                  icon: Icons.cruelty_free_rounded,
+                  icon: 'set/chicken-filled.png',
                   backgroundColor: Colors.orange,
                   iconColor: Colors.white,
                   onTap: () => context.push('/manajemen-ternak').then((_) {
@@ -466,7 +466,7 @@ class _HomeScreenPetugasState extends State<HomeScreenPetugas> {
                 ),
                 MenuItem(
                   title: 'Manajemen Komoditas',
-                  icon: Icons.inventory,
+                  icon: 'set/dozenEggs-filled.png',
                   backgroundColor: Colors.teal,
                   iconColor: Colors.white,
                   onTap: () => context.push('/manajemen-komoditas').then((_) {

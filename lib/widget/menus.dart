@@ -67,7 +67,8 @@ class MenuGrid extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: menuItems.map((item) {
               return GestureDetector(
-                key: Key('menu_item_${item.title.toLowerCase().replaceAll(" ", "_")}'),
+                key: Key(
+                    'menu_item_${item.title.toLowerCase().replaceAll(" ", "_")}'),
                 onTap: item.onTap,
                 behavior: HitTestBehavior.opaque,
                 child: Column(
@@ -88,13 +89,20 @@ class MenuGrid extends StatelessWidget {
                               color: item.iconColor,
                               size: 30,
                             )
-                          : SvgPicture.asset(
-                              'assets/icons/${item.icon}.svg',
-                              colorFilter: ColorFilter.mode(
-                                  item.iconColor, BlendMode.srcIn),
-                              width: 30,
-                              height: 30,
-                            ),
+                          : item.icon is String && item.icon.contains('.')
+                              ? Image.asset(
+                                  'assets/icons/${item.icon}',
+                                  width: 30,
+                                  height: 30,
+                                  color: item.iconColor,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/icons/${item.icon}.svg',
+                                  colorFilter: ColorFilter.mode(
+                                      item.iconColor, BlendMode.srcIn),
+                                  width: 30,
+                                  height: 30,
+                                ),
                     ),
                     const SizedBox(height: 8),
                     Expanded(

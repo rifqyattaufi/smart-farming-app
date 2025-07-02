@@ -9,10 +9,30 @@ class MainScreen extends StatelessWidget {
   const MainScreen({super.key, required this.child});
 
   static final tabs = [
-    {'icon': 'home-filled.png', 'label': 'Beranda', 'location': '/home'},
-    {'icon': 'report-filled.png', 'label': 'Laporan', 'location': '/report'},
-    {'icon': 'box-filled.png', 'label': 'Inventaris', 'location': '/inventory'},
-    {'icon': 'person-filled.png', 'label': 'Akun', 'location': '/account'},
+    {
+      'icon': 'home.png',
+      'iconActive': 'home-filled.png',
+      'label': 'Beranda',
+      'location': '/home'
+    },
+    {
+      'icon': 'report.png',
+      'iconActive': 'report-filled.png',
+      'label': 'Laporan',
+      'location': '/report'
+    },
+    {
+      'icon': 'box.png',
+      'iconActive': 'box-filled.png',
+      'label': 'Inventaris',
+      'location': '/inventory'
+    },
+    {
+      'icon': 'person.png',
+      'iconActive': 'person-filled.png',
+      'label': 'Akun',
+      'location': '/account'
+    },
   ];
 
   int _locationToIndex(String location) {
@@ -57,12 +77,18 @@ class MainScreen extends StatelessWidget {
             children: List.generate(tabs.length, (index) {
               final tab = tabs[index];
               final isActive = index == selectedIndex;
-              final String iconPath = "assets/icons/set/${tab['icon']!}";
+              // Use active icon when selected, regular icon when not
+              // Add null safety checks
+              final String iconName = isActive
+                  ? (tab['iconActive'] ?? tab['icon'] ?? 'home.png')
+                  : (tab['icon'] ?? 'home.png');
+              final String iconPath = "assets/icons/set/$iconName";
               final bool isSvg = iconPath.toLowerCase().endsWith('.svg');
 
               return GestureDetector(
-                onTap: () => context.go(tab['location']!),
-                key: Key('bottom_nav_${tab['label']!.toLowerCase()}'),
+                onTap: () => context.go(tab['location'] ?? '/home'),
+                key: Key(
+                    'bottom_nav_${(tab['label'] ?? 'unknown').toLowerCase()}'),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -81,7 +107,7 @@ class MainScreen extends StatelessWidget {
                       ),
                     const SizedBox(height: 4),
                     Text(
-                      tab['label']!,
+                      tab['label'] ?? 'Menu',
                       style: (isActive ? medium12 : regular12).copyWith(
                         color: isActive ? green1 : dark1,
                       ),
