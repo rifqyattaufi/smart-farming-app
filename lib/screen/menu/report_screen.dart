@@ -130,14 +130,14 @@ class _ReportScreenState extends State<ReportScreen> {
     final List<ChartData> jenisHamaStats = [];
 
     int colorIndex = 0;
-    jenisHamaCount.entries.forEach((entry) {
+    for (var entry in jenisHamaCount.entries) {
       jenisHamaStats.add(ChartData(
         label: entry.key,
         value: entry.value,
         color: colors[colorIndex % colors.length],
       ));
       colorIndex++;
-    });
+    }
 
     // Urutkan berdasarkan nilai tertinggi
     jenisHamaStats.sort((a, b) => b.value.compareTo(a.value));
