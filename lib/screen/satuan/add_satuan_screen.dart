@@ -87,8 +87,11 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
           isLoading = false;
         });
 
-        showAppToast(context,
-            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
+        // Tampilkan pesan error yang lebih spesifik
+        String errorMessage =
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui';
+
+        showAppToast(context, errorMessage, isError: true);
       }
     } catch (e) {
       setState(() {
@@ -161,6 +164,7 @@ class _AddSatuanScreenState extends State<AddSatuanScreen> {
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
             onPressed: _submitForm,
+            buttonText: widget.isUpdate ? 'Simpan Perubahan' : 'Tambah Satuan',
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,

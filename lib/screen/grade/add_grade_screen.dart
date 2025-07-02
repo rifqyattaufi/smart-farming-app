@@ -93,8 +93,11 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           isLoading = false;
         });
 
-        showAppToast(
-            context, response['message'] ?? 'Terjadi kesalahan tidak diketahui');
+        // Tampilkan pesan error yang lebih spesifik
+        String errorMessage =
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui';
+
+        showAppToast(context, errorMessage, isError: true);
       }
     } catch (e) {
       if (!mounted) return;
@@ -173,6 +176,7 @@ class _AddGradeScreenState extends State<AddGradeScreen> {
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
             onPressed: _submitForm,
+            buttonText: widget.isUpdate ? 'Simpan Perubahan' : 'Tambah Grade',
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,

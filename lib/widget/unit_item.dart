@@ -59,6 +59,7 @@ class UnitItem extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 4),
           Divider(
             color: green1,
             thickness: 0.5,

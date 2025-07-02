@@ -79,8 +79,11 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           isLoading = false;
         });
 
-        showAppToast(context,
-            response['message'] ?? 'Terjadi kesalahan tidak diketahui');
+        // Tampilkan pesan error yang lebih spesifik
+        String errorMessage =
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui';
+
+        showAppToast(context, errorMessage, isError: true);
       }
     } catch (e) {
       setState(() {
@@ -143,6 +146,8 @@ class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
             onPressed: _submitForm,
+            buttonText:
+                widget.isUpdate ? 'Simpan Perubahan' : 'Tambah Kategori',
             backgroundColor: green1,
             textStyle: semibold16,
             textColor: white,
