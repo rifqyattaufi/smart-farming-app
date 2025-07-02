@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
@@ -202,7 +203,8 @@ class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
             'Pelaporan Hama Tanaman ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama} berhasil ditambahkan',
             isError: false);
 
-        Navigator.pop(context);
+        // Navigate back to hama screen
+        context.go('/laporan-hama');
       } else {
         setState(() => _isLoading = false);
         showAppToast(context,

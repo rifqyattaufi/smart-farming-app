@@ -5,6 +5,7 @@ import 'package:smart_farming_app/service/hama_service.dart';
 import 'package:smart_farming_app/widget/dashboard_grid.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/tabs.dart';
+import 'package:smart_farming_app/widget/chart_widget.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -96,13 +97,93 @@ class _ReportScreenState extends State<ReportScreen> {
     super.dispose();
   }
 
+  // Method untuk menghitung statistik laporan hama
+  Map<String, dynamic> _calculateHamaStatistics() {
+    if (_laporanHamaList.isEmpty) {
+      return {
+        'jenisHamaStats': <ChartData>[],
+        'totalLaporan': 0,
+        'jenisHamaCount': 0,
+      };
+    }
+
+    // Hitung frekuensi per jenis hama
+    final Map<String, int> jenisHamaCount = {};
+
+    for (final laporan in _laporanHamaList) {
+      final jenisHama = laporan['Hama']?['JenisHama'];
+      if (jenisHama != null && jenisHama['nama'] != null) {
+        final namaJenis = jenisHama['nama'] as String;
+        jenisHamaCount[namaJenis] = (jenisHamaCount[namaJenis] ?? 0) + 1;
+      }
+    }
+
+    // Konversi ke ChartData dengan warna yang berbeda
+    final List<Color> colors = [
+      green2,
+      green1,
+      yellow,
+      red,
+      Colors.purple,
+      Colors.orange
+    ];
+    final List<ChartData> jenisHamaStats = [];
+
+    int colorIndex = 0;
+    jenisHamaCount.entries.forEach((entry) {
+      jenisHamaStats.add(ChartData(
+        label: entry.key,
+        value: entry.value,
+        color: colors[colorIndex % colors.length],
+      ));
+      colorIndex++;
+    });
+
+    // Urutkan berdasarkan nilai tertinggi
+    jenisHamaStats.sort((a, b) => b.value.compareTo(a.value));
+
+    return {
+      'jenisHamaStats': jenisHamaStats,
+      'totalLaporan': _laporanHamaList.length,
+      'jenisHamaCount': jenisHamaCount.length,
+    };
+  }
+
+  // Method untuk menghitung statistik komoditas
+  List<ChartData> _calculateKomoditasStatistics(List<dynamic> komoditasList) {
+    if (komoditasList.isEmpty) {
+      return [];
+    }
+
+    final List<Color> colors = [
+      green2,
+      green1,
+      yellow,
+      red,
+      Colors.purple,
+      Colors.orange
+    ];
+    final List<ChartData> komoditasStats = [];
+
+    for (int i = 0; i < komoditasList.length && i < 6; i++) {
+      final komoditas = komoditasList[i];
+      komoditasStats.add(ChartData(
+        label: komoditas['nama'] ?? 'N/A',
+        value: komoditas['jumlah'] ?? 0,
+        color: colors[i % colors.length],
+      ));
+    }
+
+    return komoditasStats;
+  }
+
   Widget _buildPerkebunanContent() {
     if (!_isLoading && _perkebunanData == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Gagal memuat data perkebunan.", 
+            Text("Gagal memuat data perkebunan.",
                 style: regular12.copyWith(color: dark2),
                 key: const Key('no_data_found')),
             const SizedBox(height: 10),
@@ -199,7 +280,25 @@ class _ReportScreenState extends State<ReportScreen> {
                 });
               },
             ),
-            const SizedBox(height: 12),
+            () {
+              final komoditasList =
+                  _perkebunanData?['daftarKomoditas'] as List<dynamic>? ?? [];
+              final komoditasStats =
+                  _calculateKomoditasStatistics(komoditasList);
+
+              if (komoditasStats.isNotEmpty) {
+                return Column(
+                  children: [
+                    ChartWidget(
+                      title: 'Statistik Jumlah Hasil Panen',
+                      data: komoditasStats,
+                      height: 180,
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            }(),
             ListItem(
               title: 'Hasil Komoditas Perkebunan',
               items:
@@ -213,10 +312,54 @@ class _ReportScreenState extends State<ReportScreen> {
                           })
                       .toList(),
               type: 'basic',
+              onItemTap: (context, tanaman) {
+                final id = tanaman['id'] as String?;
+                if (id != null && id.isNotEmpty) {
+                  context.push('/detail-komoditas/$id').then((_) {
+                    _fetchData(isRefresh: true);
+                  });
+                }
+              },
             ),
             const SizedBox(height: 12),
+            () {
+              final hamaStats = _calculateHamaStatistics();
+              return Column(
+                children: [
+                  // Grid statistik ringkasan
+                  DashboardGrid(
+                    title: 'Ringkasan Laporan Hama',
+                    items: [
+                      DashboardItem(
+                        title: 'Total Laporan',
+                        value: hamaStats['totalLaporan'].toString(),
+                        icon: 'other',
+                        bgColor: red2,
+                        iconColor: red,
+                      ),
+                      DashboardItem(
+                        title: 'Jenis Hama',
+                        value: hamaStats['jenisHamaCount'].toString(),
+                        icon: 'other',
+                        bgColor: yellow1,
+                        iconColor: yellow,
+                      ),
+                    ],
+                    crossAxisCount: 2,
+                    valueFontSize: 60,
+                  ),
+                  ChartWidget(
+                    title: 'Statistik Laporan Hama per Jenis',
+                    data: hamaStats['jenisHamaStats'] as List<ChartData>,
+                    height: 180,
+                  ),
+                ],
+              );
+            }(),
             ListItem(
               title: 'Laporan Hama Terbaru',
+              type: 'history',
+              personLabel: 'Pelaporan oleh',
               items: _laporanHamaList.map((laporan) {
                 final jenisHama = laporan['Hama']?['JenisHama'];
                 final unitBudidaya = laporan['UnitBudidaya'];
@@ -259,7 +402,6 @@ class _ReportScreenState extends State<ReportScreen> {
                   'id': laporan['id'],
                 };
               }).toList(),
-              type: 'history',
               onItemTap: (context, item) {
                 final id = item['id'] as String?;
                 if (id != null) {
@@ -377,6 +519,27 @@ class _ReportScreenState extends State<ReportScreen> {
               },
             ),
             const SizedBox(height: 12),
+            // Chart Komoditas Peternakan
+            () {
+              final komoditasList =
+                  _peternakanData?['daftarKomoditas'] as List<dynamic>? ?? [];
+              final komoditasStats =
+                  _calculateKomoditasStatistics(komoditasList);
+
+              if (komoditasStats.isNotEmpty) {
+                return Column(
+                  children: [
+                    ChartWidget(
+                      title: 'Statistik Jumlah Hasil Panen',
+                      data: komoditasStats,
+                      height: 180,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            }(),
             ListItem(
               title: 'Hasil Komoditas Peternakan',
               items:
@@ -390,6 +553,14 @@ class _ReportScreenState extends State<ReportScreen> {
                           })
                       .toList(),
               type: 'basic',
+              onItemTap: (context, ternak) {
+                final id = ternak['id'] as String?;
+                if (id != null && id.isNotEmpty) {
+                  context.push('/detail-komoditas/$id').then((_) {
+                    _fetchData(isRefresh: true);
+                  });
+                }
+              },
             ),
             const SizedBox(height: 24),
           ] else if (!_isLoading) ...[

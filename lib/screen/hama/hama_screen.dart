@@ -622,6 +622,8 @@ class _HamaScreenState extends State<HamaScreen> {
   Widget _buildLaporanHamaContent() {
     return ListItem(
       key: const Key('laporan_hama_list'),
+      type: 'history',
+      personLabel: 'Pelaporan oleh',
       items: _filteredLaporanHamaList.map((laporan) {
         final jenisHama = laporan['Hama']?['JenisHama'];
         final unitBudidaya = laporan['UnitBudidaya'];
@@ -650,7 +652,6 @@ class _HamaScreenState extends State<HamaScreen> {
           'id': laporan['id'],
         };
       }).toList(),
-      type: 'history',
       onItemTap: (context, item) {
         final id = item['id'] as String?;
         if (id != null) {

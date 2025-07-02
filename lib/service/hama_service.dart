@@ -373,4 +373,38 @@ class HamaService {
       return {'status': false, 'message': 'Error: ${e.toString()}'};
     }
   }
+
+  Future<Map<String, dynamic>> updateStatusHama(
+      String idLaporanHama, bool status) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json',
+    };
+    final url = Uri.parse('$_baseUrl/laporan-hama/$idLaporanHama/status');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: json.encode({'status': status}),
+      );
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Status hama berhasil diupdate',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await updateStatusHama(idLaporanHama, status);
+      } else {
+        return {'status': false, 'message': body['message'] ?? response.body};
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Error: ${e.toString()}'};
+    }
+  }
 }

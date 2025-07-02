@@ -22,6 +22,7 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
   Map<String, dynamic>? _laporanHama;
   int _jumlahHama = 0;
   bool _isLoading = true;
+  bool _isUpdatingStatus = false;
 
   @override
   void initState() {
@@ -80,6 +81,60 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
     }
   }
 
+  Future<void> _updateStatusHama() async {
+    if (_laporanHama == null || _isUpdatingStatus) return;
+
+    setState(() {
+      _isUpdatingStatus = true;
+    });
+
+    try {
+      // Always set status to true (handled) since button only shows for unhandled hama
+      const newStatus = true;
+
+      final response = await _hamaService.updateStatusHama(
+        widget.idLaporanHama!,
+        newStatus,
+      );
+
+      if (mounted) {
+        if (response['status'] == true) {
+          // Update local data
+          setState(() {
+            _laporanHama!['Hama']['status'] = newStatus;
+          });
+
+          showAppToast(
+            context,
+            'Status berhasil diubah menjadi "Sudah ditangani"',
+            title: 'Berhasil! 🎉',
+            isError: false,
+          );
+        } else {
+          showAppToast(
+            context,
+            response['message'] ?? 'Gagal mengupdate status hama',
+            title: 'Error 😢',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showAppToast(
+          context,
+          'Terjadi kesalahan: $e',
+          title: 'Error Tidak Terduga 😢',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingStatus = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +164,9 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                         Text('Gagal memuat detail laporan hama.', style: regular12.copyWith(color: dark2), key: const Key('error_message')),
+                          Text('Gagal memuat detail laporan hama.',
+                              style: regular12.copyWith(color: dark2),
+                              key: const Key('error_message')),
                           const SizedBox(height: 10),
                           ElevatedButton(
                               key: const Key('retry_button'),
@@ -166,50 +223,60 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
                                 Padding(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text("Status hama",
-                                          style:
-                                              medium14.copyWith(color: dark1)),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: (_laporanHama?['Hama']
-                                                          ?['status'] ==
-                                                      true ||
-                                                  _laporanHama?['Hama']
-                                                          ?['status'] ==
-                                                      1)
-                                              ? green2.withValues(alpha: 0.1)
-                                              : red.withValues(alpha: 0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                        ),
-                                        child: Text(
-                                          (_laporanHama?['Hama']?['status'] ==
-                                                      true ||
-                                                  _laporanHama?['Hama']
-                                                          ?['status'] ==
-                                                      1)
-                                              ? 'Ada'
-                                              : 'Tidak Ada',
-                                          style: (_laporanHama?['Hama']
-                                                          ?['status'] ==
-                                                      true ||
-                                                  _laporanHama?['Hama']
-                                                          ?['status'] ==
-                                                      1)
-                                              ? regular12.copyWith(
-                                                  color: green2)
-                                              : regular12.copyWith(color: red),
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("Status hama",
+                                              style: medium14.copyWith(
+                                                  color: dark1)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: (_laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          true ||
+                                                      _laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          1)
+                                                  ? green2.withValues(
+                                                      alpha: 0.1)
+                                                  : red.withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                            ),
+                                            child: Text(
+                                              (_laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          true ||
+                                                      _laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          1)
+                                                  ? 'Sudah ditangani'
+                                                  : 'Belum ditangani',
+                                              style: (_laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          true ||
+                                                      _laporanHama?['Hama']
+                                                              ?['status'] ==
+                                                          1)
+                                                  ? regular12.copyWith(
+                                                      color: green2)
+                                                  : regular12.copyWith(
+                                                      color: red),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
+                                const SizedBox(height: 8),
                                 infoItem(
                                     "Tanggal pelaporan",
                                     formatDisplayDate(
@@ -238,6 +305,41 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
                     ),
                   ),
       ),
+      bottomNavigationBar: _laporanHama != null &&
+              !(_laporanHama?['Hama']?['status'] == true ||
+                  _laporanHama?['Hama']?['status'] == 1)
+          ? Container(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isUpdatingStatus ? null : _updateStatusHama,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: green1,
+                    foregroundColor: white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: _isUpdatingStatus
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          'Tandai Sudah Ditangani',
+                          style: semibold14.copyWith(color: white),
+                        ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 

@@ -6,6 +6,7 @@ class ListItem extends StatelessWidget {
   final String? title;
   final List<Map<String, dynamic>> items;
   final String type; // "basic" or "history"
+  final String? personLabel; // Custom label for person field in history type
 
   final VoidCallback? onViewAll;
 
@@ -16,6 +17,7 @@ class ListItem extends StatelessWidget {
     this.title,
     required this.items,
     this.type = "basic",
+    this.personLabel,
     this.onViewAll,
     this.onItemTap,
   });
@@ -169,7 +171,7 @@ class ListItem extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'Pemakaian oleh: ${item['person'] ?? 'Unknown Person'}',
+                    '${personLabel ?? 'Pemakaian oleh'}: ${item['person'] ?? 'Unknown Person'}',
                     style: regular12.copyWith(color: dark2),
                   ),
                 ],
