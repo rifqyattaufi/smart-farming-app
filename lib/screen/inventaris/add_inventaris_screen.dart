@@ -267,7 +267,7 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         'nama': _nameController.text,
         'kategoriInventarisId': selectedLocation,
         'jumlah': int.tryParse(_sizeController.text) ?? 0,
-        'satuanId': selectedSatuan,
+        'SatuanId': selectedSatuan,
         'stokMinim': int.tryParse(_minimController.text) ?? 0,
         'tanggalKadaluwarsa': formattedKadaluwarsaForBackend,
         'gambar': finalImageUrl,
@@ -529,14 +529,14 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
-            buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Inventaris',
-            onPressed: _submitForm,
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            isLoading: _isLoading,
-            key: const Key('submit_inventaris_button')
-          ),
+              buttonText:
+                  widget.isEdit ? 'Simpan Perubahan' : 'Tambah Inventaris',
+              onPressed: _submitForm,
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              isLoading: _isLoading,
+              key: const Key('submit_inventaris_button')),
         ),
       ),
     );

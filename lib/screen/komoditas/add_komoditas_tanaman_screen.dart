@@ -186,8 +186,8 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
 
       final dataPayload = {
         'nama': _nameController.text,
-        'satuanId': selectedSatuan,
-        'jenisBudidayaId': selectedLocation,
+        'SatuanId': selectedSatuan,
+        'JenisBudidayaId': selectedLocation,
         'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
@@ -260,7 +260,6 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
     try {
       final response =
           await _komoditasService.getKomoditasById(widget.idKomoditas!);
-      
 
       if (mounted) {
         if (response['status'] == true && response['data'] != null) {
@@ -289,7 +288,6 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                 _imageUrlFromApi = null;
               }
             });
-            
           } else {
             if (mounted) {
               showAppToast(context,
@@ -373,12 +371,14 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                           items: _jenisTanamanList
                               .map((item) => item['nama'] as String)
                               .toList(),
-                          selectedValue: selectedLocation != null && _jenisTanamanList.isNotEmpty
+                          selectedValue: selectedLocation != null &&
+                                  _jenisTanamanList.isNotEmpty
                               ? _jenisTanamanList
-                                  .where((item) => item['id'] == selectedLocation)
-                                  .isNotEmpty
-                                  ? _jenisTanamanList.firstWhere(
-                                      (item) => item['id'] == selectedLocation)['nama']
+                                      .where((item) =>
+                                          item['id'] == selectedLocation)
+                                      .isNotEmpty
+                                  ? _jenisTanamanList.firstWhere((item) =>
+                                      item['id'] == selectedLocation)['nama']
                                   : null
                               : null,
                           onChanged: (value) {
@@ -405,14 +405,16 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                           items: _satuanList
                               .map((item) => item['nama'] as String)
                               .toList(),
-                          selectedValue: selectedSatuan != null && _satuanList.isNotEmpty
-                              ? _satuanList
-                                  .where((item) => item['id'] == selectedSatuan)
-                                  .isNotEmpty
-                                  ? _satuanList.firstWhere(
-                                      (item) => item['id'] == selectedSatuan)['nama']
-                                  : null
-                              : null,
+                          selectedValue:
+                              selectedSatuan != null && _satuanList.isNotEmpty
+                                  ? _satuanList
+                                          .where((item) =>
+                                              item['id'] == selectedSatuan)
+                                          .isNotEmpty
+                                      ? _satuanList.firstWhere((item) =>
+                                          item['id'] == selectedSatuan)['nama']
+                                      : null
+                                  : null,
                           onChanged: (value) {
                             setState(() {
                               final selectedItem = _satuanList.firstWhere(

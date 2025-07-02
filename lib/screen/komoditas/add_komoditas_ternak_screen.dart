@@ -185,8 +185,8 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
 
       final dataPayload = {
         'nama': _nameController.text,
-        'satuanId': selectedSatuan,
-        'jenisBudidayaId': selectedTernak,
+        'SatuanId': selectedSatuan,
+        'JenisBudidayaId': selectedTernak,
         'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
