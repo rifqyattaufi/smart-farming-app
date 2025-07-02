@@ -3,6 +3,7 @@ import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/inventaris_service.dart';
 import 'package:smart_farming_app/service/kategori_inv_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
+import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -27,11 +28,13 @@ class _AddPemakaianInventarisScreenState
   final LaporanService _laporanService = LaporanService();
   final InventarisService _inventarisService = InventarisService();
   final KategoriInvService _kategoriInvService = KategoriInvService();
+  final SatuanService _satuanService = SatuanService();
 
   String? selectedKategoriId;
   String? selectedKategoriNama;
   String? selectedInvId;
   String? selectedInvNama;
+  String? selectedInvSatuanId;
 
   bool _isLoading = false;
 
@@ -44,6 +47,7 @@ class _AddPemakaianInventarisScreenState
 
   final TextEditingController _sizeController = TextEditingController();
   final TextEditingController _catatanController = TextEditingController();
+  final TextEditingController _satuanController = TextEditingController();
 
   @override
   void initState() {
@@ -55,6 +59,7 @@ class _AddPemakaianInventarisScreenState
   void dispose() {
     _sizeController.dispose();
     _catatanController.dispose();
+    _satuanController.dispose();
     super.dispose();
   }
 
@@ -132,6 +137,8 @@ class _AddPemakaianInventarisScreenState
       _inventarisList = [];
       selectedInvId = null;
       selectedInvNama = null;
+      selectedInvSatuanId = null;
+      _satuanController.clear();
     });
     try {
       final inventarisResponse =
@@ -150,7 +157,13 @@ class _AddPemakaianInventarisScreenState
               return jumlah > 0 &&
                   !tanggalKadaluwarsa
                       .isBefore(DateTime(today.year, today.month, today.day));
-            }),
+            }).map((item) => {
+                  'id': item['id'],
+                  'nama': item['nama'],
+                  'satuanId': item['SatuanId'],
+                  'jumlah': item['jumlah'],
+                  'tanggalKadaluwarsa': item['tanggalKadaluwarsa'],
+                }),
           );
         });
       } else {
@@ -254,11 +267,44 @@ class _AddPemakaianInventarisScreenState
       selectedKategoriNama = null;
       selectedInvId = null;
       selectedInvNama = null;
+      selectedInvSatuanId = null;
       _inventarisList = [];
       _sizeController.clear();
       _catatanController.clear();
+      _satuanController.clear();
       formKey.currentState?.reset();
     });
+  }
+
+  Future<void> _changeSatuan() async {
+    if (selectedInvSatuanId != null) {
+      try {
+        final response = await _satuanService.getSatuanById(selectedInvSatuanId!);
+        if (response['status']) {
+          setState(() {
+            _satuanController.text =
+                "${response['data']['nama']} - ${response['data']['lambang']}";
+          });
+        } else {
+          setState(() {
+            _satuanController.text = "Satuan tidak ditemukan";
+          });
+          showAppToast(
+              context, 'Error fetching satuan data: ${response['message']}',
+              title: 'Error Tidak Terduga 😢');
+        }
+      } catch (e) {
+        setState(() {
+          _satuanController.text = "Error memuat satuan";
+        });
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
+    } else {
+      setState(() {
+        _satuanController.clear();
+      });
+    }
   }
 
   @override
@@ -309,7 +355,9 @@ class _AddPemakaianInventarisScreenState
 
                           selectedInvId = null;
                           selectedInvNama = null;
+                          selectedInvSatuanId = null;
                           _inventarisList = [];
+                          _satuanController.clear();
                         });
                         _fetchInventarisByKategori(selectedKategoriId!);
                       }
@@ -341,6 +389,8 @@ class _AddPemakaianInventarisScreenState
                               setState(() {
                                 selectedInvId = null;
                                 selectedInvNama = null;
+                                selectedInvSatuanId = null;
+                                _satuanController.clear();
                               });
                               return;
                             }
@@ -351,7 +401,9 @@ class _AddPemakaianInventarisScreenState
                               setState(() {
                                 selectedInvId = selected['id'].toString();
                                 selectedInvNama = value;
+                                selectedInvSatuanId = selected['satuanId']?.toString();
                               });
+                              _changeSatuan();
                             }
                           },
                     validator: (value) {
@@ -381,6 +433,19 @@ class _AddPemakaianInventarisScreenState
                         }
                         return null;
                       }),
+                  InputFieldWidget(
+                    key: const Key('satuan_input'),
+                    label: "Satuan",
+                    hint: "Satuan akan tampil otomatis",
+                    controller: _satuanController,
+                    isDisabled: true,
+                    validator: (value) {
+                      if (selectedInvId != null && (value == null || value.isEmpty)) {
+                        return 'Satuan tidak tersedia untuk inventaris ini';
+                      }
+                      return null;
+                    },
+                  ),
                   ImagePickerWidget(
                     label: "Unggah bukti pemakaian",
                     key: const Key('bukti_pemakaian_input'),
