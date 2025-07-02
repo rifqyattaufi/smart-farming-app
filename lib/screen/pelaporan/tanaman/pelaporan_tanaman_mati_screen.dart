@@ -100,23 +100,31 @@ class _PelaporanTanamanMatiScreenState
     setState(() {
       _isLoading = true;
     });
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
-    final list = (objekBudidayaList == null ||
-            (objekBudidayaList is List && objekBudidayaList.isEmpty))
-        ? [null]
-        : objekBudidayaList;
+
+    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [];
+    // Ensure we have at least one item to work with
+    final List<dynamic> list =
+        objekBudidayaList is List && objekBudidayaList.isNotEmpty
+            ? objekBudidayaList
+            : [null];
 
     bool allValid = true;
     for (int i = 0; i < list.length; i++) {
-      if (_formKeys[i].currentState == null ||
-          !_formKeys[i].currentState!.validate()) {
+      if (_formKeys.length > i && _formKeys[i].currentState != null) {
+        if (!_formKeys[i].currentState!.validate()) {
+          allValid = false;
+        }
+      } else {
         allValid = false;
       }
 
-      if (_imageList[i] == null && allValid == true) {
+      if (_imageList.length > i && _imageList[i] == null && allValid == true) {
         allValid = false;
+        final itemName = list[i] != null && list[i]['name'] != null
+            ? list[i]['name']
+            : 'tanaman ke-${i + 1}';
         showAppToast(context,
-            'Gambar bukti kondisi tanaman pada ${list[i]?['name'] ?? 'tanaman ke-${i + 1}'} tidak boleh kosong',
+            'Gambar bukti kondisi tanaman pada $itemName tidak boleh kosong',
             isError: true);
       }
     }
@@ -129,14 +137,25 @@ class _PelaporanTanamanMatiScreenState
 
     try {
       for (var i = 0; i < list.length; i++) {
+        // Check if we have valid controllers and images for this index
+        if (i >= _imageList.length ||
+            i >= _catatanController.length ||
+            i >= _dateController.length ||
+            i >= _nameController.length) {
+          continue;
+        }
+
         final imageUrl = await _imageService.uploadImage(_imageList[i]!);
+
+        final itemName =
+            list[i] != null && list[i]['name'] != null ? list[i]['name'] : '';
+        final unitName = widget.data?['unitBudidaya']?['name'] ?? '';
 
         final data = {
           'unitBudidayaId': widget.data?['unitBudidaya']?['id'],
-          'objekBudidayaId': list[i]?['id'],
+          'objekBudidayaId': list[i] != null ? list[i]['id'] : null,
           'tipe': widget.tipe,
-          'judul':
-              "Laporan Kematian ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(list[i]?['name'] ?? '')}",
+          'judul': "Laporan Kematian $unitName - $itemName",
           'gambar': imageUrl['data'],
           'catatan': _catatanController[i].text,
           'kematian': {
@@ -150,12 +169,12 @@ class _PelaporanTanamanMatiScreenState
         if (response['status']) {
           showAppToast(
             context,
-            'Berhasil mengirim laporan tanaman ${(list[i]?['name']?['name'] ?? '')} mati',
+            'Berhasil mengirim laporan tanaman $itemName mati',
             isError: false,
           );
         } else {
-          showAppToast(context,
-              'Gagal mengirim laporan tanaman ${(list[i]?['name']?['name'] ?? '')} mati');
+          showAppToast(
+              context, 'Gagal mengirim laporan tanaman $itemName mati');
         }
       }
 
@@ -175,8 +194,14 @@ class _PelaporanTanamanMatiScreenState
   @override
   void initState() {
     super.initState();
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
-    final length = objekBudidayaList.length;
+    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [];
+    // Ensure we have at least one item to work with
+    final List<dynamic> safeList =
+        objekBudidayaList is List && objekBudidayaList.isNotEmpty
+            ? objekBudidayaList
+            : [null];
+
+    final length = safeList.length;
     _catatanController = List.generate(length, (_) => TextEditingController());
     _dateController = List.generate(length, (_) => TextEditingController());
     _nameController = List.generate(length, (_) => TextEditingController());
@@ -187,7 +212,11 @@ class _PelaporanTanamanMatiScreenState
 
   @override
   Widget build(BuildContext context) {
-    final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
+    final objekBudidayaRaw = widget.data?['objekBudidaya'] ?? [];
+    final List<dynamic> objekBudidayaList =
+        objekBudidayaRaw is List && objekBudidayaRaw.isNotEmpty
+            ? objekBudidayaRaw
+            : [null];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -358,13 +387,12 @@ class _PelaporanTanamanMatiScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            isLoading: _isLoading,
-            key: const Key('submit_pelaporan_tanaman_mati_button')
-          ),
+              onPressed: _submitForm,
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              isLoading: _isLoading,
+              key: const Key('submit_pelaporan_tanaman_mati_button')),
         ),
       ),
     );
