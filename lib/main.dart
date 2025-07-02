@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:smart_farming_app/screen/komoditas/detail_komoditas_screen.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:smart_farming_app/screen/main_screen_petugas.dart';
 import 'package:toastification/toastification.dart';
@@ -536,6 +537,15 @@ final _router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as AddKomoditasTanamanScreen;
         return extra;
+      },
+    ),
+    GoRoute(
+      path: '/detail-komoditas/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailKomoditasScreen(
+          idKomoditas: id,
+        );
       },
     ),
     GoRoute(

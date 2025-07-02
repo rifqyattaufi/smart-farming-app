@@ -233,4 +233,84 @@ class KomoditasService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> updateKomoditas(
+      Map<String, dynamic> data, String id) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json',
+    };
+
+    final url = Uri.parse('$baseUrl/$id');
+
+    try {
+      final response =
+          await http.put(url, headers: headers, body: json.encode(data));
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await updateKomoditas(data, id);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to update data'),
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteKomoditas(String id) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/$id');
+
+    try {
+      final response = await http.delete(url, headers: headers);
+
+      Map<String, dynamic>? body;
+      if (response.body.isNotEmpty) {
+        body = json.decode(response.body);
+      }
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body?['message'] ?? 'success',
+          'data': body?['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await deleteKomoditas(id);
+      } else {
+        return {
+          'status': false,
+          'message': body?['message'] ??
+              (response.body.isNotEmpty
+                  ? response.body
+                  : 'Failed to delete data'),
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }

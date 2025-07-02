@@ -598,6 +598,14 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               })
           .toList(),
       type: 'basic',
+      onItemTap: (context, komoditas) {
+        final id = komoditas['id'] as String?;
+        if (id != null && id.isNotEmpty) {
+          context.push('/detail-komoditas/$id').then((_) {
+            _loadInitialData(isRefresh: true);
+          });
+        }
+      },
     );
   }
 
@@ -613,6 +621,14 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
               })
           .toList(),
       type: 'basic',
+      onItemTap: (context, komoditas) {
+        final id = komoditas['id'] as String?;
+        if (id != null && id.isNotEmpty) {
+          context.push('/detail-komoditas/$id').then((_) {
+            _loadInitialData(isRefresh: true);
+          });
+        }
+      },
     );
   }
 }
