@@ -70,16 +70,33 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                 data: updatedData,
                 tipe: widget.tipe,
                 step: widget.step + 1));
+      } else if (widget.tipe == "panen") {
+        if (widget.data!['komoditas']['tipeKomoditas'] == "individu") {
+          if (_selectedUnitBudidaya!['tipe'] == "kolektif") {
+            showAppToast(
+              context,
+              "Tipe kandang kolektif tidak dapat digunakan untuk panen individu",
+              title: 'Tipe Kandang Tidak Sesuai',
+            );
+          } else {
+            context.push('/pilih-ternak',
+                extra: PilihTernakScreen(
+                    greeting: widget.greeting,
+                    data: updatedData,
+                    tipe: widget.tipe,
+                    step: widget.step + 1));
+          }
+        } else {
+          context.push('/pelaporan-panen-ternak',
+              extra: PelaporanTernakPanenScreen(
+                  greeting: widget.greeting,
+                  data: updatedData,
+                  tipe: widget.tipe,
+                  step: widget.step + 1));
+        }
       } else if (_selectedUnitBudidaya!['tipe'] == "individu") {
         context.push('/pilih-ternak',
             extra: PilihTernakScreen(
-                greeting: widget.greeting,
-                data: updatedData,
-                tipe: widget.tipe,
-                step: widget.step + 1));
-      } else if (widget.tipe == "panen") {
-        context.push('/pelaporan-panen-ternak',
-            extra: PelaporanTernakPanenScreen(
                 greeting: widget.greeting,
                 data: updatedData,
                 tipe: widget.tipe,
@@ -193,13 +210,12 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
-            buttonText: 'Selanjutnya',
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            key: const Key('submit_pilih_kandang_button')
-          ),
+              onPressed: _submitForm,
+              buttonText: 'Selanjutnya',
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              key: const Key('submit_pilih_kandang_button')),
         ),
       ),
     );

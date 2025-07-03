@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/laporan_service.dart';
+import 'package:smart_farming_app/service/objek_budidaya_service.dart';
 import 'package:smart_farming_app/service/satuan_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -13,6 +14,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/widget/objek_selection_grid.dart';
 
 class PelaporanTernakPanenScreen extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -37,8 +39,10 @@ class _PelaporanTernakPanenScreenState
   final SatuanService _satuanService = SatuanService();
   final LaporanService _laporanService = LaporanService();
   final ImageService _imageService = ImageService();
+  final ObjekBudidayaService _objekBudidayaService = ObjekBudidayaService();
 
   List<TextEditingController> sizeControllers = [];
+  List<TextEditingController> jumlahHewanControllers = [];
   List<TextEditingController> catatanControllers = [];
   Map<String, dynamic>? satuanList;
   List<File?> imageList = [];
@@ -46,6 +50,11 @@ class _PelaporanTernakPanenScreenState
   final picker = ImagePicker();
   final List<GlobalKey<FormState>> formKeys = [];
   bool isLoading = false;
+
+  // State for grid selection
+  List<Map<String, dynamic>> allObjekBudidaya = [];
+  Set<String> selectedObjekIds = {};
+  bool isLoadingObjek = false;
 
   Future<void> _fetchData() async {
     try {
@@ -66,13 +75,53 @@ class _PelaporanTernakPanenScreenState
     }
   }
 
+  Future<void> _fetchObjekBudidaya() async {
+    if (widget.data?['unitBudidaya']?['id'] == null) return;
+
+    setState(() {
+      isLoadingObjek = true;
+    });
+
+    try {
+      final response = await _objekBudidayaService
+          .getObjekBudidayaByUnitBudidaya(widget.data!['unitBudidaya']['id']);
+
+      if (response['status'] && response['data'] != null) {
+        setState(() {
+          allObjekBudidaya = List<Map<String, dynamic>>.from(response['data']);
+          isLoadingObjek = false;
+        });
+      } else {
+        setState(() {
+          isLoadingObjek = false;
+        });
+        showAppToast(context, 'Gagal memuat data objek budidaya');
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingObjek = false;
+      });
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _fetchData();
+
+    // Only fetch objek budidaya for kolektif tipeKomoditas and individu unitBudidaya
+    if (widget.data?['komoditas']?['tipeKomoditas'] == 'kolektif' &&
+        widget.data?['unitBudidaya']?['tipe'] == 'individu') {
+      _fetchObjekBudidaya();
+    }
+
     final objekBudidayaList = widget.data?['objekBudidaya'] ?? [null];
     final length = objekBudidayaList.length;
     sizeControllers = List.generate(length, (_) => TextEditingController());
+    jumlahHewanControllers =
+        List.generate(length, (_) => TextEditingController());
     catatanControllers = List.generate(length, (_) => TextEditingController());
     imageList = List.generate(length, (_) => null);
     formKeys.clear();
@@ -128,8 +177,59 @@ class _PelaporanTernakPanenScreenState
     );
   }
 
-  Future<void> _submitForm(bool isDeleted) async {
+  void _toggleObjekSelection(String objekId) {
+    setState(() {
+      if (selectedObjekIds.contains(objekId)) {
+        selectedObjekIds.remove(objekId);
+      } else {
+        selectedObjekIds.add(objekId);
+      }
+    });
+  }
+
+  void _selectAllObjek() {
+    setState(() {
+      selectedObjekIds = allObjekBudidaya
+          .map((objek) => objek['id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toSet();
+    });
+  }
+
+  void _deselectAllObjek() {
+    setState(() {
+      selectedObjekIds.clear();
+    });
+  }
+
+  Widget _buildObjekGrid() {
+    return ObjekSelectionGrid(
+      objektList: allObjekBudidaya,
+      selectedObjekIds: selectedObjekIds,
+      onObjekTap: _toggleObjekSelection,
+      onSelectAll: _selectAllObjek,
+      onDeselectAll: _deselectAllObjek,
+      title: 'Pilih Hewan yang Dipanen',
+      subtitle: 'Tap pada objek untuk memilih/membatalkan pilihan',
+      isLoading: isLoadingObjek,
+    );
+  }
+
+  Future<void> _submitForm() async {
     if (isLoading) return;
+
+    // Validate that at least one objek is selected for kolektif tipeKomoditas and individu unitBudidaya
+    if (widget.data?['komoditas']?['tipeKomoditas'] == 'kolektif' &&
+        widget.data?['unitBudidaya']?['tipe'] == 'individu' &&
+        selectedObjekIds.isEmpty) {
+      showAppToast(
+        context,
+        'Pilih minimal satu hewan yang akan dipanen',
+        isError: true,
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
@@ -176,8 +276,10 @@ class _PelaporanTernakPanenScreenState
           'panen': {
             'komoditasId': widget.data?['komoditas']?['id'],
             'jumlah': double.parse(sizeControllers[i].text),
+            if (widget.data?['unitBudidaya']?['tipe'] == 'kolektif')
+              'jumlahHewan': int.parse(jumlahHewanControllers[i].text),
           },
-          'isDeleted': isDeleted,
+          'detailPanen': selectedObjekIds.toList(),
         };
 
         final response = await _laporanService.createLaporanPanen(data);
@@ -288,6 +390,25 @@ class _PelaporanTernakPanenScreenState
                               return null;
                             },
                           ),
+                          // Show jumlah hewan field for kolektif unitBudidaya
+                          if (widget.data?['unitBudidaya']?['tipe'] ==
+                              'kolektif')
+                            InputFieldWidget(
+                              key: Key('jumlah_hewan_input_$i'),
+                              label: "Jumlah hewan",
+                              hint: "Contoh: 5",
+                              controller: jumlahHewanControllers[i],
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Jumlah hewan wajib diisi';
+                                }
+                                if (int.tryParse(value) == null) {
+                                  return 'Jumlah hewan harus berupa angka';
+                                }
+                                return null;
+                              },
+                            ),
                           DropdownFieldWidget(
                             key: Key('satuan_panen_dropdown_$i'),
                             label: "Satuan panen",
@@ -330,6 +451,38 @@ class _PelaporanTernakPanenScreenState
                     ),
                   );
                 }),
+                // Show grid only for kolektif tipeKomoditas and individu unitBudidaya
+                if (widget.data?['komoditas']?['tipeKomoditas'] == 'kolektif' &&
+                    widget.data?['unitBudidaya']?['tipe'] == 'individu') ...[
+                  _buildObjekGrid(),
+                  if (selectedObjekIds.isEmpty && allObjekBudidaya.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border:
+                              Border.all(color: Colors.red.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.warning_outlined,
+                                color: Colors.red, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Pilih minimal satu hewan yang akan dipanen',
+                                style: medium12.copyWith(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
                 const SizedBox(height: 16),
               ],
             ),
@@ -340,27 +493,13 @@ class _PelaporanTernakPanenScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  content: const Text(
-                      'Apakah anda ingin menghapus data hewan yang dipanen?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(false),
-                      child: const Text('Tidak'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(true),
-                      child: const Text('Ya'),
-                    ),
-                  ],
-                ),
-              );
-              _submitForm(confirm!);
-            },
-            backgroundColor: green1,
+            onPressed: _submitForm,
+            backgroundColor:
+                (widget.data?['komoditas']?['tipeKomoditas'] == 'kolektif' &&
+                        widget.data?['unitBudidaya']?['tipe'] == 'individu' &&
+                        selectedObjekIds.isEmpty)
+                    ? dark3
+                    : green1,
             textStyle: semibold16,
             textColor: white,
             isLoading: isLoading,

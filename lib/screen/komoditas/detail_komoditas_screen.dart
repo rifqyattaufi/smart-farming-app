@@ -26,7 +26,7 @@ class _DetailTanamanScreenState extends State<DetailKomoditasScreen> {
   final AuthService _authService = AuthService();
 
   Map<String, dynamic>? _komoditas;
-  int _jumlahHasilPanen = 0;
+  double _jumlahHasilPanen = 0.0;
   bool _isLoading = true;
   bool _isDeleting = false;
   String? _userRole;
@@ -66,7 +66,8 @@ class _DetailTanamanScreenState extends State<DetailKomoditasScreen> {
         if (response['status'] == true && response['data'] != null) {
           setState(() {
             _komoditas = response['data'];
-            _jumlahHasilPanen = response['data']['jumlah'] as int? ?? 0;
+            _jumlahHasilPanen =
+                (response['data']['jumlah'] as num?)?.toDouble() ?? 0.0;
             _userRole = role;
             _isLoading = false;
           });
@@ -267,11 +268,22 @@ class _DetailTanamanScreenState extends State<DetailKomoditasScreen> {
                                   _komoditas?['JenisBudidaya']?['nama'] ??
                                       'N/A'),
                               infoItem("Jumlah hasil panen",
-                                  "$_jumlahHasilPanen ${_komoditas?['Satuan']?['lambang'] ?? 'N/A'}"),
+                                  "${_jumlahHasilPanen.toStringAsFixed(_jumlahHasilPanen == _jumlahHasilPanen.toInt() ? 0 : 2)} ${_komoditas?['Satuan']?['lambang'] ?? 'N/A'}"),
                               infoItem(
                                 "Satuan",
                                 "${_komoditas?['Satuan']?['nama'] ?? 'N/A'} - ${_komoditas?['Satuan']?['lambang'] ?? 'N/A'}",
                               ),
+                              infoItem(
+                                "Tipe pelaporan",
+                                _komoditas?['tipeKomoditas'] == 'individu'
+                                    ? 'Individu'
+                                    : 'Kolektif',
+                              ),
+                              infoItem(
+                                  "Objek dihapus saat pelaporan",
+                                  _komoditas?['hapusObjek'] == true
+                                      ? 'Ya'
+                                      : 'Tidak'),
                               infoItem(
                                   "Tanggal didaftarkan",
                                   _formatTanggal(

@@ -12,6 +12,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddKomoditasTernakScreen extends StatefulWidget {
   final bool isEdit;
@@ -39,6 +40,8 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
   List<Map<String, dynamic>> jenisHewanList = [];
   String? selectedTernak;
   String? selectedSatuan;
+  String? tipeKomoditas;
+  String? hapusObjek;
 
   File? _image;
   final picker = ImagePicker();
@@ -48,7 +51,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
   String? _imageUrlFromApi;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _jumlahController = TextEditingController();
-  int _currentJumlah = 0;
+  double _currentJumlah = 0.0;
 
   Future<void> _fetchData() async {
     try {
@@ -187,6 +190,8 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
         'nama': _nameController.text,
         'SatuanId': selectedSatuan,
         'JenisBudidayaId': selectedTernak,
+        'tipeKomoditas': tipeKomoditas ?? 'Individu',
+        'hapusObjek': hapusObjek == 'Ya' ? true : false,
         'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
@@ -248,8 +253,12 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           if (apiData != null && apiData is Map<String, dynamic>) {
             setState(() {
               _nameController.text = apiData['nama']?.toString() ?? '';
-              _currentJumlah = apiData['jumlah'] as int? ?? 0;
+              _currentJumlah = (apiData['jumlah'] as num?)?.toDouble() ?? 0;
               _jumlahController.text = _currentJumlah.toString();
+              tipeKomoditas = apiData['tipeKomoditas']?.toString() == 'individu'
+                  ? 'Individu'
+                  : 'Kolektif';
+              hapusObjek = apiData['hapusObjek'] == true ? 'Ya' : 'Tidak';
 
               // Set selected jenis ternak
               if (apiData['JenisBudidaya'] != null) {
@@ -369,12 +378,14 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                           items: jenisHewanList
                               .map((item) => item['nama'] as String)
                               .toList(),
-                          selectedValue: selectedTernak != null && jenisHewanList.isNotEmpty
+                          selectedValue: selectedTernak != null &&
+                                  jenisHewanList.isNotEmpty
                               ? jenisHewanList
-                                  .where((item) => item['id'] == selectedTernak)
-                                  .isNotEmpty
-                                  ? jenisHewanList.firstWhere(
-                                      (item) => item['id'] == selectedTernak)['nama']
+                                      .where((item) =>
+                                          item['id'] == selectedTernak)
+                                      .isNotEmpty
+                                  ? jenisHewanList.firstWhere((item) =>
+                                      item['id'] == selectedTernak)['nama']
                                   : null
                               : null,
                           onChanged: (value) {
@@ -401,14 +412,16 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                           items: satuanList
                               .map((item) => item['nama'] as String)
                               .toList(),
-                          selectedValue: selectedSatuan != null && satuanList.isNotEmpty
-                              ? satuanList
-                                  .where((item) => item['id'] == selectedSatuan)
-                                  .isNotEmpty
-                                  ? satuanList.firstWhere(
-                                      (item) => item['id'] == selectedSatuan)['nama']
-                                  : null
-                              : null,
+                          selectedValue:
+                              selectedSatuan != null && satuanList.isNotEmpty
+                                  ? satuanList
+                                          .where((item) =>
+                                              item['id'] == selectedSatuan)
+                                          .isNotEmpty
+                                      ? satuanList.firstWhere((item) =>
+                                          item['id'] == selectedSatuan)['nama']
+                                      : null
+                                  : null,
                           onChanged: (value) {
                             setState(() {
                               final selectedItem = satuanList.firstWhere(
@@ -496,6 +509,26 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                             },
                           ),
                         ],
+                        RadioField(
+                          label: 'Tipe pelaporan panen',
+                          selectedValue: tipeKomoditas ?? "",
+                          options: const ['Individu', 'Kolektif'],
+                          onChanged: (value) {
+                            setState(() {
+                              tipeKomoditas = value;
+                            });
+                          },
+                        ),
+                        RadioField(
+                          label: 'Menghapus data hewan setelah di panen?',
+                          selectedValue: hapusObjek ?? "",
+                          options: const ['Ya', 'Tidak'],
+                          onChanged: (value) {
+                            setState(() {
+                              hapusObjek = value;
+                            });
+                          },
+                        ),
                         ImagePickerWidget(
                           key: const Key('imagePicker'),
                           label: "Unggah gambar komoditas",

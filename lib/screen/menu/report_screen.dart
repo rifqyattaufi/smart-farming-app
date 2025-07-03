@@ -167,9 +167,14 @@ class _ReportScreenState extends State<ReportScreen> {
 
     for (int i = 0; i < komoditasList.length && i < 6; i++) {
       final komoditas = komoditasList[i];
+      final jumlah = komoditas['jumlah'];
+      // Convert to int safely, handling both int and double types
+      final int value =
+          jumlah is double ? jumlah.toInt() : (jumlah as int? ?? 0);
+
       komoditasStats.add(ChartData(
         label: komoditas['nama'] ?? 'N/A',
-        value: komoditas['jumlah'] ?? 0,
+        value: value,
         color: colors[i % colors.length],
       ));
     }

@@ -48,8 +48,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
 
   Future<void> _submitForm() async {
     if (selectedKomoditas == null) {
-      showAppToast(
-          context, 'Silakan pilih komoditas terlebih dahulu');
+      showAppToast(context, 'Silakan pilih komoditas terlebih dahulu');
       return;
     }
 
@@ -128,7 +127,8 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
                               'jenisBudidayaId': item['JenisBudidaya']['id'],
                               'jenisBudidayaLatin': item['JenisBudidaya']
                                   ['latin'],
-                              'satuan': item['SatuanId']
+                              'satuan': item['SatuanId'],
+                              'tipeKomoditas': item['tipeKomoditas']
                             })
                         .toList(),
                     onItemTap: (context, item) {
@@ -145,15 +145,14 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: () {
-              _submitForm();
-            },
-            buttonText: 'Selanjutnya',
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            key: const Key('next_button_pilih_komoditas')
-          ),
+              onPressed: () {
+                _submitForm();
+              },
+              buttonText: 'Selanjutnya',
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              key: const Key('next_button_pilih_komoditas')),
         ),
       ),
     );
