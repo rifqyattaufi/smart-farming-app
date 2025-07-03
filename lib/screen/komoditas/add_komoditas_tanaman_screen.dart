@@ -188,6 +188,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
         'nama': _nameController.text,
         'SatuanId': selectedSatuan,
         'JenisBudidayaId': selectedLocation,
+        'tipeKomoditas': 'kolektif',
         'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
