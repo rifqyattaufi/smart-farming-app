@@ -1,3 +1,12 @@
+// NOTE: This screen is now deprecated in favor of the new multi-step flow:
+// Step 1: pilih_kebun_screen.dart
+// Step 2: pilih_tanaman_screen.dart
+// Step 3: pelaporan_tindakan_massal_screen.dart
+// Step 4: pelaporan_harian_tanaman_tabel_screen.dart
+//
+// This file is kept for backward compatibility only.
+// The new flow provides better UX for bulk reporting.
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -931,13 +940,12 @@ class _PelaporanHarianTanamanScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            isLoading: _isLoading,
-            key: const Key('submit_pelaporan_harian_tanaman_button')
-          ),
+              onPressed: _submitForm,
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              isLoading: _isLoading,
+              key: const Key('submit_pelaporan_harian_tanaman_button')),
         ),
       ),
     );

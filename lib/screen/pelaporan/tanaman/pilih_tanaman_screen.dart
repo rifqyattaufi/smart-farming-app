@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_nutrisi_tanaman_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_mati_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_sakit_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tindakan_massal_screen.dart';
 import 'package:smart_farming_app/service/objek_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
@@ -66,6 +66,13 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
     final updatedData = Map<String, dynamic>.from(widget.data ?? {});
     updatedData['objekBudidaya'] = _selectedTanaman;
 
+    // Jika sudah ada tindakan massal (mode edit), langsung kembali dengan data
+    if (widget.data?['tindakanMassal'] != null) {
+      Navigator.pop(context, updatedData);
+      return;
+    }
+
+    // Flow normal untuk pertama kali
     if (widget.tipe == "panen") {
       context.push('/pelaporan-panen-tanaman',
           extra: PelaporanTanamanPanenScreen(
@@ -99,8 +106,8 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
             step: widget.step + 1,
           ));
     } else if (widget.tipe == "harian") {
-      context.push('/pelaporan-harian-tanaman',
-          extra: PelaporanHarianTanamanScreen(
+      context.push('/pelaporan-tindakan-massal',
+          extra: PelaporanTindakanMassalScreen(
             greeting: widget.greeting,
             data: updatedData,
             tipe: widget.tipe,
@@ -112,6 +119,11 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
   @override
   void initState() {
     super.initState();
+    // Set pre-selected tanaman jika ada (untuk mode edit)
+    if (widget.data?['objekBudidaya'] != null) {
+      _selectedTanaman =
+          List<Map<String, dynamic>>.from(widget.data!['objekBudidaya']);
+    }
     _fetchData();
   }
 
@@ -143,6 +155,46 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
               subtitle: 'Pilih tanaman yang akan dilakukan pelaporan!',
               showDate: true,
             ),
+
+            // Banner informasi jika dalam mode edit
+            if (widget.data?['objekBudidaya'] != null &&
+                widget.data!['objekBudidaya'].isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Colors.orange.shade700, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Mode Edit',
+                              style: semibold14.copyWith(
+                                  color: Colors.orange.shade700),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Anda dapat menambah atau menghapus tanaman yang dipilih. Tanaman yang sudah dipilih sebelumnya akan tetap terseleksi.',
+                              style: regular12.copyWith(
+                                  color: Colors.orange.shade600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
             _listTanaman.isEmpty
                 ? Padding(
                     padding: const EdgeInsets.all(16),
@@ -189,13 +241,12 @@ class _PilihTanamanScreenState extends State<PilihTanamanScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
-            buttonText: 'Selanjutnya',
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            key: const Key('next_button')
-          ),
+              onPressed: _submitForm,
+              buttonText: 'Selanjutnya',
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              key: const Key('next_button')),
         ),
       ),
     );

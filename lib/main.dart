@@ -53,6 +53,8 @@ import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_mati_sc
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_nutrisi_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_sakit_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tindakan_massal_screen.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_tabel_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_panen_ternak_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/ternak/pelaporan_harian_ternak_screen.dart';
@@ -308,6 +310,20 @@ final _router = GoRouter(
       path: '/pelaporan-harian-tanaman',
       builder: (context, state) {
         final extra = state.extra as PelaporanHarianTanamanScreen;
+        return extra;
+      },
+    ),
+    GoRoute(
+      path: '/pelaporan-tindakan-massal',
+      builder: (context, state) {
+        final extra = state.extra as PelaporanTindakanMassalScreen;
+        return extra;
+      },
+    ),
+    GoRoute(
+      path: '/pelaporan-harian-tanaman-tabel',
+      builder: (context, state) {
+        final extra = state.extra as PelaporanHarianTanamanTabelScreen;
         return extra;
       },
     ),

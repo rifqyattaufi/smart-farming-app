@@ -162,13 +162,12 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: _submitForm,
-            buttonText: 'Selanjutnya',
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            key: const Key('next_button')
-          ),
+              onPressed: _submitForm,
+              buttonText: 'Selanjutnya',
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              key: const Key('next_button')),
         ),
       ),
     );
