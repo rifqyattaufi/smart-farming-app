@@ -13,6 +13,10 @@ class PanenTab extends StatelessWidget {
   final ChartDataState panenKomoditasState;
   final RiwayatDataState riwayatPanenState;
 
+  final String? objektBelumPanenErrorMessage;
+  final Map<String, dynamic>? objektBelumPanenData;
+  final Map<String, dynamic>? ternakReport;
+
   final Future<void> Function() onDateIconPressed;
   final ChartFilterType selectedChartFilterType;
   final String formattedDisplayedDateRange;
@@ -27,6 +31,9 @@ class PanenTab extends StatelessWidget {
     required this.laporanPanenState,
     required this.panenKomoditasState,
     required this.riwayatPanenState,
+    this.objektBelumPanenErrorMessage,
+    this.objektBelumPanenData,
+    this.ternakReport,
     required this.onDateIconPressed,
     required this.selectedChartFilterType,
     required this.formattedDisplayedDateRange,
@@ -231,6 +238,174 @@ class PanenTab extends StatelessWidget {
     );
   }
 
+  Widget _buildHewanBelumPanenContent() {
+    if (objektBelumPanenData == null) {
+      return Center(
+        child: Text(
+          'Tidak ada data hewan yang perlu dipanen',
+          style: regular14.copyWith(color: dark2),
+        ),
+      );
+    }
+
+    final data = objektBelumPanenData!['data'] as Map<String, dynamic>?;
+    if (data == null) {
+      return Center(
+        child: Text(
+          'Data tidak tersedia',
+          style: regular14.copyWith(color: dark2),
+        ),
+      );
+    }
+
+    final totalObjects = data['totalObjects'] as int? ?? 0;
+    final objects = data['objects'] as List<dynamic>? ?? [];
+    final cutoffDate = data['cutoffDate'] as String?;
+
+    if (totalObjects == 0 || objects.isEmpty) {
+      return Column(
+        children: [
+          Icon(
+            Icons.check_circle_outline,
+            size: 48,
+            color: green1,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Semua hewan sudah dipanen atau belum saatnya panen',
+            style: regular14.copyWith(color: dark2),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Summary
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: yellow1.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: yellow),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.warning_amber,
+                color: yellow,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _getHewanSummaryText(totalObjects),
+                      style: medium14.copyWith(color: dark1),
+                    ),
+                    if (cutoffDate != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Berdasarkan batas waktu: ${formatDisplayDate(cutoffDate)}',
+                        style: regular12.copyWith(color: dark2),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: objects.length > 3 ? 200 : null,
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: objects.length > 3
+                ? const BouncingScrollPhysics()
+                : const NeverScrollableScrollPhysics(),
+            itemCount: objects.length,
+            itemBuilder: (context, index) => _buildHewanItem(objects[index]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHewanItem(dynamic obj) {
+    final objMap = obj as Map<String, dynamic>? ?? {};
+    final namaId = objMap['namaId'] as String? ?? 'N/A';
+    final unitBudidaya = objMap['unitBudidaya'] as Map<String, dynamic>?;
+    final unitNama = unitBudidaya?['nama'] as String? ?? 'N/A';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  namaId,
+                  style: medium12.copyWith(color: dark1),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Lokasi: $unitNama',
+                  style: regular10.copyWith(color: dark2),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getHewanPanenTitle() {
+    if (ternakReport == null) {
+      return 'Hewan yang Perlu Dipanen';
+    }
+
+    final namaHewan = ternakReport!['nama'] as String? ?? 'Hewan';
+    final periodePanen = ternakReport!['periodePanen'] as int?;
+
+    if (periodePanen == null) {
+      return '$namaHewan yang Perlu Dipanen';
+    }
+
+    return '$namaHewan tidak produktif selama $periodePanen hari terakhir';
+  }
+
+  String _getHewanSummaryText(int totalObjects) {
+    if (ternakReport == null) {
+      return 'Total: $totalObjects hewan perlu dipanen';
+    }
+
+    final namaHewan = ternakReport!['nama'] as String? ?? 'Hewan';
+    return '$namaHewan tidak produktif: $totalObjects ekor';
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -298,6 +473,108 @@ class PanenTab extends StatelessWidget {
               ],
             ),
           ),
+
+          // Hewan Belum Dipanen Section - only show if periodePanen is not null
+          if (ternakReport != null &&
+              ternakReport!['periodePanen'] != null) ...[
+            if (objektBelumPanenData == null &&
+                objektBelumPanenErrorMessage == null)
+              // Loading state
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getHewanPanenTitle(),
+                          style: bold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12.0),
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20.0),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else if (objektBelumPanenErrorMessage != null)
+              // Error state
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getHewanPanenTitle(),
+                          style: bold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12.0),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text(
+                              objektBelumPanenErrorMessage!,
+                              style: regular14.copyWith(color: Colors.red),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else if (objektBelumPanenData != null)
+              // Data loaded state
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getHewanPanenTitle(),
+                          style: bold16.copyWith(color: dark1),
+                        ),
+                        const SizedBox(height: 12.0),
+                        _buildHewanBelumPanenContent(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 12),
+          ],
 
           // Riwayat Section
           if (riwayatPanenState.isLoading)

@@ -1141,9 +1141,8 @@ class ReportService {
       'startDate': DateFormat('yyyy-MM-dd').format(startDate),
       'endDate': DateFormat('yyyy-MM-dd').format(endDate),
     };
-    final url =
-        Uri.parse('$baseUrl/statistik/jumlah-panen/$jenisBudidayaId')
-            .replace(queryParameters: queryParams);
+    final url = Uri.parse('$baseUrl/statistik/jumlah-panen/$jenisBudidayaId')
+        .replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -1322,4 +1321,40 @@ class ReportService {
     }
   }
 
+  Future<Map<String, dynamic>> getObjekBudidayaBelumPanen({
+    required String jenisBudidayaId,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/belum-panen/$jenisBudidayaId');
+
+    try {
+      final response = await http.get(url, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': body['message'] ?? 'Success',
+          'data': body['data'] ?? [],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getObjekBudidayaBelumPanen(
+            jenisBudidayaId: jenisBudidayaId);
+      } else {
+        return {
+          'status': false,
+          'message': body['message'] ?? 'Failed to load data',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Error: ${e.toString()}',
+        'data': [],
+      };
+    }
+  }
 }

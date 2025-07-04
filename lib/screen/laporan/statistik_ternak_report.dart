@@ -38,6 +38,10 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
   Map<String, dynamic>? _statistikHarianData;
   String? _statistikHarianErrorMessage;
 
+  // State untuk Objek Budidaya Belum Panen
+  Map<String, dynamic>? _objektBelumPanenData;
+  String? _objektBelumPanenErrorMessage;
+
   // --- Unified State for Charts and Riwayat ---
   final Map<String, ChartDataState<List<dynamic>>> _chartStates = {
     'laporanHarian': ChartDataState<List<dynamic>>(),
@@ -508,6 +512,9 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
                     page: 1,
                     tipeNutrisi: 'vitamin,vaksin')),
       ]);
+
+      // Fetch objek budidaya belum panen separately
+      await _fetchObjekBudidayaBelumPanen();
     } catch (e) {
       if (mounted) {
         showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
@@ -929,6 +936,43 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
     return summary.toString().trim();
   }
 
+  Future<void> _fetchObjekBudidayaBelumPanen() async {
+    if (!mounted || widget.idTernak == null) return;
+
+    setState(() {
+      _objektBelumPanenData = null;
+      _objektBelumPanenErrorMessage = null;
+    });
+
+    try {
+      final response = await _reportService.getObjekBudidayaBelumPanen(
+        jenisBudidayaId: widget.idTernak!,
+      );
+
+      if (mounted) {
+        if (response['status'] == true) {
+          setState(() {
+            _objektBelumPanenData = response;
+            _objektBelumPanenErrorMessage = null;
+          });
+        } else {
+          setState(() {
+            _objektBelumPanenData = null;
+            _objektBelumPanenErrorMessage = response['message'] as String? ??
+                'Gagal memuat data hewan yang belum dipanen';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _objektBelumPanenData = null;
+          _objektBelumPanenErrorMessage = 'Error: ${e.toString()}';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -980,6 +1024,9 @@ class _StatistikTernakReportState extends State<StatistikTernakReport> {
                     laporanPanenState: _chartStates['laporanPanen']!,
                     panenKomoditasState: _chartStates['panenKomoditas']!,
                     riwayatPanenState: _riwayatStates['panen']!,
+                    objektBelumPanenErrorMessage: _objektBelumPanenErrorMessage,
+                    objektBelumPanenData: _objektBelumPanenData,
+                    ternakReport: _ternakReport,
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,
                     formattedDisplayedDateRange: formattedDisplayedDateRange,
