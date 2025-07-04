@@ -36,7 +36,7 @@ class _ChipFilterState extends State<ChipFilter> {
                 widget.onCategorySelected(category);
               },
               selectedColor: green1,
-              backgroundColor: Colors.transparent,
+              backgroundColor: Colors.white,
               labelStyle: TextStyle(
                 color: isSelected ? Colors.white : green1,
               ),
