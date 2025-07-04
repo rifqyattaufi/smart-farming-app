@@ -847,8 +847,8 @@ class _PelaporanHarianTanamanTabelScreenState
                                     }),
                                 if (_lastHeights[i] > 0)
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(top: 4, left: 4),
+                                    padding: const EdgeInsets.only(
+                                        top: 0, left: 4, bottom: 12),
                                     child: Row(
                                       children: [
                                         Icon(Icons.info_outline,
@@ -900,8 +900,8 @@ class _PelaporanHarianTanamanTabelScreenState
                                 if (kondisiDaun[i] == _initialKondisiDaun[i] &&
                                     _initialKondisiDaun[i] != 'sehat')
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(top: 4, left: 4),
+                                    padding: const EdgeInsets.only(
+                                        top: 0, left: 4, bottom: 12),
                                     child: Row(
                                       children: [
                                         Icon(Icons.info_outline,
@@ -954,8 +954,8 @@ class _PelaporanHarianTanamanTabelScreenState
                                         _initialStatusTumbuh[i] &&
                                     _initialStatusTumbuh[i] != 'bibit')
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(top: 4, left: 4),
+                                    padding: const EdgeInsets.only(
+                                        top: 0, left: 4, bottom: 12),
                                     child: Row(
                                       children: [
                                         Icon(Icons.info_outline,

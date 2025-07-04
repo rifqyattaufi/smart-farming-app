@@ -225,7 +225,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   iconColor: yellow,
                 ),
                 DashboardItem(
-                  title: 'Jenis Tanaman Budidaya',
+                  title: 'Jenis Tanaman',
                   value: _perkebunanData?['jenisTanaman'].toString() ?? '-',
                   icon: 'other',
                   bgColor: blue3,

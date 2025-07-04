@@ -267,7 +267,7 @@ class _PelaporanTindakanMassalScreenState
                   showDate: true,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Form(
                     key: _formKey,
                     child: Column(
