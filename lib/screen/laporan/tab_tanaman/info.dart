@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -216,6 +217,10 @@ class _InfoTabState extends State<InfoTab> {
                 'id': kebunItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
+            onItemTap: (context, kebunItem) {
+              final id = kebunItem['id'] ?? '';
+              context.push('/detail-kebun/$id').then((_) {});
+            },
           ),
         ),
       );

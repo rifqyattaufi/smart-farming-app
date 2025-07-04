@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/theme.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
@@ -215,6 +216,10 @@ class _InfoTabState extends State<InfoTab> {
                 'id': kandangItem['id'] as String? ?? UniqueKey().toString(),
               };
             }).toList(),
+            onItemTap: (context, kandangItem) {
+              final id = kandangItem['id'] ?? '';
+              context.push('/detail-kandang/$id').then((_) {});
+            },
           ),
         ),
       );
@@ -298,7 +303,8 @@ class _InfoTabState extends State<InfoTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        key: Key('load_more_ternak_${kandangItem['id'] ?? 'unknown'}'),
+                        key: Key(
+                            'load_more_ternak_${kandangItem['id'] ?? 'unknown'}'),
                         "Muat lagi ternak di ${kandangItem['nama'] ?? ''}",
                         style: regular14.copyWith(color: green1),
                       ),
