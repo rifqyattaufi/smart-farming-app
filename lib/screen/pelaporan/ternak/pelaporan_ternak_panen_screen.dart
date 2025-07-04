@@ -471,14 +471,14 @@ class _PelaporanTernakPanenScreenState
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border:
-                              Border.all(color: Colors.red.withOpacity(0.3)),
+                              Border.all(color: Colors.red.withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.warning_outlined,
+                            const Icon(Icons.warning_outlined,
                                 color: Colors.red, size: 20),
                             const SizedBox(width: 8),
                             Expanded(

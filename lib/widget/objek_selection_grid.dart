@@ -47,9 +47,9 @@ class ObjekSelectionGrid extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: dark3.withOpacity(0.1),
+                color: dark3.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: dark3.withOpacity(0.3)),
+                border: Border.all(color: dark3.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -108,9 +108,9 @@ class ObjekSelectionGrid extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: green1.withOpacity(0.1),
+                color: green1.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: green1.withOpacity(0.3)),
+                border: Border.all(color: green1.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -146,7 +146,7 @@ class ObjekSelectionGrid extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
-                    color: isSelected ? green1.withOpacity(0.1) : white,
+                    color: isSelected ? green1.withValues(alpha: 0.1) : white,
                     border: Border.all(
                       color: isSelected ? green1 : dark3,
                       width: isSelected ? 2 : 1,
@@ -155,7 +155,7 @@ class ObjekSelectionGrid extends StatelessWidget {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: green1.withOpacity(0.2),
+                              color: green1.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             )
