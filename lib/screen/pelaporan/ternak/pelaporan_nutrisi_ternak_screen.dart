@@ -379,14 +379,18 @@ class _PelaporanNutrisiTernakScreenState
                           InputFieldWidget(
                               key: Key('jumlah_dosis_$i'),
                               label: "Jumlah/dosis",
-                              hint: "Contoh: 10",
+                              hint: "Contoh: 10.5",
                               controller: _sizeController[i],
-                              keyboardType: TextInputType.number,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Masukkan jumlah/dosis';
                                 } else if (double.tryParse(value) == null) {
                                   return 'Masukkan angka yang valid';
+                                } else if (double.parse(value) <= 0) {
+                                  return 'Jumlah/dosis harus lebih dari 0';
                                 }
                                 return null;
                               }),

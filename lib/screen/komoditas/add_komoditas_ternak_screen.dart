@@ -192,7 +192,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
         'JenisBudidayaId': selectedTernak,
         'tipeKomoditas': tipeKomoditas ?? 'Individu',
         'hapusObjek': hapusObjek == 'Ya' ? true : false,
-        'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
+        'jumlah': widget.isEdit ? double.parse(_jumlahController.text) : 0.0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
 
@@ -253,8 +253,8 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
           if (apiData != null && apiData is Map<String, dynamic>) {
             setState(() {
               _nameController.text = apiData['nama']?.toString() ?? '';
-              _currentJumlah = (apiData['jumlah'] as num?)?.toDouble() ?? 0;
-              _jumlahController.text = _currentJumlah.toString();
+              _currentJumlah = (apiData['jumlah'] as num?)?.toDouble() ?? 0.0;
+              _jumlahController.text = _currentJumlah.toStringAsFixed(1);
               tipeKomoditas = apiData['tipeKomoditas']?.toString() == 'individu'
                   ? 'Individu'
                   : 'Kolektif';
@@ -454,10 +454,11 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                           InputFieldWidget(
                             key: const Key('jumlahField'),
                             label:
-                                "Jumlah hasil ternak (saat ini: $_currentJumlah)",
+                                "Jumlah hasil ternak (saat ini: ${_currentJumlah.toStringAsFixed(1)})",
                             hint: "Masukkan jumlah yang tersisa",
                             controller: _jumlahController,
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -465,13 +466,13 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                                   icon: const Icon(Icons.remove_circle_outline,
                                       color: Colors.red),
                                   onPressed: () {
-                                    final currentValue =
-                                        int.tryParse(_jumlahController.text) ??
-                                            0;
-                                    if (currentValue > 0) {
-                                      _jumlahController.text =
-                                          (currentValue - 1).toString();
-                                    }
+                                    final currentValue = double.tryParse(
+                                            _jumlahController.text) ??
+                                        0.0;
+                                    final newValue = (currentValue - 0.1)
+                                        .clamp(0.0, _currentJumlah);
+                                    _jumlahController.text =
+                                        newValue.toStringAsFixed(1);
                                   },
                                   key: const Key('decreaseButton'),
                                 ),
@@ -479,13 +480,13 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                                   icon: const Icon(Icons.add_circle_outline,
                                       color: Colors.green),
                                   onPressed: () {
-                                    final currentValue =
-                                        int.tryParse(_jumlahController.text) ??
-                                            0;
-                                    if (currentValue < _currentJumlah) {
-                                      _jumlahController.text =
-                                          (currentValue + 1).toString();
-                                    }
+                                    final currentValue = double.tryParse(
+                                            _jumlahController.text) ??
+                                        0.0;
+                                    final newValue = (currentValue + 0.1)
+                                        .clamp(0.0, _currentJumlah);
+                                    _jumlahController.text =
+                                        newValue.toStringAsFixed(1);
                                   },
                                   key: const Key('increaseButton'),
                                 ),
@@ -495,7 +496,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah hasil ternak tidak boleh kosong';
                               }
-                              final inputValue = int.tryParse(value);
+                              final inputValue = double.tryParse(value);
                               if (inputValue == null) {
                                 return 'Jumlah hasil ternak harus berupa angka';
                               }
@@ -503,7 +504,7 @@ class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
                                 return 'Jumlah hasil ternak tidak boleh negatif';
                               }
                               if (inputValue > _currentJumlah) {
-                                return 'Jumlah tidak boleh lebih dari $_currentJumlah';
+                                return 'Jumlah tidak boleh lebih dari ${_currentJumlah.toStringAsFixed(1)}';
                               }
                               return null;
                             },

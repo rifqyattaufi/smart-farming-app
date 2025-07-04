@@ -49,7 +49,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
   String? _imageUrlFromApi;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _jumlahController = TextEditingController();
-  int _currentJumlah = 0;
+  double _currentJumlah = 0.0;
 
   Future<void> _fetchData() async {
     try {
@@ -189,7 +189,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
         'SatuanId': selectedSatuan,
         'JenisBudidayaId': selectedLocation,
         'tipeKomoditas': 'kolektif',
-        'jumlah': widget.isEdit ? int.parse(_jumlahController.text) : 0,
+        'jumlah': widget.isEdit ? double.parse(_jumlahController.text) : 0.0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
 
@@ -269,8 +269,8 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
           if (apiData != null && apiData is Map<String, dynamic>) {
             setState(() {
               _nameController.text = apiData['nama']?.toString() ?? '';
-              _currentJumlah = apiData['jumlah'] as int? ?? 0;
-              _jumlahController.text = _currentJumlah.toString();
+              _currentJumlah = (apiData['jumlah'] as num?)?.toDouble() ?? 0.0;
+              _jumlahController.text = _currentJumlah.toStringAsFixed(1);
 
               // Set selected jenis tanaman
               if (apiData['JenisBudidaya'] != null) {
@@ -448,10 +448,11 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                           InputFieldWidget(
                             key: const Key('jumlahField'),
                             label:
-                                "Jumlah hasil panen (saat ini: $_currentJumlah)",
+                                "Jumlah hasil panen (saat ini: ${_currentJumlah.toStringAsFixed(1)})",
                             hint: "Masukkan jumlah yang tersisa",
                             controller: _jumlahController,
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -459,12 +460,14 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                                   icon: const Icon(Icons.remove_circle_outline,
                                       color: Colors.red),
                                   onPressed: () {
-                                    final currentValue =
-                                        int.tryParse(_jumlahController.text) ??
-                                            0;
+                                    final currentValue = double.tryParse(
+                                            _jumlahController.text) ??
+                                        0.0;
                                     if (currentValue > 0) {
+                                      final newValue = (currentValue - 0.1)
+                                          .clamp(0.0, _currentJumlah);
                                       _jumlahController.text =
-                                          (currentValue - 1).toString();
+                                          newValue.toStringAsFixed(1);
                                     }
                                   },
                                   key: const Key('decreaseButton'),
@@ -473,12 +476,14 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                                   icon: const Icon(Icons.add_circle_outline,
                                       color: Colors.green),
                                   onPressed: () {
-                                    final currentValue =
-                                        int.tryParse(_jumlahController.text) ??
-                                            0;
+                                    final currentValue = double.tryParse(
+                                            _jumlahController.text) ??
+                                        0.0;
                                     if (currentValue < _currentJumlah) {
+                                      final newValue = (currentValue + 0.1)
+                                          .clamp(0.0, _currentJumlah);
                                       _jumlahController.text =
-                                          (currentValue + 1).toString();
+                                          newValue.toStringAsFixed(1);
                                     }
                                   },
                                   key: const Key('increaseButton'),
@@ -489,7 +494,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah hasil panen tidak boleh kosong';
                               }
-                              final inputValue = int.tryParse(value);
+                              final inputValue = double.tryParse(value);
                               if (inputValue == null) {
                                 return 'Jumlah hasil panen harus berupa angka';
                               }
@@ -497,7 +502,7 @@ class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                                 return 'Jumlah hasil panen tidak boleh negatif';
                               }
                               if (inputValue > _currentJumlah) {
-                                return 'Jumlah tidak boleh lebih dari $_currentJumlah';
+                                return 'Jumlah tidak boleh lebih dari ${_currentJumlah.toStringAsFixed(1)}';
                               }
                               return null;
                             },

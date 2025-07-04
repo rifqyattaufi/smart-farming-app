@@ -279,7 +279,8 @@ class _AddPemakaianInventarisScreenState
   Future<void> _changeSatuan() async {
     if (selectedInvSatuanId != null) {
       try {
-        final response = await _satuanService.getSatuanById(selectedInvSatuanId!);
+        final response =
+            await _satuanService.getSatuanById(selectedInvSatuanId!);
         if (response['status']) {
           setState(() {
             _satuanController.text =
@@ -401,7 +402,8 @@ class _AddPemakaianInventarisScreenState
                               setState(() {
                                 selectedInvId = selected['id'].toString();
                                 selectedInvNama = value;
-                                selectedInvSatuanId = selected['satuanId']?.toString();
+                                selectedInvSatuanId =
+                                    selected['satuanId']?.toString();
                               });
                               _changeSatuan();
                             }
@@ -418,9 +420,10 @@ class _AddPemakaianInventarisScreenState
                   InputFieldWidget(
                       key: const Key('jumlah_digunakan_input'),
                       label: "Jumlah digunakan",
-                      hint: "Contoh: 20",
+                      hint: "Contoh: 20.5",
                       controller: _sizeController,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Jumlah tidak boleh kosong';
@@ -440,7 +443,8 @@ class _AddPemakaianInventarisScreenState
                     controller: _satuanController,
                     isDisabled: true,
                     validator: (value) {
-                      if (selectedInvId != null && (value == null || value.isEmpty)) {
+                      if (selectedInvId != null &&
+                          (value == null || value.isEmpty)) {
                         return 'Satuan tidak tersedia untuk inventaris ini';
                       }
                       return null;

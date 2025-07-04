@@ -377,15 +377,19 @@ class _PelaporanTernakPanenScreenState
                           InputFieldWidget(
                             key: Key('jumlah_panen_input_$i'),
                             label: "Jumlah panen",
-                            hint: "Contoh: 20",
+                            hint: "Contoh: 20.5",
                             controller: sizeControllers[i],
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah panen wajib diisi';
                               }
                               if (double.tryParse(value) == null) {
                                 return 'Jumlah panen harus berupa angka';
+                              }
+                              if (double.parse(value) <= 0) {
+                                return 'Jumlah panen harus lebih dari 0';
                               }
                               return null;
                             },
@@ -398,13 +402,18 @@ class _PelaporanTernakPanenScreenState
                               label: "Jumlah hewan",
                               hint: "Contoh: 5",
                               controller: jumlahHewanControllers[i],
-                              keyboardType: TextInputType.number,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Jumlah hewan wajib diisi';
                                 }
-                                if (int.tryParse(value) == null) {
+                                if (double.tryParse(value) == null) {
                                   return 'Jumlah hewan harus berupa angka';
+                                }
+                                if (double.parse(value) <= 0) {
+                                  return 'Jumlah hewan harus lebih dari 0';
                                 }
                                 return null;
                               },

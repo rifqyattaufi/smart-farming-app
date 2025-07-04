@@ -36,6 +36,14 @@ class MatiTab extends StatelessWidget {
     this.selectedChartDateRange,
   });
 
+  // Helper function to safely extract numeric values from dynamic data
+  num _safeNumericValue(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
+
   String _generateRangkumanMati() {
     if (laporanMatiState.isLoading || statistikPenyebabState.isLoading) {
       return "Memuat data laporan kematian...";
@@ -57,8 +65,9 @@ class MatiTab extends StatelessWidget {
           : "pada periode $start hingga $end";
     }
 
-    num totalKematian = laporanMatiState.dataPoints.fold(
-        0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0));
+    num totalKematian = laporanMatiState.dataPoints.fold(0, (prev, curr) {
+      return prev + _safeNumericValue(curr['jumlahKematian']);
+    });
 
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, ditemukan total $totalKematian kasus kematian tanaman. ");
@@ -72,7 +81,7 @@ class MatiTab extends StatelessWidget {
 
       final List<String> penyebabParts = penyakitData.map<String>((item) {
         final nama = item['penyebab'] ?? 'N/A';
-        final total = (item['jumlahKematian'] as num?)?.toInt() ?? 0;
+        final total = _safeNumericValue(item['jumlahKematian']).toInt();
         return "$total kasus $nama";
       }).toList();
 
@@ -114,8 +123,9 @@ class MatiTab extends StatelessWidget {
         ),
       );
     } else {
-      final totalMati = laporanMatiState.dataPoints.fold<num>(
-          0, (sum, item) => sum + ((item['jumlahKematian'] as num?) ?? 0));
+      final totalMati = laporanMatiState.dataPoints.fold<num>(0, (sum, item) {
+        return sum + _safeNumericValue(item['jumlahKematian']);
+      });
 
       cardContent = Stack(
         children: [

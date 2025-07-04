@@ -94,6 +94,14 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     _fetchInitialDataAndDependencies();
   }
 
+  // Helper function to safely extract numeric values from dynamic data
+  num _safeNumericValue(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
+
   Future<void> _fetchInitialDataAndDependencies() async {
     await _fetchInitialData();
     if (widget.idTanaman != null && mounted && _tanamanReport != null) {
@@ -225,7 +233,9 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         final backendEntry = backendDataMap[periodKey];
         processedDataPoints.add({
           'period': periodKey,
-          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0
+          valueKey: backendEntry != null
+              ? _safeNumericValue(backendEntry[valueKey])
+              : 0
         });
         processedXLabels.add(displayLabel);
         currentDate = currentDate.add(const Duration(days: 1));
@@ -244,7 +254,9 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         final backendEntry = backendDataMap[periodKey];
         processedDataPoints.add({
           'period': periodKey,
-          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0
+          valueKey: backendEntry != null
+              ? _safeNumericValue(backendEntry[valueKey])
+              : 0
         });
         processedXLabels.add(displayLabel);
         currentDate = (currentDate.month == 12)
@@ -261,7 +273,9 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
         final backendEntry = backendDataMap[periodKey];
         processedDataPoints.add({
           'period': periodKey,
-          valueKey: backendEntry != null ? (backendEntry[valueKey] ?? 0) : 0
+          valueKey: backendEntry != null
+              ? _safeNumericValue(backendEntry[valueKey])
+              : 0
         });
         processedXLabels.add(displayLabel);
         currentDate = DateTime(currentDate.year + 1, 1, 1);
@@ -734,7 +748,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     num maxValue = double.negativeInfinity;
 
     for (var item in dataPoints) {
-      final value = (item[valueKey] as num?) ?? 0;
+      final value = _safeNumericValue(item[valueKey]);
       if (value < minValue) minValue = value;
       if (value > maxValue) maxValue = value;
     }
@@ -743,7 +757,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     List<DateTime> maxDays = [];
 
     for (var item in dataPoints) {
-      final value = (item[valueKey] as num?) ?? 0;
+      final value = _safeNumericValue(item[valueKey]);
       final date = DateTime.tryParse(item['period'] ?? '');
       if (date == null) continue;
 
@@ -905,7 +919,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       summary.write("tidak ditemukan adanya aktivitas pelaporan.\n\n");
     } else {
       num totalLaporan = laporanHarianState.dataPoints.fold(
-          0, (prev, curr) => prev + ((curr['jumlahLaporan'] as num?) ?? 0));
+          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahLaporan']));
       // Menghitung jumlah hari aktual dalam rentang yang dipilih
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgLaporan = totalLaporan / daysInPeriod; // Pembagi diubah
@@ -932,8 +946,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     final nutrisiState = _chartStates['nutrisi']!;
 
     if (!penyiramanState.isLoading && penyiramanState.dataPoints.isNotEmpty) {
-      num totalPenyiraman = penyiramanState.dataPoints.fold(
-          0, (prev, curr) => prev + ((curr['jumlahPenyiraman'] as num?) ?? 0));
+      num totalPenyiraman = penyiramanState.dataPoints.fold(0,
+          (prev, curr) => prev + _safeNumericValue(curr['jumlahPenyiraman']));
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgPenyiraman = totalPenyiraman / daysInPeriod;
       summary.write(
@@ -942,7 +956,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
     if (!pruningState.isLoading && pruningState.dataPoints.isNotEmpty) {
       num totalPruning = pruningState.dataPoints.fold(
-          0, (prev, curr) => prev + ((curr['jumlahPruning'] as num?) ?? 0));
+          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahPruning']));
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgPruning = totalPruning / daysInPeriod;
       summary.write(
@@ -951,7 +965,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
     if (!repottingState.isLoading && repottingState.dataPoints.isNotEmpty) {
       num totalRepotting = repottingState.dataPoints.fold(
-          0, (prev, curr) => prev + ((curr['jumlahRepotting'] as num?) ?? 0));
+          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahRepotting']));
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgRepotting = totalRepotting / daysInPeriod;
       summary.write(
@@ -962,7 +976,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       num totalNutrisi = nutrisiState.dataPoints.fold(
           0,
           (prev, curr) =>
-              prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0));
+              prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']));
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgNutrisi = totalNutrisi / daysInPeriod;
       summary.write(
@@ -978,35 +992,35 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
 
     num totalSakit = !sakitState.isLoading
         ? sakitState.dataPoints.fold(
-            0, (prev, curr) => prev + ((curr['jumlahSakit'] as num?) ?? 0))
+            0, (prev, curr) => prev + _safeNumericValue(curr['jumlahSakit']))
         : 0;
     num totalMati = !matiState.isLoading
         ? matiState.dataPoints.fold(
-            0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0))
+            0, (prev, curr) => prev + _safeNumericValue(curr['jumlahKematian']))
         : 0;
     num totalVitamin = !vitaminState.isLoading
         ? vitaminState.dataPoints.fold(
             0,
             (prev, curr) =>
-                prev + ((curr['jumlahPemberianVitamin'] as num?) ?? 0))
+                prev + _safeNumericValue(curr['jumlahPemberianVitamin']))
         : 0;
     num totalNutrisi = !pupukState.isLoading
         ? pupukState.dataPoints.fold(
             0,
             (prev, curr) =>
-                prev + ((curr['jumlahKejadianPemberianPupuk'] as num?) ?? 0))
+                prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']))
         : 0;
     num totalDisinfektan = !disinfektanState.isLoading
         ? disinfektanState.dataPoints.fold(
             0,
             (prev, curr) =>
-                prev + ((curr['jumlahPemberianDisinfektan'] as num?) ?? 0))
+                prev + _safeNumericValue(curr['jumlahPemberianDisinfektan']))
         : 0;
     num totalPanen = !panenState.isLoading
         ? panenState.dataPoints.fold(
             0,
             (prev, curr) =>
-                prev + ((curr['jumlahLaporanPanenTanaman'] as num?) ?? 0))
+                prev + _safeNumericValue(curr['jumlahLaporanPanenTanaman']))
         : 0;
 
     final List<String> attentionItems = [];

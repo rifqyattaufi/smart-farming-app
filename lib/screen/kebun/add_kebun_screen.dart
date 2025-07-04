@@ -512,23 +512,24 @@ class _AddKebunScreenState extends State<AddKebunScreen> {
                     label: "Jumlah tanaman",
                     hint: "Contoh: 20 (satuan tanaman)",
                     controller: _jumlahController,
-                    keyboardType: TextInputType.number,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     isDisabled: initialJumlahTanaman == null ||
-                            int.tryParse(initialJumlahTanaman ?? '') == 0
+                            double.tryParse(initialJumlahTanaman ?? '') == 0
                         ? false
                         : true,
                     isGrayed: initialJumlahTanaman == null ||
-                            int.tryParse(initialJumlahTanaman ?? '') == 0
+                            double.tryParse(initialJumlahTanaman ?? '') == 0
                         ? false
                         : true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Jumlah tanaman tidak boleh kosong';
                       }
-                      if (int.tryParse(value) == null) {
+                      if (double.tryParse(value) == null) {
                         return 'Jumlah tanaman harus berupa angka';
                       }
-                      if (int.parse(value) <= 0) {
+                      if (double.parse(value) <= 0) {
                         return 'Jumlah tanaman harus lebih besar dari 0';
                       }
                       return null;
