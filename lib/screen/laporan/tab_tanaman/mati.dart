@@ -36,6 +36,14 @@ class MatiTab extends StatelessWidget {
     this.selectedChartDateRange,
   });
 
+  // Helper function to safely extract numeric values from dynamic data
+  num _safeNumericValue(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
+
   String _generateRangkumanMati() {
     if (laporanMatiState.isLoading || statistikPenyebabState.isLoading) {
       return "Memuat data laporan kematian...";
@@ -57,8 +65,9 @@ class MatiTab extends StatelessWidget {
           : "pada periode $start hingga $end";
     }
 
-    num totalKematian = laporanMatiState.dataPoints.fold(
-        0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0));
+    num totalKematian = laporanMatiState.dataPoints.fold(0, (prev, curr) {
+      return prev + _safeNumericValue(curr['jumlahKematian']);
+    });
 
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, ditemukan total $totalKematian kasus kematian tanaman. ");
@@ -72,7 +81,7 @@ class MatiTab extends StatelessWidget {
 
       final List<String> penyebabParts = penyakitData.map<String>((item) {
         final nama = item['penyebab'] ?? 'N/A';
-        final total = (item['jumlahKematian'] as num?)?.toInt() ?? 0;
+        final total = _safeNumericValue(item['jumlahKematian']).toInt();
         return "$total kasus $nama";
       }).toList();
 
@@ -114,8 +123,9 @@ class MatiTab extends StatelessWidget {
         ),
       );
     } else {
-      final totalMati = laporanMatiState.dataPoints.fold<num>(
-          0, (sum, item) => sum + ((item['jumlahKematian'] as num?) ?? 0));
+      final totalMati = laporanMatiState.dataPoints.fold<num>(0, (sum, item) {
+        return sum + _safeNumericValue(item['jumlahKematian']);
+      });
 
       cardContent = Stack(
         children: [
@@ -286,12 +296,34 @@ class MatiTab extends StatelessWidget {
             )
           else
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                  key: const Key('no_riwayat_pelaporan_mati'),
-                  style: regular12.copyWith(color: dark2),
-                  'Tidak ada riwayat pelaporan kematian tanaman untuk ditampilkan saat ini.'),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.assignment_outlined,
+                        size: 48,
+                        color: dark2.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Belum ada riwayat pelaporan kematian tanaman',
+                        style: medium14.copyWith(color: dark2),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Lakukan pelaporan kematian tanaman untuk melihat riwayatnya di sini',
+                        style: regular12.copyWith(
+                            color: dark2.withValues(alpha: 0.7)),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           const SizedBox(height: 80),
         ],

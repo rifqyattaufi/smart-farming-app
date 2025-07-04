@@ -398,17 +398,18 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         InputFieldWidget(
                             key: const Key('jumlah_stok_input'),
                             label: "Jumlah stok",
-                            hint: "Contoh: 20",
+                            hint: "Contoh: 20.5",
                             controller: _sizeController,
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah stok tidak boleh kosong';
                               }
-                              if (int.tryParse(value) == null) {
+                              if (double.tryParse(value) == null) {
                                 return 'Jumlah stok harus berupa angka';
                               }
-                              if (int.parse(value) <= 0) {
+                              if (double.parse(value) <= 0) {
                                 return 'Jumlah stok harus lebih dari 0';
                               }
                               return null;
@@ -416,15 +417,19 @@ class _AddInventarisScreenState extends State<AddInventarisScreen> {
                         InputFieldWidget(
                             key: const Key('stok_minim_input'),
                             label: "Stok minim (untuk perhitungan stok rendah)",
-                            keyboardType: TextInputType.number,
-                            hint: "Contoh: 5",
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            hint: "Contoh: 5.0",
                             controller: _minimController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Stok minimal tidak boleh kosong';
                               }
-                              if (int.tryParse(value) == null) {
+                              if (double.tryParse(value) == null) {
                                 return 'Stok minimal harus berupa angka';
+                              }
+                              if (double.parse(value) < 0) {
+                                return 'Stok minimal tidak boleh negatif';
                               }
                               return null;
                             }),

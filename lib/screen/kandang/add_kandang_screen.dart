@@ -453,14 +453,19 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                         InputFieldWidget(
                             key: const Key('luas_kandang_input'),
                             label: "Luas kandang",
-                            hint: "Contoh: 30m²",
+                            hint: "Contoh: 30.5m²",
                             controller: _sizeController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Luas kandang tidak boleh kosong';
                               }
-                              if (int.tryParse(value) == null) {
+                              if (double.tryParse(value) == null) {
                                 return 'Luas kandang harus berupa angka';
+                              }
+                              if (double.parse(value) <= 0) {
+                                return 'Luas kandang harus lebih dari 0';
                               }
                               return null;
                             }),
@@ -493,22 +498,29 @@ class _AddKandangScreenState extends State<AddKandangScreen> {
                         InputFieldWidget(
                             key: const Key('jumlah_hewan_input'),
                             label: "Jumlah hewan ternak",
-                            hint: "Contoh: 20 (satuan ekor)",
+                            hint: "Contoh: 20.5 (satuan ekor)",
                             controller: _jumlahController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
                             isDisabled: initialJumlahHewan == null ||
-                                    int.tryParse(initialJumlahHewan ?? '') == 0
+                                    double.tryParse(initialJumlahHewan ?? '') ==
+                                        0
                                 ? false
                                 : true,
                             isGrayed: initialJumlahHewan == null ||
-                                    int.tryParse(initialJumlahHewan ?? '') == 0
+                                    double.tryParse(initialJumlahHewan ?? '') ==
+                                        0
                                 ? false
                                 : true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah hewan tidak boleh kosong';
                               }
-                              if (int.tryParse(value) == null) {
+                              if (double.tryParse(value) == null) {
                                 return 'Jumlah hewan harus berupa angka';
+                              }
+                              if (double.parse(value) <= 0) {
+                                return 'Jumlah hewan harus lebih dari 0';
                               }
                               return null;
                             }),

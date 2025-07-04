@@ -8,25 +8,33 @@ class ChartSection extends StatelessWidget {
   final String title;
   final ChartDataState chartState;
   final String valueKeyForMapping;
+  final String? labelKeyForMapping;
   final bool showFilterControls;
-  final Future<void> Function()? onDateIconPressed;
+  final VoidCallback? onDateIconPressed;
   final ChartFilterType? selectedChartFilterType;
   final String? displayedDateRangeText;
-  final void Function(ChartFilterType?)? onChartFilterTypeChanged;
-  final String? labelKeyForMapping;
+  final ValueChanged<ChartFilterType?>? onChartFilterTypeChanged;
 
   const ChartSection({
     super.key,
     required this.title,
     required this.chartState,
     required this.valueKeyForMapping,
+    this.labelKeyForMapping,
     this.showFilterControls = false,
     this.onDateIconPressed,
     this.selectedChartFilterType,
     this.displayedDateRangeText,
     this.onChartFilterTypeChanged,
-    this.labelKeyForMapping,
   });
+
+  // Helper function to safely extract numeric values from dynamic data
+  double _safeDoubleValue(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +59,14 @@ class ChartSection extends StatelessWidget {
             chartState.rawData?.whereType<Map<String, dynamic>>().toList() ??
                 [];
         finalValues = data
-            .map<double>(
-                (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
+            .map<double>((e) => _safeDoubleValue(e[valueKeyForMapping]))
             .toList();
         finalXLabels = data
             .map<String>((e) => (e[labelKeyForMapping!] as String?) ?? 'N/A')
             .toList();
       } else {
         finalValues = chartState.dataPoints
-            .map<double>(
-                (e) => (e[valueKeyForMapping] as num?)?.toDouble() ?? 0.0)
+            .map<double>((e) => _safeDoubleValue(e[valueKeyForMapping]))
             .toList();
         finalXLabels = chartState.xLabels;
       }

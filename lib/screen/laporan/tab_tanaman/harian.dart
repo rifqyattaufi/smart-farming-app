@@ -151,7 +151,8 @@ class HarianTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Rangkuman Statistik", style: bold18.copyWith(color: dark1)),
+            Text("Rangkuman Statistik Laporan Harian",
+                style: bold18.copyWith(color: dark1)),
             const SizedBox(height: 12),
             (laporanHarianState.isLoading ||
                         penyiramanState.isLoading ||

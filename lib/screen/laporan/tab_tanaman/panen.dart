@@ -345,12 +345,34 @@ class PanenTab extends StatelessWidget {
             )
           else
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                  key: const Key('no_riwayat_panen'),
-                  style: regular12.copyWith(color: dark2),
-                  'Tidak ada riwayat pelaporan panen tanaman untuk ditampilkan saat ini.'),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.assignment_outlined,
+                        size: 48,
+                        color: dark2.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Belum ada riwayat pelaporan panen',
+                        style: medium14.copyWith(color: dark2),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Lakukan pelaporan panen untuk melihat riwayatnya di sini',
+                        style: regular12.copyWith(
+                            color: dark2.withValues(alpha: 0.7)),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           const SizedBox(height: 80),
         ],

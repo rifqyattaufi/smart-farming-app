@@ -233,10 +233,34 @@ class _InfoTabState extends State<InfoTab> {
     } else {
       listChildren.add(
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Text("Tidak ditemukan daftar kebun untuk jenis tanaman ini.",
-              key: const Key('no_kebun_found'),
-              style: regular14.copyWith(color: dark2)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.assignment_outlined,
+                    size: 48,
+                    color: dark2.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Belum ada kebun budidaya',
+                    style: medium14.copyWith(color: dark2),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Buat kebun budidaya untuk jenis tanaman ini',
+                    style:
+                        regular12.copyWith(color: dark2.withValues(alpha: 0.7)),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -312,7 +336,8 @@ class _InfoTabState extends State<InfoTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        key: Key('load_more_tanaman_${kebunItem['id'] ?? 'unknown'}'),
+                        key: Key(
+                            'load_more_tanaman_${kebunItem['id'] ?? 'unknown'}'),
                         "Muat lagi tanaman di ${kebunItem['nama'] ?? ''}",
                         style: regular14.copyWith(color: green1),
                       ),
