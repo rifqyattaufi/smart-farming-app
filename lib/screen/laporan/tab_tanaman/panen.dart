@@ -64,6 +64,11 @@ class PanenTab extends StatelessWidget {
         (sum, point) =>
             sum + ((point['jumlahLaporanPanenTanaman'] as num?) ?? 0).toInt());
 
+    // Handle empty state when no harvest reports occurred
+    if (totalLaporan == 0) {
+      return "Berdasarkan statistik $periodeText, belum ada pelaporan panen yang dilakukan. Lakukan pelaporan panen secara rutin untuk memantau produktivitas tanaman.";
+    }
+
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, telah dilakukan $totalLaporan kali pelaporan panen. ");
 

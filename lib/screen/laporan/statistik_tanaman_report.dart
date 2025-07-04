@@ -915,11 +915,72 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     if (laporanHarianState.error != null) {
       return "Tidak dapat memuat rangkuman karena terjadi kesalahan pada data laporan harian.";
     }
+
+    // Check if all chart states are empty or have zero values
+    final penyiramanState = _chartStates['penyiraman']!;
+    final pruningState = _chartStates['pruning']!;
+    final repottingState = _chartStates['repotting']!;
+    final nutrisiState = _chartStates['nutrisi']!;
+    final sakitState = _chartStates['laporanSakit']!;
+    final matiState = _chartStates['laporanMati']!;
+    final vitaminState = _chartStates['laporanVitamin']!;
+    final pupukState = _chartStates['laporanNutrisi']!;
+    final disinfektanState = _chartStates['laporanDisinfektan']!;
+    final panenState = _chartStates['laporanPanen']!;
+
+    // Calculate totals for all activities
+    num totalLaporan = laporanHarianState.dataPoints.fold(
+        0, (prev, curr) => prev + _safeNumericValue(curr['jumlahLaporan']));
+    num totalPenyiraman = penyiramanState.dataPoints.fold(
+        0, (prev, curr) => prev + _safeNumericValue(curr['jumlahPenyiraman']));
+    num totalPruning = pruningState.dataPoints.fold(
+        0, (prev, curr) => prev + _safeNumericValue(curr['jumlahPruning']));
+    num totalRepotting = repottingState.dataPoints.fold(
+        0, (prev, curr) => prev + _safeNumericValue(curr['jumlahRepotting']));
+    num totalNutrisiMain = nutrisiState.dataPoints.fold(
+        0,
+        (prev, curr) =>
+            prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']));
+    num totalSakit = sakitState.dataPoints
+        .fold(0, (prev, curr) => prev + _safeNumericValue(curr['jumlahSakit']));
+    num totalMati = matiState.dataPoints.fold(
+        0, (prev, curr) => prev + _safeNumericValue(curr['jumlahKematian']));
+    num totalVitamin = vitaminState.dataPoints.fold(
+        0,
+        (prev, curr) =>
+            prev + _safeNumericValue(curr['jumlahPemberianVitamin']));
+    num totalPupuk = pupukState.dataPoints.fold(
+        0,
+        (prev, curr) =>
+            prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']));
+    num totalDisinfektan = disinfektanState.dataPoints.fold(
+        0,
+        (prev, curr) =>
+            prev + _safeNumericValue(curr['jumlahPemberianDisinfektan']));
+    num totalPanen = panenState.dataPoints.fold(
+        0,
+        (prev, curr) =>
+            prev + _safeNumericValue(curr['jumlahLaporanPanenTanaman']));
+
+    // Check if ALL activities are zero (complete empty state)
+    if (totalLaporan == 0 &&
+        totalPenyiraman == 0 &&
+        totalPruning == 0 &&
+        totalRepotting == 0 &&
+        totalNutrisiMain == 0 &&
+        totalSakit == 0 &&
+        totalMati == 0 &&
+        totalVitamin == 0 &&
+        totalPupuk == 0 &&
+        totalDisinfektan == 0 &&
+        totalPanen == 0) {
+      return "Berdasarkan statistik pelaporan pada tanggal $displayRange, tidak ditemukan aktivitas perawatan tanaman atau pelaporan apapun. Mulai lakukan pelaporan dan perawatan rutin untuk memantau kondisi dan pertumbuhan tanaman Anda secara optimal.";
+    }
+
     if (laporanHarianState.dataPoints.isEmpty) {
-      summary.write("tidak ditemukan adanya aktivitas pelaporan.\n\n");
+      summary.write(
+          "tidak ditemukan adanya aktivitas pelaporan harian, namun terdapat beberapa aktivitas lainnya.\n\n");
     } else {
-      num totalLaporan = laporanHarianState.dataPoints.fold(
-          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahLaporan']));
       // Menghitung jumlah hari aktual dalam rentang yang dipilih
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgLaporan = totalLaporan / daysInPeriod; // Pembagi diubah
@@ -940,88 +1001,41 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       }
     }
 
-    final penyiramanState = _chartStates['penyiraman']!;
-    final pruningState = _chartStates['pruning']!;
-    final repottingState = _chartStates['repotting']!;
-    final nutrisiState = _chartStates['nutrisi']!;
-
-    if (!penyiramanState.isLoading && penyiramanState.dataPoints.isNotEmpty) {
-      num totalPenyiraman = penyiramanState.dataPoints.fold(0,
-          (prev, curr) => prev + _safeNumericValue(curr['jumlahPenyiraman']));
+    if (!penyiramanState.isLoading &&
+        penyiramanState.dataPoints.isNotEmpty &&
+        totalPenyiraman > 0) {
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgPenyiraman = totalPenyiraman / daysInPeriod;
       summary.write(
           "Frekuensi penyiraman tanaman terjadi $totalPenyiraman kali dengan rata-rata ${avgPenyiraman.toStringAsFixed(1)} kali per hari. ");
     }
 
-    if (!pruningState.isLoading && pruningState.dataPoints.isNotEmpty) {
-      num totalPruning = pruningState.dataPoints.fold(
-          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahPruning']));
+    if (!pruningState.isLoading &&
+        pruningState.dataPoints.isNotEmpty &&
+        totalPruning > 0) {
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgPruning = totalPruning / daysInPeriod;
       summary.write(
           "Kemudian, frekuensi pruning tanaman terjadi $totalPruning kali dengan rata-rata ${avgPruning.toStringAsFixed(1)} kali per hari.\n\n");
     }
 
-    if (!repottingState.isLoading && repottingState.dataPoints.isNotEmpty) {
-      num totalRepotting = repottingState.dataPoints.fold(
-          0, (prev, curr) => prev + _safeNumericValue(curr['jumlahRepotting']));
+    if (!repottingState.isLoading &&
+        repottingState.dataPoints.isNotEmpty &&
+        totalRepotting > 0) {
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
       double avgRepotting = totalRepotting / daysInPeriod;
       summary.write(
           "Frekuensi repotting tanaman terjadi $totalRepotting kali dengan rata-rata ${avgRepotting.toStringAsFixed(1)} kali per hari.\n\n");
     }
 
-    if (!nutrisiState.isLoading && nutrisiState.dataPoints.isNotEmpty) {
-      num totalNutrisi = nutrisiState.dataPoints.fold(
-          0,
-          (prev, curr) =>
-              prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']));
+    if (!nutrisiState.isLoading &&
+        nutrisiState.dataPoints.isNotEmpty &&
+        totalNutrisiMain > 0) {
       final int daysInPeriod = range.end.difference(range.start).inDays + 1;
-      double avgNutrisi = totalNutrisi / daysInPeriod;
+      double avgNutrisi = totalNutrisiMain / daysInPeriod;
       summary.write(
-          "Frekuensi pemberian nutrisi tanaman terjadi $totalNutrisi kali dengan rata-rata ${avgNutrisi.toStringAsFixed(1)} kali per hari.\n\n");
+          "Frekuensi pemberian nutrisi tanaman terjadi $totalNutrisiMain kali dengan rata-rata ${avgNutrisi.toStringAsFixed(1)} kali per hari.\n\n");
     }
-
-    final sakitState = _chartStates['laporanSakit']!;
-    final matiState = _chartStates['laporanMati']!;
-    final vitaminState = _chartStates['laporanVitamin']!;
-    final pupukState = _chartStates['laporanNutrisi']!;
-    final disinfektanState = _chartStates['laporanDisinfektan']!;
-    final panenState = _chartStates['laporanPanen']!;
-
-    num totalSakit = !sakitState.isLoading
-        ? sakitState.dataPoints.fold(
-            0, (prev, curr) => prev + _safeNumericValue(curr['jumlahSakit']))
-        : 0;
-    num totalMati = !matiState.isLoading
-        ? matiState.dataPoints.fold(
-            0, (prev, curr) => prev + _safeNumericValue(curr['jumlahKematian']))
-        : 0;
-    num totalVitamin = !vitaminState.isLoading
-        ? vitaminState.dataPoints.fold(
-            0,
-            (prev, curr) =>
-                prev + _safeNumericValue(curr['jumlahPemberianVitamin']))
-        : 0;
-    num totalNutrisi = !pupukState.isLoading
-        ? pupukState.dataPoints.fold(
-            0,
-            (prev, curr) =>
-                prev + _safeNumericValue(curr['jumlahKejadianPemberianPupuk']))
-        : 0;
-    num totalDisinfektan = !disinfektanState.isLoading
-        ? disinfektanState.dataPoints.fold(
-            0,
-            (prev, curr) =>
-                prev + _safeNumericValue(curr['jumlahPemberianDisinfektan']))
-        : 0;
-    num totalPanen = !panenState.isLoading
-        ? panenState.dataPoints.fold(
-            0,
-            (prev, curr) =>
-                prev + _safeNumericValue(curr['jumlahLaporanPanenTanaman']))
-        : 0;
 
     final List<String> attentionItems = [];
     if (totalSakit > 0) {
@@ -1033,8 +1047,8 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     if (totalVitamin > 0) {
       attentionItems.add("$totalVitamin laporan pemberian vitamin");
     }
-    if (totalNutrisi > 0) {
-      attentionItems.add("$totalNutrisi laporan pemberian nutrisi");
+    if (totalPupuk > 0) {
+      attentionItems.add("$totalPupuk laporan pemberian nutrisi");
     }
     if (totalDisinfektan > 0) {
       attentionItems.add("$totalDisinfektan laporan pemberian disinfektan");

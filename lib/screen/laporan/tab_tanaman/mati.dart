@@ -69,17 +69,22 @@ class MatiTab extends StatelessWidget {
       return prev + _safeNumericValue(curr['jumlahKematian']);
     });
 
+    // Handle empty state when no deaths occurred
+    if (totalKematian == 0) {
+      return "Berdasarkan statistik $periodeText, tidak ditemukan kasus kematian tanaman. Kondisi ini menunjukkan bahwa tanaman dalam keadaan baik dan terawat dengan optimal.";
+    }
+
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, ditemukan total $totalKematian kasus kematian tanaman. ");
 
-    final penyakitData = statistikPenyebabState.rawData
+    final penyebabData = statistikPenyebabState.rawData
             ?.whereType<Map<String, dynamic>>()
             .toList() ??
         [];
-    if (penyakitData.isNotEmpty) {
+    if (penyebabData.isNotEmpty) {
       summary.write("Rincian penyebab yang ditemukan yaitu ");
 
-      final List<String> penyebabParts = penyakitData.map<String>((item) {
+      final List<String> penyebabParts = penyebabData.map<String>((item) {
         final nama = item['penyebab'] ?? 'N/A';
         final total = _safeNumericValue(item['jumlahKematian']).toInt();
         return "$total kasus $nama";

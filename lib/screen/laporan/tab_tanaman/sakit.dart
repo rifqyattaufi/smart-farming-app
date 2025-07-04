@@ -60,6 +60,11 @@ class SakitTab extends StatelessWidget {
     num totalSakit = laporanSakitState.dataPoints
         .fold(0, (prev, curr) => prev + ((curr['jumlahSakit'] as num?) ?? 0));
 
+    // Handle empty state when no sick plants occurred
+    if (totalSakit == 0) {
+      return "Berdasarkan statistik $periodeText, tidak ditemukan kasus tanaman sakit. Kondisi ini menunjukkan bahwa tanaman dalam keadaan sehat dan terawat dengan baik.";
+    }
+
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, ditemukan total $totalSakit kasus tanaman sakit. ");
 

@@ -79,6 +79,11 @@ class NutrisiTab extends StatelessWidget {
         (prev, curr) =>
             prev + ((curr['jumlahPemberianDisinfektan'] as num?) ?? 0));
 
+    // Handle empty state when no nutrition activities occurred
+    if (totalNutrisi == 0 && totalVitamin == 0 && totalDisinfektan == 0) {
+      return "Berdasarkan statistik pelaporan $periodeText, tidak ditemukan aktivitas pemberian nutrisi. Pastikan untuk memberikan nutrisi yang cukup untuk pertumbuhan tanaman yang optimal.";
+    }
+
     final List<String> summaryParts = [];
     if (totalVitamin > 0) {
       summaryParts.add("total $totalVitamin kasus pemberian vitamin");
