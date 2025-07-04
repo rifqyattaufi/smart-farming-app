@@ -1,2 +1,0 @@
-D:/smart-farming-app/android/app/.cxx/Debug/461m4i3b/armeabi-v7a/CMakeFiles/edit_cache.dir
-D:/smart-farming-app/android/app/.cxx/Debug/461m4i3b/armeabi-v7a/CMakeFiles/rebuild_cache.dir
