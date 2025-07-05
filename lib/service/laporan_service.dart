@@ -864,4 +864,57 @@ class LaporanService {
       };
     }
   }
+
+  /// Get harvest statistics with grade breakdown by jenis budidaya
+  Future<Map<String, dynamic>> getStatistikPanenGradeByJenisBudidaya({
+    required String jenisBudidayaId,
+    String? startDate,
+    String? endDate,
+  }) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json'
+    };
+
+    final queryParams = <String, String>{};
+    if (startDate != null) queryParams['startDate'] = startDate;
+    if (endDate != null) queryParams['endDate'] = endDate;
+
+    final uri = Uri.parse(
+            '${dotenv.env['BASE_URL'] ?? ''}/report/statistik-panen-grade/$jenisBudidayaId')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(uri, headers: headers);
+      final body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'status': true,
+          'message': 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getStatistikPanenGradeByJenisBudidaya(
+          jenisBudidayaId: jenisBudidayaId,
+          startDate: startDate,
+          endDate: endDate,
+        );
+      } else {
+        return {
+          'status': false,
+          'message':
+              body['message'] ?? 'Failed to fetch harvest grade statistics',
+          'details': body,
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }
