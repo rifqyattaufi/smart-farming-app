@@ -265,6 +265,41 @@ class AddKandangScreenState extends State<AddKandangScreen> {
     try {
       if (!_formKey.currentState!.validate()) return;
 
+      // Additional validation for notification data
+      if (notifikasiPanen == 'Aktif') {
+        if (selectedTipePanen.isEmpty ||
+            _waktuNotifikasiPanenController.text.isEmpty) {
+          showAppToast(context, 'Data notifikasi panen tidak lengkap');
+          return;
+        }
+        if (selectedTipePanen == 'Mingguan' && selectedHariPanen == null) {
+          showAppToast(context, 'Pilih hari notifikasi untuk tipe mingguan');
+          return;
+        }
+        if (selectedTipePanen == 'Bulanan' &&
+            _tanggalNotifikasiPanenController.text.isEmpty) {
+          showAppToast(context, 'Pilih tanggal notifikasi untuk tipe bulanan');
+          return;
+        }
+      }
+
+      if (notifikasiNutrisi == 'Aktif') {
+        if (selectedTipeNutrisi.isEmpty ||
+            _waktuNotifikasiNutrisiController.text.isEmpty) {
+          showAppToast(context, 'Data notifikasi nutrisi tidak lengkap');
+          return;
+        }
+        if (selectedTipeNutrisi == 'Mingguan' && selectedHariNutrisi == null) {
+          showAppToast(context, 'Pilih hari notifikasi untuk tipe mingguan');
+          return;
+        }
+        if (selectedTipeNutrisi == 'Bulanan' &&
+            _tanggalNotifikasiNutrisiController.text.isEmpty) {
+          showAppToast(context, 'Pilih tanggal notifikasi untuk tipe bulanan');
+          return;
+        }
+      }
+
       if (_image == null && !widget.isEdit) {
         showAppToast(context, 'Gambar kandang tidak boleh kosong');
         return;
@@ -294,8 +329,16 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                   'isActive': true,
                   'notificationType': notificationType[selectedTipePanen],
                   'scheduledTime': _waktuNotifikasiPanenController.text,
-                  'dayOfMonth': _tanggalNotifikasiPanenController.text,
-                  'dayOfWeek': dayToInt[selectedHariPanen],
+                  'dayOfMonth': selectedTipePanen == 'Bulanan'
+                      ? (int.tryParse(
+                              _tanggalNotifikasiPanenController.text.isEmpty
+                                  ? '0'
+                                  : _tanggalNotifikasiPanenController.text) ??
+                          null)
+                      : null,
+                  'dayOfWeek': selectedTipePanen == 'Mingguan'
+                      ? dayToInt[selectedHariPanen]
+                      : null,
                 }
               : null,
           'vitamin': notifikasiNutrisi == 'Aktif'
@@ -303,8 +346,16 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                   'isActive': true,
                   'notificationType': notificationType[selectedTipeNutrisi],
                   'scheduledTime': _waktuNotifikasiNutrisiController.text,
-                  'dayOfMonth': _tanggalNotifikasiNutrisiController.text,
-                  'dayOfWeek': dayToInt[selectedHariNutrisi],
+                  'dayOfMonth': selectedTipeNutrisi == 'Bulanan'
+                      ? (int.tryParse(
+                              _tanggalNotifikasiNutrisiController.text.isEmpty
+                                  ? '0'
+                                  : _tanggalNotifikasiNutrisiController.text) ??
+                          null)
+                      : null,
+                  'dayOfWeek': selectedTipeNutrisi == 'Mingguan'
+                      ? dayToInt[selectedHariNutrisi]
+                      : null,
                 }
               : null,
         }
@@ -685,7 +736,7 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                                 _showDayOfMonthPicker(
                                         context,
                                         int.tryParse(
-                                            _waktuNotifikasiPanenController
+                                            _tanggalNotifikasiPanenController
                                                 .text))
                                     .then((pickedDay) {
                                   if (pickedDay != null) {
@@ -825,7 +876,7 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                                 _showDayOfMonthPicker(
                                         context,
                                         int.tryParse(
-                                            _waktuNotifikasiNutrisiController
+                                            _tanggalNotifikasiNutrisiController
                                                 .text))
                                     .then((pickedDay) {
                                   if (pickedDay != null) {
