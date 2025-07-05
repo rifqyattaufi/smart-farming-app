@@ -151,12 +151,12 @@ class _PelaporanKematianTernakScreenState
         if (response['status']) {
           showAppToast(
             context,
-            'Berhasil mengirim laporan Kematian ${(list[i]?['name']?['name'] ?? '')}',
+            'Berhasil mengirim laporan Kematian ${(list[i]?['name'] ?? '')}',
             isError: false,
           );
         } else {
           showAppToast(context,
-              'Gagal mengirim laporan Kematian ${(list[i]?['name']?['name'] ?? '')}: ${response['message']}');
+              'Gagal mengirim laporan Kematian ${(list[i]?['name'] ?? '')}: ${response['message']}');
         }
       }
 
