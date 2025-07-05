@@ -35,6 +35,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _imageUrl;
+  String? _userRole;
 
   File? _selectedImage;
 
@@ -102,7 +103,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
     try {
       final data = {
-        'role': roleMap[selectedLocation] ?? '',
+        'role': _userRole == 'pjawab'
+            ? (roleMap[selectedLocation] ?? '')
+            : (_userRole ?? ''), // Use current user role if not pjawab
         'name': _namaController.text,
         'email': _emailController.text,
         'phone': _nomorController.text,
@@ -226,10 +229,24 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
   @override
   void initState() {
+    super.initState();
+    _getUserRole();
     if (widget.isEdit ?? false) {
       _fetchData();
     }
-    super.initState();
+  }
+
+  Future<void> _getUserRole() async {
+    try {
+      final user = await _authService.getUser();
+      if (user != null) {
+        setState(() {
+          _userRole = user['role'];
+        });
+      }
+    } catch (e) {
+      // Handle error silently or show toast if needed
+    }
   }
 
   @override
@@ -244,10 +261,12 @@ class _AddUserScreenState extends State<AddUserScreen> {
             titleSpacing: 0,
             elevation: 0,
             toolbarHeight: 80,
-            title: const Header(
+            title: Header(
                 headerType: HeaderType.back,
                 title: 'Manajemen Pengguna',
-                greeting: 'Tambah Pengguna'),
+                greeting: (widget.isEdit ?? false)
+                    ? 'Edit Data Pengguna'
+                    : 'Tambah Data Pengguna'),
           ),
         ),
         body: SafeArea(
@@ -273,28 +292,29 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    DropdownFieldWidget(
-                      key: const Key('role_dropdown'),
-                      label: "Pilih role",
-                      hint: "Pilih role",
-                      items: const [
-                        "Penanggung Jawab",
-                        "Petugas Pelaporan",
-                        "Inventor RFC"
-                      ],
-                      selectedValue: selectedLocation,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedLocation = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Role tidak boleh kosong';
-                        }
-                        return null;
-                      },
-                    ),
+                    if (_userRole == 'pjawab')
+                      DropdownFieldWidget(
+                        key: const Key('role_dropdown'),
+                        label: "Pilih role",
+                        hint: "Pilih role",
+                        items: const [
+                          "Penanggung Jawab",
+                          "Petugas Pelaporan",
+                          "Inventor RFC"
+                        ],
+                        selectedValue: selectedLocation,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedLocation = value;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Role tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      ),
                     InputFieldWidget(
                         key: const Key('nama_pengguna_input'),
                         label: "Nama pengguna",
@@ -314,6 +334,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       label: "Email pengguna",
                       hint: "Contoh: example@mail.com",
                       controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
                       isDisabled: (widget.isEdit ?? false) && widget.id != null,
                       isGrayed: (widget.isEdit ?? false) && widget.id != null,
                       validator: (value) {
@@ -334,6 +355,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       label: "Nomor telepon",
                       hint: "Contoh: 08**********",
                       controller: _nomorController,
+                      keyboardType: TextInputType.phone,
                       isDisabled: (widget.isEdit ?? false) && widget.id != null,
                       isGrayed: (widget.isEdit ?? false) && widget.id != null,
                       validator: (value) {

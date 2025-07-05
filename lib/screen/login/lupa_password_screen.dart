@@ -83,6 +83,7 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
                         label: "Email pengguna",
                         hint: "Contoh: example@mail.com",
                         controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Email tidak boleh kosong';
@@ -107,16 +108,15 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            buttonText: 'Selanjutnya',
-            onPressed: () {
-              _submitForm();
-            },
-            backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
-            isLoading: _isLoading,
-            key: const Key('submit_button')
-          ),
+              buttonText: 'Selanjutnya',
+              onPressed: () {
+                _submitForm();
+              },
+              backgroundColor: green1,
+              textStyle: semibold16,
+              textColor: white,
+              isLoading: _isLoading,
+              key: const Key('submit_button')),
         ),
       ),
     );
