@@ -23,10 +23,10 @@ class AddSatuanScreen extends StatefulWidget {
   });
 
   @override
-  _AddSatuanScreenState createState() => _AddSatuanScreenState();
+  AddSatuanScreenState createState() => AddSatuanScreenState();
 }
 
-class _AddSatuanScreenState extends State<AddSatuanScreen> {
+class AddSatuanScreenState extends State<AddSatuanScreen> {
   final SatuanService _satuanService = SatuanService();
 
   final TextEditingController _nameController = TextEditingController();

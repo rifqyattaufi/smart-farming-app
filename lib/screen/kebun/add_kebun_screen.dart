@@ -24,10 +24,10 @@ class AddKebunScreen extends StatefulWidget {
       {super.key, this.onKebunAdded, this.isEdit = false, this.idKebun});
 
   @override
-  _AddKebunScreenState createState() => _AddKebunScreenState();
+  AddKebunScreenState createState() => AddKebunScreenState();
 }
 
-class _AddKebunScreenState extends State<AddKebunScreen> {
+class AddKebunScreenState extends State<AddKebunScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
   final ScheduleUnitNotificationService _scheduleUnitNotification =

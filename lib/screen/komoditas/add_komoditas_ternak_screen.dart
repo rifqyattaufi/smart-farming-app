@@ -26,11 +26,11 @@ class AddKomoditasTernakScreen extends StatefulWidget {
       this.idKomoditas});
 
   @override
-  _AddKomoditasTernakScreenState createState() =>
-      _AddKomoditasTernakScreenState();
+  AddKomoditasTernakScreenState createState() =>
+      AddKomoditasTernakScreenState();
 }
 
-class _AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
+class AddKomoditasTernakScreenState extends State<AddKomoditasTernakScreen> {
   final SatuanService _satuanService = SatuanService();
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final ImageService _imageService = ImageService();

@@ -21,10 +21,10 @@ class AddHamaScreen extends StatefulWidget {
   });
 
   @override
-  _AddHamaScreenState createState() => _AddHamaScreenState();
+  AddHamaScreenState createState() => AddHamaScreenState();
 }
 
-class _AddHamaScreenState extends State<AddHamaScreen> {
+class AddHamaScreenState extends State<AddHamaScreen> {
   final HamaService _hamaService = HamaService();
 
   final TextEditingController _nameController = TextEditingController();

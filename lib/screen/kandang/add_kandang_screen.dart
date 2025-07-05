@@ -25,10 +25,10 @@ class AddKandangScreen extends StatefulWidget {
       {super.key, this.onKandangAdded, this.isEdit = false, this.idKandang});
 
   @override
-  _AddKandangScreenState createState() => _AddKandangScreenState();
+  AddKandangScreenState createState() => AddKandangScreenState();
 }
 
-class _AddKandangScreenState extends State<AddKandangScreen> {
+class AddKandangScreenState extends State<AddKandangScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
   final ScheduleUnitNotificationService _scheduleUnitNotification =

@@ -21,10 +21,10 @@ class AddKategoriInvScreen extends StatefulWidget {
   });
 
   @override
-  _AddKategoriInvScreenState createState() => _AddKategoriInvScreenState();
+  AddKategoriInvScreenState createState() => AddKategoriInvScreenState();
 }
 
-class _AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
+class AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
   final KategoriInvService _kategoriInvService = KategoriInvService();
 
   final TextEditingController _nameController = TextEditingController();
