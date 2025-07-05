@@ -25,11 +25,11 @@ class AddKomoditasTanamanScreen extends StatefulWidget {
       this.idKomoditas});
 
   @override
-  _AddKomoditasTanamanScreenState createState() =>
-      _AddKomoditasTanamanScreenState();
+  AddKomoditasTanamanScreenState createState() =>
+      AddKomoditasTanamanScreenState();
 }
 
-class _AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
+class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
   final SatuanService _satuanService = SatuanService();
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final ImageService _imageService = ImageService();

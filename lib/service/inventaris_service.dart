@@ -536,4 +536,42 @@ class InventarisService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> getPemakaianInventarisByLaporanId(
+      String laporanId) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {'Authorization': 'Bearer $resolvedToken'};
+    final url = Uri.parse('$baseUrl/laporan/$laporanId/pemakaian');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {
+          'status': true,
+          'message': body['message'] ?? 'success',
+          'data': body['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await getPemakaianInventarisByLaporanId(laporanId);
+      } else {
+        final body = response.body;
+        return {
+          'status': false,
+          'message': body.isNotEmpty
+              ? json.decode(body)['message']
+              : 'Failed to load data',
+          'data': null
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+        'data': null
+      };
+    }
+  }
 }

@@ -25,10 +25,10 @@ class AddTanamanScreen extends StatefulWidget {
   });
 
   @override
-  _AddTanamanScreenState createState() => _AddTanamanScreenState();
+  AddTanamanScreenState createState() => AddTanamanScreenState();
 }
 
-class _AddTanamanScreenState extends State<AddTanamanScreen> {
+class AddTanamanScreenState extends State<AddTanamanScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final ImageService _imageService = ImageService();
 

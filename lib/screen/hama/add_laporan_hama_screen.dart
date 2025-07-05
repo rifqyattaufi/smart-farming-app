@@ -21,10 +21,10 @@ class AddLaporanHamaScreen extends StatefulWidget {
   const AddLaporanHamaScreen({super.key, this.data = const {}});
 
   @override
-  _AddLaporanHamaScreenState createState() => _AddLaporanHamaScreenState();
+  AddLaporanHamaScreenState createState() => AddLaporanHamaScreenState();
 }
 
-class _AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
+class AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
   final HamaService _hamaService = HamaService();
   final ImageService _imageService = ImageService();
   final LaporanService _laporanService = LaporanService();

@@ -29,10 +29,10 @@ class AddInventarisScreen extends StatefulWidget {
   });
 
   @override
-  _AddInventarisScreenState createState() => _AddInventarisScreenState();
+  AddInventarisScreenState createState() => AddInventarisScreenState();
 }
 
-class _AddInventarisScreenState extends State<AddInventarisScreen> {
+class AddInventarisScreenState extends State<AddInventarisScreen> {
   final InventarisService _inventarisService = InventarisService();
   final KategoriInvService _kategoriInvService = KategoriInvService();
   final SatuanService _satuanService = SatuanService();

@@ -21,10 +21,10 @@ class AddTernakScreen extends StatefulWidget {
       {super.key, this.onTernakAdded, this.isEdit = false, this.idTernak});
 
   @override
-  _AddTernakScreenState createState() => _AddTernakScreenState();
+  AddTernakScreenState createState() => AddTernakScreenState();
 }
 
-class _AddTernakScreenState extends State<AddTernakScreen> {
+class AddTernakScreenState extends State<AddTernakScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final ImageService _imageService = ImageService();
 

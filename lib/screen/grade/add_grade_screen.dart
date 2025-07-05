@@ -23,10 +23,10 @@ class AddGradeScreen extends StatefulWidget {
   });
 
   @override
-  _AddGradeScreenState createState() => _AddGradeScreenState();
+  AddGradeScreenState createState() => AddGradeScreenState();
 }
 
-class _AddGradeScreenState extends State<AddGradeScreen> {
+class AddGradeScreenState extends State<AddGradeScreen> {
   final GradeService _gradeService = GradeService();
 
   final TextEditingController _nameController = TextEditingController();

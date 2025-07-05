@@ -18,11 +18,11 @@ class AddPemakaianInventarisScreen extends StatefulWidget {
   const AddPemakaianInventarisScreen({super.key});
 
   @override
-  _AddPemakaianInventarisScreenState createState() =>
-      _AddPemakaianInventarisScreenState();
+  AddPemakaianInventarisScreenState createState() =>
+      AddPemakaianInventarisScreenState();
 }
 
-class _AddPemakaianInventarisScreenState
+class AddPemakaianInventarisScreenState
     extends State<AddPemakaianInventarisScreen> {
   final ImageService _imageService = ImageService();
   final LaporanService _laporanService = LaporanService();

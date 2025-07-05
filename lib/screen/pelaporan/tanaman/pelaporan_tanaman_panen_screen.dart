@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/image_service.dart';
@@ -159,6 +160,26 @@ class _PelaporanTanamanPanenScreenState
     });
   }
 
+  List<String> _getAvailableGradesForIndex(int currentIndex) {
+    // Get all grade names that are already selected (excluding current index)
+    final selectedGradeIds = _rincianGradeList
+        .asMap()
+        .entries
+        .where(
+            (entry) => entry.key != currentIndex && entry.value.gradeId != null)
+        .map((entry) => entry.value.gradeId)
+        .toSet();
+
+    // Return grades that are not yet selected, plus the currently selected one for this index
+    final currentGradeId = _rincianGradeList[currentIndex].gradeId;
+    return _gradeMasterList
+        .where((grade) =>
+            !selectedGradeIds.contains(grade['id']) ||
+            grade['id'] == currentGradeId)
+        .map((grade) => grade['nama'].toString())
+        .toList();
+  }
+
   double _calculateTotalRealisasiPanen() {
     double total = 0.0;
 
@@ -294,6 +315,9 @@ class _PelaporanTanamanPanenScreenState
       _showError('Harap lengkapi semua field yang wajib diisi.');
       return;
     }
+
+    // Validate duplicate grade selection
+    final selectedGradeIds = <String>[];
     for (var rincian in _rincianGradeList) {
       if (rincian.gradeId == null || rincian.jumlahController.text.isEmpty) {
         _showError(
@@ -305,6 +329,13 @@ class _PelaporanTanamanPanenScreenState
         _showError('Jumlah pada rincian grade harus angka positif.');
         return;
       }
+
+      // Check for duplicate grades
+      if (selectedGradeIds.contains(rincian.gradeId)) {
+        _showError('Grade yang sama tidak boleh dipilih lebih dari sekali.');
+        return;
+      }
+      selectedGradeIds.add(rincian.gradeId!);
     }
 
     if (_isLoading) return;
@@ -374,6 +405,9 @@ class _PelaporanTanamanPanenScreenState
               break;
             }
           }
+
+          // Navigate to home-petugas using GoRouter
+          context.go('/home-petugas');
         } else {
           _showError(response['message'] ?? 'Gagal mengirim laporan panen.');
         }
@@ -523,43 +557,6 @@ class _PelaporanTanamanPanenScreenState
                             return null;
                           },
                         ),
-                        InputFieldWidget(
-                          label: "Estimasi total panen (sebelum panen)",
-                          hint: "Contoh: 100",
-                          controller: _estimasiPanenController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          validator: (value) {
-                            if (value != null &&
-                                value.isNotEmpty &&
-                                double.tryParse(value) == null) {
-                              return 'Harus berupa angka';
-                            }
-                            if (value != null &&
-                                value.isNotEmpty &&
-                                double.tryParse(value)! <= 0) {
-                              return 'Estimasi panen harus lebih dari 0';
-                            }
-                            return null;
-                          },
-                        ),
-                        InputFieldWidget(
-                          key: const Key('gagal_panen'),
-                          label: "Kuantitas gagal panen (jika ada)",
-                          hint: "Contoh: 5",
-                          controller: _gagalPanenController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          validator: (value) {
-                            if (value != null &&
-                                value.isNotEmpty &&
-                                double.tryParse(value) == null) {
-                              return 'Harus berupa angka';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) => setState(() {}),
-                        ),
                         DropdownFieldWidget(
                           key: const Key('satuan_panen'),
                           label: "Satuan panen",
@@ -577,6 +574,63 @@ class _PelaporanTanamanPanenScreenState
                             return null;
                           },
                         ),
+                        InputFieldWidget(
+                          label: "Estimasi total panen (sebelum panen)",
+                          hint:
+                              "Contoh: 100${satuanData != null ? ' ${satuanData!['nama']}' : ''}",
+                          controller: _estimasiPanenController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          suffixIcon: satuanData != null
+                              ? Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    satuanData!['nama'],
+                                    style: medium14.copyWith(color: dark2),
+                                  ),
+                                )
+                              : null,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value) == null) {
+                              return 'Harus berupa angka';
+                            }
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value)! <= 0) {
+                              return 'Estimasi panen harus lebih dari 0';
+                            }
+                            return null;
+                          },
+                        ),
+                        InputFieldWidget(
+                          key: const Key('gagal_panen'),
+                          label: "Kuantitas gagal panen (jika ada)",
+                          hint:
+                              "Contoh: 5${satuanData != null ? ' ${satuanData!['nama']}' : ''}",
+                          controller: _gagalPanenController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          suffixIcon: satuanData != null
+                              ? Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    satuanData!['nama'],
+                                    style: medium14.copyWith(color: dark2),
+                                  ),
+                                )
+                              : null,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                double.tryParse(value) == null) {
+                              return 'Harus berupa angka';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => setState(() {}),
+                        ),
                         ImagePickerWidget(
                           key: const Key('image_picker_panen'),
                           label: "Unggah bukti hasil panen",
@@ -590,7 +644,7 @@ class _PelaporanTanamanPanenScreenState
                           label: "Catatan/jurnal pelaporan",
                           hint: "Keterangan",
                           controller: _catatanController,
-                          maxLines: 10,
+                          maxLines: 5,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Catatan wajib diisi';
@@ -636,10 +690,7 @@ class _PelaporanTanamanPanenScreenState
                                       key: rincian.gradeFieldKey,
                                       label: 'Pilih Grade Kualitas',
                                       hint: 'Pilih Grade',
-                                      items: _gradeMasterList
-                                          .map((grade) =>
-                                              grade['nama'].toString())
-                                          .toList(),
+                                      items: _getAvailableGradesForIndex(index),
                                       selectedValue: rincian.gradeNama,
                                       onChanged: (String? selectedNamaGrade) {
                                         setState(() {
@@ -666,12 +717,25 @@ class _PelaporanTanamanPanenScreenState
                                     const SizedBox(height: 10),
                                     InputFieldWidget(
                                       key: rincian.jumlahFieldKey,
-                                      label: "Jumlah kuantitas grade ini",
-                                      hint: "Contoh: 5",
+                                      label:
+                                          "Jumlah kuantitas grade ini ${satuanData != null ? '(${satuanData!['nama']})' : ''}",
+                                      hint:
+                                          "Contoh: 5${satuanData != null ? ' ${satuanData!['nama']}' : ''}",
                                       controller: rincian.jumlahController,
                                       keyboardType:
                                           const TextInputType.numberWithOptions(
                                               decimal: true),
+                                      suffixIcon: satuanData != null
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
+                                              child: Text(
+                                                satuanData!['nama'],
+                                                style: medium14.copyWith(
+                                                    color: dark2),
+                                              ),
+                                            )
+                                          : null,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Jumlah wajib diisi';
