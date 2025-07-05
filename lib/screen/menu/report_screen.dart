@@ -326,6 +326,76 @@ class _ReportScreenState extends State<ReportScreen> {
                 }
               },
             ),
+            const SizedBox(height: 24),
+            // Laporan Grade Panen Section
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: green4,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: () {
+                  context.push('/hasil-panen-with-grades').then((_) {
+                    _fetchData(isRefresh: true);
+                  });
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: green2,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.analytics_outlined,
+                        size: 28,
+                        color: green1,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Laporan Grade Panen',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: green1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Lihat hasil panen berdasarkan grade kualitas',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: green1.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: green1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             () {
               final hamaStats = _calculateHamaStatistics();

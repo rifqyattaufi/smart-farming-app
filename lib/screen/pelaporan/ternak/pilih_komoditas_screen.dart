@@ -34,7 +34,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
 
   Future<void> _fetchData() async {
     try {
-      final response = await _komoditasService.getKomoditasByTipe('hewan');
+      final response = await _komoditasService.getKomoditasByTipe(tipe: 'hewan');
       if (response['status']) {
         setState(() {
           _listKomoditas = response['data'];

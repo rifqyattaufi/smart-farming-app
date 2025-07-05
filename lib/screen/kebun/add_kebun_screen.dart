@@ -346,8 +346,7 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                       ? (int.tryParse(
                               _tanggalNotifikasiPanenController.text.isEmpty
                                   ? '0'
-                                  : _tanggalNotifikasiPanenController.text) ??
-                          null)
+                                  : _tanggalNotifikasiPanenController.text))
                       : null,
                   'dayOfWeek': selectedTipePanen == 'Mingguan'
                       ? dayToInt[selectedHariPanen]
@@ -363,8 +362,7 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                       ? (int.tryParse(
                               _tanggalNotifikasiNutrisiController.text.isEmpty
                                   ? '0'
-                                  : _tanggalNotifikasiNutrisiController.text) ??
-                          null)
+                                  : _tanggalNotifikasiNutrisiController.text))
                       : null,
                   'dayOfWeek': selectedTipeNutrisi == 'Mingguan'
                       ? dayToInt[selectedHariNutrisi]

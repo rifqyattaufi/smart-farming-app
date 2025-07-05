@@ -136,7 +136,7 @@ class _KomoditasScreenState extends State<KomoditasScreen> {
 
     Map<String, dynamic> response;
     try {
-      response = await _komoditasService.getKomoditasByTipe(tipe,
+      response = await _komoditasService.getKomoditasByTipe(tipe: tipe,
           page: page, limit: _pageSize);
     } catch (e) {
       if (mounted) {
