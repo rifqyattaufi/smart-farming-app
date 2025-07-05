@@ -149,8 +149,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
           }
         }
       } else {
-        data['password'] = _emailController.text;
-        data['confirmPassword'] = _emailController.text;
+        data['password'] = _emailController.text.toLowerCase();
+        data['confirmPassword'] = _emailController.text.toLowerCase();
         response = await _authService.register(
           data,
         );
@@ -381,6 +381,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           const SizedBox(height: 4),
                           Text(
                             '- Password untuk pengguna baru adalah email pengguna.\n'
+                            '- Password akan disimpan dalam huruf kecil semua.\n'
                             '- Pastikan untuk mengubah password setelah akun dibuat.',
                             style: regular12.copyWith(color: dark1),
                           ),
