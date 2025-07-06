@@ -394,7 +394,7 @@ class _HasilPanenWithGradesScreenState
                   buttonText: _selectedKomoditasName ?? 'Pilih Komoditas',
                   backgroundColor: _selectedKomoditasId != null ? green1 : grey,
                   textColor: _selectedKomoditasId != null ? white : dark1,
-                  textStyle: semibold16.copyWith(
+                  textStyle: semibold14.copyWith(
                       color: _selectedKomoditasId != null ? white : dark1),
                 ),
               ),
@@ -407,8 +407,8 @@ class _HasilPanenWithGradesScreenState
                       : 'Pilih Tanggal',
                   backgroundColor: _startDate != null ? green1 : grey,
                   textColor: _startDate != null ? white : dark1,
-                  textStyle: semibold16.copyWith(
-                      color: _selectedKomoditasId != null ? white : dark1),
+                  textStyle: semibold14.copyWith(
+                      color: _startDate != null ? white : dark1),
                 ),
               ),
             ],

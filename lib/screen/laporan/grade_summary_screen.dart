@@ -269,7 +269,7 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
             backgroundColor: _startDate != null ? green1 : grey,
             textColor: _startDate != null ? white : dark1,
             textStyle:
-                semibold16.copyWith(color: _startDate != null ? white : dark1),
+                semibold14.copyWith(color: _startDate != null ? white : dark1),
           ),
         ],
       ),
