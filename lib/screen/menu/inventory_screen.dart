@@ -330,7 +330,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                       'name': item['nama'] ?? 'N/A',
                                       'icon': item['gambar'] as String?,
                                       'category':
-                                          'Stok: ${formatNumber(item['jumlah'])} ${item['lambangSatuan'] ?? ''}',
+                                          'Stok: ${formatNumber(item['jumlah'] ?? 0)} ${item['lambangSatuan'] ?? ''}',
                                     })
                                 .toList(),
                             type: 'basic',

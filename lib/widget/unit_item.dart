@@ -7,6 +7,7 @@ class UnitItem extends StatelessWidget {
   final String? unitDescription;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final bool showActions; // New parameter to control button visibility
 
   const UnitItem({
     super.key,
@@ -15,6 +16,7 @@ class UnitItem extends StatelessWidget {
     this.unitDescription,
     required this.onEdit,
     required this.onDelete,
+    this.showActions = true, // Default to true for backward compatibility
   });
 
   @override
@@ -31,6 +33,7 @@ class UnitItem extends StatelessWidget {
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 8),
                     Text(
                         '$unitName${unitSymbol != null ? ' - $unitSymbol' : ''}',
                         style: medium14.copyWith(color: dark1)),
@@ -44,18 +47,21 @@ class UnitItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
+                    const SizedBox(height: 8),
                   ],
                 )),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: dark1),
-                  onPressed: onDelete,
-                  key: const Key('delete_unit_button'),
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit_outlined, color: dark1),
-                  onPressed: onEdit,
-                  key: const Key('edit_unit_button'),
-                ),
+                if (showActions) ...[
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, color: dark1),
+                    onPressed: onDelete,
+                    key: const Key('delete_unit_button'),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit_outlined, color: dark1),
+                    onPressed: onEdit,
+                    key: const Key('edit_unit_button'),
+                  ),
+                ],
               ],
             ),
           ),

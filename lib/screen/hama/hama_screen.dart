@@ -671,7 +671,9 @@ class _HamaScreenState extends State<HamaScreen> {
           return UnitItem(
             key: Key('jenis_hama_${jenisHama['id'] ?? 'unknown'}'),
             unitName: jenisHama['nama'] ?? 'N/A',
+            showActions: _userRole == 'pjawab', // Only show actions for pjawab
             onEdit: () {
+              if (_userRole != 'pjawab') return; // Guard clause
               final id = jenisHama['id'] as String?;
               if (id != null) {
                 context.push('/tambah-hama',
@@ -684,6 +686,7 @@ class _HamaScreenState extends State<HamaScreen> {
               }
             },
             onDelete: () async {
+              if (_userRole != 'pjawab') return; // Guard clause
               final id = jenisHama['id'] as String?;
               if (id == null) return;
 
