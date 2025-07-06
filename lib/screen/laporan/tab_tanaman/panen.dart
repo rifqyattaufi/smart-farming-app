@@ -331,8 +331,12 @@ class PanenTab extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                Icon(Icons.category_outlined,
-                    size: 48, color: dark2.withValues(alpha: 0.5)),
+                Image.asset(
+                  'assets/icons/set/fruitbag-filled.png',
+                  width: 48,
+                  height: 48,
+                  color: dark2.withValues(alpha: 0.5),
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Tidak ada data grade',
