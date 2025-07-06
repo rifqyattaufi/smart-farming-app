@@ -11,6 +11,7 @@ import 'package:smart_farming_app/utils/app_utils.dart';
 class PanenTab extends StatelessWidget {
   final ChartDataState laporanPanenState;
   final ChartDataState panenKomoditasState;
+  final ChartDataState panenGradeState;
   final RiwayatDataState riwayatPanenState;
 
   final Future<void> Function() onDateIconPressed;
@@ -26,6 +27,7 @@ class PanenTab extends StatelessWidget {
     super.key,
     required this.laporanPanenState,
     required this.panenKomoditasState,
+    required this.panenGradeState,
     required this.riwayatPanenState,
     required this.onDateIconPressed,
     required this.selectedChartFilterType,
@@ -99,6 +101,56 @@ class PanenTab extends StatelessWidget {
       summary.write(".");
     } else if (!panenKomoditasState.isLoading) {
       summary.write("Belum ada hasil panen yang tercatat untuk periode ini.");
+    }
+
+    // Add grade information if available
+    if (panenGradeState.dataPoints.isNotEmpty && !panenGradeState.isLoading) {
+      final gradeData = panenGradeState.dataPoints;
+      final totalGrades = gradeData.length;
+
+      if (totalGrades > 0) {
+        // Calculate total harvest for grade
+        final totalGradeHarvest = gradeData.fold<double>(0.0, (sum, grade) {
+          final value = grade['value'];
+          if (value is num) return sum + value.toDouble();
+          return sum;
+        });
+
+        summary.write(
+            " Hasil panen terbagi dalam $totalGrades jenis grade dengan total ${totalGradeHarvest.toStringAsFixed(totalGradeHarvest.truncateToDouble() == totalGradeHarvest ? 0 : 1)} ");
+
+        // Get unit from first grade data
+        final firstGradeUnit = gradeData.isNotEmpty
+            ? (gradeData.first['unit']?.toString() ?? '')
+            : '';
+        if (firstGradeUnit.isNotEmpty) {
+          summary.write(firstGradeUnit);
+        }
+        summary.write(": ");
+
+        final gradeList = gradeData.map((grade) {
+          final label = grade['label']?.toString() ?? '';
+          final value =
+              grade['value'] is num ? (grade['value'] as num).toDouble() : 0.0;
+          final unit = grade['unit']?.toString() ?? '';
+
+          // Calculate percentage
+          final percentage =
+              totalGradeHarvest > 0 ? (value / totalGradeHarvest * 100) : 0.0;
+
+          return "grade $label ${value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1)} $unit (${percentage.toStringAsFixed(1)}%)";
+        }).toList();
+
+        if (gradeList.length <= 3) {
+          summary.write(gradeList.join(', '));
+        } else {
+          summary.write(
+              "${gradeList.take(2).join(', ')}, dan ${gradeList.length - 2} grade lainnya");
+        }
+        summary.write(".");
+      }
+    } else if (!panenGradeState.isLoading && panenGradeState.error == null) {
+      summary.write(" Belum ada data distribusi grade untuk periode ini.");
     }
 
     return summary.toString();
@@ -236,6 +288,164 @@ class PanenTab extends StatelessWidget {
     );
   }
 
+  Widget _buildGradeDetailSection() {
+    if (panenGradeState.isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    if (panenGradeState.error != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(
+          child: Text(
+            'Error memuat detail grade: ${panenGradeState.error}',
+            style: regular12.copyWith(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    final gradeData = panenGradeState.dataPoints;
+
+    if (gradeData.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/icons/set/fruitbag-filled.png',
+                  width: 48,
+                  height: 48,
+                  color: dark2.withValues(alpha: 0.5),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Tidak ada data grade',
+                  style: medium14.copyWith(color: dark2),
+                ),
+                Text(
+                  'Belum ada laporan panen dengan grade untuk periode ini',
+                  style: regular12.copyWith(color: dark2),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Calculate total harvest for percentage calculation
+    final totalHarvest = gradeData.fold<double>(0.0, (sum, grade) {
+      final value = grade['value'];
+      if (value is num) return sum + value.toDouble();
+      return sum;
+    });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child:
+              Text('Detail Grade Panen', style: bold18.copyWith(color: dark1)),
+        ),
+        ...gradeData.asMap().entries.map((entry) {
+          final index = entry.key;
+          final grade = entry.value;
+          final isLast = index == gradeData.length - 1;
+
+          final label = grade['label']?.toString() ?? 'N/A';
+          final value =
+              grade['value'] is num ? (grade['value'] as num).toDouble() : 0.0;
+          final unit = grade['unit']?.toString() ?? '';
+          final commodity = grade['commodity']?.toString() ?? '';
+
+          // Calculate percentage
+          final percentage =
+              totalHarvest > 0 ? (value / totalHarvest * 100) : 0.0;
+
+          // Define colors for grade indicators
+          final gradeColors = [green1, green2, yellow, yellow2, blue1, red];
+          final gradeColor = gradeColors[index % gradeColors.length];
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: isLast
+                  ? null
+                  : Border(
+                      bottom: BorderSide(
+                          color: dark4.withValues(alpha: 0.3), width: 0.5),
+                    ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: gradeColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: bold14.copyWith(color: dark1),
+                      ),
+                      if (commodity.isNotEmpty)
+                        Text(
+                          commodity,
+                          style: regular12.copyWith(color: dark2),
+                        ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1)} $unit',
+                      style: bold14.copyWith(color: green1),
+                    ),
+                    Text(
+                      '${percentage.toStringAsFixed(1)}% dari total',
+                      style: regular12.copyWith(color: dark2),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -286,6 +496,18 @@ class PanenTab extends StatelessWidget {
             labelKeyForMapping: 'namaKomoditas',
             showFilterControls: false,
           ),
+
+          const SizedBox(height: 12),
+          ChartSection(
+            title: 'Distribusi Grade Panen',
+            chartState: panenGradeState,
+            valueKeyForMapping: 'value',
+            labelKeyForMapping: 'label',
+            showFilterControls: false,
+          ),
+
+          const SizedBox(height: 12),
+          _buildGradeDetailSection(),
 
           // Rangkuman Section
           Padding(

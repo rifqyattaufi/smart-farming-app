@@ -149,8 +149,7 @@ class AddKategoriInvScreenState extends State<AddKategoriInvScreen> {
             buttonText:
                 widget.isUpdate ? 'Simpan Perubahan' : 'Tambah Kategori',
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: isLoading,
             key: const Key('submit_kategori_inventaris'),
           ),

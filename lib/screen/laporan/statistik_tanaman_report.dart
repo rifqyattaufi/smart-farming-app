@@ -6,6 +6,7 @@ import 'package:smart_farming_app/utils/app_utils.dart';
 import 'package:smart_farming_app/model/chart_data_state.dart';
 import 'package:smart_farming_app/service/report_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
+import 'package:smart_farming_app/service/laporan_service.dart';
 import 'package:smart_farming_app/utils/custom_picker_utils.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/harian.dart';
 import 'package:smart_farming_app/screen/laporan/tab_tanaman/info.dart';
@@ -28,6 +29,7 @@ class StatistikTanamanReport extends StatefulWidget {
 class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final ReportService _reportService = ReportService();
+  final LaporanService _laporanService = LaporanService();
 
   Map<String, dynamic>? _tanamanReport;
   List<dynamic> _kebunList = [];
@@ -56,6 +58,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     'laporanDisinfektan': ChartDataState<List<dynamic>>(),
     'laporanPanen': ChartDataState<List<dynamic>>(),
     'panenKomoditas': ChartDataState<List<dynamic>>(),
+    'panenGrade': ChartDataState<List<dynamic>>(),
   };
 
   final Map<String, RiwayatDataState<List<dynamic>>> _riwayatStates = {
@@ -564,12 +567,7 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   startDate: start,
                   endDate: end),
         ),
-        // _fetchAndProcessRiwayatData(
-        //     riwayatKey: 'umum',
-        //     defaultErrorMessage: 'Gagal memuat riwayat pelaporan umum',
-        //     fetchFunction: () =>
-        //         _reportService.getRiwayatLaporanUmumJenisBudidaya(
-        //             jenisBudidayaId: widget.idTanaman!, limit: 3, page: 1)),
+        _fetchPanenGradeData(),
         _fetchAndProcessRiwayatData(
             riwayatKey: 'umum',
             defaultErrorMessage: 'Gagal memuat riwayat pelaporan umum',
@@ -1079,6 +1077,60 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
     return summary.toString().trim();
   }
 
+  Future<void> _fetchPanenGradeData() async {
+    if (!mounted ||
+        widget.idTanaman == null ||
+        _selectedChartDateRange == null) {
+      return;
+    }
+
+    final gradeState = _chartStates['panenGrade'];
+    if (gradeState == null) return;
+
+    setState(() => gradeState.setLoading());
+
+    try {
+      final response =
+          await _laporanService.getStatistikPanenGradeByJenisBudidaya(
+        jenisBudidayaId: widget.idTanaman!,
+        startDate:
+            _selectedChartDateRange!.start.toIso8601String().split('T')[0],
+        endDate: _selectedChartDateRange!.end.toIso8601String().split('T')[0],
+      );
+
+      if (mounted) {
+        if (response['status'] == true && response['data'] != null) {
+          final data = response['data'] as Map<String, dynamic>;
+          final chartData = data['chartData'] as List<dynamic>? ?? [];
+
+          // Convert to chart data points with proper double handling
+          final dataPoints = chartData
+              .map((item) => {
+                    'label': item['label']?.toString() ?? '',
+                    'value': _safeNumericValue(item['value']),
+                    'commodity': item['commodity']?.toString() ?? '',
+                    'unit': item['unit']?.toString() ?? '',
+                  })
+              .toList();
+
+          final labels =
+              chartData.map((item) => item['label']?.toString() ?? '').toList();
+
+          gradeState.setData(dataPoints, labels, chartData);
+        } else {
+          gradeState.setError(response['message'] as String? ??
+              'Gagal memuat data grade panen');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        gradeState.setError('Error grade panen: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) setState(() {}); // Trigger rebuild
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1127,9 +1179,14 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
                   ),
                   PanenTab(
                     key: const Key('panenTab'),
-                    laporanPanenState: _chartStates['laporanPanen']!,
-                    panenKomoditasState: _chartStates['panenKomoditas']!,
-                    riwayatPanenState: _riwayatStates['panen']!,
+                    laporanPanenState: _chartStates['laporanPanen'] ??
+                        ChartDataState<List<dynamic>>(),
+                    panenKomoditasState: _chartStates['panenKomoditas'] ??
+                        ChartDataState<List<dynamic>>(),
+                    panenGradeState: _chartStates['panenGrade'] ??
+                        ChartDataState<List<dynamic>>(),
+                    riwayatPanenState: _riwayatStates['panen'] ??
+                        RiwayatDataState<List<dynamic>>(),
                     onDateIconPressed: _showDateFilterDialog,
                     selectedChartFilterType: _selectedChartFilterType,
                     formattedDisplayedDateRange: formattedDisplayedDateRange,

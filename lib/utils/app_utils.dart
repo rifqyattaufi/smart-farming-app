@@ -102,3 +102,26 @@ String formatTimeAgo(String? isoTimestamp) {
     return DateFormat('dd MMM yy, HH:mm').format(reportTime);
   }
 }
+
+String formatNumber(dynamic number) {
+  if (number == null) return '0';
+
+  if (number is int) {
+    return number.toString();
+  } else if (number is double) {
+    // If it's a whole number (like 5.0), display as int
+    if (number == number.toInt()) {
+      return number.toInt().toString();
+    } else {
+      // Format with up to 2 decimal places, removing trailing zeros
+      return number.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+    }
+  } else {
+    // Try to parse as double
+    final doubleValue = double.tryParse(number.toString());
+    if (doubleValue != null) {
+      return formatNumber(doubleValue);
+    }
+    return number.toString();
+  }
+}

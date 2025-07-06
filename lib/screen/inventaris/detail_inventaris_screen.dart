@@ -70,8 +70,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       if (!mounted) return;
       if (response['status']) {
         final data = response['data'];
+        final inventarisDetails = data['inventaris'];
         setState(() {
-          _inventarisDetails = data['inventaris'];
+          _inventarisDetails = inventarisDetails;
           final defaultChartRawData =
               data['defaultChartData'] as List<dynamic>? ?? [];
           _updateChartDisplayData(defaultChartRawData, ChartFilterType.weekly);
@@ -463,7 +464,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         'person': item['petugasNama'],
         'date': item['laporanTanggal'],
         'time': item['laporanWaktu'],
-        'jumlah': item['jumlah'],
+        'jumlah': formatNumber(item['jumlah']),
         'laporanId': item['laporanId'],
       };
     }).toList();
@@ -544,7 +545,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                               infoItem("Kategori inventaris",
                                   kategori?['nama'] ?? 'Unknown'),
                               infoItem("Jumlah Stok",
-                                  "${num.parse(jumlah.toString()).toStringAsFixed(num.parse(jumlah.toString()).truncateToDouble() == num.parse(jumlah.toString()) ? 0 : 1)}${satuanLambang.isNotEmpty ? ' $satuanLambang' : ''}"),
+                                  "${formatNumber(jumlah)}${satuanLambang.isNotEmpty ? ' $satuanLambang' : ''}"),
                               infoItem("Satuan",
                                   satuanNama.isNotEmpty ? satuanNama : ""),
                               _buildKetersediaan(
@@ -697,9 +698,28 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                             type: "history",
                             onItemTap: (context, tappedItem) {
                               final id = tappedItem['id']?.toString();
+                              final laporanId =
+                                  tappedItem['laporanId']?.toString();
                               if (id != null && id.isNotEmpty) {
-                                context
-                                    .push('/detail-pemakaian-inventaris/$id');
+                                // Check inventory category to determine navigation
+                                final kategoriNama =
+                                    _inventarisDetails?['kategoriInventaris']
+                                                ?['nama']
+                                            ?.toString()
+                                            .toLowerCase() ??
+                                        '';
+
+                                // Navigate to laporan nutrisi for nutrisi categories
+                                if (kategoriNama == 'pupuk' ||
+                                    kategoriNama == 'vitamin' ||
+                                    kategoriNama == 'disinfektan' ||
+                                    kategoriNama == 'vaksin') {
+                                  context.push(
+                                      '/detail-laporan-nutrisi/$laporanId');
+                                } else {
+                                  context
+                                      .push('/detail-pemakaian-inventaris/$id');
+                                }
                               } else {
                                 showAppToast(
                                     context, 'Detail riwayat tidak ditemukan.');
@@ -722,7 +742,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                               onPressed: () => _fetchRiwayatPemakaian(
                                   page: _riwayatCurrentPage + 1),
                               backgroundColor: green1,
-                              textColor: white,
+                              textStyle: regular12.copyWith(color: white),
                             ),
                           ),
                         const SizedBox(height: 80),
@@ -753,8 +773,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                 },
                 buttonText: 'Ubah Data',
                 backgroundColor: yellow2,
-                textStyle: semibold16,
-                textColor: white,
+                textStyle: semibold16.copyWith(color: white),
               ),
               const SizedBox(height: 12),
               CustomButton(
@@ -766,8 +785,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                       },
                 buttonText: _isDeleting ? 'Menghapus...' : 'Hapus Data',
                 backgroundColor: red,
-                textStyle: semibold16,
-                textColor: white,
+                textStyle: semibold16.copyWith(color: white),
               ),
             ],
           ),

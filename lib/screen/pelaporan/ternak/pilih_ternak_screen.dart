@@ -185,8 +185,7 @@ class _PilihTernakScreenState extends State<PilihTernakScreen> {
             },
             buttonText: 'Selanjutnya',
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             key: const Key('next_button_pilih_ternak')
           ),
         ),

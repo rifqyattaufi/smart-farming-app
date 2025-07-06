@@ -57,8 +57,15 @@ class SakitTab extends StatelessWidget {
           : "pada periode $start hingga $end";
     }
 
-    num totalSakit = laporanSakitState.dataPoints
-        .fold(0, (prev, curr) => prev + ((curr['jumlahSakit'] as num?) ?? 0));
+    num totalSakit = laporanSakitState.dataPoints.fold(0, (prev, curr) {
+      final value = curr['jumlahSakit'];
+      if (value is num) {
+        return prev + value;
+      } else if (value is String) {
+        return prev + (num.tryParse(value) ?? 0);
+      }
+      return prev;
+    });
 
     // Handle empty state when no sick plants occurred
     if (totalSakit == 0) {
@@ -77,7 +84,13 @@ class SakitTab extends StatelessWidget {
 
       final List<String> penyakitParts = penyakitData.map<String>((item) {
         final nama = item['penyakit'] ?? 'N/A';
-        final total = (item['jumlahKasus'] as num?)?.toInt() ?? 0;
+        final value = item['jumlahKasus'];
+        int total = 0;
+        if (value is num) {
+          total = value.toInt();
+        } else if (value is String) {
+          total = int.tryParse(value) ?? 0;
+        }
         return "$total kasus $nama";
       }).toList();
 
@@ -119,8 +132,15 @@ class SakitTab extends StatelessWidget {
         ),
       );
     } else {
-      final totalSakit = laporanSakitState.dataPoints.fold<num>(
-          0, (sum, item) => sum + ((item['jumlahSakit'] as num?) ?? 0));
+      final totalSakit = laporanSakitState.dataPoints.fold<num>(0, (sum, item) {
+        final value = item['jumlahSakit'];
+        if (value is num) {
+          return sum + value;
+        } else if (value is String) {
+          return sum + (num.tryParse(value) ?? 0);
+        }
+        return sum;
+      });
 
       cardContent = Stack(
         children: [

@@ -97,6 +97,8 @@ import 'package:smart_farming_app/screen/users/detail_user_screen.dart';
 import 'package:smart_farming_app/screen/users/users_screen.dart';
 import 'package:smart_farming_app/service/database_helper.dart';
 import 'package:smart_farming_app/service/fcm_service.dart';
+import 'package:smart_farming_app/screen/laporan/hasil_panen_with_grades_screen.dart';
+import 'package:smart_farming_app/screen/laporan/grade_summary_screen.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -367,7 +369,7 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/detail-laporan-nutrisi-tanaman/:id',
+      path: '/detail-laporan-nutrisi/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'];
         return DetailLaporanNutrisiScreen(
@@ -739,6 +741,17 @@ final _router = GoRouter(
     GoRoute(
       path: '/syarat-dan-ketentuan',
       builder: (context, state) => const TermsConditionScreen(),
+    ),
+    GoRoute(
+      path: '/hasil-panen-with-grades',
+      builder: (context, state) => const HasilPanenWithGradesScreen(),
+    ),
+    GoRoute(
+      path: '/grade-summary/:komoditasId',
+      builder: (context, state) {
+        final komoditasId = state.pathParameters['komoditasId']!;
+        return GradeSummaryScreen(komoditasId: komoditasId);
+      },
     ),
   ],
 );

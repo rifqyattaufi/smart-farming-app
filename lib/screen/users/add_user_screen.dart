@@ -401,8 +401,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                 _submitForm();
               },
               backgroundColor: green1,
-              textStyle: semibold16,
-              textColor: white,
+              textStyle: semibold16.copyWith(color: white),
               isLoading: _isLoading,
               key: const Key('submit_user_button'),
             ),

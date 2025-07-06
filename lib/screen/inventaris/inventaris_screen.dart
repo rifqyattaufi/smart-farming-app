@@ -358,8 +358,8 @@ class _InventarisScreenState extends State<InventarisScreen> {
         response = await _komoditasService.getKomoditasSearch(searchQuery, tipe,
             page: page, limit: _pageSize);
       } else {
-        response = await _komoditasService.getKomoditasByTipe(tipe,
-            page: page, limit: _pageSize);
+        response = await _komoditasService.getKomoditasByTipe(
+            tipe: tipe, page: page, limit: _pageSize);
       }
     } catch (e) {
       if (mounted) {
@@ -987,7 +987,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .map((inventaris) => {
                       'name': inventaris['nama'] ?? 'N/A',
                       'category':
-                          'Stok: ${inventaris['jumlah'] ?? 0} ${inventaris['Satuan']?['lambang'] ?? ''}',
+                          'Stok: ${formatNumber(inventaris['jumlah'])} ${inventaris['Satuan']?['lambang'] ?? ''}',
                       'icon': inventaris['gambar'] as String?,
                       'id': inventaris['id'],
                     })
@@ -996,6 +996,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .push('/detail-inventaris/${item['id']}')
                 .then((_) => _handleRefresh()),
           ),
+        const SizedBox(height: 8),
         if (itemYangSudahKadaluwarsa.isNotEmpty)
           ListItem(
             key: const Key('itemKadaluwarsaListItem'),
@@ -1015,6 +1016,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .push('/detail-inventaris/${item['id']}')
                 .then((_) => _handleRefresh()),
           ),
+        const SizedBox(height: 8),
         if (stokRendah.isNotEmpty)
           ListItem(
             key: const Key('stokRendahListItem'),
@@ -1024,7 +1026,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .map((inventaris) => {
                       'name': inventaris['nama'] ?? 'N/A',
                       'category':
-                          'Stok: ${inventaris['jumlah'] ?? 0} ${inventaris['Satuan']?['lambang'] ?? ''} (Min: ${inventaris['stokMinim'] ?? 0})',
+                          'Stok: ${formatNumber(inventaris['jumlah'])} ${inventaris['Satuan']?['lambang'] ?? ''} (Min: ${formatNumber(inventaris['stokMinim'])})',
                       'icon': inventaris['gambar'] as String?,
                       'id': inventaris['id'],
                     })
@@ -1033,6 +1035,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .push('/detail-inventaris/${item['id']}')
                 .then((_) => _handleRefresh()),
           ),
+        const SizedBox(height: 8),
         if (stokHabis.isNotEmpty)
           ListItem(
             key: const Key('stokHabisListItem'),
@@ -1050,6 +1053,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .push('/detail-inventaris/${item['id']}')
                 .then((_) => _handleRefresh()),
           ),
+        const SizedBox(height: 8),
         if (showSemuaInventarisSection)
           ListItem(
             key: const Key('semuaInventarisListItem'),
@@ -1058,7 +1062,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 .map((inventaris) => {
                       'name': inventaris['nama'] ?? 'N/A',
                       'category':
-                          'Stok: ${inventaris['jumlah'] ?? 0} ${inventaris['Satuan']?['lambang'] ?? ''}',
+                          'Stok: ${formatNumber(inventaris['jumlah'])} ${inventaris['Satuan']?['lambang'] ?? ''}',
                       'icon': inventaris['gambar'] as String?,
                       'id': inventaris['id'],
                       'subCategory':
@@ -1153,7 +1157,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 return {
                   'name': komoditas['nama'] ?? 'N/A',
                   'category':
-                      'Jumlah Stok ${komoditas['jumlah'] ?? 'N/A'} ${satuan != null ? satuan['lambang'] : ''}',
+                      'Jumlah Stok ${formatNumber(komoditas['jumlah'])} ${satuan != null ? satuan['lambang'] : ''}',
                   'icon': komoditas['gambar'] as String?,
                   'id': komoditas['id'],
                 };
@@ -1209,7 +1213,7 @@ class _InventarisScreenState extends State<InventarisScreen> {
                 return {
                   'name': komoditas['nama'] ?? 'N/A',
                   'category':
-                      'Jumlah Stok ${komoditas['jumlah'] ?? 'N/A'} ${satuan != null ? satuan['lambang'] : ''}',
+                      'Jumlah Stok ${formatNumber(komoditas['jumlah'])} ${satuan != null ? satuan['lambang'] : ''}',
                   'icon': komoditas['gambar'] as String?,
                   'id': komoditas['id'],
                 };

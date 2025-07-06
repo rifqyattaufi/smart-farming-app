@@ -346,8 +346,7 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                       ? (int.tryParse(
                               _tanggalNotifikasiPanenController.text.isEmpty
                                   ? '0'
-                                  : _tanggalNotifikasiPanenController.text) ??
-                          null)
+                                  : _tanggalNotifikasiPanenController.text))
                       : null,
                   'dayOfWeek': selectedTipePanen == 'Mingguan'
                       ? dayToInt[selectedHariPanen]
@@ -363,8 +362,7 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                       ? (int.tryParse(
                               _tanggalNotifikasiNutrisiController.text.isEmpty
                                   ? '0'
-                                  : _tanggalNotifikasiNutrisiController.text) ??
-                          null)
+                                  : _tanggalNotifikasiNutrisiController.text))
                       : null,
                   'dayOfWeek': selectedTipeNutrisi == 'Mingguan'
                       ? dayToInt[selectedHariNutrisi]
@@ -896,8 +894,7 @@ class AddKebunScreenState extends State<AddKebunScreen> {
           child: CustomButton(
             onPressed: _submitKebun,
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: _isLoading,
             key: const Key('submit_kebun'),
           ),

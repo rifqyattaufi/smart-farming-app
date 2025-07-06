@@ -192,8 +192,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               buttonText: 'Reset Password',
               onPressed: _submitForm,
               backgroundColor: green1,
-              textStyle: semibold16,
-              textColor: white,
+              textStyle: semibold16.copyWith(color: white),
               isLoading: _isLoading,
               key: const Key('resetPasswordButton')
             ),

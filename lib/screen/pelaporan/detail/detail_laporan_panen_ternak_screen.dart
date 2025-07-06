@@ -154,11 +154,8 @@ class _DetailLaporanPanenTernakScreenState
                                     _laporanPanenTernak?['UnitBudidaya']
                                             ['nama'] ??
                                         "-"),
-                                infoItem(
-                                    "Jumlah panen",
-                                    _laporanPanenTernak?['Panen']['jumlah']
-                                            ?.toString() ??
-                                        "-"),
+                                infoItem("Jumlah panen",
+                                    "${_laporanPanenTernak?['Panen']['jumlah']?.toString() ?? '-'} ${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['lambang'] ?? ''}"),
                                 infoItem("Satuan panen",
                                     "${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['nama'] ?? '-'} - ${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['lambang'] ?? '-'}"),
                                 infoItem(

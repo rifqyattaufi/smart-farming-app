@@ -300,13 +300,22 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                       'person': item['petugasNama'],
                                       'date': item['laporanTanggal'],
                                       'time': item['laporanWaktu'],
+                                      'laporanId': item['laporanId'],
+                                      'sourceTable': item['sourceTable'],
                                     })
                                 .toList(),
                             onViewAll: () =>
                                 context.push('/riwayat-pemakaian-inventaris'),
                             onItemTap: (context, item) {
                               final id = item['id'] ?? '';
-                              context.push('/detail-pemakaian-inventaris/$id');
+                              final laporanId = item['laporanId'] ?? '';
+                              if (item['sourceTable'] == 'vitamin') {
+                                context
+                                    .push('/detail-laporan-nutrisi/$laporanId');
+                              } else {
+                                context
+                                    .push('/detail-pemakaian-inventaris/$id');
+                              }
                             },
                           ),
                           const SizedBox(height: 12),
@@ -318,10 +327,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                     [])
                                 .map((item) => {
                                       'id': item['id'],
-                                      'name': item['nama'],
-                                      'icon': item['gambar'],
+                                      'name': item['nama'] ?? 'N/A',
+                                      'icon': item['gambar'] as String?,
                                       'category':
-                                          'Stok: ${item['jumlah']} ${item['lambangSatuan']}',
+                                          'Stok: ${formatNumber(item['jumlah'])} ${item['lambangSatuan'] ?? ''}',
                                     })
                                 .toList(),
                             type: 'basic',

@@ -509,8 +509,7 @@ class _PelaporanTernakPanenScreenState
                         selectedObjekIds.isEmpty)
                     ? dark3
                     : green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: isLoading,
             key: const Key('submit_panen_button'),
           ),

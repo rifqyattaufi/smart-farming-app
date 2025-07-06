@@ -34,7 +34,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
 
   Future<void> _fetchData() async {
     try {
-      final response = await _komoditasService.getKomoditasByTipe('hewan');
+      final response = await _komoditasService.getKomoditasByTipe(tipe: 'hewan');
       if (response['status']) {
         setState(() {
           _listKomoditas = response['data'];
@@ -150,8 +150,7 @@ class _PilihKomoditasScreenState extends State<PilihKomoditasScreen> {
               },
               buttonText: 'Selanjutnya',
               backgroundColor: green1,
-              textStyle: semibold16,
-              textColor: white,
+              textStyle: semibold16.copyWith(color: white),
               key: const Key('next_button_pilih_komoditas')),
         ),
       ),

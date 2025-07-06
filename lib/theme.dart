@@ -42,6 +42,7 @@ TextStyle semibold12 = _textStyle(12, FontWeight.w600);
 TextStyle bold12 = _textStyle(12, FontWeight.w700);
 TextStyle extraBold12 = _textStyle(12, FontWeight.w800);
 TextStyle black12 = _textStyle(12, FontWeight.w900);
+TextStyle medium10 = _textStyle(10, FontWeight.w500);
 TextStyle medium12 = _textStyle(12, FontWeight.w500);
 TextStyle light12 = _textStyle(12, FontWeight.w300);
 TextStyle extraLight12 = _textStyle(12, FontWeight.w200);

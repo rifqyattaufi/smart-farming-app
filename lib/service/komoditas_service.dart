@@ -88,14 +88,13 @@ class KomoditasService {
     }
   }
 
-  Future<Map<String, dynamic>> getKomoditasByTipe(
-    String tipe, {
+  Future<Map<String, dynamic>> getKomoditasByTipe({
+    required String tipe,
     int page = 1,
-    int limit = 20,
+    int limit = 100, // Use a larger limit to get all plant commodities
   }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-
     final url = Uri.parse('$baseUrl/tipe/$tipe?page=$page&limit=$limit');
 
     try {
@@ -113,11 +112,11 @@ class KomoditasService {
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getKomoditasByTipe(tipe, page: page, limit: limit);
+        return await getKomoditasByTipe(tipe: tipe, page: page, limit: limit);
       } else {
         return {
           'status': false,
-          'message': body['message'] ?? 'Failed to load data by tipe',
+          'message': body['message'] ?? 'Failed to load data',
           'data': [],
           'totalPages': 0,
           'currentPage': page,

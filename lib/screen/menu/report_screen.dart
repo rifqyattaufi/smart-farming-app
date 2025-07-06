@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_farming_app/service/dashboard_service.dart';
 import 'package:smart_farming_app/service/hama_service.dart';
@@ -325,6 +326,55 @@ class _ReportScreenState extends State<ReportScreen> {
                   });
                 }
               },
+            ),
+            // Laporan Grade Panen Section
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: InkWell(
+                key: const Key('laporan_grade_panen'),
+                onTap: () {
+                  context.push('/hasil-panen-with-grades').then((_) {
+                    _fetchData(isRefresh: true);
+                  });
+                },
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.analytics_outlined,
+                        size: 40,
+                        color: green1,
+                      ),
+                      const SizedBox(width: 30),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Laporan Grade Panen',
+                                style: semibold16.copyWith(color: dark1)),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Lihat hasil panen berdasarkan kualitas',
+                              style: regular12.copyWith(color: dark2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/left.svg',
+                        height: 24,
+                        colorFilter: ColorFilter.mode(dark1, BlendMode.srcIn),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             () {
