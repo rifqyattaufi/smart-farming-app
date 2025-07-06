@@ -312,8 +312,7 @@ class _PelaporanTanamanSakitScreenState
           child: CustomButton(
             onPressed: _submitForm,
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: _isLoading,
             key: const Key('submit_pelaporan_tanaman_sakit_button'),
           ),

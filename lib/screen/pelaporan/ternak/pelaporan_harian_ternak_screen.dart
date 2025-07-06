@@ -271,8 +271,7 @@ class _PelaporanHarianTernakScreenState
               _submitForm();
             },
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: isLoading,
             key: const Key('submit_pelaporan_harian_ternak_button'),
           ),

@@ -722,7 +722,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                               onPressed: () => _fetchRiwayatPemakaian(
                                   page: _riwayatCurrentPage + 1),
                               backgroundColor: green1,
-                              textColor: white,
+                              textStyle: regular12.copyWith(color: white),
                             ),
                           ),
                         const SizedBox(height: 80),
@@ -753,8 +753,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                 },
                 buttonText: 'Ubah Data',
                 backgroundColor: yellow2,
-                textStyle: semibold16,
-                textColor: white,
+                textStyle: semibold16.copyWith(color: white),
               ),
               const SizedBox(height: 12),
               CustomButton(
@@ -766,8 +765,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                       },
                 buttonText: _isDeleting ? 'Menghapus...' : 'Hapus Data',
                 backgroundColor: red,
-                textStyle: semibold16,
-                textColor: white,
+                textStyle: semibold16.copyWith(color: white),
               ),
             ],
           ),

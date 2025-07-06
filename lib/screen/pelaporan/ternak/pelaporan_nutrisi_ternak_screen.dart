@@ -445,8 +445,7 @@ class _PelaporanNutrisiTernakScreenState
           child: CustomButton(
             onPressed: _submitForm,
             backgroundColor: green1,
-            textStyle: semibold16,
-            textColor: white,
+            textStyle: semibold16.copyWith(color: white),
             isLoading: isLoading,
             key: const Key('submit_button_pelaporan_nutrisi_ternak'),
           ),

@@ -339,12 +339,11 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                           )
                         else
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Text("Tidak terdaftar pada kebun manapun.",
-                                style: regular14.copyWith(color: dark2),
-                                key: const Key('no_kebun_message'))
-                          ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: Text("Tidak terdaftar pada kebun manapun.",
+                                  style: regular14.copyWith(color: dark2),
+                                  key: const Key('no_kebun_message'))),
                         const SizedBox(height: 90),
                       ],
                     ),
@@ -380,7 +379,6 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                           buttonText: 'Ubah Data',
                           backgroundColor: yellow2,
                           textStyle: semibold16.copyWith(color: white),
-                          textColor: white,
                         ),
                         const SizedBox(height: 12),
                         CustomButton(
@@ -393,7 +391,6 @@ class _DetailTanamanScreenState extends State<DetailTanamanScreen> {
                           buttonText: 'Hapus Data',
                           backgroundColor: red,
                           textStyle: semibold16.copyWith(color: white),
-                          textColor: white,
                           isLoading: _isDeleting,
                         ),
                       ],

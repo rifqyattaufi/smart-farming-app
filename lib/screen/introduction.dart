@@ -128,8 +128,7 @@ class _IntroductionState extends State<Introduction> {
                 }
               },
               backgroundColor: green1,
-              textStyle: semibold16,
-              textColor: white,
+              textStyle: semibold16.copyWith(color: white),
               key: const Key('introduction_next_button'),
             ),
           ),

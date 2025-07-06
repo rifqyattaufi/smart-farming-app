@@ -334,8 +334,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                       },
                       buttonText: 'Ubah Data',
                       backgroundColor: yellow2,
-                      textStyle: semibold16,
-                      textColor: white,
+                      textStyle: semibold16.copyWith(color: white),
                     ),
                     const SizedBox(height: 12), // Jarak antara tombol
                     CustomButton(
@@ -368,8 +367,7 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                       },
                       buttonText: 'Hapus Data',
                       backgroundColor: red,
-                      textStyle: semibold16,
-                      textColor: white,
+                      textStyle: semibold16.copyWith(color: white),
                     ),
                   ],
                 ),

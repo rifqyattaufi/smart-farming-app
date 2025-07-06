@@ -366,7 +366,6 @@ class AddTanamanScreenState extends State<AddTanamanScreen> {
               buttonText: widget.isEdit ? 'Simpan Perubahan' : 'Tambah Tanaman',
               backgroundColor: green1,
               textStyle: semibold16.copyWith(color: white),
-              textColor: white,
               isLoading: _isLoading,
               key: const Key('submit_tanaman_button')),
         ),

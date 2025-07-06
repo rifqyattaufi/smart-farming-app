@@ -345,7 +345,6 @@ class _DetailTanamanScreenState extends State<DetailKomoditasScreen> {
                           buttonText: 'Ubah Data',
                           backgroundColor: yellow2,
                           textStyle: semibold16.copyWith(color: white),
-                          textColor: white,
                         ),
                         const SizedBox(height: 12),
                         CustomButton(
@@ -358,7 +357,6 @@ class _DetailTanamanScreenState extends State<DetailKomoditasScreen> {
                           buttonText: 'Hapus Data',
                           backgroundColor: red,
                           textStyle: semibold16.copyWith(color: white),
-                          textColor: white,
                           isLoading: _isDeleting,
                         ),
                       ],

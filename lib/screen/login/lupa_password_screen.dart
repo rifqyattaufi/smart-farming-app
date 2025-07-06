@@ -113,8 +113,7 @@ class _LupaPasswordScreenState extends State<LupaPasswordScreen> {
                 _submitForm();
               },
               backgroundColor: green1,
-              textStyle: semibold16,
-              textColor: white,
+              textStyle: semibold16.copyWith(color: white),
               isLoading: _isLoading,
               key: const Key('submit_button')),
         ),
