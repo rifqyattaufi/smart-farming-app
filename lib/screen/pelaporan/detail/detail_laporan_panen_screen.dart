@@ -36,8 +36,7 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
             context, response['message'] ?? 'Gagal memuat data laporan panen.');
       }
     } catch (e) {
-      showAppToast(
-          context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
           title: 'Error Tidak Terduga 😢');
     } finally {
       if (mounted) {
@@ -157,24 +156,12 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
                                     _laporanPanen?['PanenKebun']['komoditas']
                                             ['nama'] ??
                                         '-'),
-                                infoItem(
-                                    "Estimasi panen",
-                                    _laporanPanen?['PanenKebun']
-                                                ['estimasiPanen']
-                                            ?.toString() ??
-                                        '-'),
-                                infoItem(
-                                    "Realisasi Panen",
-                                    _laporanPanen?['PanenKebun']
-                                                ['realisasiPanen']
-                                            ?.toString() ??
-                                        '-'),
-                                infoItem(
-                                    "Umur tanaman saat panen",
-                                    _laporanPanen?['PanenKebun']
-                                                ['umurTanamanPanen']
-                                            ?.toString() ??
-                                        '-'),
+                                infoItem("Estimasi panen",
+                                    "${_laporanPanen?['PanenKebun']['estimasiPanen']?.toString() ?? '-'} ${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['lambang'] ?? ''}"),
+                                infoItem("Realisasi Panen",
+                                    "${_laporanPanen?['PanenKebun']['realisasiPanen']?.toString() ?? '-'} ${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['lambang'] ?? ''}"),
+                                infoItem("Umur tanaman saat panen",
+                                    "${_laporanPanen?['PanenKebun']['umurTanamanPanen']?.toString() ?? '-'} Hari"),
                                 infoItem("Satuan panen",
                                     "${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['nama'] ?? '-'} - ${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['lambang'] ?? '-'}"),
                                 infoItem("Pelaporan oleh",
@@ -205,8 +192,8 @@ class _DetailLaporanPanenScreenState extends State<DetailLaporanPanenScreen> {
                                         [])
                                     .map((grade) {
                                   return infoItem(
-                                      'Grade ${grade['Grade']['nama'] ?? '-'}',
-                                      '${grade['jumlah'] ?? '-'}');
+                                      '${grade['Grade']['nama'] ?? '-'}',
+                                      '${grade['jumlah'] ?? '-'} ${_laporanPanen?['PanenKebun']['komoditas']['Satuan']['lambang'] ?? ''}');
                                 }).toList()),
                               ],
                             ),

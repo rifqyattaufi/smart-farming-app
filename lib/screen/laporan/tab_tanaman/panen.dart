@@ -357,107 +357,88 @@ class PanenTab extends StatelessWidget {
       return sum;
     });
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child:
+              Text('Detail Grade Panen', style: bold18.copyWith(color: dark1)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('Detail Grade Panen',
-                  style: bold16.copyWith(color: dark1)),
+        ...gradeData.asMap().entries.map((entry) {
+          final index = entry.key;
+          final grade = entry.value;
+          final isLast = index == gradeData.length - 1;
+
+          final label = grade['label']?.toString() ?? 'N/A';
+          final value =
+              grade['value'] is num ? (grade['value'] as num).toDouble() : 0.0;
+          final unit = grade['unit']?.toString() ?? '';
+          final commodity = grade['commodity']?.toString() ?? '';
+
+          // Calculate percentage
+          final percentage =
+              totalHarvest > 0 ? (value / totalHarvest * 100) : 0.0;
+
+          // Define colors for grade indicators
+          final gradeColors = [green1, green2, yellow, yellow2, blue1, red];
+          final gradeColor = gradeColors[index % gradeColors.length];
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: isLast
+                  ? null
+                  : Border(
+                      bottom: BorderSide(
+                          color: dark4.withValues(alpha: 0.3), width: 0.5),
+                    ),
             ),
-            ...gradeData.asMap().entries.map((entry) {
-              final index = entry.key;
-              final grade = entry.value;
-              final isLast = index == gradeData.length - 1;
-
-              final label = grade['label']?.toString() ?? 'N/A';
-              final value = grade['value'] is num
-                  ? (grade['value'] as num).toDouble()
-                  : 0.0;
-              final unit = grade['unit']?.toString() ?? '';
-              final commodity = grade['commodity']?.toString() ?? '';
-
-              // Calculate percentage
-              final percentage =
-                  totalHarvest > 0 ? (value / totalHarvest * 100) : 0.0;
-
-              // Define colors for grade indicators
-              final gradeColors = [green1, green2, yellow, yellow2, blue1, red];
-              final gradeColor = gradeColors[index % gradeColors.length];
-
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  border: isLast
-                      ? null
-                      : Border(
-                          bottom: BorderSide(
-                              color: dark4.withValues(alpha: 0.3), width: 0.5),
-                        ),
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: gradeColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                child: Row(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: bold14.copyWith(color: dark1),
+                      ),
+                      if (commodity.isNotEmpty)
+                        Text(
+                          commodity,
+                          style: regular12.copyWith(color: dark2),
+                        ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: gradeColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                    Text(
+                      '${value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1)} $unit',
+                      style: bold14.copyWith(color: green1),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Grade $label',
-                            style: bold14.copyWith(color: dark1),
-                          ),
-                          if (commodity.isNotEmpty)
-                            Text(
-                              commodity,
-                              style: regular12.copyWith(color: dark2),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1)} $unit',
-                          style: bold14.copyWith(color: green1),
-                        ),
-                        Text(
-                          '${percentage.toStringAsFixed(1)}% dari total',
-                          style: regular10.copyWith(color: dark2),
-                        ),
-                      ],
+                    Text(
+                      '${percentage.toStringAsFixed(1)}% dari total',
+                      style: regular12.copyWith(color: dark2),
                     ),
                   ],
                 ),
-              );
-            }),
-          ],
-        ),
-      ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 

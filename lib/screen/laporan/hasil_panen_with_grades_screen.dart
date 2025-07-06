@@ -192,9 +192,10 @@ class _HasilPanenWithGradesScreenState
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          alignment: Alignment.center,
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 300, maxHeight: 400),
-            padding: const EdgeInsets.all(16),
+            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +215,7 @@ class _HasilPanenWithGradesScreenState
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 Flexible(
                   child: ListView.separated(
                     shrinkWrap: true,
@@ -227,8 +228,8 @@ class _HasilPanenWithGradesScreenState
                       if (index == 0) {
                         return InkWell(
                           onTap: () {
-                            Navigator.of(context).pop(
-                                {'id': '', 'name': 'Semua Komoditas Tumbuhan'});
+                            Navigator.of(context)
+                                .pop({'id': '', 'name': 'Semua Komoditas'});
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -237,7 +238,7 @@ class _HasilPanenWithGradesScreenState
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Semua Komoditas Tumbuhan',
+                                    'Semua Komoditas',
                                     style: medium14.copyWith(
                                       color: _selectedKomoditasId == null
                                           ? green1
@@ -352,14 +353,18 @@ class _HasilPanenWithGradesScreenState
 
   Widget _buildFilterSection() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(
+        top: 16,
+        left: 20,
+        right: 20,
+        bottom: 12,
+      ),
       decoration: BoxDecoration(
         color: white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: dark1.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -371,12 +376,12 @@ class _HasilPanenWithGradesScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Filter Data', style: bold16.copyWith(color: dark1)),
+              Text('Filter Data', style: bold18.copyWith(color: dark1)),
               if (_selectedKomoditasId != null || _startDate != null)
                 TextButton(
                   onPressed: _clearFilters,
                   child: Text('Hapus Filter',
-                      style: medium12.copyWith(color: red)),
+                      style: medium14.copyWith(color: red)),
                 ),
             ],
           ),
@@ -388,7 +393,7 @@ class _HasilPanenWithGradesScreenState
                   onPressed: _selectKomoditas,
                   buttonText: _selectedKomoditasName ?? 'Pilih Komoditas',
                   backgroundColor: _selectedKomoditasId != null ? green1 : grey,
-                  textColor: _selectedKomoditasId != null ? white : dark2,
+                  textColor: _selectedKomoditasId != null ? white : dark1,
                 ),
               ),
               const SizedBox(width: 12),
@@ -396,10 +401,10 @@ class _HasilPanenWithGradesScreenState
                 child: CustomButton(
                   onPressed: _selectDateRange,
                   buttonText: _startDate != null && _endDate != null
-                      ? '${DateFormat('dd/MM').format(_startDate!)} - ${DateFormat('dd/MM').format(_endDate!)}'
+                      ? '${DateFormat('d MMM yy').format(_startDate!)} - ${DateFormat('d MMM yy').format(_endDate!)}'
                       : 'Pilih Tanggal',
                   backgroundColor: _startDate != null ? green1 : grey,
-                  textColor: _startDate != null ? white : dark2,
+                  textColor: _startDate != null ? white : dark1,
                 ),
               ),
             ],
@@ -414,19 +419,17 @@ class _HasilPanenWithGradesScreenState
     final hasilPanen = harvest['hasilPanen'];
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.only(
+        bottom: 6,
+        left: 16,
+        right: 16,
+        top: 6,
+      ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+          color: white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: dark1.withValues(alpha: 0.1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -437,8 +440,8 @@ class _HasilPanenWithGradesScreenState
                 borderRadius: BorderRadius.circular(8),
                 child: ImageBuilder(
                   url: harvest['gambar'] ?? '',
-                  width: 60,
-                  height: 60,
+                  width: 80,
+                  height: 80,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -449,18 +452,19 @@ class _HasilPanenWithGradesScreenState
                   children: [
                     Text(
                       harvest['judul'] ?? 'Laporan Panen',
-                      style: bold14.copyWith(color: dark1),
+                      style: bold16.copyWith(color: dark1),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      harvest['komoditas']['nama'] ?? 'N/A',
-                      style: medium12.copyWith(color: green1),
+                      'Komoditas: ${harvest['komoditas']['nama'] ?? 'N/A'}',
+                      style: medium14.copyWith(color: green1),
                     ),
+                    const SizedBox(height: 4),
                     Text(
-                      'Panen: ${_formatDate(harvest['tanggalPanen'])}',
-                      style: regular10.copyWith(color: dark2),
+                      'Tanggal Panen: ${_formatDate(harvest['tanggalPanen'])}',
+                      style: regular12.copyWith(color: dark2),
                     ),
                   ],
                 ),
@@ -481,20 +485,22 @@ class _HasilPanenWithGradesScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoItem('Estimasi',
+                    _buildInfoItem('Estimasi Panen',
                         '${hasilPanen['estimasiPanen']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}'),
-                    _buildInfoItem('Realisasi',
-                        '${hasilPanen['realisasiPanen']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}'),
+                    _buildInfoItem('Gagal Panen',
+                        '${hasilPanen['gagalPanen']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}',
+                        alignRight: true),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoItem('Gagal',
-                        '${hasilPanen['gagalPanen']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}'),
+                    _buildInfoItem('Hasil Panen',
+                        '${hasilPanen['realisasiPanen']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}'),
                     _buildInfoItem(
-                        'Efisiensi', '${hasilPanen['efisiensiPanen']}%'),
+                        'Efisiensi Panen', '${hasilPanen['efisiensiPanen']}%',
+                        alignRight: true),
                   ],
                 ),
               ],
@@ -503,8 +509,8 @@ class _HasilPanenWithGradesScreenState
 
           // Rincian Grade
           if (grades.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text('Rincian Grade', style: bold12.copyWith(color: dark1)),
+            const SizedBox(height: 10),
+            Text('Rincian Grade', style: bold14.copyWith(color: dark1)),
             const SizedBox(height: 8),
             ...grades.map((grade) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
@@ -523,22 +529,26 @@ class _HasilPanenWithGradesScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(grade['gradeNama'],
-                                style: medium12.copyWith(color: dark1)),
+                                style: medium14.copyWith(color: dark1)),
                             if (grade['gradeDeskripsi'] != null &&
                                 grade['gradeDeskripsi'].isNotEmpty)
-                              Text(grade['gradeDeskripsi'],
-                                  style: regular10.copyWith(color: dark2)),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: _buildExpandableText(
+                                    grade['gradeDeskripsi']),
+                              ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                               '${grade['jumlah']} ${harvest['komoditas']['satuan']?['lambang'] ?? ''}',
-                              style: bold12.copyWith(color: green1)),
+                              style: bold16.copyWith(color: green1)),
                           Text('${grade['persentase']}%',
-                              style: regular10.copyWith(color: dark2)),
+                              style: regular12.copyWith(color: dark2)),
                         ],
                       ),
                     ],
@@ -553,7 +563,7 @@ class _HasilPanenWithGradesScreenState
             children: [
               Text(
                 'Pelapor: ${harvest['pelapor']['nama']}',
-                style: regular10.copyWith(color: dark2),
+                style: regular12.copyWith(color: dark2),
               ),
               GestureDetector(
                 onTap: () {
@@ -563,14 +573,14 @@ class _HasilPanenWithGradesScreenState
                 },
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: green1,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(7),
                   ),
                   child: Text(
-                    'Lihat Summary Grade',
-                    style: regular10.copyWith(color: white),
+                    'Lihat Detail Grade',
+                    style: regular14.copyWith(color: white),
                   ),
                 ),
               ),
@@ -581,20 +591,35 @@ class _HasilPanenWithGradesScreenState
     );
   }
 
-  Widget _buildInfoItem(String label, String value) {
+  Widget _buildInfoItem(String label, String value, {bool alignRight = false}) {
     return Column(
+      crossAxisAlignment:
+          alignRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Text(label, style: regular10.copyWith(color: dark2)),
+        Text(label, style: regular12.copyWith(color: dark2)),
         const SizedBox(height: 2),
         Text(value, style: medium12.copyWith(color: dark1)),
       ],
     );
   }
 
+  Widget _buildExpandableText(String text) {
+    const int maxLength = 60;
+
+    if (text.length <= maxLength) {
+      return Text(
+        text,
+        style: regular12.copyWith(color: dark2),
+      );
+    }
+
+    return _ExpandableText(text: text);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: dark4,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
@@ -605,8 +630,8 @@ class _HasilPanenWithGradesScreenState
           toolbarHeight: 80,
           title: const Header(
             headerType: HeaderType.back,
-            title: 'Laporan Panen',
-            greeting: 'Data Hasil Panen dengan Grade',
+            title: 'Laporan Perkebunan',
+            greeting: 'Laporan Grade Panen',
           ),
         ),
       ),
@@ -624,7 +649,12 @@ class _HasilPanenWithGradesScreenState
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.agriculture, size: 64, color: grey),
+                                Image.asset(
+                                  'assets/icons/set/fruitbag-filled.png',
+                                  width: 64,
+                                  height: 64,
+                                  color: grey,
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'Tidak ada data hasil panen',
@@ -659,6 +689,47 @@ class _HasilPanenWithGradesScreenState
                 ],
               ),
       ),
+    );
+  }
+}
+
+class _ExpandableText extends StatefulWidget {
+  final String text;
+
+  const _ExpandableText({required this.text});
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool isExpanded = false;
+  static const int maxLength = 60;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isExpanded
+              ? widget.text
+              : '${widget.text.substring(0, maxLength)}...',
+          style: regular12.copyWith(color: dark2),
+        ),
+        const SizedBox(height: 2),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isExpanded = !isExpanded;
+            });
+          },
+          child: Text(
+            isExpanded ? 'Tampilkan lebih sedikit' : 'Tampilkan lebih banyak',
+            style: medium10.copyWith(color: green1),
+          ),
+        ),
+      ],
     );
   }
 }

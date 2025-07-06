@@ -81,7 +81,7 @@ class ChartWidget extends StatelessWidget {
     final yAxisLabels = _generateYAxisLabels(maxValue);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

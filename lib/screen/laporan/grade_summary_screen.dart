@@ -152,18 +152,12 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
     final periodeSummary = _summaryData!['periodeSummary'];
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: const Color(0xFFE8E8E8)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,8 +182,8 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
                       style: bold16.copyWith(color: dark1),
                     ),
                     Text(
-                      '${komoditas['satuan']['nama']} (${komoditas['satuan']['lambang']})',
-                      style: regular12.copyWith(color: dark2),
+                      'Satuan panen: ${komoditas['satuan']['nama']} (${komoditas['satuan']['lambang']})',
+                      style: regular14.copyWith(color: dark2),
                     ),
                   ],
                 ),
@@ -236,40 +230,28 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: regular10.copyWith(color: dark2)),
+        Text(label, style: regular12.copyWith(color: dark2)),
         const SizedBox(height: 2),
-        Text(value, style: bold12.copyWith(color: dark1)),
+        Text(value, style: bold14.copyWith(color: dark1)),
       ],
     );
   }
 
   Widget _buildFilterSection() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Filter Periode', style: bold14.copyWith(color: dark1)),
+              Text('Filter Periode', style: bold18.copyWith(color: dark1)),
               if (_startDate != null)
                 TextButton(
                   onPressed: _clearDateFilter,
                   child: Text('Hapus Filter',
-                      style: medium12.copyWith(color: red)),
+                      style: medium14.copyWith(color: red)),
                 ),
             ],
           ),
@@ -280,7 +262,7 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
                 ? '${DateFormat('dd MMM yyyy').format(_startDate!)} - ${DateFormat('dd MMM yyyy').format(_endDate!)}'
                 : 'Pilih Periode Waktu',
             backgroundColor: _startDate != null ? green1 : grey,
-            textColor: _startDate != null ? white : dark2,
+            textColor: _startDate != null ? white : dark1,
           ),
         ],
       ),
@@ -295,23 +277,22 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
 
     if (gradeSummary.isEmpty) {
       return Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: const Color(0xFFE8E8E8)),
         ),
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.category_outlined, size: 48, color: grey),
+              Image.asset(
+                'assets/icons/set/fruitbag-filled.png',
+                width: 48,
+                height: 48,
+                color: grey,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Tidak ada data grade',
@@ -328,106 +309,106 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
       );
     }
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text('Detail Grade', style: bold16.copyWith(color: dark1)),
-          ),
-          ...gradeSummary.asMap().entries.map((entry) {
-            final index = entry.key;
-            final grade = entry.value;
-            final isLast = index == gradeSummary.length - 1;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Detail Grade', style: bold18.copyWith(color: dark1)),
+        ),
+        ...gradeSummary.asMap().entries.map((entry) {
+          final index = entry.key;
+          final grade = entry.value;
+          final isLast = index == gradeSummary.length - 1;
 
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                border: isLast
-                    ? null
-                    : Border(
-                        bottom: BorderSide(
-                            color: dark4.withValues(alpha: 0.3), width: 0.5),
-                      ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: [
-                        green1,
-                        green2,
-                        yellow,
-                        yellow2,
-                        blue1,
-                        red
-                      ][index % 6],
-                      borderRadius: BorderRadius.circular(2),
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: isLast
+                  ? null
+                  : Border(
+                      bottom: BorderSide(
+                          color: dark4.withValues(alpha: 0.3), width: 0.5),
                     ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: [
+                      green1,
+                      green2,
+                      yellow,
+                      yellow2,
+                      blue1,
+                      red
+                    ][index % 6],
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          grade['gradeNama'] ?? 'N/A',
-                          style: bold14.copyWith(color: dark1),
-                        ),
-                        if (grade['gradeDeskripsi'] != null &&
-                            grade['gradeDeskripsi'].isNotEmpty)
-                          Text(
-                            grade['gradeDeskripsi'],
-                            style: regular12.copyWith(color: dark2),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${grade['totalJumlah'] ?? 0} ${komoditas['satuan']?['lambang'] ?? ''}',
-                        style: bold14.copyWith(color: green1),
+                        grade['gradeNama'] ?? 'N/A',
+                        style: bold14.copyWith(color: dark1),
                       ),
-                      Text(
-                        '${grade['persentaseTotal'] ?? 0}% dari total',
-                        style: regular10.copyWith(color: dark2),
-                      ),
-                      Text(
-                        'Rata-rata: ${grade['averagePerHarvest'] ?? 0} ${komoditas['satuan']?['lambang'] ?? ''}/panen',
-                        style: regular10.copyWith(color: dark2),
-                      ),
+                      if (grade['gradeDeskripsi'] != null &&
+                          grade['gradeDeskripsi'].isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: _buildExpandableText(grade['gradeDeskripsi']),
+                        ),
                     ],
                   ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
+                ),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${grade['totalJumlah'] ?? 0} ${komoditas['satuan']?['lambang'] ?? ''}',
+                      style: bold14.copyWith(color: green1),
+                    ),
+                    Text(
+                      '${grade['persentaseTotal'] ?? 0}% dari total',
+                      style: regular12.copyWith(color: dark2),
+                    ),
+                    Text(
+                      'Rata-rata: ${grade['averagePerHarvest'] ?? 0} ${komoditas['satuan']?['lambang'] ?? ''}/panen',
+                      style: regular12.copyWith(color: dark2),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
+  }
+
+  Widget _buildExpandableText(String text) {
+    const int maxLength = 50;
+
+    if (text.length <= maxLength) {
+      return Text(
+        text,
+        style: regular12.copyWith(color: dark2),
+      );
+    }
+
+    return _ExpandableText(text: text);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: dark4,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
@@ -438,7 +419,7 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
           toolbarHeight: 80,
           title: Header(
             headerType: HeaderType.back,
-            title: 'Summary Grade',
+            title: 'Detail Grade',
             greeting: _komoditasDetail?['nama'] ?? 'Loading...',
           ),
         ),
@@ -467,6 +448,47 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
                 ),
               ),
       ),
+    );
+  }
+}
+
+class _ExpandableText extends StatefulWidget {
+  final String text;
+
+  const _ExpandableText({required this.text});
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool isExpanded = false;
+  static const int maxLength = 50;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isExpanded
+              ? widget.text
+              : '${widget.text.substring(0, maxLength)}...',
+          style: regular12.copyWith(color: dark2),
+        ),
+        const SizedBox(height: 2),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isExpanded = !isExpanded;
+            });
+          },
+          child: Text(
+            isExpanded ? 'Tampilkan lebih sedikit' : 'Tampilkan lebih banyak',
+            style: medium10.copyWith(color: green1),
+          ),
+        ),
+      ],
     );
   }
 }

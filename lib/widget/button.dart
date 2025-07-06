@@ -43,7 +43,11 @@ class CustomButton extends StatelessWidget {
                   strokeWidth: 2.0,
                 ),
               )
-            : Text(buttonText, style: textStyle?.copyWith(color: white)),
+            : Text(
+                buttonText,
+                style: textStyle ?? TextStyle(color: textColor ?? white),
+                textAlign: TextAlign.center,
+              ),
       ),
     );
   }
