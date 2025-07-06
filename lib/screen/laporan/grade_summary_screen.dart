@@ -170,7 +170,12 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
                   color: green1.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.category, color: green1, size: 24),
+                child: Image.asset(
+                  'assets/icons/set/fruitbag-filled.png',
+                  width: 24,
+                  height: 24,
+                  color: green1,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
