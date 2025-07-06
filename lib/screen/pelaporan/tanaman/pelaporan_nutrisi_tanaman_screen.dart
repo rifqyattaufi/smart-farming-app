@@ -83,7 +83,12 @@ class _PelaporanNutrisiTanamanScreenState
     _disposeControllers();
 
     _catatanControllers = List.generate(length, (_) => TextEditingController());
-    _sizeControllers = List.generate(length, (_) => TextEditingController());
+    _sizeControllers = List.generate(length, (index) {
+      final controller = TextEditingController();
+      // Add listener untuk update stok display
+      controller.addListener(() => _updateStokDisplay());
+      return controller;
+    });
     _satuanControllers = List.generate(length, (_) => TextEditingController());
     _imageList = List.generate(length, (_) => null);
 
@@ -99,6 +104,7 @@ class _PelaporanNutrisiTanamanScreenState
       controller.dispose();
     }
     for (var controller in _sizeControllers) {
+      controller.removeListener(() => _updateStokDisplay());
       controller.dispose();
     }
     for (var controller in _satuanControllers) {
@@ -132,7 +138,7 @@ class _PelaporanNutrisiTanamanScreenState
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
-                      'stok': item['jumlah'],
+                      'stok': double.tryParse(item['jumlah'].toString()) ?? 0.0,
                       'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
@@ -149,7 +155,7 @@ class _PelaporanNutrisiTanamanScreenState
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
-                      'stok': item['jumlah'],
+                      'stok': double.tryParse(item['jumlah'].toString()) ?? 0.0,
                       'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
@@ -166,7 +172,7 @@ class _PelaporanNutrisiTanamanScreenState
                       'name': item['nama'],
                       'id': item['id'],
                       'satuanId': item['SatuanId'],
-                      'stok': item['jumlah'],
+                      'stok': double.tryParse(item['jumlah'].toString()) ?? 0.0,
                       'satuanNama': item['Satuan']?['nama'] ?? '',
                     })
                 .toList();
@@ -224,6 +230,80 @@ class _PelaporanNutrisiTanamanScreenState
     }
   }
 
+  void _updateStokDisplay() {
+    // Trigger rebuild untuk update label stok
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Widget _buildInfoPenggunaanBahan(
+      int currentIndex, Map<String, dynamic> bahan) {
+    final bahanId = bahan['id'].toString();
+    final bahanNama = bahan['name'];
+
+    // Hitung berapa tanaman lain yang menggunakan bahan yang sama
+    List<int> tanamanLainIndices = [];
+    for (int i = 0; i < selectedBahanList.length; i++) {
+      if (i != currentIndex &&
+          selectedBahanList[i] != null &&
+          selectedBahanList[i]!['id'].toString() == bahanId) {
+        tanamanLainIndices.add(i);
+      }
+    }
+
+    if (tanamanLainIndices.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 16, color: Colors.blue.shade700),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'Bahan "$bahanNama" juga digunakan oleh:',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          ...tanamanLainIndices.map((index) {
+            final dosisText = _sizeControllers[index].text;
+            final dosis = double.tryParse(dosisText) ?? 0.0;
+            final tanamanNama =
+                _objekBudidayaList[index]['name'] ?? 'Tanpa Nama';
+            return Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(
+                '• Tanaman ${index + 1} ($tanamanNama): ${dosis > 0 ? '${dosis.toStringAsFixed(1)} ${bahan['satuanNama']}' : 'Belum diisi'}',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.blue.shade600,
+                ),
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submitForm() async {
     if (_isLoading) return;
     setState(() {
@@ -237,6 +317,47 @@ class _PelaporanNutrisiTanamanScreenState
       _showErrorSnackbar("Tidak ada data objek budidaya untuk dilaporkan.");
       setState(() => _isLoading = false);
       return;
+    }
+
+    // Validasi stok kumulatif untuk semua bahan yang digunakan
+    Map<String, double> penggunaanBahan = {};
+    Map<String, Map<String, dynamic>> infoBahan = {};
+
+    for (int i = 0; i < _objekBudidayaList.length; i++) {
+      if (selectedBahanList[i] != null) {
+        final bahanId = selectedBahanList[i]!['id'].toString();
+        final dosisText = _sizeControllers[i].text;
+        final dosis = double.tryParse(dosisText) ?? 0.0;
+
+        penggunaanBahan[bahanId] = (penggunaanBahan[bahanId] ?? 0.0) + dosis;
+
+        if (!infoBahan.containsKey(bahanId)) {
+          final stokValue = selectedBahanList[i]!['stok'];
+          final stokDouble = (stokValue is double)
+              ? stokValue
+              : double.tryParse(stokValue.toString()) ?? 0.0;
+
+          infoBahan[bahanId] = {
+            'nama': selectedBahanList[i]!['name'],
+            'stok': stokDouble,
+            'satuanNama': selectedBahanList[i]!['satuanNama'],
+          };
+        }
+      }
+    }
+
+    // Cek apakah ada penggunaan yang melebihi stok
+    for (final entry in penggunaanBahan.entries) {
+      final bahanId = entry.key;
+      final totalPenggunaan = entry.value;
+      final infoBahanItem = infoBahan[bahanId]!;
+      final stok = infoBahanItem['stok'] as double;
+
+      if (totalPenggunaan > stok) {
+        errorMessages.add(
+            "Total penggunaan ${infoBahanItem['nama']} (${totalPenggunaan.toStringAsFixed(1)} ${infoBahanItem['satuanNama']}) melebihi stok yang tersedia (${stok.toStringAsFixed(1)} ${infoBahanItem['satuanNama']})");
+        allFormsValid = false;
+      }
     }
 
     for (int i = 0; i < _objekBudidayaList.length; i++) {
@@ -465,20 +586,47 @@ class _PelaporanNutrisiTanamanScreenState
 
                           if (currentBahanTerpilih != null &&
                               currentBahanTerpilih['stok'] != null) {
-                            final dynamic stokValue =
-                                currentBahanTerpilih['stok'];
+                            final double stokAwal =
+                                (currentBahanTerpilih['stok'] is double)
+                                    ? currentBahanTerpilih['stok'] as double
+                                    : double.tryParse(
+                                            currentBahanTerpilih['stok']
+                                                .toString()) ??
+                                        0.0;
                             satuanDisplay =
                                 currentBahanTerpilih['satuanNama'] as String? ??
                                     '';
 
-                            final double? stokAngka =
-                                double.tryParse(stokValue.toString());
+                            if (stokAwal > 0) {
+                              // Hitung total penggunaan bahan yang sama di tanaman sebelumnya
+                              double totalTerpakai = 0.0;
+                              final currentBahanId =
+                                  currentBahanTerpilih['id'].toString();
 
-                            if (stokAngka != null) {
+                              for (int j = 0; j < i; j++) {
+                                if (selectedBahanList.length > j &&
+                                    selectedBahanList[j] != null &&
+                                    selectedBahanList[j]!['id'].toString() ==
+                                        currentBahanId) {
+                                  final dosisText = _sizeControllers[j].text;
+                                  final dosis =
+                                      double.tryParse(dosisText) ?? 0.0;
+                                  totalTerpakai += dosis;
+                                }
+                              }
+
+                              final double stokTersisa =
+                                  stokAwal - totalTerpakai;
                               final String stokFormatted =
-                                  stokAngka.toStringAsFixed(1);
-                              labelUntukJumlah =
-                                  "Jumlah/dosis (Sisa: $stokFormatted $satuanDisplay)";
+                                  stokTersisa.toStringAsFixed(1);
+
+                              if (totalTerpakai > 0) {
+                                labelUntukJumlah =
+                                    "Jumlah/dosis (Sisa: $stokFormatted $satuanDisplay, Terpakai: ${totalTerpakai.toStringAsFixed(1)} $satuanDisplay)";
+                              } else {
+                                labelUntukJumlah =
+                                    "Jumlah/dosis (Sisa: $stokFormatted $satuanDisplay)";
+                              }
                             }
                           }
 
@@ -494,9 +642,22 @@ class _PelaporanNutrisiTanamanScreenState
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 8.0, bottom: 8.0),
-                                      child: Text(
-                                        'Tanaman Ke-${i + 1}: ${objek['name'] ?? 'Tanpa Nama'}',
-                                        style: bold18.copyWith(color: dark1),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Tanaman Ke-${i + 1}: ${objek['name'] ?? 'Tanpa Nama'}',
+                                            style:
+                                                bold18.copyWith(color: dark1),
+                                          ),
+                                          // Tampilkan informasi penggunaan bahan yang sama jika ada
+                                          if (currentBahanTerpilih != null) ...[
+                                            const SizedBox(height: 4),
+                                            _buildInfoPenggunaanBahan(
+                                                i, currentBahanTerpilih),
+                                          ],
+                                        ],
                                       ),
                                     ),
                                   if (_objekBudidayaList.length == 1 &&
@@ -618,11 +779,73 @@ class _PelaporanNutrisiTanamanScreenState
                                         if (currentBahanTerpilih != null &&
                                             currentBahanTerpilih['stok'] !=
                                                 null) {
-                                          dynamic stokValue =
-                                              currentBahanTerpilih['stok'];
-                                          if (stokValue is num &&
-                                              number > stokValue) {
-                                            return 'Dosis melebihi stok (Sisa: ${stokValue.toStringAsFixed(1)} $satuanDisplay)';
+                                          final double stokAwal =
+                                              (currentBahanTerpilih['stok']
+                                                      is double)
+                                                  ? currentBahanTerpilih['stok']
+                                                      as double
+                                                  : double.tryParse(
+                                                          currentBahanTerpilih[
+                                                                  'stok']
+                                                              .toString()) ??
+                                                      0.0;
+
+                                          if (stokAwal > 0) {
+                                            // Hitung total penggunaan bahan yang sama di tanaman lain
+                                            double totalTerpakai = 0.0;
+                                            final currentBahanId =
+                                                currentBahanTerpilih['id']
+                                                    .toString();
+
+                                            // Hitung penggunaan di tanaman sebelumnya
+                                            for (int j = 0; j < i; j++) {
+                                              if (selectedBahanList
+                                                          .length >
+                                                      j &&
+                                                  selectedBahanList[j] !=
+                                                      null &&
+                                                  selectedBahanList[j]!['id']
+                                                          .toString() ==
+                                                      currentBahanId) {
+                                                final dosisText =
+                                                    _sizeControllers[j].text;
+                                                final dosis = double.tryParse(
+                                                        dosisText) ??
+                                                    0.0;
+                                                totalTerpakai += dosis;
+                                              }
+                                            }
+
+                                            // Hitung penggunaan di tanaman setelahnya (jika sudah diisi)
+                                            for (int j = i + 1;
+                                                j < selectedBahanList.length;
+                                                j++) {
+                                              if (selectedBahanList[j] !=
+                                                      null &&
+                                                  selectedBahanList[j]!['id']
+                                                          .toString() ==
+                                                      currentBahanId) {
+                                                final dosisText =
+                                                    _sizeControllers[j].text;
+                                                final dosis = double.tryParse(
+                                                        dosisText) ??
+                                                    0.0;
+                                                totalTerpakai += dosis;
+                                              }
+                                            }
+
+                                            final double totalKebutuhan =
+                                                totalTerpakai + number;
+
+                                            if (totalKebutuhan > stokAwal) {
+                                              final double stokTersisa =
+                                                  stokAwal - totalTerpakai;
+                                              if (stokTersisa <= 0) {
+                                                return 'Stok habis (Sudah terpakai: ${totalTerpakai.toStringAsFixed(1)} $satuanDisplay)';
+                                              } else {
+                                                return 'Total dosis melebihi stok (Sisa: ${stokTersisa.toStringAsFixed(1)} $satuanDisplay)';
+                                              }
+                                            }
                                           }
                                         }
                                         return null;
