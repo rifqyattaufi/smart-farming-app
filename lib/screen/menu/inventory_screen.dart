@@ -327,10 +327,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                     [])
                                 .map((item) => {
                                       'id': item['id'],
-                                      'name': item['nama'],
-                                      'icon': item['gambar'],
+                                      'name': item['nama'] ?? 'N/A',
+                                      'icon': item['gambar'] as String?,
                                       'category':
-                                          'Stok: ${item['jumlah']} ${item['lambangSatuan']}',
+                                          'Stok: ${formatNumber(item['jumlah'])} ${item['lambangSatuan'] ?? ''}',
                                     })
                                 .toList(),
                             type: 'basic',

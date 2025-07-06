@@ -141,11 +141,8 @@ class _DetailLaporanNutrisiScreenState
                                     "Nama inventaris",
                                     laporanNutrisi?['Vitamin']['inventaris']
                                         ['nama']),
-                                infoItem(
-                                    "Jumlah digunakan",
-                                    laporanNutrisi?['Vitamin']['jumlah']
-                                            ?.toString() ??
-                                        "-"),
+                                infoItem("Jumlah digunakan",
+                                    "${laporanNutrisi?['Vitamin']['jumlah']?.toString() ?? "-"} ${laporanNutrisi?['Vitamin']['inventaris']['Satuan']['lambang'] ?? ""}"),
                                 infoItem("Satuan",
                                     "${laporanNutrisi?['Vitamin']['inventaris']['Satuan']['nama']} - ${laporanNutrisi?['Vitamin']['inventaris']['Satuan']['lambang']}"),
                                 if (laporanNutrisi?['ObjekBudidaya'] != null)
