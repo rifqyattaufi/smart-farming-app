@@ -22,7 +22,7 @@ class _DetailPemakaianInventarisFromLaporanScreenState
   final InventarisService _inventarisService = InventarisService();
 
   Map<String, dynamic>? _inventarisDetails;
-  int _jumlahPemakaian = 0;
+  double _jumlahPemakaian = 0.0;
   bool _isLoading = true;
 
   @override
@@ -52,11 +52,15 @@ class _DetailPemakaianInventarisFromLaporanScreenState
       final response = await _inventarisService
           .getPemakaianInventarisByLaporanId(widget.idLaporan!);
 
+
       if (mounted) {
         if (response['status'] == true && response['data'] != null) {
           setState(() {
             _inventarisDetails = response['data'];
-            _jumlahPemakaian = response['data']['jumlah'] ?? 0;
+            // Handle both int and double values
+            final jumlah = response['data']['jumlah'] ?? 0;
+            _jumlahPemakaian =
+                jumlah is int ? jumlah.toDouble() : (jumlah as double? ?? 0.0);
             _isLoading = false;
           });
         } else {
@@ -153,7 +157,7 @@ class _DetailPemakaianInventarisFromLaporanScreenState
                                         ?['name'] ??
                                     'Tidak diketahui'),
                             infoItem("Jumlah digunakan",
-                                _jumlahPemakaian.toString()),
+                                "${formatNumber(_jumlahPemakaian)} ${_inventarisDetails?['inventaris']?['Satuan']?['lambang'] ?? ''}"),
                             infoItem(
                               "Satuan",
                               _inventarisDetails?['inventaris']?['Satuan'] !=

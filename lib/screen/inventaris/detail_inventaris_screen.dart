@@ -70,8 +70,9 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
       if (!mounted) return;
       if (response['status']) {
         final data = response['data'];
+        final inventarisDetails = data['inventaris'];
         setState(() {
-          _inventarisDetails = data['inventaris'];
+          _inventarisDetails = inventarisDetails;
           final defaultChartRawData =
               data['defaultChartData'] as List<dynamic>? ?? [];
           _updateChartDisplayData(defaultChartRawData, ChartFilterType.weekly);
@@ -463,7 +464,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
         'person': item['petugasNama'],
         'date': item['laporanTanggal'],
         'time': item['laporanWaktu'],
-        'jumlah': item['jumlah'],
+        'jumlah': formatNumber(item['jumlah']),
         'laporanId': item['laporanId'],
       };
     }).toList();
@@ -544,7 +545,7 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                               infoItem("Kategori inventaris",
                                   kategori?['nama'] ?? 'Unknown'),
                               infoItem("Jumlah Stok",
-                                  "${num.parse(jumlah.toString()).toStringAsFixed(num.parse(jumlah.toString()).truncateToDouble() == num.parse(jumlah.toString()) ? 0 : 1)}${satuanLambang.isNotEmpty ? ' $satuanLambang' : ''}"),
+                                  "${formatNumber(jumlah)}${satuanLambang.isNotEmpty ? ' $satuanLambang' : ''}"),
                               infoItem("Satuan",
                                   satuanNama.isNotEmpty ? satuanNama : ""),
                               _buildKetersediaan(

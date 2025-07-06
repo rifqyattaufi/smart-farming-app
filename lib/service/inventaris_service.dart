@@ -503,10 +503,12 @@ class InventarisService {
       String idInventaris) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$baseUrl/$idInventaris/detail-pemakaian-inventaris');
+    final url = Uri.parse('$baseUrl/pemakaian/$idInventaris');
+
 
     try {
       final response = await http.get(url, headers: headers);
+
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
@@ -520,11 +522,15 @@ class InventarisService {
         return await getPemakaianInventarisById(idInventaris);
       } else {
         final body = response.body;
+        Map<String, dynamic> errorResponse;
+        try {
+          errorResponse = json.decode(body);
+        } catch (e) {
+          errorResponse = {'message': 'Unknown error occurred'};
+        }
         return {
           'status': false,
-          'message': body.isNotEmpty
-              ? json.decode(body)['message']
-              : 'Failed to load data',
+          'message': errorResponse['message'] ?? 'Failed to load data',
           'data': null
         };
       }

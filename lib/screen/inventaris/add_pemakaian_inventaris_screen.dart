@@ -35,6 +35,7 @@ class AddPemakaianInventarisScreenState
   String? selectedInvId;
   String? selectedInvNama;
   String? selectedInvSatuanId;
+  double? selectedInvStok; // Add this to track current stock
 
   bool _isLoading = false;
 
@@ -118,17 +119,23 @@ class AddPemakaianInventarisScreenState
       final kategoriResponse =
           await _kategoriInvService.getKategoriInventarisOnly();
       if (kategoriResponse['status'] && kategoriResponse['data'] != null) {
-        setState(() {
-          _kategoriList =
-              List<Map<String, dynamic>>.from(kategoriResponse['data']);
-        });
+        if (mounted) {
+          setState(() {
+            _kategoriList =
+                List<Map<String, dynamic>>.from(kategoriResponse['data']);
+          });
+        }
       } else {
-        showAppToast(
-            context, kategoriResponse['message'] ?? 'Gagal memuat data');
+        if (mounted) {
+          showAppToast(
+              context, kategoriResponse['message'] ?? 'Gagal memuat data');
+        }
       }
     } catch (e) {
-      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
-          title: 'Error Tidak Terduga 😢');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     }
   }
 
@@ -138,41 +145,48 @@ class AddPemakaianInventarisScreenState
       selectedInvId = null;
       selectedInvNama = null;
       selectedInvSatuanId = null;
+      selectedInvStok = null;
       _satuanController.clear();
     });
     try {
       final inventarisResponse =
           await _inventarisService.getInventarisByKategoriId(kategoriId);
       if (inventarisResponse['status'] && inventarisResponse['data'] != null) {
-        setState(() {
-          final today = DateTime.now();
-          _inventarisList = List<Map<String, dynamic>>.from(
-            (inventarisResponse['data'] as List).where((item) {
-              final jumlah = item['jumlah'] ?? 0;
-              final tanggalKadaluwarsaStr = item['tanggalKadaluwarsa'];
-              if (tanggalKadaluwarsaStr == null) return false;
-              final tanggalKadaluwarsa =
-                  DateTime.tryParse(tanggalKadaluwarsaStr);
-              if (tanggalKadaluwarsa == null) return false;
-              return jumlah > 0 &&
-                  !tanggalKadaluwarsa
-                      .isBefore(DateTime(today.year, today.month, today.day));
-            }).map((item) => {
-                  'id': item['id'],
-                  'nama': item['nama'],
-                  'satuanId': item['SatuanId'],
-                  'jumlah': item['jumlah'],
-                  'tanggalKadaluwarsa': item['tanggalKadaluwarsa'],
-                }),
-          );
-        });
+        if (mounted) {
+          setState(() {
+            final today = DateTime.now();
+            _inventarisList = List<Map<String, dynamic>>.from(
+              (inventarisResponse['data'] as List).where((item) {
+                final jumlah = item['jumlah'] ?? 0;
+                final tanggalKadaluwarsaStr = item['tanggalKadaluwarsa'];
+                if (tanggalKadaluwarsaStr == null) return false;
+                final tanggalKadaluwarsa =
+                    DateTime.tryParse(tanggalKadaluwarsaStr);
+                if (tanggalKadaluwarsa == null) return false;
+                return jumlah > 0 &&
+                    !tanggalKadaluwarsa
+                        .isBefore(DateTime(today.year, today.month, today.day));
+              }).map((item) => {
+                    'id': item['id'],
+                    'nama': item['nama'],
+                    'satuanId': item['SatuanId'],
+                    'jumlah': item['jumlah'],
+                    'tanggalKadaluwarsa': item['tanggalKadaluwarsa'],
+                  }),
+            );
+          });
+        }
       } else {
-        showAppToast(
-            context, inventarisResponse['message'] ?? 'Gagal memuat data');
+        if (mounted) {
+          showAppToast(
+              context, inventarisResponse['message'] ?? 'Gagal memuat data');
+        }
       }
     } catch (e) {
-      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
-          title: 'Error Tidak Terduga 😢');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     }
   }
 
@@ -205,11 +219,13 @@ class AddPemakaianInventarisScreenState
       final imageUrlResponse = await _imageService.uploadImage(_image!);
       if (!(imageUrlResponse['status'] ?? false) ||
           imageUrlResponse['data'] == null) {
-        showAppToast(context,
-            'Gagal mengunggah gambar: ${imageUrlResponse['message'] ?? 'URL tidak valid'}');
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          showAppToast(context,
+              'Gagal mengunggah gambar: ${imageUrlResponse['message'] ?? 'URL tidak valid'}');
+          setState(() {
+            _isLoading = false;
+          });
+        }
         return;
       }
       final imageUrl = imageUrlResponse['data'];
@@ -235,22 +251,26 @@ class AddPemakaianInventarisScreenState
           await _laporanService.createLaporanPenggunaanInventaris(data);
 
       if (response['status']) {
-        showAppToast(
-            context, 'Berhasil menambahkan laporan pemakaian inventaris',
-            isError: false);
-        _resetForm();
         if (mounted) {
+          showAppToast(
+              context, 'Berhasil menambahkan laporan pemakaian inventaris',
+              isError: false);
+          _resetForm();
           Navigator.pop(context);
         }
       } else {
-        showAppToast(
-            context,
-            response['message'] ??
-                'Gagal menambahkan laporan pemakaian inventaris');
+        if (mounted) {
+          showAppToast(
+              context,
+              response['message'] ??
+                  'Gagal menambahkan laporan pemakaian inventaris');
+        }
       }
     } catch (e) {
-      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
-          title: 'Error Tidak Terduga 😢');
+      if (mounted) {
+        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+            title: 'Error Tidak Terduga 😢');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -268,6 +288,7 @@ class AddPemakaianInventarisScreenState
       selectedInvId = null;
       selectedInvNama = null;
       selectedInvSatuanId = null;
+      selectedInvStok = null;
       _inventarisList = [];
       _sizeController.clear();
       _catatanController.clear();
@@ -282,29 +303,37 @@ class AddPemakaianInventarisScreenState
         final response =
             await _satuanService.getSatuanById(selectedInvSatuanId!);
         if (response['status']) {
-          setState(() {
-            _satuanController.text =
-                "${response['data']['nama']} - ${response['data']['lambang']}";
-          });
+          if (mounted) {
+            setState(() {
+              _satuanController.text =
+                  "${response['data']['nama']} - ${response['data']['lambang']}";
+            });
+          }
         } else {
-          setState(() {
-            _satuanController.text = "Satuan tidak ditemukan";
-          });
-          showAppToast(
-              context, 'Error fetching satuan data: ${response['message']}',
-              title: 'Error Tidak Terduga 😢');
+          if (mounted) {
+            setState(() {
+              _satuanController.text = "Satuan tidak ditemukan";
+            });
+            showAppToast(
+                context, 'Error fetching satuan data: ${response['message']}',
+                title: 'Error Tidak Terduga 😢');
+          }
         }
       } catch (e) {
-        setState(() {
-          _satuanController.text = "Error memuat satuan";
-        });
-        showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
-            title: 'Error Tidak Terduga 😢');
+        if (mounted) {
+          setState(() {
+            _satuanController.text = "Error memuat satuan";
+          });
+          showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+              title: 'Error Tidak Terduga 😢');
+        }
       }
     } else {
-      setState(() {
-        _satuanController.clear();
-      });
+      if (mounted) {
+        setState(() {
+          _satuanController.clear();
+        });
+      }
     }
   }
 
@@ -357,6 +386,7 @@ class AddPemakaianInventarisScreenState
                           selectedInvId = null;
                           selectedInvNama = null;
                           selectedInvSatuanId = null;
+                          selectedInvStok = null;
                           _inventarisList = [];
                           _satuanController.clear();
                         });
@@ -391,6 +421,7 @@ class AddPemakaianInventarisScreenState
                                 selectedInvId = null;
                                 selectedInvNama = null;
                                 selectedInvSatuanId = null;
+                                selectedInvStok = null;
                                 _satuanController.clear();
                               });
                               return;
@@ -404,6 +435,9 @@ class AddPemakaianInventarisScreenState
                                 selectedInvNama = value;
                                 selectedInvSatuanId =
                                     selected['satuanId']?.toString();
+                                selectedInvStok = (selected['jumlah'] is int)
+                                    ? (selected['jumlah'] as int).toDouble()
+                                    : (selected['jumlah'] as double? ?? 0.0);
                               });
                               _changeSatuan();
                             }
@@ -419,7 +453,9 @@ class AddPemakaianInventarisScreenState
                   ),
                   InputFieldWidget(
                       key: const Key('jumlah_digunakan_input'),
-                      label: "Jumlah digunakan",
+                      label: selectedInvStok != null
+                          ? "Jumlah digunakan (Sisa stok: ${selectedInvStok!.toStringAsFixed(selectedInvStok! % 1 == 0 ? 0 : 1)})"
+                          : "Jumlah digunakan",
                       hint: "Contoh: 20.5",
                       controller: _sizeController,
                       keyboardType:
@@ -431,8 +467,14 @@ class AddPemakaianInventarisScreenState
                         if (double.tryParse(value) == null) {
                           return 'Jumlah harus berupa angka';
                         }
-                        if (double.parse(value) <= 0) {
+                        final inputValue = double.parse(value);
+                        if (inputValue <= 0) {
                           return 'Jumlah harus lebih dari 0';
+                        }
+                        // Check if input exceeds available stock
+                        if (selectedInvStok != null &&
+                            inputValue > selectedInvStok!) {
+                          return 'Jumlah melebihi stok tersedia (${selectedInvStok!.toStringAsFixed(selectedInvStok! % 1 == 0 ? 0 : 1)})';
                         }
                         return null;
                       }),
