@@ -391,7 +391,7 @@ class _HasilPanenWithGradesScreenState
               Expanded(
                 child: CustomButton(
                   onPressed: _selectKomoditas,
-                  buttonText: _selectedKomoditasName ?? 'Pilih Komoditas',
+                  buttonText: _selectedKomoditasName ?? 'Semua Komoditas',
                   backgroundColor: _selectedKomoditasId != null ? green1 : grey,
                   textColor: _selectedKomoditasId != null ? white : dark1,
                   textStyle: semibold14.copyWith(

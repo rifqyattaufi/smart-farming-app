@@ -698,9 +698,28 @@ class _DetailInventarisScreenState extends State<DetailInventarisScreen> {
                             type: "history",
                             onItemTap: (context, tappedItem) {
                               final id = tappedItem['id']?.toString();
+                              final laporanId =
+                                  tappedItem['laporanId']?.toString();
                               if (id != null && id.isNotEmpty) {
-                                context
-                                    .push('/detail-pemakaian-inventaris/$id');
+                                // Check inventory category to determine navigation
+                                final kategoriNama =
+                                    _inventarisDetails?['kategoriInventaris']
+                                                ?['nama']
+                                            ?.toString()
+                                            .toLowerCase() ??
+                                        '';
+
+                                // Navigate to laporan nutrisi for nutrisi categories
+                                if (kategoriNama == 'pupuk' ||
+                                    kategoriNama == 'vitamin' ||
+                                    kategoriNama == 'disinfektan' ||
+                                    kategoriNama == 'vaksin') {
+                                  context.push(
+                                      '/detail-laporan-nutrisi/$laporanId');
+                                } else {
+                                  context
+                                      .push('/detail-pemakaian-inventaris/$id');
+                                }
                               } else {
                                 showAppToast(
                                     context, 'Detail riwayat tidak ditemukan.');

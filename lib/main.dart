@@ -369,7 +369,7 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/detail-laporan-nutrisi-tanaman/:id',
+      path: '/detail-laporan-nutrisi/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'];
         return DetailLaporanNutrisiScreen(
