@@ -47,6 +47,7 @@ class _BannerWidgetState extends State<BannerWidget> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(12),
+      width: double.infinity,
       decoration: BoxDecoration(
         color: green4,
         borderRadius: BorderRadius.circular(8),

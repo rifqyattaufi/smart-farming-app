@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/theme.dart';
 
-class MenuCard extends StatelessWidget {
+class MenuCard extends StatefulWidget {
   final Color bgColor;
   final Color iconColor;
   final IconData icon;
@@ -20,34 +20,104 @@ class MenuCard extends StatelessWidget {
   });
 
   @override
+  State<MenuCard> createState() => _MenuCardState();
+}
+
+class _MenuCardState extends State<MenuCard> {
+  bool _isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
     return Material(
-      color: bgColor,
+      color: widget.bgColor,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          height: 160,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 165),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
-                  backgroundColor: iconColor,
-                  child: Icon(icon, color: Colors.white),
+                  backgroundColor: widget.iconColor,
+                  child: Icon(widget.icon, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
-                Text(title, style: semibold16.copyWith(color: dark1)),
+                Text(
+                  widget.title,
+                  style: bold18.copyWith(color: dark1),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle,
-                    style: regular12.copyWith(color: dark1, fontSize: 13)),
+                _buildSubtitleWithExpandButton(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSubtitleWithExpandButton() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Deteksi ukuran layar
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isLargeScreen = screenWidth > 400;
+
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: widget.subtitle,
+            style: medium14.copyWith(color: dark1),
+          ),
+          maxLines: 3,
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout(maxWidth: constraints.maxWidth);
+
+        final isOverflowing = textPainter.didExceedMaxLines;
+
+        // Pada layar besar, tampilkan semua teks tanpa tombol expand
+        if (isLargeScreen) {
+          return Text(
+            widget.subtitle,
+            style: medium14.copyWith(color: dark1),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.subtitle,
+              style: medium14.copyWith(color: dark1),
+              maxLines: _isExpanded ? null : 3,
+              overflow: _isExpanded ? null : TextOverflow.ellipsis,
+            ),
+            if (isOverflowing) ...[
+              const SizedBox(height: 4),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Text(
+                  _isExpanded
+                      ? 'Tampilkan lebih sedikit'
+                      : 'Tampilkan lebih banyak',
+                  style: medium12.copyWith(color: widget.iconColor),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
