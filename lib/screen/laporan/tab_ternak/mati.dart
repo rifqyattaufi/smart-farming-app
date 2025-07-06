@@ -57,8 +57,20 @@ class MatiTab extends StatelessWidget {
           : "pada periode $start hingga $end";
     }
 
-    num totalKematian = laporanMatiState.dataPoints.fold(
-        0, (prev, curr) => prev + ((curr['jumlahKematian'] as num?) ?? 0));
+    num totalKematian = laporanMatiState.dataPoints.fold(0, (prev, curr) {
+      final value = curr['jumlahKematian'];
+      if (value is num) {
+        return prev + value;
+      } else if (value is String) {
+        return prev + (num.tryParse(value) ?? 0);
+      }
+      return prev;
+    });
+
+    // Handle empty state when no deaths occurred
+    if (totalKematian == 0) {
+      return "Berdasarkan statistik $periodeText, tidak ditemukan kasus kematian ternak. Kondisi ini menunjukkan bahwa ternak dalam keadaan sehat dan terawat dengan baik.";
+    }
 
     final summary = StringBuffer(
         "Berdasarkan statistik $periodeText, ditemukan total $totalKematian kasus kematian ternak. ");
@@ -72,7 +84,13 @@ class MatiTab extends StatelessWidget {
 
       final List<String> penyebabParts = penyakitData.map<String>((item) {
         final nama = item['penyebab'] ?? 'N/A';
-        final total = (item['jumlahKematian'] as num?)?.toInt() ?? 0;
+        final value = item['jumlahKematian'];
+        int total = 0;
+        if (value is num) {
+          total = value.toInt();
+        } else if (value is String) {
+          total = int.tryParse(value) ?? 0;
+        }
         return "$total kasus $nama";
       }).toList();
 
@@ -114,8 +132,15 @@ class MatiTab extends StatelessWidget {
         ),
       );
     } else {
-      final totalMati = laporanMatiState.dataPoints.fold<num>(
-          0, (sum, item) => sum + ((item['jumlahKematian'] as num?) ?? 0));
+      final totalMati = laporanMatiState.dataPoints.fold<num>(0, (sum, item) {
+        final value = item['jumlahKematian'];
+        if (value is num) {
+          return sum + value;
+        } else if (value is String) {
+          return sum + (num.tryParse(value) ?? 0);
+        }
+        return sum;
+      });
 
       cardContent = Stack(
         children: [
