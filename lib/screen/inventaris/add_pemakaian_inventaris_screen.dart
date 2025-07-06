@@ -35,7 +35,7 @@ class AddPemakaianInventarisScreenState
   String? selectedInvId;
   String? selectedInvNama;
   String? selectedInvSatuanId;
-  double? selectedInvStok; // Add this to track current stock
+  double? selectedInvStok;
 
   bool _isLoading = false;
 
@@ -237,7 +237,7 @@ class AddPemakaianInventarisScreenState
       final inventarisNama = inventarisYangDipilih['nama'];
 
       final data = {
-        "judul": "Laporan Pemakaian Inventaris $inventarisNama",
+        "judul": "Laporan Pemakaian Inventaris - $inventarisNama",
         "tipe": "inventaris",
         "gambar": imageUrl,
         "catatan": _catatanController.text,

@@ -185,7 +185,7 @@ class AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
         'unitBudidayaId': selectedLocation,
         'tipe': 'hama',
         'judul':
-            "Laporan Hama ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama}",
+            "Laporan Hama - ${selectedHama == 'lainnya' ? _namaHamaController.text : selectedNamaHama}",
         'gambar': imageUrl.isNotEmpty ? imageUrl['data'] : '',
         'catatan': _catatanController.text,
         'hama': {

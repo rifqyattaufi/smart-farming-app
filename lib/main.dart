@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:smart_farming_app/screen/komoditas/detail_komoditas_screen.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:smart_farming_app/screen/main_screen_petugas.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_nutrisi_kebun_screen.dart';
 import 'package:toastification/toastification.dart';
 import 'package:smart_farming_app/firebase_options.dart';
 import 'package:smart_farming_app/model/notifikasi_model.dart';
@@ -367,6 +368,10 @@ final _router = GoRouter(
         final extra = state.extra as PelaporanNutrisiTanamanScreen;
         return extra;
       },
+    ),
+    GoRoute(
+      path: '/pelaporan-nutrisi-kebun',
+      builder: (context, state) => state.extra as PelaporanNutrisiKebunScreen,
     ),
     GoRoute(
       path: '/detail-laporan-nutrisi/:id',

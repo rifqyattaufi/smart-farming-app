@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_nutrisi_kebun_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_tanaman_panen_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_tanaman_screen.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -31,6 +32,10 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
   List<dynamic> _listKebun = [];
   Map<String, dynamic>? _selectedUnitBudidaya;
+  String _selectedListType = 'tanaman'; // 'tanaman' atau 'kebun'
+  String? _selectedFromList; // Track which list the selection came from
+  Key _listTanamanKey = UniqueKey(); // Key untuk force rebuild list tanaman
+  Key _listKebunKey = UniqueKey(); // Key untuk force rebuild list kebun
 
   Future<void> _fetchData() async {
     try {
@@ -62,6 +67,13 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
       if (widget.tipe == "panen") {
         context.push('/pelaporan-panen-tanaman',
             extra: PelaporanTanamanPanenScreen(
+                greeting: widget.greeting,
+                data: updatedData,
+                tipe: widget.tipe,
+                step: widget.step + 1));
+      } else if (widget.tipe == 'vitamin' && _selectedListType == 'kebun') {
+        context.push('/pelaporan-nutrisi-kebun',
+            extra: PelaporanNutrisiKebunScreen(
                 greeting: widget.greeting,
                 data: updatedData,
                 tipe: widget.tipe,
@@ -133,27 +145,104 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
                       ],
                     ),
                   )
-                : ListItemSelectable(
-                    key: const Key('pilih_kebun'),
-                    title: 'Daftar Kebun',
-                    type: ListItemType.simple,
-                    items: _listKebun
-                        .map((item) => {
-                              'name': item['nama'],
-                              'id': item['id'],
-                              'icon': item['gambar'],
-                              'category': item['JenisBudidaya']['nama'],
-                              'tipe': item['tipe'],
-                              'latin': item['JenisBudidaya']['latin'],
-                              'createdAt': item['createdAt'],
-                            })
-                        .toList(),
-                    onItemTap: (context, item) {
-                      setState(() {
-                        _selectedUnitBudidaya = item; // Update local state
-                      });
-                    },
+                : Column(
+                    children: [
+                      ListItemSelectable(
+                        key: _listTanamanKey,
+                        title: widget.tipe == 'vitamin'
+                            ? 'Daftar Kebun (Pelaporan Per Tanaman)'
+                            : 'Daftar Kebun',
+                        type: ListItemType.simple,
+                        items: _listKebun
+                            .map((item) => {
+                                  'name': item['nama'],
+                                  'id': item['id'],
+                                  'icon': item['gambar'],
+                                  'category': item['JenisBudidaya']['nama'],
+                                  'tipe': item['tipe'],
+                                  'latin': item['JenisBudidaya']['latin'],
+                                  'createdAt': item['createdAt'],
+                                })
+                            .toList(),
+                        onItemTap: (context, item) {
+                          setState(() {
+                            // Reset selection dari list kebun jika sebelumnya dipilih dari sana
+                            if (_selectedFromList == 'kebun') {
+                              _listKebunKey =
+                                  UniqueKey(); // Force rebuild list kebun untuk reset selection
+                            }
+                            _selectedUnitBudidaya = item; // Update local state
+                            _selectedListType =
+                                'tanaman'; // Tandai sebagai selection untuk pelaporan per tanaman
+                            _selectedFromList =
+                                'tanaman'; // Track dari list mana
+                          });
+                        },
+                      ),
+
+                      // Tambahkan info banner jika tipe vitamin
+                      if (widget.tipe == 'vitamin')
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline,
+                                    color: Colors.blue.shade700, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Pilih opsi pelaporan di atas untuk per tanaman, atau di bawah untuk per kebun',
+                                    style: regular12.copyWith(
+                                        color: Colors.blue.shade700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+
+            // List kebun kedua khusus untuk tipe vitamin
+            if (widget.tipe == 'vitamin' && _listKebun.isNotEmpty)
+              ListItemSelectable(
+                key: _listKebunKey,
+                title: 'Daftar Kebun (Pelaporan Per Kebun)',
+                type: ListItemType.simple,
+                items: _listKebun
+                    .map((item) => {
+                          'name': item['nama'],
+                          'id': item['id'],
+                          'icon': item['gambar'],
+                          'category': item['JenisBudidaya']['nama'],
+                          'tipe': item['tipe'],
+                          'latin': item['JenisBudidaya']['latin'],
+                          'createdAt': item['createdAt'],
+                        })
+                    .toList(),
+                onItemTap: (context, item) {
+                  setState(() {
+                    // Reset selection dari list tanaman jika sebelumnya dipilih dari sana
+                    if (_selectedFromList == 'tanaman') {
+                      _listTanamanKey =
+                          UniqueKey(); // Force rebuild list tanaman untuk reset selection
+                    }
+                    _selectedUnitBudidaya = item; // Update local state
+                    _selectedListType =
+                        'kebun'; // Tandai sebagai selection untuk pelaporan per kebun
+                    _selectedFromList = 'kebun'; // Track dari list mana
+                  });
+                },
+              ),
+
             const SizedBox(height: 16),
           ],
         ),
