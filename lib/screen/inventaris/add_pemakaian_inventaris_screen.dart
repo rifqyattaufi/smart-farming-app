@@ -157,15 +157,24 @@ class AddPemakaianInventarisScreenState
             final today = DateTime.now();
             _inventarisList = List<Map<String, dynamic>>.from(
               (inventarisResponse['data'] as List).where((item) {
-                final jumlah = item['jumlah'] ?? 0;
+                final jumlah = (item['jumlah'] as num?)?.toDouble() ?? 0.0;
                 final tanggalKadaluwarsaStr = item['tanggalKadaluwarsa'];
-                if (tanggalKadaluwarsaStr == null) return false;
+
+                // If jumlah is 0 or negative, don't include
+                if (jumlah <= 0) return false;
+
+                // If tanggalKadaluwarsa is null (optional), include the item
+                if (tanggalKadaluwarsaStr == null) return true;
+
+                // If tanggalKadaluwarsa exists, check if it's not expired
                 final tanggalKadaluwarsa =
                     DateTime.tryParse(tanggalKadaluwarsaStr);
-                if (tanggalKadaluwarsa == null) return false;
-                return jumlah > 0 &&
-                    !tanggalKadaluwarsa
-                        .isBefore(DateTime(today.year, today.month, today.day));
+                if (tanggalKadaluwarsa == null)
+                  return true; // Invalid date format, still include
+
+                // Check if not expired (not before today)
+                return !tanggalKadaluwarsa
+                    .isBefore(DateTime(today.year, today.month, today.day));
               }).map((item) => {
                     'id': item['id'],
                     'nama': item['nama'],
@@ -435,9 +444,9 @@ class AddPemakaianInventarisScreenState
                                 selectedInvNama = value;
                                 selectedInvSatuanId =
                                     selected['satuanId']?.toString();
-                                selectedInvStok = (selected['jumlah'] is int)
-                                    ? (selected['jumlah'] as int).toDouble()
-                                    : (selected['jumlah'] as double? ?? 0.0);
+                                selectedInvStok =
+                                    (selected['jumlah'] as num?)?.toDouble() ??
+                                        0.0;
                               });
                               _changeSatuan();
                             }
