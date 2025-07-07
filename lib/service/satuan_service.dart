@@ -23,6 +23,7 @@ class SatuanService {
     };
     if (searchQuery != null && searchQuery.isNotEmpty) {
       queryParams['nama'] = searchQuery;
+      queryParams['lambang'] = searchQuery;
     }
 
     final url = Uri.parse(baseUrl).replace(queryParameters: queryParams);

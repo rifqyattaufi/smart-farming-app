@@ -13,10 +13,21 @@ class HamaService {
   Future<Map<String, dynamic>> getDaftarHama({
     int page = 1,
     int limit = 20,
+    String? searchQuery,
   }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
-    final url = Uri.parse('$_jenisHamaBaseUrl?page=$page&limit=$limit');
+
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['nama'] = searchQuery;
+    }
+
+    final url =
+        Uri.parse(_jenisHamaBaseUrl).replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -33,7 +44,8 @@ class HamaService {
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getDaftarHama(page: page, limit: limit);
+        return await getDaftarHama(
+            page: page, limit: limit, searchQuery: searchQuery);
       } else {
         return {
           'status': false,
@@ -240,11 +252,21 @@ class HamaService {
   Future<Map<String, dynamic>> getLaporanHama({
     int page = 1,
     int limit = 10,
+    String? searchQuery,
   }) async {
     final resolvedToken = await _authService.getToken();
     final headers = {'Authorization': 'Bearer $resolvedToken'};
 
-    final url = Uri.parse('$_baseUrl/laporan-hama?page=$page&limit=$limit');
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['search'] = searchQuery;
+    }
+
+    final url = Uri.parse('$_baseUrl/laporan-hama')
+        .replace(queryParameters: queryParams);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -261,7 +283,8 @@ class HamaService {
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        return await getLaporanHama(page: page, limit: limit);
+        return await getLaporanHama(
+            page: page, limit: limit, searchQuery: searchQuery);
       } else {
         return {
           'status': false,
@@ -297,7 +320,7 @@ class HamaService {
     final encodedQuery = Uri.encodeComponent(query);
 
     final url = Uri.parse(
-        '$_baseUrl/hama/search/$encodedQuery?page=$page&limit=$limit');
+        '$_baseUrl/laporan-hama/search/$encodedQuery?page=$page&limit=$limit');
 
     try {
       final response = await http.get(url, headers: headers);

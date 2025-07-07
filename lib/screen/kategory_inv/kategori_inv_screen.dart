@@ -116,8 +116,9 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
   void _onSearchQueryChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      if (_searchQuery != query.trim()) {
-        _performSearch(query.trim());
+      final trimmedQuery = query.trim();
+      if (_searchQuery != trimmedQuery) {
+        _performSearch(trimmedQuery);
       }
     });
   }
@@ -173,8 +174,10 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
             context.push('/tambah-kategori-inventaris',
                 extra: AddKategoriInvScreen(
                   isUpdate: false,
-                  onKategoriInvAdded: () =>
-                      _fetchKategoriInv(page: 1, isRefresh: true),
+                  onKategoriInvAdded: () => _fetchKategoriInv(
+                      page: 1,
+                      isRefresh: true,
+                      query: _searchQuery.isEmpty ? null : _searchQuery),
                 ));
           },
           backgroundColor: green1,
@@ -241,25 +244,30 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                   return Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: UnitItem(
-                                      key: Key('kategori_inv_item_${kategori['id']}'),
+                                      key: Key(
+                                          'kategori_inv_item_${kategori['id']}'),
                                       unitName:
                                           kategori['nama']?.toString() ?? 'N/A',
                                       onEdit: () {
                                         context.push(
                                             '/tambah-kategori-inventaris',
-                                            extra:
-                                                AddKategoriInvScreen(
-                                                    isUpdate: true,
-                                                    id: kategori['id']
-                                                            ?.toString() ??
-                                                        '',
-                                                    nama: kategori['nama']
-                                                            ?.toString() ??
-                                                        '',
-                                                    onKategoriInvAdded: () =>
-                                                        _fetchKategoriInv(
-                                                            page: 1,
-                                                            isRefresh: true)));
+                                            extra: AddKategoriInvScreen(
+                                                isUpdate: true,
+                                                id: kategori[
+                                                            'id']
+                                                        ?.toString() ??
+                                                    '',
+                                                nama: kategori['nama']
+                                                        ?.toString() ??
+                                                    '',
+                                                onKategoriInvAdded: () =>
+                                                    _fetchKategoriInv(
+                                                        page: 1,
+                                                        isRefresh: true,
+                                                        query: _searchQuery
+                                                                .isEmpty
+                                                            ? null
+                                                            : _searchQuery)));
                                       },
                                       onDelete: () {
                                         showDialog(
@@ -272,14 +280,16 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                     'Apakah Anda yakin ingin menghapus kategori "${kategori['nama']}"?'),
                                                 actions: [
                                                   TextButton(
-                                                    key: const Key('cancel_delete_kategori'),
+                                                    key: const Key(
+                                                        'cancel_delete_kategori'),
                                                     onPressed: () =>
                                                         Navigator.of(context)
                                                             .pop(),
                                                     child: const Text('Batal'),
                                                   ),
                                                   TextButton(
-                                                    key: const Key('confirm_delete_kategori'),
+                                                    key: const Key(
+                                                        'confirm_delete_kategori'),
                                                     onPressed: () async {
                                                       Navigator.of(context)
                                                           .pop();
@@ -297,7 +307,11 @@ class _KategoriInvScreenState extends State<KategoriInvScreen> {
                                                             isError: false);
                                                         _fetchKategoriInv(
                                                             page: 1,
-                                                            isRefresh: true);
+                                                            isRefresh: true,
+                                                            query: _searchQuery
+                                                                    .isEmpty
+                                                                ? null
+                                                                : _searchQuery);
                                                       } else {
                                                         _showError(response[
                                                                 'message'] ??

@@ -138,8 +138,14 @@ class _HamaScreenState extends State<HamaScreen> {
 
     Map<String, dynamic> response;
     try {
-      response =
-          await _hamaService.getLaporanHama(page: page, limit: _pageSize);
+      final searchQuery = _searchController.text.trim().isNotEmpty
+          ? _searchController.text.trim()
+          : null;
+      response = await _hamaService.getLaporanHama(
+        page: page,
+        limit: _pageSize,
+        searchQuery: searchQuery,
+      );
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -162,78 +168,58 @@ class _HamaScreenState extends State<HamaScreen> {
             (response['currentPage'] ?? page) < (response['totalPages'] ?? 0);
         _isLoadingMoreLaporan = false;
         if (isInitialSetupOrRefresh) _isInitialLoading = false;
-        if (_searchController.text.isEmpty) {
-          _filteredLaporanHamaList = List.from(_laporanHamaList);
-        }
+        _filteredLaporanHamaList = List.from(_laporanHamaList);
       });
     }
   }
 
   Future<void> _searchLaporanHama(String query,
       {bool isNewSearch = false}) async {
-    final String normalizedQuery = query.toLowerCase().trim();
+    final String normalizedQuery = query.trim();
     if (isNewSearch) {
       if (normalizedQuery.isEmpty) {
         if (mounted) {
           setState(() {
             _isSearching = false;
-            _filteredLaporanHamaList = List.from(_laporanHamaList);
             _currentSearchPageLaporan = 1;
             _hasNextSearchPageLaporan = true;
           });
+          // Refresh data without search
+          _fetchLaporanHamaPage(page: 1, isInitialSetupOrRefresh: true);
         }
         return;
       }
       if (mounted) {
         setState(() {
           _isSearching = true;
-          _filteredLaporanHamaList.clear();
           _currentSearchPageLaporan = 1;
           _hasNextSearchPageLaporan = true;
         });
+        // Fetch data with search
+        _fetchLaporanHamaPage(page: 1, isInitialSetupOrRefresh: true);
       }
     } else {
       if (mounted) {
         setState(() {
           _isLoadingMoreSearchLaporan = true;
         });
-      }
-    }
-
-    Map<String, dynamic> response;
-    try {
-      response = await _hamaService.searchLaporanHama(normalizedQuery,
-          page: _currentSearchPageLaporan, limit: _pageSize);
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isSearching = false;
-          _isLoadingMoreSearchLaporan = false;
-        });
-      }
-      return;
-    }
-
-    if (mounted) {
-      setState(() {
-        _isSearching = false;
-        _isLoadingMoreSearchLaporan = false;
-        final List<dynamic> fetchedData =
-            List<dynamic>.from(response['data'] ?? []);
-        _filteredLaporanHamaList.addAll(fetchedData);
-        _hasNextSearchPageLaporan =
-            (response['currentPage'] ?? _currentSearchPageLaporan) <
-                (response['totalPages'] ?? 0);
-        if (response['status'] != true && isNewSearch) {
-          _filteredLaporanHamaList.clear();
+        // Fetch more pages with current search
+        await _fetchLaporanHamaPage(page: _currentSearchPageLaporan + 1);
+        if (mounted) {
+          setState(() {
+            _currentSearchPageLaporan++;
+            _isLoadingMoreSearchLaporan = false;
+          });
         }
-      });
+      }
     }
   }
 
   Future<void> _fetchMoreLaporanHamaSearchResults({required int page}) async {
     if (_searchController.text.isNotEmpty) {
       await _searchLaporanHama(_searchController.text, isNewSearch: false);
+    } else {
+      await _fetchLaporanHamaPage(page: page);
     }
   }
 
@@ -310,8 +296,11 @@ class _HamaScreenState extends State<HamaScreen> {
     }
     Map<String, dynamic> response;
     try {
-      response = await _hamaService.searchDaftarHama(normalizedQuery,
-          page: _currentSearchPageDaftarHama, limit: _pageSize);
+      response = await _hamaService.getDaftarHama(
+        page: _currentSearchPageDaftarHama,
+        limit: _pageSize,
+        searchQuery: normalizedQuery,
+      );
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -328,10 +317,17 @@ class _HamaScreenState extends State<HamaScreen> {
         _isLoadingMoreSearchDaftarHama = false;
         final List<dynamic> fetchedData =
             List<dynamic>.from(response['data'] ?? []);
-        _filteredDaftarHamaList.addAll(fetchedData);
+
+        if (isNewSearch) {
+          _filteredDaftarHamaList = fetchedData;
+        } else {
+          _filteredDaftarHamaList.addAll(fetchedData);
+        }
+
         _hasNextSearchPageDaftarHama =
             (response['currentPage'] ?? _currentSearchPageDaftarHama) <
                 (response['totalPages'] ?? 0);
+
         if (response['status'] != true && isNewSearch) {
           _filteredDaftarHamaList.clear();
         }

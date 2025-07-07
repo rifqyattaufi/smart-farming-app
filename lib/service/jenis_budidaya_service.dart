@@ -192,7 +192,7 @@ class JenisBudidayaService {
         };
       } else if (response.statusCode == 401) {
         await _authService.refreshToken();
-        
+
         return await getJenisBudidayaSearch(query, tipe,
             page: page, limit: limit);
       } else {

@@ -298,7 +298,7 @@ class _PelaporanNutrisiTanamanScreenState
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

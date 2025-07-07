@@ -86,8 +86,7 @@ class _GradeScreenState extends State<GradeScreen> {
         });
       } else {
         if (mounted) {
-          showAppToast(context,
-              response['message'] ?? 'Gagal memuat data');
+          showAppToast(context, response['message'] ?? 'Gagal memuat data');
         }
       }
     } catch (e) {
@@ -119,8 +118,9 @@ class _GradeScreenState extends State<GradeScreen> {
   void _onSearchQueryChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      if (_searchQuery != query.trim()) {
-        _performSearch(query.trim());
+      final trimmedQuery = query.trim();
+      if (_searchQuery != trimmedQuery) {
+        _performSearch(trimmedQuery);
       }
     });
   }
@@ -168,7 +168,10 @@ class _GradeScreenState extends State<GradeScreen> {
             context.push('/tambah-grade',
                 extra: AddGradeScreen(
                   isUpdate: false,
-                  onGradeAdded: () => _fetchGradeData(page: 1, isRefresh: true),
+                  onGradeAdded: () => _fetchGradeData(
+                      page: 1,
+                      isRefresh: true,
+                      query: _searchQuery.isEmpty ? null : _searchQuery),
                 ));
           },
           backgroundColor: green1,
@@ -248,16 +251,20 @@ class _GradeScreenState extends State<GradeScreen> {
                                                 isUpdate: true,
                                                 id: grade['id']?.toString() ??
                                                     '',
-                                                nama:
-                                                    grade['nama']?.toString() ??
-                                                        '',
+                                                nama: grade['nama']
+                                                        ?.toString() ??
+                                                    '',
                                                 deskripsi: grade['deskripsi']
                                                         ?.toString() ??
                                                     '',
                                                 onGradeAdded: () =>
                                                     _fetchGradeData(
                                                         page: 1,
-                                                        isRefresh: true)));
+                                                        isRefresh: true,
+                                                        query: _searchQuery
+                                                                .isEmpty
+                                                            ? null
+                                                            : _searchQuery)));
                                       },
                                       onDelete: () {
                                         showDialog(
@@ -270,14 +277,16 @@ class _GradeScreenState extends State<GradeScreen> {
                                                     'Apakah Anda yakin ingin menghapus grade "${grade['nama']}"?'),
                                                 actions: [
                                                   TextButton(
-                                                    key: const Key('cancel_button'),
+                                                    key: const Key(
+                                                        'cancel_button'),
                                                     onPressed: () =>
                                                         Navigator.of(context)
                                                             .pop(),
                                                     child: const Text('Batal'),
                                                   ),
                                                   TextButton(
-                                                    key: const Key('delete_button'),
+                                                    key: const Key(
+                                                        'delete_button'),
                                                     onPressed: () async {
                                                       Navigator.of(context)
                                                           .pop();
@@ -294,7 +303,11 @@ class _GradeScreenState extends State<GradeScreen> {
                                                             isError: false);
                                                         _fetchGradeData(
                                                             page: 1,
-                                                            isRefresh: true);
+                                                            isRefresh: true,
+                                                            query: _searchQuery
+                                                                    .isEmpty
+                                                                ? null
+                                                                : _searchQuery);
                                                       } else {
                                                         showAppToast(
                                                             context,

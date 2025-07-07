@@ -117,8 +117,9 @@ class _SatuanScreenState extends State<SatuanScreen> {
   void _onSearchQueryChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      if (_searchQuery != query.trim()) {
-        _performSearch(query.trim());
+      final trimmedQuery = query.trim();
+      if (_searchQuery != trimmedQuery) {
+        _performSearch(trimmedQuery);
       }
     });
   }
@@ -133,7 +134,7 @@ class _SatuanScreenState extends State<SatuanScreen> {
   void _showError(String message, {bool isError = true}) {
     if (mounted) {
       showAppToast(
-          context,
+        context,
         message,
         isError: isError,
       );
@@ -169,8 +170,10 @@ class _SatuanScreenState extends State<SatuanScreen> {
             context.push('/tambah-satuan',
                 extra: AddSatuanScreen(
                   isUpdate: false,
-                  onSatuanAdded: () =>
-                      _fetchSatuanData(page: 1, isRefresh: true),
+                  onSatuanAdded: () => _fetchSatuanData(
+                      page: 1,
+                      isRefresh: true,
+                      query: _searchQuery.isEmpty ? null : _searchQuery),
                 ));
           },
           backgroundColor: green1,
@@ -257,7 +260,12 @@ class _SatuanScreenState extends State<SatuanScreen> {
                                                   '',
                                               onSatuanAdded: () =>
                                                   _fetchSatuanData(
-                                                      page: 1, isRefresh: true),
+                                                      page: 1,
+                                                      isRefresh: true,
+                                                      query:
+                                                          _searchQuery.isEmpty
+                                                              ? null
+                                                              : _searchQuery),
                                             ));
                                       },
                                       onDelete: () {
@@ -295,7 +303,11 @@ class _SatuanScreenState extends State<SatuanScreen> {
                                                             isError: false);
                                                         _fetchSatuanData(
                                                             page: 1,
-                                                            isRefresh: true);
+                                                            isRefresh: true,
+                                                            query: _searchQuery
+                                                                    .isEmpty
+                                                                ? null
+                                                                : _searchQuery);
                                                       } else {
                                                         _showError(response[
                                                                 'message'] ??

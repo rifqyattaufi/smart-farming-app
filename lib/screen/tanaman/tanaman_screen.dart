@@ -106,11 +106,23 @@ class _TanamanScreenState extends State<TanamanScreen> {
 
     Map<String, dynamic> response;
     try {
-      response = await _jenisBudidayaService.getJenisBudidayaByTipe(
-        'tumbuhan',
-        page: page,
-        limit: _pageSize,
-      );
+      final searchQuery = _searchController.text.trim();
+      if (searchQuery.isNotEmpty) {
+        // Use search endpoint when there's a search query
+        response = await _jenisBudidayaService.getJenisBudidayaSearch(
+          searchQuery,
+          'tumbuhan',
+          page: page,
+          limit: _pageSize,
+        );
+      } else {
+        // Use regular endpoint for normal listing
+        response = await _jenisBudidayaService.getJenisBudidayaByTipe(
+          'tumbuhan',
+          page: page,
+          limit: _pageSize,
+        );
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -130,14 +142,23 @@ class _TanamanScreenState extends State<TanamanScreen> {
         final int totalPages = response['totalPages'] ?? 0;
         final int currentPageFromServer = response['currentPage'] ?? page;
 
-        if (isInitialSetupOrRefresh || page == 1) _tanamanList.clear();
-        _tanamanList.addAll(fetchedData);
-        _hasNextPage = currentPageFromServer < totalPages;
-        _isLoadingMore = false;
-
-        if (_searchController.text.isEmpty) {
-          _filteredTanamanList = List.from(_tanamanList);
+        if (isInitialSetupOrRefresh || page == 1) {
+          _tanamanList.clear();
+          _filteredTanamanList.clear();
         }
+
+        if (_searchController.text.isNotEmpty) {
+          // For search, add to filtered list
+          _filteredTanamanList.addAll(fetchedData);
+          _hasNextSearchPage = currentPageFromServer < totalPages;
+        } else {
+          // For normal listing, add to main list and sync filtered list
+          _tanamanList.addAll(fetchedData);
+          _filteredTanamanList.addAll(fetchedData);
+          _hasNextPage = currentPageFromServer < totalPages;
+        }
+
+        _isLoadingMore = false;
         if (isInitialSetupOrRefresh) _isInitialLoading = false;
       });
     }
@@ -281,6 +302,7 @@ class _TanamanScreenState extends State<TanamanScreen> {
                   void handleTanamanUpdate() {
                     _handleRefresh();
                   }
+
                   context.push('/tambah-tanaman',
                       extra: AddTanamanScreen(
                         isEdit: false,
@@ -365,7 +387,9 @@ class _TanamanScreenState extends State<TanamanScreen> {
       return Center(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text("Jenis tanaman tidak ditemukan.", style: regular12.copyWith(color: dark2), key: const Key('no_search_results'))));
+              child: Text("Jenis tanaman tidak ditemukan.",
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('no_search_results'))));
     }
 
     if (!isCurrentlySearching &&
@@ -376,7 +400,9 @@ class _TanamanScreenState extends State<TanamanScreen> {
       return Center(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text("Tidak ada jenis tanaman yang tersedia.", style: regular12.copyWith(color: dark2), key: const Key('no_tanaman_available'))));
+              child: Text("Tidak ada jenis tanaman yang tersedia.",
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('no_tanaman_available'))));
     }
 
     if (_filteredTanamanList.isEmpty &&
@@ -385,7 +411,11 @@ class _TanamanScreenState extends State<TanamanScreen> {
             _isLoadingMoreSearch ||
             _isSearching)) {
       return SizedBox(
-          height: 200, child: Center(child: Text("Memuat data...", style: regular12.copyWith(color: dark2), key: const Key('loading_tanaman'))));
+          height: 200,
+          child: Center(
+              child: Text("Memuat data...",
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('loading_tanaman'))));
     }
 
     if (_filteredTanamanList.isEmpty &&
@@ -395,7 +425,9 @@ class _TanamanScreenState extends State<TanamanScreen> {
       return Center(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text("Tidak ada jenis tanaman.", style: regular12.copyWith(color: dark2), key: const Key('no_tanaman'))));
+              child: Text("Tidak ada jenis tanaman.",
+                  style: regular12.copyWith(color: dark2),
+                  key: const Key('no_tanaman'))));
     }
 
     return ListItem(
