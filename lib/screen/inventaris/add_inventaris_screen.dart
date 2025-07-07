@@ -380,6 +380,11 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
     }
   }
 
+  // Helper method to check if stock editing should be disabled
+  bool get _isStokEditingDisabled {
+    return widget.isEdit && _currentJumlahStok > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     String? selectedKategoriName = kategoriList.isNotEmpty
@@ -456,6 +461,41 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                             return null;
                           },
                         ),
+                        if (_isStokEditingDisabled) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.info_outline,
+                                        color: Colors.blue.shade600, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "Informasi Jumlah Stok",
+                                      style: semibold12.copyWith(
+                                          color: Colors.blue.shade700),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "Jumlah stok tidak dapat diubah karena stok saat ini masih tersedia, habiskan stok terlebih dahulu untuk menambahkan stok baru.",
+                                  style: regular10.copyWith(
+                                      color: Colors.blue.shade600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         InputFieldWidget(
                             key: const Key('jumlah_stok_input'),
                             label: "Jumlah stok",
@@ -463,24 +503,35 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                             controller: _sizeController,
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
+                            isDisabled: _isStokEditingDisabled,
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
                                   key: const Key('decrease_stok_button'),
                                   icon: Icon(Icons.remove_circle_outline,
-                                      color: green1),
-                                  onPressed: _decrementJumlahStok,
+                                      color: _isStokEditingDisabled
+                                          ? Colors.grey
+                                          : green1),
+                                  onPressed: _isStokEditingDisabled
+                                      ? null
+                                      : _decrementJumlahStok,
                                 ),
                                 IconButton(
                                   key: const Key('increase_stok_button'),
                                   icon: Icon(Icons.add_circle_outline,
-                                      color: green1),
-                                  onPressed: _incrementJumlahStok,
+                                      color: _isStokEditingDisabled
+                                          ? Colors.grey
+                                          : green1),
+                                  onPressed: _isStokEditingDisabled
+                                      ? null
+                                      : _incrementJumlahStok,
                                 ),
                               ],
                             ),
-                            onChanged: (value) => _updateJumlahStokFromText(),
+                            onChanged: _isStokEditingDisabled
+                                ? null
+                                : (value) => _updateJumlahStokFromText(),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah stok tidak boleh kosong';
