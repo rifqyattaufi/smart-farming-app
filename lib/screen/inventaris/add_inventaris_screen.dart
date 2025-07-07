@@ -58,6 +58,61 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
   final picker = ImagePicker();
   bool _isLoading = false;
 
+  // Variables for tracking current stock values
+  double _currentJumlahStok = 0.0;
+  double _currentStokMinim = 0.0;
+
+  // Helper methods for increment/decrement functionality
+  void _incrementJumlahStok() {
+    setState(() {
+      _currentJumlahStok += 1.0;
+      _sizeController.text = _currentJumlahStok.toStringAsFixed(1);
+    });
+  }
+
+  void _decrementJumlahStok() {
+    setState(() {
+      if (_currentJumlahStok > 0) {
+        _currentJumlahStok -= 1.0;
+        _sizeController.text = _currentJumlahStok.toStringAsFixed(1);
+      }
+    });
+  }
+
+  void _incrementStokMinim() {
+    setState(() {
+      _currentStokMinim += 1.0;
+      _minimController.text = _currentStokMinim.toStringAsFixed(1);
+    });
+  }
+
+  void _decrementStokMinim() {
+    setState(() {
+      if (_currentStokMinim > 0) {
+        _currentStokMinim -= 1.0;
+        _minimController.text = _currentStokMinim.toStringAsFixed(1);
+      }
+    });
+  }
+
+  void _updateJumlahStokFromText() {
+    final value = double.tryParse(_sizeController.text);
+    if (value != null && value >= 0) {
+      setState(() {
+        _currentJumlahStok = value;
+      });
+    }
+  }
+
+  void _updateStokMinimFromText() {
+    final value = double.tryParse(_minimController.text);
+    if (value != null && value >= 0) {
+      setState(() {
+        _currentStokMinim = value;
+      });
+    }
+  }
+
   Future<void> _pickImage(BuildContext context) async {
     showModalBottomSheet(
       context: context,
@@ -143,6 +198,13 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize default values for new inventory
+    if (!widget.isEdit) {
+      _sizeController.text = _currentJumlahStok.toStringAsFixed(1);
+      _minimController.text = _currentStokMinim.toStringAsFixed(1);
+    }
+
     _loadDropdownData();
 
     if (widget.isEdit) {
@@ -169,8 +231,12 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
       selectedLocation = data['kategoriInventaris']?['id']?.toString() ??
           data['KategoriInventarisId']?.toString();
 
-      _sizeController.text = (data['jumlah'] ?? '').toString();
-      _minimController.text = (data['stokMinim'] ?? '').toString();
+      // Initialize current stock values
+      _currentJumlahStok = (data['jumlah'] as num?)?.toDouble() ?? 0.0;
+      _sizeController.text = _currentJumlahStok.toStringAsFixed(1);
+
+      _currentStokMinim = (data['stokMinim'] as num?)?.toDouble() ?? 0.0;
+      _minimController.text = _currentStokMinim.toStringAsFixed(1);
 
       selectedSatuan = data['Satuan']?['id']?.toString() ??
           data['satuan']?['id']?.toString() ??
@@ -237,11 +303,6 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
       return;
     }
 
-    if (_selectedDateTimeKadaluwarsa == null) {
-      showAppToast(context, 'Tanggal kadaluwarsa tidak boleh kosong');
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     String? finalImageUrl = _existingImageUrl;
@@ -260,15 +321,15 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
         }
       }
 
-      final String formattedKadaluwarsaForBackend =
-          _selectedDateTimeKadaluwarsa!.toIso8601String();
+      final String? formattedKadaluwarsaForBackend =
+          _selectedDateTimeKadaluwarsa?.toIso8601String();
 
       final inventarisPayload = {
         'nama': _nameController.text,
         'kategoriInventarisId': selectedLocation,
-        'jumlah': int.tryParse(_sizeController.text) ?? 0,
+        'jumlah': double.tryParse(_sizeController.text) ?? 0.0,
         'SatuanId': selectedSatuan,
-        'stokMinim': int.tryParse(_minimController.text) ?? 0,
+        'stokMinim': double.tryParse(_minimController.text) ?? 0.0,
         'tanggalKadaluwarsa': formattedKadaluwarsaForBackend,
         'gambar': finalImageUrl,
         'detail': _descriptionController.text,
@@ -402,6 +463,24 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                             controller: _sizeController,
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  key: const Key('decrease_stok_button'),
+                                  icon: Icon(Icons.remove_circle_outline,
+                                      color: green1),
+                                  onPressed: _decrementJumlahStok,
+                                ),
+                                IconButton(
+                                  key: const Key('increase_stok_button'),
+                                  icon: Icon(Icons.add_circle_outline,
+                                      color: green1),
+                                  onPressed: _incrementJumlahStok,
+                                ),
+                              ],
+                            ),
+                            onChanged: (value) => _updateJumlahStokFromText(),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Jumlah stok tidak boleh kosong';
@@ -421,6 +500,24 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                                 decimal: true),
                             hint: "Contoh: 5.0",
                             controller: _minimController,
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  key: const Key('decrease_minim_button'),
+                                  icon: Icon(Icons.remove_circle_outline,
+                                      color: green1),
+                                  onPressed: _decrementStokMinim,
+                                ),
+                                IconButton(
+                                  key: const Key('increase_minim_button'),
+                                  icon: Icon(Icons.add_circle_outline,
+                                      color: green1),
+                                  onPressed: _incrementStokMinim,
+                                ),
+                              ],
+                            ),
+                            onChanged: (value) => _updateStokMinimFromText(),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Stok minimal tidak boleh kosong';
@@ -462,7 +559,7 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                         ),
                         InputFieldWidget(
                           key: const Key('tanggal_kadaluwarsa_input'),
-                          label: "Tanggal kadaluwarsa",
+                          label: "Tanggal kadaluwarsa (opsional)",
                           hint: "Contoh:  Senin, 17 Februari 2025",
                           controller: _dateController,
                           suffixIcon: const Icon(Icons.calendar_today),
@@ -501,9 +598,6 @@ class AddInventarisScreenState extends State<AddInventarisScreen> {
                               }
                             }
                           },
-                          validator: (value) => (value == null || value.isEmpty)
-                              ? 'Tanggal & waktu kadaluwarsa tidak boleh kosong'
-                              : null,
                         ),
                         ImagePickerWidget(
                           key: const Key('gambar_inventaris_picker'),
