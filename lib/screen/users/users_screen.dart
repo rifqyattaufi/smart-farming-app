@@ -31,12 +31,12 @@ class _UsersScreenState extends State<UsersScreen> {
           petugas.clear();
           inventor.clear();
 
-          // pjawab.addAll(List<Map<String, dynamic>>.from(
-          //     response['data']['pjawab'] ?? []));
-          // petugas.addAll(List<Map<String, dynamic>>.from(
-          //     response['data']['petugas'] ?? []));
-          // inventor.addAll(List<Map<String, dynamic>>.from(
-          //     response['data']['inventor'] ?? []));
+          pjawab.addAll(List<Map<String, dynamic>>.from(
+              response['data']['pjawab'] ?? []));
+          petugas.addAll(List<Map<String, dynamic>>.from(
+              response['data']['petugas'] ?? []));
+          inventor.addAll(List<Map<String, dynamic>>.from(
+              response['data']['inventor'] ?? []));
         });
       } else {
         showAppToast(context, response['message'] ?? 'Gagal memuat data');
