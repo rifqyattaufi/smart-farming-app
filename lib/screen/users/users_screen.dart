@@ -31,12 +31,12 @@ class _UsersScreenState extends State<UsersScreen> {
           petugas.clear();
           inventor.clear();
 
-          pjawab.addAll(List<Map<String, dynamic>>.from(
-              response['data']['pjawab'] ?? []));
-          petugas.addAll(List<Map<String, dynamic>>.from(
-              response['data']['petugas'] ?? []));
-          inventor.addAll(List<Map<String, dynamic>>.from(
-              response['data']['inventor'] ?? []));
+          // pjawab.addAll(List<Map<String, dynamic>>.from(
+          //     response['data']['pjawab'] ?? []));
+          // petugas.addAll(List<Map<String, dynamic>>.from(
+          //     response['data']['petugas'] ?? []));
+          // inventor.addAll(List<Map<String, dynamic>>.from(
+          //     response['data']['inventor'] ?? []));
         });
       } else {
         showAppToast(context, response['message'] ?? 'Gagal memuat data');
@@ -112,95 +112,125 @@ class _UsersScreenState extends State<UsersScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                NewestReports(
-                  key: const Key('penanggung_jawab_rfc'),
-                  title: 'Penanggung Jawab RFC',
-                  reports: pjawab
-                      .map((user) => {
-                            'text': user['name'] ?? '-',
-                            'subtext': user['email'] ?? '-',
-                            'icon': user['avatarUrl'] ??
-                                'assets/icons/set/person-filled.png',
-                            'isActive': user['isActive'] ?? false,
-                            'id': user['id'],
-                          })
-                      .toList(),
-                  onItemTap: (context, item) {
-                    final id = item['id'] ?? '';
-                    context
-                        .push('/detail-pengguna',
-                            extra: DetailUserScreen(
-                              id: id,
-                            ))
-                        .then((_) {
-                      _fetchData();
-                    });
-                  },
-                  mode: NewestReportsMode.full,
-                  titleTextStyle: bold18.copyWith(color: dark1),
-                  reportTextStyle: medium12.copyWith(color: dark1),
-                  timeTextStyle: regular12.copyWith(color: dark2),
-                ),
-                const SizedBox(height: 12),
-                NewestReports(
-                  key: const Key('petugas_pelaporan_rfc'),
-                  title: 'Petugas Pelaporan',
-                  reports: petugas
-                      .map((user) => {
-                            'text': user['name'] ?? '-',
-                            'subtext': user['email'] ?? '-',
-                            'icon':
-                                user['avatarUrl'] ?? 'assets/icons/goclub.svg',
-                            'isActive': user['isActive'] ?? false,
-                            'id': user['id'],
-                          })
-                      .toList(),
-                  onItemTap: (context, item) {
-                    final id = item['id'] ?? '';
-                    context
-                        .push('/detail-pengguna',
-                            extra: DetailUserScreen(
-                              id: id,
-                            ))
-                        .then((_) {
-                      _fetchData();
-                    });
-                  },
-                  mode: NewestReportsMode.full,
-                  titleTextStyle: bold18.copyWith(color: dark1),
-                  reportTextStyle: medium12.copyWith(color: dark1),
-                  timeTextStyle: regular12.copyWith(color: dark2),
-                ),
-                const SizedBox(height: 12),
-                NewestReports(
-                  key: const Key('inventor_rfc'),
-                  title: 'Inventor RFC',
-                  reports: inventor
-                      .map((user) => {
-                            'text': user['name'] ?? '-',
-                            'subtext': user['email'] ?? '-',
-                            'icon':
-                                user['avatarUrl'] ?? 'assets/icons/goclub.svg',
-                            'isActive': user['isActive'] ?? false,
-                            'id': user['id'],
-                          })
-                      .toList(),
-                  onItemTap: (context, item) {
-                    final id = item['id'] ?? '';
-                    context
-                        .push('/detail-pengguna',
-                            extra: DetailUserScreen(
-                              id: id,
-                            ))
-                        .then((_) {
-                      _fetchData();
-                    });
-                  },
-                  mode: NewestReportsMode.full,
-                  titleTextStyle: bold18.copyWith(color: dark1),
-                  reportTextStyle: medium12.copyWith(color: dark1),
-                  timeTextStyle: regular12.copyWith(color: dark2),
-                ),
+                // Check if all lists are empty for empty state
+                if (pjawab.isEmpty && petugas.isEmpty && inventor.isEmpty)
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 200),
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 80,
+                            color: grey,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Belum Ada Data Pengguna',
+                            style: bold18.copyWith(color: dark2),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tambahkan pengguna pertama dengan menekan tombol + di bawah',
+                            style: regular14.copyWith(color: dark2),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else ...[
+                  NewestReports(
+                    key: const Key('penanggung_jawab_rfc'),
+                    title: 'Penanggung Jawab RFC',
+                    reports: pjawab
+                        .map((user) => {
+                              'text': user['name'] ?? '-',
+                              'subtext': user['email'] ?? '-',
+                              'icon': user['avatarUrl'] ??
+                                  'assets/icons/set/person-filled.png',
+                              'isActive': user['isActive'] ?? false,
+                              'id': user['id'],
+                            })
+                        .toList(),
+                    onItemTap: (context, item) {
+                      final id = item['id'] ?? '';
+                      context
+                          .push('/detail-pengguna',
+                              extra: DetailUserScreen(
+                                id: id,
+                              ))
+                          .then((_) {
+                        _fetchData();
+                      });
+                    },
+                    mode: NewestReportsMode.full,
+                    titleTextStyle: bold18.copyWith(color: dark1),
+                    reportTextStyle: medium12.copyWith(color: dark1),
+                    timeTextStyle: regular12.copyWith(color: dark2),
+                  ),
+                  const SizedBox(height: 12),
+                  NewestReports(
+                    key: const Key('petugas_pelaporan_rfc'),
+                    title: 'Petugas Pelaporan',
+                    reports: petugas
+                        .map((user) => {
+                              'text': user['name'] ?? '-',
+                              'subtext': user['email'] ?? '-',
+                              'icon': user['avatarUrl'] ??
+                                  'assets/icons/set/person-filled.png',
+                              'isActive': user['isActive'] ?? false,
+                              'id': user['id'],
+                            })
+                        .toList(),
+                    onItemTap: (context, item) {
+                      final id = item['id'] ?? '';
+                      context
+                          .push('/detail-pengguna',
+                              extra: DetailUserScreen(
+                                id: id,
+                              ))
+                          .then((_) {
+                        _fetchData();
+                      });
+                    },
+                    mode: NewestReportsMode.full,
+                    titleTextStyle: bold18.copyWith(color: dark1),
+                    reportTextStyle: medium12.copyWith(color: dark1),
+                    timeTextStyle: regular12.copyWith(color: dark2),
+                  ),
+                  const SizedBox(height: 12),
+                  NewestReports(
+                    key: const Key('inventor_rfc'),
+                    title: 'Inventor RFC',
+                    reports: inventor
+                        .map((user) => {
+                              'text': user['name'] ?? '-',
+                              'subtext': user['email'] ?? '-',
+                              'icon': user['avatarUrl'] ??
+                                  'assets/icons/set/person-filled.png',
+                              'isActive': user['isActive'] ?? false,
+                              'id': user['id'],
+                            })
+                        .toList(),
+                    onItemTap: (context, item) {
+                      final id = item['id'] ?? '';
+                      context
+                          .push('/detail-pengguna',
+                              extra: DetailUserScreen(
+                                id: id,
+                              ))
+                          .then((_) {
+                        _fetchData();
+                      });
+                    },
+                    mode: NewestReportsMode.full,
+                    titleTextStyle: bold18.copyWith(color: dark1),
+                    reportTextStyle: medium12.copyWith(color: dark1),
+                    timeTextStyle: regular12.copyWith(color: dark2),
+                  ),
+                ],
               ],
             ),
           ),
