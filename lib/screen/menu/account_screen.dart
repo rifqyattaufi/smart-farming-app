@@ -58,7 +58,7 @@ class _AccountScreenState extends State<AccountScreen> {
       },
       {
         'text': 'Bantuan',
-        'onTap': () => context.push('/detail'),
+        'onTap': () => context.push('/bantuan'),
       }
     ];
 

@@ -6,6 +6,7 @@ import 'package:smart_farming_app/widget/header.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:smart_farming_app/widget/image_builder.dart';
 import 'package:smart_farming_app/utils/app_utils.dart';
+import 'package:smart_farming_app/widget/button.dart';
 
 class DetailHamaScreen extends StatefulWidget {
   final String? idLaporanHama;
@@ -308,37 +309,18 @@ class _DetailHamaScreenState extends State<DetailHamaScreen> {
       bottomNavigationBar: _laporanHama != null &&
               !(_laporanHama?['Hama']?['status'] == true ||
                   _laporanHama?['Hama']?['status'] == 1)
-          ? Container(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isUpdatingStatus ? null : _updateStatusHama,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: green1,
-                    foregroundColor: white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: _isUpdatingStatus
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          'Tandai Sudah Ditangani',
-                          style: semibold14.copyWith(color: white),
-                        ),
-                ),
+          ? SafeArea(
+              child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CustomButton(
+                onPressed: _isUpdatingStatus ? null : _updateStatusHama,
+                backgroundColor: green1,
+                buttonText: 'Tandai Sudah Ditangani',
+                textStyle: semibold16.copyWith(color: white),
+                isLoading: _isLoading,
+                key: const Key('submit_tindakan_hama_button'),
               ),
-            )
+            ))
           : null,
     );
   }

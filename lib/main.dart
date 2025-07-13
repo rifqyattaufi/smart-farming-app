@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:smart_farming_app/screen/bantuan_screen.dart';
 import 'package:smart_farming_app/screen/komoditas/detail_komoditas_screen.dart';
 import 'package:smart_farming_app/screen/login/reset_password_screen.dart';
 import 'package:smart_farming_app/screen/main_screen_petugas.dart';
@@ -461,6 +462,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/detail',
       builder: (context, state) => const BlankScreen(),
+    ),
+    GoRoute(
+      path: '/bantuan',
+      builder: (context, state) => const BantuanScreen(),
     ),
     GoRoute(
       path: '/statistik-laporan-tanaman/:id',

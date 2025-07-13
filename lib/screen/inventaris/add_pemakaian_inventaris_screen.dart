@@ -169,8 +169,9 @@ class AddPemakaianInventarisScreenState
                 // If tanggalKadaluwarsa exists, check if it's not expired
                 final tanggalKadaluwarsa =
                     DateTime.tryParse(tanggalKadaluwarsaStr);
-                if (tanggalKadaluwarsa == null)
+                if (tanggalKadaluwarsa == null) {
                   return true; // Invalid date format, still include
+                }
 
                 // Check if not expired (not before today)
                 return !tanggalKadaluwarsa
