@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pelaporan_harian_tanaman_tabel_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/tanaman/pilih_tanaman_screen.dart';
@@ -12,6 +14,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
 import 'package:smart_farming_app/widget/radio_field.dart';
+import 'package:smart_farming_app/widget/img_picker.dart';
 
 class PelaporanTindakanMassalScreen extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -37,12 +40,17 @@ class _PelaporanTindakanMassalScreenState
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final InventarisService _inventarisService = InventarisService();
   final SatuanService _satuanService = SatuanService();
+  final ImagePicker picker = ImagePicker();
 
   // Status untuk tindakan massal
-  String statusPenyiraman = 'Ya';
-  String statusPruning = 'Ya';
-  String statusNutrisi = 'Ya';
-  String statusRepotting = 'Ya';
+  String statusPenyiraman = 'Tidak';
+  String statusPruning = 'Tidak';
+  String statusNutrisi = 'Tidak';
+  String statusRepotting = 'Tidak';
+
+  // Upload gambar kondisi harian kebun
+  File? _imageKondisiHarian;
+  String statusUploadGambar = 'Tidak';
 
   // Data nutrisi massal
   String? statusPemberianMassal = 'Pupuk';
@@ -180,6 +188,16 @@ class _PelaporanTindakanMassalScreenState
       }
     }
 
+    // Validasi gambar kondisi harian kebun jika diperlukan
+    if (statusUploadGambar == 'Ya' && _imageKondisiHarian == null) {
+      showAppToast(
+        context,
+        'Harap upload foto kondisi tanaman',
+        isError: true,
+      );
+      return;
+    }
+
     // Menyiapkan data tindakan massal
     final updatedData = Map<String, dynamic>.from(widget.data ?? {});
     updatedData['tindakanMassal'] = {
@@ -195,7 +213,10 @@ class _PelaporanTindakanMassalScreenState
           'jumlahDosis': double.tryParse(_sizeMassalController.text) ?? 0.0,
           'satuan': _satuanMassalController.text,
         }
-      }
+      },
+      // Data gambar kondisi harian kebun
+      'uploadGambar': statusUploadGambar == 'Ya',
+      'imageKondisiHarian': _imageKondisiHarian,
     };
 
     // Navigasi ke screen tabel input cepat
@@ -230,6 +251,52 @@ class _PelaporanTindakanMassalScreenState
             step: widget.step,
           ));
     }
+  }
+
+  Future<void> _pickImageKondisiHarian(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const Key('camera_kondisi_harian'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Buka Kamera'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (pickedFile != null) {
+                  setState(() {
+                    _imageKondisiHarian = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              key: const Key('gallery_kondisi_harian'),
+              leading: const Icon(Icons.photo),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (pickedFile != null) {
+                  setState(() {
+                    _imageKondisiHarian = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -670,6 +737,27 @@ class _PelaporanTindakanMassalScreenState
                             });
                           },
                         ),
+                        RadioField(
+                          key: const Key('status_upload_gambar'),
+                          label: 'Upload foto kondisi tanaman?',
+                          selectedValue: statusUploadGambar,
+                          options: const ['Ya', 'Tidak'],
+                          onChanged: (value) {
+                            setState(() {
+                              statusUploadGambar = value;
+                              if (value == 'Tidak') {
+                                _imageKondisiHarian = null;
+                              }
+                            });
+                          },
+                        ),
+                        if (statusUploadGambar == 'Ya') ...[
+                          ImagePickerWidget(
+                            label: 'Foto Kondisi Harian Kebun - Opsional',
+                            image: _imageKondisiHarian,
+                            onPickImage: _pickImageKondisiHarian,
+                          ),
+                        ],
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -694,7 +782,13 @@ class _PelaporanTindakanMassalScreenState
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Pengaturan di atas akan diterapkan untuk semua $jumlahTanaman tanaman yang dipilih. Pada langkah selanjutnya, Anda akan mengisi data spesifik untuk setiap tanaman seperti tinggi tanaman dan kondisi daun.',
+                                '• Upload foto kondisi harian kebun untuk semua tanaman yang dipilih. Foto ini akan digunakan untuk dokumentasi kondisi tanaman secara keseluruhan apabila tidak dilakukan pengisian data individual.',
+                                style: regular12.copyWith(
+                                    color: Colors.blue.shade600),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '• Pengaturan di atas akan diterapkan untuk semua $jumlahTanaman tanaman yang dipilih. Pada langkah selanjutnya, Anda akan mengisi data spesifik untuk setiap tanaman seperti tinggi tanaman dan kondisi daun.',
                                 style: regular12.copyWith(
                                     color: Colors.blue.shade600),
                               ),

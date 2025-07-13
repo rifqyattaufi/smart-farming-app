@@ -41,6 +41,7 @@ class _PelaporanHarianTanamanTabelScreenState
 
   List<String> kondisiDaun = [];
   List<String> statusTumbuh = [];
+
   // Untuk melacak nilai awal yang diambil dari laporan terakhir
   List<String> _initialKondisiDaun = [];
   List<String> _initialStatusTumbuh = [];
@@ -128,7 +129,7 @@ class _PelaporanHarianTanamanTabelScreenState
                 kondisiDaunValue != null &&
                 kondisiDaunDisplayMap.containsKey(kondisiDaunValue)) {
               kondisiDaun[i] = kondisiDaunValue;
-              _initialKondisiDaun[i] = kondisiDaunValue; // simpan nilai awal
+              _initialKondisiDaun[i] = kondisiDaunValue;
             }
 
             // Ambil status tumbuh dari laporan terakhir
@@ -137,7 +138,7 @@ class _PelaporanHarianTanamanTabelScreenState
                 statusTumbuhValue != null &&
                 statusTumbuhDisplayMap.containsKey(statusTumbuhValue)) {
               statusTumbuh[i] = statusTumbuhValue;
-              _initialStatusTumbuh[i] = statusTumbuhValue; // simpan nilai awal
+              _initialStatusTumbuh[i] = statusTumbuhValue;
             }
           }
         });
@@ -258,9 +259,7 @@ class _PelaporanHarianTanamanTabelScreenState
 
     // Jika ada perubahan, update state
     if (result != null && mounted) {
-      setState(() {
-        // Refresh akan terjadi karena initState dipanggil ulang
-      });
+      setState(() {});
     }
   }
 
@@ -360,15 +359,45 @@ class _PelaporanHarianTanamanTabelScreenState
 
       int processedCount = 0;
 
-      // Jika tidak ada data individual tapi ada tindakan massal, kirim minimal 1 laporan
-      // dengan data tanaman pertama
+      // Jika tidak ada data individual tapi ada tindakan massal, kirim laporan untuk SEMUA tanaman
+      // karena tindakan massal berlaku untuk semua tanaman
       bool needToSubmitMassActionOnly =
           !hasDataPerTanaman.contains(true) && hasMassActions;
 
+      // OPTIMASI: Upload foto kondisi tanaman hanya sekali jika diperlukan
+      String? sharedKondisiHarianUrl;
+      final File? imageKondisiHarian =
+          tindakanMassal?['imageKondisiHarian'] as File?;
+
+      // Cek apakah ada tanaman yang akan menggunakan foto kondisi harian kebun
+      bool needsSharedImage = false;
       for (int i = 0; i < formCountToValidate; i++) {
-        // Proses tanaman jika memiliki data individual ATAU jika perlu mengirim tindakan massal saja
-        // dan ini adalah iterasi pertama (untuk memastikan hanya 1 laporan dikirim)
-        if (!hasDataPerTanaman[i] && !(needToSubmitMassActionOnly && i == 0)) {
+        if ((hasDataPerTanaman[i] || needToSubmitMassActionOnly) &&
+            _imageTanamanList[i] == null &&
+            imageKondisiHarian != null) {
+          needsSharedImage = true;
+          break;
+        }
+      }
+
+      // Upload foto kondisi harian kebun sekali saja jika diperlukan
+      if (needsSharedImage) {
+        final imageUrlResponse =
+            await _imageService.uploadImage(imageKondisiHarian!);
+        if (!imageUrlResponse['status']) {
+          if (mounted) {
+            showAppToast(context, 'Gagal mengupload foto kondisi tanaman');
+            setState(() => _isLoading = false);
+          }
+          return;
+        }
+        sharedKondisiHarianUrl = imageUrlResponse['data'];
+      }
+
+      for (int i = 0; i < formCountToValidate; i++) {
+        // Proses tanaman jika memiliki data individual ATAU jika perlu mengirim tindakan massal
+        // (tindakan massal berlaku untuk SEMUA tanaman, bukan hanya tanaman pertama)
+        if (!hasDataPerTanaman[i] && !needToSubmitMassActionOnly) {
           continue;
         }
 
@@ -381,18 +410,30 @@ class _PelaporanHarianTanamanTabelScreenState
                 ? objekBudidayaOriginalList[i]
                 : null;
 
-            // Upload gambar tanaman (optional - use placeholder if not provided)
+            // Upload gambar tanaman (priority: individual image -> shared kondisi harian -> placeholder)
             String imageUrl;
             if (_imageTanamanList[i] != null) {
+              // Upload gambar individual jika ada
               final imageUrlResponse =
                   await _imageService.uploadImage(_imageTanamanList[i]!);
               if (!imageUrlResponse['status']) {
                 return false;
               }
               imageUrl = imageUrlResponse['data'];
+            } else if (sharedKondisiHarianUrl != null) {
+              // Gunakan URL foto kondisi harian yang sudah diupload
+              imageUrl = sharedKondisiHarianUrl;
             } else {
-              // Use a default placeholder URL or generate a simple placeholder
-              imageUrl = "https://via.placeholder.com/400x300?text=No+Image";
+              // Gunakan gambar kebun/unit budidaya sebagai fallback
+              final String? kebunImageUrl =
+                  widget.data?['unitBudidaya']?['image'];
+              if (kebunImageUrl != null && kebunImageUrl.isNotEmpty) {
+                imageUrl = kebunImageUrl;
+              } else {
+                // Gunakan placeholder hanya jika gambar kebun juga tidak ada
+                imageUrl =
+                    "https://res.cloudinary.com/do4mvm3ta/image/upload/v1749373032/axclv6ilcevzf9jazfk3.webp";
+              }
             }
 
             // Submit laporan harian
@@ -418,6 +459,7 @@ class _PelaporanHarianTanamanTabelScreenState
                 "penyiraman": tindakanMassal?['penyiraman'] ?? false,
                 "pruning": tindakanMassal?['pruning'] ?? false,
                 "repotting": tindakanMassal?['repotting'] ?? false,
+
                 // Data individual: Kirim data baru jika ada perubahan, atau data terakhir jika tidak ada perubahan
                 "tinggiTanaman": hasDataPerTanaman[i]
                     ? tinggiTanaman
@@ -485,7 +527,7 @@ class _PelaporanHarianTanamanTabelScreenState
               context, 'Beberapa laporan gagal dikirim. Silakan coba lagi.');
         } else {
           String message = needToSubmitMassActionOnly
-              ? 'Laporan tindakan massal berhasil dicatat.'
+              ? 'Laporan tindakan massal berhasil dicatat untuk $processedCount tanaman.'
               : 'Laporan berhasil dikirim untuk $processedCount tanaman.';
           showAppToast(
             context,
@@ -626,7 +668,8 @@ class _PelaporanHarianTanamanTabelScreenState
                           'Penyiraman: ${tindakanMassal?['penyiraman'] == true ? "Ya" : "Tidak"} • '
                           'Pruning: ${tindakanMassal?['pruning'] == true ? "Ya" : "Tidak"} • '
                           'Nutrisi: ${tindakanMassal?['nutrisi'] == true ? "Ya" : "Tidak"} • '
-                          'Repotting: ${tindakanMassal?['repotting'] == true ? "Ya" : "Tidak"}',
+                          'Repotting: ${tindakanMassal?['repotting'] == true ? "Ya" : "Tidak"} • '
+                          'Foto Kondisi: ${tindakanMassal?['uploadGambar'] == true ? "Ya" : "Tidak"}',
                           style:
                               regular12.copyWith(color: Colors.green.shade600),
                         ),
@@ -726,6 +769,24 @@ class _PelaporanHarianTanamanTabelScreenState
                                     'SEMUA data individual bersifat OPSIONAL termasuk foto. Anda dapat:\n• Hanya menjalankan tindakan massal saja (langsung klik "Simpan Laporan")\n• Mengisi data individual untuk tanaman tertentu\n• Mengombinasikan keduanya sesuai kebutuhan\n\nJika hanya tindakan massal, kondisi tanaman tetap menggunakan data terakhir untuk analisis kesehatan.',
                                     style: regular12.copyWith(
                                         color: Colors.blue.shade700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.image,
+                                    color: Colors.orange.shade700, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    tindakanMassal?['uploadGambar'] == true
+                                        ? 'Foto kondisi tanaman telah diupload di tahap sebelumnya dan akan digunakan untuk laporan yang tidak memiliki foto individual (dioptimasi: 1x upload untuk banyak tanaman).'
+                                        : 'Tidak ada foto kondisi harian kebun. Isi foto kondisi individual per tanaman (opsional). Apabila keduanya kosong maka akan menggunakan gambar kebun sebagai pengganti.',
+                                    style: regular12.copyWith(
+                                        color: Colors.orange.shade700),
                                   ),
                                 ),
                               ],

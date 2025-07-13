@@ -188,7 +188,7 @@ class _ListItemSelectableState extends State<ListItemSelectable> {
             child: SizedBox(
               width: 60,
               height: 60,
-              child: ImageBuilder(url: item['icon'], fit: BoxFit.cover),
+              child: ImageBuilder(url: item['icon'] ?? '', fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: 12),
