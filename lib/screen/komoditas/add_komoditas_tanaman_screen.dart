@@ -12,6 +12,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
+import 'package:smart_farming_app/widget/radio_field.dart';
 
 class AddKomoditasTanamanScreen extends StatefulWidget {
   final VoidCallback? onKomoditasTanamanAdded;
@@ -40,6 +41,7 @@ class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
 
   String? selectedLocation;
   String? selectedSatuan;
+  String? hapusObjek = 'Ya'; // Default value set to 'Ya'
 
   bool isLoading = false;
   bool _isFetchingEditData = false;
@@ -189,6 +191,7 @@ class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
         'SatuanId': selectedSatuan,
         'JenisBudidayaId': selectedLocation,
         'tipeKomoditas': 'kolektif',
+        'hapusObjek': hapusObjek == 'Ya' ? true : false,
         'jumlah': widget.isEdit ? double.parse(_jumlahController.text) : 0.0,
         if (finalImageUrl != null) 'gambar': finalImageUrl,
       };
@@ -271,6 +274,8 @@ class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
               _nameController.text = apiData['nama']?.toString() ?? '';
               _currentJumlah = (apiData['jumlah'] as num?)?.toDouble() ?? 0.0;
               _jumlahController.text = _currentJumlah.toStringAsFixed(1);
+
+              hapusObjek = apiData['hapusObjek'] == true ? 'Ya' : 'Tidak';
 
               // Set selected jenis tanaman
               if (apiData['JenisBudidaya'] != null) {
@@ -508,6 +513,16 @@ class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
                             },
                           ),
                         ],
+                        RadioField(
+                          label: 'Menghapus data tanaman setelah di panen?',
+                          selectedValue: hapusObjek ?? "",
+                          options: const ['Ya', 'Tidak'],
+                          onChanged: (value) {
+                            setState(() {
+                              hapusObjek = value;
+                            });
+                          },
+                        ),
                         ImagePickerWidget(
                           key: const Key('imagePicker'),
                           label: "Unggah gambar komoditas",

@@ -310,7 +310,7 @@ class _PelaporanTanamanPanenScreenState
     );
   }
 
-  Future<void> _submitForm(bool isDeleted) async {
+  Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       _showError('Harap lengkapi semua field yang wajib diisi.');
       return;
@@ -384,8 +384,7 @@ class _PelaporanTanamanPanenScreenState
                     'jumlah': double.parse(rincian.jumlahController.text),
                   })
               .toList(),
-        },
-        'isDeleted': isDeleted,
+        }
       };
       final response = await _laporanService.createLaporanPanenKebun(payload);
       if (mounted) {
@@ -809,26 +808,7 @@ class _PelaporanTanamanPanenScreenState
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CustomButton(
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  content: const Text(
-                      'Apakah anda ingin menghapus data tanaman yang dipanen?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(false),
-                      child: const Text('Tidak'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(true),
-                      child: const Text('Ya'),
-                    ),
-                  ],
-                ),
-              );
-              _submitForm(confirm!);
-            },
+            onPressed: _submitForm,
             backgroundColor: green1,
             textStyle: semibold16.copyWith(color: white),
             isLoading: _isLoading,
