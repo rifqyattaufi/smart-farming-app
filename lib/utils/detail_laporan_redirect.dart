@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_farming_app/screen/hama/detail_hama_screen.dart';
 import 'package:smart_farming_app/screen/inventaris/detail_pemakaian_inventaris_from_laporan_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_harian_screen.dart';
 import 'package:smart_farming_app/screen/pelaporan/detail/detail_laporan_mati_screen.dart';
@@ -43,10 +44,12 @@ void navigateToDetailLaporan(
             DetailLaporanPanenTernakScreen(idLaporanPanenTernak: idLaporan);
       }
       break;
-    // Implementasi untuk detail pemakaian inventaris dari laporan
     case 'inventaris':
       targetScreen =
           DetailPemakaianInventarisFromLaporanScreen(idLaporan: idLaporan);
+      break;
+    default:
+      targetScreen = DetailHamaScreen(idLaporanHama: idLaporan);
       break;
   }
 
