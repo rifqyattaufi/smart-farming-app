@@ -113,7 +113,7 @@ class _DetailNotifScreenState extends State<DetailNotifScreen> {
                             const SizedBox(height: 20),
                             const Divider(),
                             infoItem("Target Pengguna",
-                                _notificationData?['targetUser'] ?? "-"),
+                                _notificationData?['targetRole'] ?? "-"),
                             infoItem(
                                 "Status Notifikasi",
                                 _notificationData?['isActive'] == true
