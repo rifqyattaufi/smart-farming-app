@@ -56,6 +56,19 @@ class _UsersScreenState extends State<UsersScreen> {
   int selectedTab = 0;
   TextEditingController searchController = TextEditingController();
 
+  List<Map<String, dynamic>> _filterUsers(List<Map<String, dynamic>> users) {
+    if (searchController.text.isEmpty) {
+      return users;
+    }
+
+    final query = searchController.text.toLowerCase();
+    return users.where((user) {
+      final name = (user['name'] ?? '').toString().toLowerCase();
+      final email = (user['email'] ?? '').toString().toLowerCase();
+      return name.contains(query) || email.contains(query);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,7 +126,9 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
                 const SizedBox(height: 20),
                 // Check if all lists are empty for empty state
-                if (pjawab.isEmpty && petugas.isEmpty && inventor.isEmpty)
+                if (_filterUsers(pjawab).isEmpty &&
+                    _filterUsers(petugas).isEmpty &&
+                    _filterUsers(inventor).isEmpty)
                   Center(
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 200),
@@ -127,12 +142,16 @@ class _UsersScreenState extends State<UsersScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Belum Ada Data Pengguna',
+                            searchController.text.isNotEmpty
+                                ? 'Tidak Ada Hasil Pencarian'
+                                : 'Belum Ada Data Pengguna',
                             style: bold18.copyWith(color: dark2),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tambahkan pengguna pertama dengan menekan tombol + di bawah',
+                            searchController.text.isNotEmpty
+                                ? 'Coba kata kunci lain atau periksa ejaan pencarian Anda'
+                                : 'Tambahkan pengguna pertama dengan menekan tombol + di bawah',
                             style: regular14.copyWith(color: dark2),
                             textAlign: TextAlign.center,
                           ),
@@ -141,95 +160,101 @@ class _UsersScreenState extends State<UsersScreen> {
                     ),
                   )
                 else ...[
-                  NewestReports(
-                    key: const Key('penanggung_jawab_rfc'),
-                    title: 'Penanggung Jawab RFC',
-                    reports: pjawab
-                        .map((user) => {
-                              'text': user['name'] ?? '-',
-                              'subtext': user['email'] ?? '-',
-                              'icon': user['avatarUrl'] ??
-                                  'assets/icons/set/person-filled.png',
-                              'isActive': user['isActive'] ?? false,
-                              'id': user['id'],
-                            })
-                        .toList(),
-                    onItemTap: (context, item) {
-                      final id = item['id'] ?? '';
-                      context
-                          .push('/detail-pengguna',
-                              extra: DetailUserScreen(
-                                id: id,
-                              ))
-                          .then((_) {
-                        _fetchData();
-                      });
-                    },
-                    mode: NewestReportsMode.full,
-                    titleTextStyle: bold18.copyWith(color: dark1),
-                    reportTextStyle: medium12.copyWith(color: dark1),
-                    timeTextStyle: regular12.copyWith(color: dark2),
-                  ),
-                  const SizedBox(height: 12),
-                  NewestReports(
-                    key: const Key('petugas_pelaporan_rfc'),
-                    title: 'Petugas Pelaporan',
-                    reports: petugas
-                        .map((user) => {
-                              'text': user['name'] ?? '-',
-                              'subtext': user['email'] ?? '-',
-                              'icon': user['avatarUrl'] ??
-                                  'assets/icons/set/person-filled.png',
-                              'isActive': user['isActive'] ?? false,
-                              'id': user['id'],
-                            })
-                        .toList(),
-                    onItemTap: (context, item) {
-                      final id = item['id'] ?? '';
-                      context
-                          .push('/detail-pengguna',
-                              extra: DetailUserScreen(
-                                id: id,
-                              ))
-                          .then((_) {
-                        _fetchData();
-                      });
-                    },
-                    mode: NewestReportsMode.full,
-                    titleTextStyle: bold18.copyWith(color: dark1),
-                    reportTextStyle: medium12.copyWith(color: dark1),
-                    timeTextStyle: regular12.copyWith(color: dark2),
-                  ),
-                  const SizedBox(height: 12),
-                  NewestReports(
-                    key: const Key('inventor_rfc'),
-                    title: 'Inventor RFC',
-                    reports: inventor
-                        .map((user) => {
-                              'text': user['name'] ?? '-',
-                              'subtext': user['email'] ?? '-',
-                              'icon': user['avatarUrl'] ??
-                                  'assets/icons/set/person-filled.png',
-                              'isActive': user['isActive'] ?? false,
-                              'id': user['id'],
-                            })
-                        .toList(),
-                    onItemTap: (context, item) {
-                      final id = item['id'] ?? '';
-                      context
-                          .push('/detail-pengguna',
-                              extra: DetailUserScreen(
-                                id: id,
-                              ))
-                          .then((_) {
-                        _fetchData();
-                      });
-                    },
-                    mode: NewestReportsMode.full,
-                    titleTextStyle: bold18.copyWith(color: dark1),
-                    reportTextStyle: medium12.copyWith(color: dark1),
-                    timeTextStyle: regular12.copyWith(color: dark2),
-                  ),
+                  if (_filterUsers(pjawab).isNotEmpty) ...[
+                    NewestReports(
+                      key: const Key('penanggung_jawab_rfc'),
+                      title: 'Penanggung Jawab RFC',
+                      reports: _filterUsers(pjawab)
+                          .map((user) => {
+                                'text': user['name'] ?? '-',
+                                'subtext': user['email'] ?? '-',
+                                'icon': user['avatarUrl'] ??
+                                    'assets/icons/set/person-filled.png',
+                                'isActive': user['isActive'] ?? false,
+                                'id': user['id'],
+                              })
+                          .toList(),
+                      onItemTap: (context, item) {
+                        final id = item['id'] ?? '';
+                        context
+                            .push('/detail-pengguna',
+                                extra: DetailUserScreen(
+                                  id: id,
+                                ))
+                            .then((_) {
+                          _fetchData();
+                        });
+                      },
+                      mode: NewestReportsMode.full,
+                      titleTextStyle: bold18.copyWith(color: dark1),
+                      reportTextStyle: medium12.copyWith(color: dark1),
+                      timeTextStyle: regular12.copyWith(color: dark2),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (_filterUsers(petugas).isNotEmpty) ...[
+                    NewestReports(
+                      key: const Key('petugas_pelaporan_rfc'),
+                      title: 'Petugas Pelaporan',
+                      reports: _filterUsers(petugas)
+                          .map((user) => {
+                                'text': user['name'] ?? '-',
+                                'subtext': user['email'] ?? '-',
+                                'icon': user['avatarUrl'] ??
+                                    'assets/icons/set/person-filled.png',
+                                'isActive': user['isActive'] ?? false,
+                                'id': user['id'],
+                              })
+                          .toList(),
+                      onItemTap: (context, item) {
+                        final id = item['id'] ?? '';
+                        context
+                            .push('/detail-pengguna',
+                                extra: DetailUserScreen(
+                                  id: id,
+                                ))
+                            .then((_) {
+                          _fetchData();
+                        });
+                      },
+                      mode: NewestReportsMode.full,
+                      titleTextStyle: bold18.copyWith(color: dark1),
+                      reportTextStyle: medium12.copyWith(color: dark1),
+                      timeTextStyle: regular12.copyWith(color: dark2),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (_filterUsers(inventor).isNotEmpty) ...[
+                    NewestReports(
+                      key: const Key('inventor_rfc'),
+                      title: 'Inventor RFC',
+                      reports: _filterUsers(inventor)
+                          .map((user) => {
+                                'text': user['name'] ?? '-',
+                                'subtext': user['email'] ?? '-',
+                                'icon': user['avatarUrl'] ??
+                                    'assets/icons/set/person-filled.png',
+                                'isActive': user['isActive'] ?? false,
+                                'id': user['id'],
+                              })
+                          .toList(),
+                      onItemTap: (context, item) {
+                        final id = item['id'] ?? '';
+                        context
+                            .push('/detail-pengguna',
+                                extra: DetailUserScreen(
+                                  id: id,
+                                ))
+                            .then((_) {
+                          _fetchData();
+                        });
+                      },
+                      mode: NewestReportsMode.full,
+                      titleTextStyle: bold18.copyWith(color: dark1),
+                      reportTextStyle: medium12.copyWith(color: dark1),
+                      timeTextStyle: regular12.copyWith(color: dark2),
+                    ),
+                  ],
                 ],
               ],
             ),

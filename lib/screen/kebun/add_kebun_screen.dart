@@ -151,7 +151,8 @@ class AddKebunScreenState extends State<AddKebunScreen> {
     if (response['status'] == true) {
       final List<dynamic> data = response['data'];
       setState(() {
-        jenisTanamanList = data.map((item) {
+        jenisTanamanList =
+            data.where((item) => item['status'] == true).map((item) {
           return {
             'id': item['id'],
             'nama': item['nama'],
@@ -344,9 +345,9 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                   'scheduledTime': _waktuNotifikasiPanenController.text,
                   'dayOfMonth': selectedTipePanen == 'Bulanan'
                       ? (int.tryParse(
-                              _tanggalNotifikasiPanenController.text.isEmpty
-                                  ? '0'
-                                  : _tanggalNotifikasiPanenController.text))
+                          _tanggalNotifikasiPanenController.text.isEmpty
+                              ? '0'
+                              : _tanggalNotifikasiPanenController.text))
                       : null,
                   'dayOfWeek': selectedTipePanen == 'Mingguan'
                       ? dayToInt[selectedHariPanen]
@@ -360,9 +361,9 @@ class AddKebunScreenState extends State<AddKebunScreen> {
                   'scheduledTime': _waktuNotifikasiNutrisiController.text,
                   'dayOfMonth': selectedTipeNutrisi == 'Bulanan'
                       ? (int.tryParse(
-                              _tanggalNotifikasiNutrisiController.text.isEmpty
-                                  ? '0'
-                                  : _tanggalNotifikasiNutrisiController.text))
+                          _tanggalNotifikasiNutrisiController.text.isEmpty
+                              ? '0'
+                              : _tanggalNotifikasiNutrisiController.text))
                       : null,
                   'dayOfWeek': selectedTipeNutrisi == 'Mingguan'
                       ? dayToInt[selectedHariNutrisi]

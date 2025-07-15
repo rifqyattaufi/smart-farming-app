@@ -77,7 +77,10 @@ class AddKomoditasTanamanScreenState extends State<AddKomoditasTanamanScreen> {
       if (jenisTanamanResponse['status']) {
         setState(() {
           _jenisTanamanList = List<Map<String, dynamic>>.from(
-              jenisTanamanResponse['data'].map((item) {
+              jenisTanamanResponse['data']
+                  .where((item) =>
+                      item['status'] == true) // Filter hanya status = true
+                  .map((item) {
             return {
               'id': item['id'],
               'nama': item['nama'],

@@ -114,6 +114,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       if (_selectedImage != null) {
         final imageUploadResponse =
             await _imageService.uploadImage(_selectedImage!);
+
         if (imageUploadResponse['status'] == true &&
             imageUploadResponse['data'] != null) {
           data['avatarUrl'] = imageUploadResponse['data'];
@@ -127,6 +128,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
           }
           return;
         }
+      } else {
+        // Don't set avatarUrl at all, let backend handle default value
       }
 
       Map<String, dynamic>? response;
@@ -303,11 +306,13 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           "Inventor RFC"
                         ],
                         selectedValue: selectedLocation,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedLocation = value;
-                          });
-                        },
+                        onChanged: (widget.isEdit ?? false) && widget.id == null
+                            ? null // Disable jika edit profil sendiri (penanggung jawab)
+                            : (value) {
+                                setState(() {
+                                  selectedLocation = value;
+                                });
+                              },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Role tidak boleh kosong';

@@ -50,7 +50,10 @@ class _PilihKebunScreenState extends State<PilihKebunScreen> {
 
       if (response['status']) {
         setState(() {
-          _listKebun = response['data'];
+          _listKebun = response['data']
+              .where((item) =>
+                  item['status'] == true) // Filter hanya status = true
+              .toList();
         });
       }
     } catch (e) {
