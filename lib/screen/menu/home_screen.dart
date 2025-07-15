@@ -317,6 +317,12 @@ class _HomeScreenState extends State<HomeScreen> {
               onViewAll: () => context.push('/manajemen-komoditas').then((_) {
                 _fetchData(isRefresh: true);
               }),
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/detail-komoditas/$id').then((_) {
+                  _fetchData(isRefresh: true);
+                });
+              },
             ),
             const SizedBox(height: 80),
           ] else if (!_isLoading) ...[
@@ -547,6 +553,12 @@ class _HomeScreenState extends State<HomeScreen> {
               onViewAll: () => context.push('/manajemen-komoditas').then((_) {
                 _fetchData(isRefresh: true);
               }),
+              onItemTap: (context, item) {
+                final id = item['id'] ?? '';
+                context.push('/detail-komoditas/$id').then((_) {
+                  _fetchData(isRefresh: true);
+                });
+              },
             ),
             const SizedBox(height: 80),
           ] else if (!_isLoading) ...[
