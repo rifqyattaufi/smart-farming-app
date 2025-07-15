@@ -60,12 +60,12 @@ class _PelaporanHarianTanamanTabelScreenState
   final Map<String, String> statusTumbuhDisplayMap = {
     'bibit': 'Bibit',
     'perkecambahan': 'Perkecambahan',
-    'vegetatifAwal': 'Vegetatif Awal',
-    'vegetatifLanjut': 'Vegetatif Lanjut',
-    'generatifAwal': 'Generatif Awal',
-    'generatifLanjut': 'Generatif Lanjut',
-    'panen': 'Panen',
-    'dormansi': 'Dormansi',
+    'vegetatifAwal': 'Vegetatif Awal - Pertumbuhan Daun & Batang',
+    'vegetatifLanjut': 'Vegetatif Lanjut - Siap Berbunga',
+    'generatifAwal': 'Generatif Awal - Pembentukan Bunga',
+    'generatifLanjut': 'Generatif Lanjut - Pembentukan Buah',
+    'panen': 'Panen - Pematangan Buah',
+    'dormansi': 'Dormansi - Fase Istirahat Tanaman',
   };
 
   final Map<String, String> kondisiDaunDisplayMap = {
@@ -297,6 +297,9 @@ class _PelaporanHarianTanamanTabelScreenState
         hasData = true;
       }
 
+      // Note: Untuk nutrisi massal, foto dosis individual tidak wajib
+      // Nutrisi massal akan tetap diproses meskipun tidak ada foto dosis individual
+
       // Only count condition or growth status changes if they are different from the ones loaded from the last report
       // (tracked through the _initialKondisiDaun and _initialStatusTumbuh arrays)
       if (kondisiDaun[i] != _initialKondisiDaun[i]) {
@@ -476,11 +479,23 @@ class _PelaporanHarianTanamanTabelScreenState
             }
 
             // Submit laporan nutrisi jika diperlukan
-            if (tindakanMassal?['nutrisi'] == true &&
-                _imageDosisList[i] != null) {
-              final imageDosisUrlResponse =
-                  await _imageService.uploadImage(_imageDosisList[i]!);
-              if (!imageDosisUrlResponse['status']) return false;
+            if (tindakanMassal?['nutrisi'] == true) {
+              String? imageDosisUrl;
+
+              // Priority untuk foto dosis: individual image -> shared kondisi harian -> kebun image -> placeholder
+              if (_imageDosisList[i] != null) {
+                // Upload foto dosis individual jika ada
+                final imageDosisUrlResponse =
+                    await _imageService.uploadImage(_imageDosisList[i]!);
+                if (!imageDosisUrlResponse['status']) return false;
+                imageDosisUrl = imageDosisUrlResponse['data'];
+              } else if (sharedKondisiHarianUrl != null) {
+                // Gunakan foto kondisi harian yang sudah diupload
+                imageDosisUrl = sharedKondisiHarianUrl;
+              } else {
+                // Gunakan foto yang sama dengan laporan harian (imageUrl yang sudah disiapkan di atas)
+                imageDosisUrl = imageUrl;
+              }
 
               // Ambil data nutrisi massal
               final Map<String, dynamic>? nutrisiData =
@@ -492,7 +507,7 @@ class _PelaporanHarianTanamanTabelScreenState
                 'tipe': 'vitamin',
                 'judul':
                     "Laporan Pemberian Nutrisi ${widget.data?['unitBudidaya']?['name'] ?? ''} - ${(currentObjek?['name'] ?? 'Tanaman ${i + 1}')}",
-                'gambar': imageDosisUrlResponse['data'],
+                'gambar': imageDosisUrl,
                 'catatan': _catatanController[i].text.isEmpty
                     ? "Pemberian nutrisi massal"
                     : _catatanController[i].text,
