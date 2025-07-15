@@ -6,6 +6,7 @@ import 'package:smart_farming_app/utils/detail_laporan_redirect.dart';
 import 'package:smart_farming_app/widget/chart_section.dart';
 import 'package:smart_farming_app/widget/list_items.dart';
 import 'package:smart_farming_app/widget/newest.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
 
 class HarianTab extends StatelessWidget {
@@ -146,6 +147,265 @@ class HarianTab extends StatelessWidget {
     );
   }
 
+  Widget _buildScrollableChartSection(
+    BuildContext context, {
+    required String title,
+    required ChartDataState chartState,
+    required String valueKeyForMapping,
+    String? labelKeyForMapping,
+  }) {
+    if (chartState.isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    if (chartState.error != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          'Error $title: ${chartState.error}',
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    // Extract data untuk chart
+    List<double> finalValues;
+    List<String> finalXLabels;
+
+    if (labelKeyForMapping != null) {
+      final data =
+          chartState.rawData?.whereType<Map<String, dynamic>>().toList() ?? [];
+      finalValues = data
+          .map<double>((e) => _safeDoubleValue(e[valueKeyForMapping]))
+          .toList();
+      finalXLabels = data
+          .map<String>((e) => (e[labelKeyForMapping] as String?) ?? 'N/A')
+          .toList();
+    } else {
+      finalValues = chartState.dataPoints
+          .map<double>((e) => _safeDoubleValue(e[valueKeyForMapping]))
+          .toList();
+      finalXLabels = chartState.xLabels;
+    }
+
+    if (finalValues.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              'Tidak ada data $title untuk ditampilkan.',
+              style: regular14.copyWith(color: dark2),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Tentukan apakah chart perlu scrollable berdasarkan jumlah data
+    final bool isScrollable = finalValues.length > 8;
+    final double chartWidth = isScrollable
+        ? math.max(
+            finalValues.length * 60.0, MediaQuery.of(context).size.width - 32)
+        : MediaQuery.of(context).size.width - 32;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                title,
+                style: bold18.copyWith(color: dark1),
+              ),
+              if (isScrollable) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.swipe_left,
+                  size: 16,
+                  color: dark2,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Geser →',
+                  style: regular12.copyWith(color: dark2),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 220, // Tinggi total termasuk label
+            child: isScrollable
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: SizedBox(
+                      width: chartWidth,
+                      child: _buildChart(finalValues, finalXLabels),
+                    ),
+                  )
+                : _buildChart(finalValues, finalXLabels),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChart(List<double> data, List<String> xLabels) {
+    if (data.isEmpty || xLabels.isEmpty) {
+      return Center(
+        child: Text(
+          'Tidak ada data untuk ditampilkan',
+          style: regular14.copyWith(color: dark2),
+        ),
+      );
+    }
+
+    final double maxValue =
+        data.isNotEmpty ? data.reduce((a, b) => a > b ? a : b) : 0.0;
+    final double maxY = maxValue > 0 ? (maxValue / 4).ceil() * 4.0 : 5.0;
+    final double interval = maxY > 0 ? (maxY / 4).ceilToDouble() : 1.0;
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: maxY,
+        minY: 0,
+        barGroups: List.generate(data.length, (index) {
+          final isMax = data.isNotEmpty &&
+              data[index] == data.reduce((a, b) => a > b ? a : b);
+          return BarChartGroupData(
+            x: index,
+            barRods: [
+              BarChartRodData(
+                toY: data[index],
+                width: data.length > 15 ? 25 : (data.length > 8 ? 30 : 35),
+                borderRadius: BorderRadius.circular(data.length > 15 ? 4 : 6),
+                color: isMax ? green1 : green2.withValues(alpha: 0.7),
+              ),
+            ],
+          );
+        }),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 32,
+              interval: interval,
+              getTitlesWidget: (value, meta) {
+                if (value == meta.max || value == meta.min) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: Text(
+                    value.toInt().toString(),
+                    style:
+                        medium12.copyWith(color: dark1.withValues(alpha: 0.8)),
+                  ),
+                );
+              },
+            ),
+          ),
+          rightTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 32,
+              getTitlesWidget: (value, meta) {
+                int index = value.toInt();
+                if (index >= 0 && index < xLabels.length) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      xLabels[index],
+                      style: medium10.copyWith(color: dark1),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: interval,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: grey.withValues(alpha: 0.3),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        borderData: FlBorderData(
+          show: true,
+          border: Border(
+            bottom: BorderSide(color: grey.withValues(alpha: 0.5), width: 1),
+            left: BorderSide(color: grey.withValues(alpha: 0.5), width: 1),
+          ),
+        ),
+        barTouchData: BarTouchData(
+          enabled: true,
+          handleBuiltInTouches: true,
+          touchTooltipData: BarTouchTooltipData(
+            tooltipRoundedRadius: 8,
+            tooltipPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            tooltipMargin: 8,
+            getTooltipColor: (group) {
+              return dark1.withValues(alpha: 0.9);
+            },
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              String dataLabel = "";
+              if (group.x.toInt() >= 0 && group.x.toInt() < xLabels.length) {
+                dataLabel = xLabels[group.x.toInt()];
+              }
+
+              String jumlahValue = rod.toY.toInt().toString();
+              final String text = 'Tinggi: $dataLabel\nJumlah: $jumlahValue';
+
+              return BarTooltipItem(
+                text,
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.start,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  double _safeDoubleValue(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> listChildren = [];
@@ -211,7 +471,8 @@ class HarianTab extends StatelessWidget {
           _convertTinggiTanamanToChartState(grafikTinggiTanaman);
 
       listChildren.add(
-        ChartSection(
+        _buildScrollableChartSection(
+          context,
           title: 'Distribusi Tinggi Tanaman',
           chartState: tinggiTanamanState,
           valueKeyForMapping: 'tinggi',
@@ -375,6 +636,46 @@ class HarianTab extends StatelessWidget {
                     style: bold16.copyWith(color: dark1),
                   ),
                   const SizedBox(height: 12.0),
+
+                  // Informasi Klasifikasi Kesehatan
+                  Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outlined,
+                              color: Colors.blue.shade700,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Informasi Klasifikasi Kesehatan',
+                              style: medium14.copyWith(
+                                  color: Colors.blue.shade700),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Klasifikasi kesehatan tanaman ditentukan berdasarkan kondisi daun:\n'
+                          '• Sehat: Kondisi daun "sehat"\n'
+                          '• Perlu Perhatian: Kondisi daun "kuning" atau "bercak"\n'
+                          '• Kritis: Kondisi daun "kering", "layu", "keriting", atau "rusak"',
+                          style:
+                              regular12.copyWith(color: Colors.blue.shade700),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
 
                   // Overview Statistics
                   Row(
