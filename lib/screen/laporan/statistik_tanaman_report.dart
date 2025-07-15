@@ -1069,6 +1069,98 @@ class _StatistikTanamanReportState extends State<StatistikTanamanReport> {
       summary.write(".\n\n");
     }
 
+    // Analisis Distribusi Tinggi Tanaman
+    if (_statistikHarianData != null &&
+        _statistikHarianData!['grafikTinggiTanaman'] != null) {
+      final grafikTinggiTanaman =
+          _statistikHarianData!['grafikTinggiTanaman'] as Map<String, dynamic>?;
+
+      if (grafikTinggiTanaman != null && grafikTinggiTanaman.isNotEmpty) {
+        final labels = grafikTinggiTanaman['labels'] as List<dynamic>? ?? [];
+        final datasets =
+            grafikTinggiTanaman['datasets'] as List<dynamic>? ?? [];
+
+        if (labels.isNotEmpty && datasets.isNotEmpty) {
+          final dataset = datasets.first as Map<String, dynamic>;
+          final dataPoints = dataset['data'] as List<dynamic>? ?? [];
+
+          if (dataPoints.isNotEmpty) {
+            // Analisis distribusi tinggi tanaman
+            final heights =
+                dataPoints.map((e) => (e as num).toDouble()).toList();
+            heights.sort();
+
+            final totalTanaman = heights.length;
+            final tinggiMin = heights.first;
+            final tinggiMax = heights.last;
+            final tinggiRataRata =
+                heights.reduce((a, b) => a + b) / totalTanaman;
+
+            // Kelompokkan untuk mencari modus (tinggi yang paling sering muncul)
+            Map<double, int> heightFrequency = {};
+            for (var height in heights) {
+              heightFrequency[height] = (heightFrequency[height] ?? 0) + 1;
+            }
+
+            final sortedByFrequency = heightFrequency.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
+            final tinggiTerbanyak = sortedByFrequency.first.key;
+            final jumlahTinggiTerbanyak = sortedByFrequency.first.value;
+
+            // Hitung median
+            double tinggiMedian;
+            if (totalTanaman % 2 == 0) {
+              tinggiMedian = (heights[totalTanaman ~/ 2 - 1] +
+                      heights[totalTanaman ~/ 2]) /
+                  2;
+            } else {
+              tinggiMedian = heights[totalTanaman ~/ 2];
+            }
+
+            // Klasifikasi distribusi
+            final rentangTinggi = tinggiMax - tinggiMin;
+            String distribusiKategori;
+            if (rentangTinggi <= 5) {
+              distribusiKategori = "sangat seragam";
+            } else if (rentangTinggi <= 10) {
+              distribusiKategori = "cukup seragam";
+            } else if (rentangTinggi <= 20) {
+              distribusiKategori = "bervariasi";
+            } else {
+              distribusiKategori = "sangat bervariasi";
+            }
+
+            summary.write(
+                "Dari segi pertumbuhan fisik tanaman, analisis distribusi tinggi menunjukkan bahwa dari $totalTanaman tanaman yang dipantau, ");
+            summary.write(
+                "tinggi tanaman berkisar antara ${tinggiMin.toStringAsFixed(1)} cm hingga ${tinggiMax.toStringAsFixed(1)} cm ");
+            summary.write(
+                "dengan rata-rata ${tinggiRataRata.toStringAsFixed(1)} cm dan median ${tinggiMedian.toStringAsFixed(1)} cm. ");
+
+            summary.write(
+                "Tinggi yang paling umum ditemukan adalah ${tinggiTerbanyak.toStringAsFixed(1)} cm ");
+            summary
+                .write("yang dimiliki oleh $jumlahTinggiTerbanyak tanaman. ");
+
+            summary.write(
+                "Secara keseluruhan, distribusi tinggi tanaman tergolong $distribusiKategori ");
+
+            if (distribusiKategori == "sangat seragam" ||
+                distribusiKategori == "cukup seragam") {
+              summary.write(
+                  "yang menunjukkan pertumbuhan yang konsisten dan kondisi perawatan yang baik.\n\n");
+            } else if (distribusiKategori == "bervariasi") {
+              summary.write(
+                  "yang dapat mengindikasikan adanya variasi dalam kondisi tumbuh atau tahap pertumbuhan yang berbeda.\n\n");
+            } else {
+              summary.write(
+                  "yang mungkin memerlukan perhatian khusus untuk mengidentifikasi faktor-faktor yang menyebabkan perbedaan pertumbuhan yang signifikan.\n\n");
+            }
+          }
+        }
+      }
+    }
+
     summary.write(
         "Bukti pelaporan dapat dilihat pada detail riwayat di setiap tab terkait.");
 

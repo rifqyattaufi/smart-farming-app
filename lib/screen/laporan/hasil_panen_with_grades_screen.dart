@@ -639,59 +639,61 @@ class _HasilPanenWithGradesScreenState
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _fetchHarvestData(reset: true),
-        color: green1,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  _buildFilterSection(),
-                  Expanded(
-                    child: _harvestData.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/set/fruitbag-filled.png',
-                                  width: 64,
-                                  height: 64,
-                                  color: grey,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Tidak ada data hasil panen',
-                                  style: medium14.copyWith(color: dark2),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Coba ubah filter atau tambah laporan panen baru',
-                                  style: regular12.copyWith(color: dark2),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                            controller: _scrollController,
-                            itemCount:
-                                _harvestData.length + (_isLoadingMore ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index == _harvestData.length) {
-                                return const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: CircularProgressIndicator(),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () => _fetchHarvestData(reset: true),
+          color: green1,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    _buildFilterSection(),
+                    Expanded(
+                      child: _harvestData.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/icons/set/fruitbag-filled.png',
+                                    width: 64,
+                                    height: 64,
+                                    color: grey,
                                   ),
-                                );
-                              }
-                              return _buildHarvestCard(_harvestData[index]);
-                            },
-                          ),
-                  ),
-                ],
-              ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Tidak ada data hasil panen',
+                                    style: medium14.copyWith(color: dark2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Coba ubah filter atau tambah laporan panen baru',
+                                    style: regular12.copyWith(color: dark2),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              itemCount: _harvestData.length +
+                                  (_isLoadingMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == _harvestData.length) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                return _buildHarvestCard(_harvestData[index]);
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

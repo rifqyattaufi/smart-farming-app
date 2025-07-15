@@ -192,7 +192,7 @@ class AddLaporanHamaScreenState extends State<AddLaporanHamaScreen> {
           'jenisHamaId':
               newCreatedHamaId ?? selectedHama, // Gunakan id baru jika ada
           'jumlah': int.parse(_sizeController.text),
-          'status': 1
+          'status': 0
         }
       };
 

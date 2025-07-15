@@ -431,29 +431,31 @@ class _GradeSummaryScreenState extends State<GradeSummaryScreen> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchGradeSummary,
-        color: green1,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    _buildHeaderCard(),
-                    _buildFilterSection(),
-                    if (_summaryData != null) ...[
-                      ChartWidget(
-                        title: 'Distribusi Grade',
-                        data: _getChartData(),
-                        height: 200,
-                      ),
-                      _buildGradeDetailList(),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetchGradeSummary,
+          color: green1,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      _buildHeaderCard(),
+                      _buildFilterSection(),
+                      if (_summaryData != null) ...[
+                        ChartWidget(
+                          title: 'Distribusi Grade',
+                          data: _getChartData(),
+                          height: 200,
+                        ),
+                        _buildGradeDetailList(),
+                      ],
+                      const SizedBox(height: 24),
                     ],
-                    const SizedBox(height: 24),
-                  ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

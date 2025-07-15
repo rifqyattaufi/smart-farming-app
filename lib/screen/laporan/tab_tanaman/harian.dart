@@ -90,6 +90,62 @@ class HarianTab extends StatelessWidget {
     );
   }
 
+  ChartDataState _convertTinggiTanamanToChartState(
+      Map<String, dynamic> grafikData) {
+    final labels = grafikData['labels'] as List<dynamic>? ?? [];
+    final datasets = grafikData['datasets'] as List<dynamic>? ?? [];
+
+    if (labels.isEmpty || datasets.isEmpty) {
+      return ChartDataState(
+        isLoading: false,
+        dataPoints: [],
+        error: null,
+        xLabels: [],
+        rawData: [],
+      );
+    }
+
+    final dataset = datasets.first as Map<String, dynamic>;
+    final dataPoints = dataset['data'] as List<dynamic>? ?? [];
+
+    if (dataPoints.isEmpty) {
+      return ChartDataState(
+        isLoading: false,
+        dataPoints: [],
+        error: null,
+        xLabels: [],
+        rawData: [],
+      );
+    }
+
+    // Kelompokkan data berdasarkan tinggi tanaman (frequency distribution)
+    Map<double, int> heightFrequency = {};
+    for (int i = 0; i < dataPoints.length; i++) {
+      final height = (dataPoints[i] as num).toDouble();
+      heightFrequency[height] = (heightFrequency[height] ?? 0) + 1;
+    }
+
+    // Urutkan berdasarkan tinggi tanaman
+    final sortedHeights = heightFrequency.keys.toList()..sort();
+
+    // Convert ke format yang dibutuhkan ChartSection
+    final convertedData = sortedHeights.map((height) {
+      final frequency = heightFrequency[height]!;
+      return {
+        'label': '${height.toStringAsFixed(1)}cm',
+        'tinggi': frequency,
+      };
+    }).toList();
+
+    return ChartDataState(
+      isLoading: false,
+      dataPoints: convertedData,
+      error: null,
+      xLabels: sortedHeights.map((h) => '${h.toStringAsFixed(1)}cm').toList(),
+      rawData: convertedData,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> listChildren = [];
@@ -141,6 +197,28 @@ class HarianTab extends StatelessWidget {
         valueKeyForMapping: 'jumlahKejadianPemberianPupuk',
       ),
     );
+
+    // Chart Distribusi Tinggi Tanaman
+    if (statistikHarianData != null &&
+        statistikHarianData!['grafikTinggiTanaman'] != null &&
+        (statistikHarianData!['grafikTinggiTanaman'] as Map<String, dynamic>)
+            .isNotEmpty) {
+      final grafikTinggiTanaman =
+          statistikHarianData!['grafikTinggiTanaman'] as Map<String, dynamic>;
+
+      // Convert data ke format ChartDataState
+      final tinggiTanamanState =
+          _convertTinggiTanamanToChartState(grafikTinggiTanaman);
+
+      listChildren.add(
+        ChartSection(
+          title: 'Distribusi Tinggi Tanaman',
+          chartState: tinggiTanamanState,
+          valueKeyForMapping: 'tinggi',
+          labelKeyForMapping: 'label',
+        ),
+      );
+    }
 
     listChildren.add(const SizedBox(height: 4));
 
@@ -652,37 +730,40 @@ class HarianTab extends StatelessWidget {
       listChildren.add(
           _paddedError('Error Riwayat Pelaporan: ${riwayatUmumState.error}'));
     } else if (riwayatUmumState.items.isNotEmpty) {
-      listChildren.add(NewestReports(
-        key: const Key('riwayat_pelaporan_harian'),
-        title: 'Riwayat Pelaporan',
-        reports: riwayatUmumState.items
-            .map((item) => {
-                  'id': item['laporanId'] as String? ??
-                      item['id'] as String? ??
-                      '',
-                  'text': item['text'] as String? ?? 'Laporan',
-                  'subtext': 'Oleh: ${item['person'] as String? ?? 'N/A'}',
-                  'icon':
-                      item['gambar'] as String? ?? 'assets/images/appIcon.png',
-                  'time': item['time'],
-                })
-            .toList(),
-        onItemTap: (itemContext, tappedItem) {
-          final idLaporan = tappedItem['id'] as String?;
-          if (idLaporan != null) {
-            navigateToDetailLaporan(itemContext,
-                idLaporan: idLaporan,
-                jenisLaporan: 'harian',
-                jenisBudidaya: 'tumbuhan');
-          } else {
-            showAppToast(
-                context, 'ID laporan tidak ditemukan. Silakan coba lagi.');
-          }
-        },
-        mode: NewestReportsMode.full,
-        titleTextStyle: bold18.copyWith(color: dark1),
-        reportTextStyle: medium12.copyWith(color: dark1),
-        timeTextStyle: regular12.copyWith(color: dark2),
+      listChildren.add(Container(
+        margin: const EdgeInsets.only(top: 16),
+        child: NewestReports(
+          key: const Key('riwayat_pelaporan_harian'),
+          title: 'Riwayat Pelaporan',
+          reports: riwayatUmumState.items
+              .map((item) => {
+                    'id': item['laporanId'] as String? ??
+                        item['id'] as String? ??
+                        '',
+                    'text': item['text'] as String? ?? 'Laporan',
+                    'subtext': 'Oleh: ${item['person'] as String? ?? 'N/A'}',
+                    'icon': item['gambar'] as String? ??
+                        'assets/images/appIcon.png',
+                    'time': item['time'],
+                  })
+              .toList(),
+          onItemTap: (itemContext, tappedItem) {
+            final idLaporan = tappedItem['id'] as String?;
+            if (idLaporan != null) {
+              navigateToDetailLaporan(itemContext,
+                  idLaporan: idLaporan,
+                  jenisLaporan: 'harian',
+                  jenisBudidaya: 'tumbuhan');
+            } else {
+              showAppToast(
+                  context, 'ID laporan tidak ditemukan. Silakan coba lagi.');
+            }
+          },
+          mode: NewestReportsMode.full,
+          titleTextStyle: bold18.copyWith(color: dark1),
+          reportTextStyle: medium12.copyWith(color: dark1),
+          timeTextStyle: regular12.copyWith(color: dark2),
+        ),
       ));
     } else {
       listChildren.add(
