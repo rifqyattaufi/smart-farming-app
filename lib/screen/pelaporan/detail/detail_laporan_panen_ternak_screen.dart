@@ -186,10 +186,16 @@ class _DetailLaporanPanenTernakScreenState
                                     style: bold18.copyWith(color: dark1)),
                                 const SizedBox(height: 8),
                                 // Check if grade data exists
-                                if (_laporanPanenTernak?['Panen']?['PanenRincianGrades'] != null && 
-                                    (_laporanPanenTernak!['Panen']['PanenRincianGrades'] as List).isNotEmpty) ...[
+                                if (_laporanPanenTernak?['Panen']
+                                            ?['PanenRincianGrades'] !=
+                                        null &&
+                                    (_laporanPanenTernak!['Panen']
+                                            ['PanenRincianGrades'] as List)
+                                        .isNotEmpty) ...[
                                   // Display each grade
-                                  ...(_laporanPanenTernak!['Panen']['PanenRincianGrades'] as List<dynamic>)
+                                  ...(_laporanPanenTernak!['Panen']
+                                              ['PanenRincianGrades']
+                                          as List<dynamic>)
                                       .map((grade) {
                                     return infoItem(
                                         '${grade['Grade']['nama'] ?? '-'}',
@@ -202,16 +208,20 @@ class _DetailLaporanPanenTernakScreenState
                                     decoration: BoxDecoration(
                                       color: Colors.grey.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                                      border: Border.all(
+                                          color: Colors.grey
+                                              .withValues(alpha: 0.3)),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.info_outline, color: Colors.grey, size: 20),
+                                        const Icon(Icons.info_outline,
+                                            color: Colors.grey, size: 20),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             'Tidak ada rincian grade untuk laporan panen ini.',
-                                            style: medium12.copyWith(color: Colors.grey),
+                                            style: medium12.copyWith(
+                                                color: Colors.grey),
                                           ),
                                         ),
                                       ],

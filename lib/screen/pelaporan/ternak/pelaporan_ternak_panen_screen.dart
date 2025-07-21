@@ -171,7 +171,7 @@ class _PelaporanTernakPanenScreenState
 
   List<String> _getAvailableGradesForIndex(int animalIndex, int currentIndex) {
     if (animalIndex >= _rincianGradeListPerAnimal.length) return [];
-    
+
     // Get all grade names that are already selected (excluding current index)
     final selectedGradeIds = _rincianGradeListPerAnimal[animalIndex]
         .asMap()
@@ -182,9 +182,10 @@ class _PelaporanTernakPanenScreenState
         .toSet();
 
     // Return grades that are not yet selected, plus the currently selected one for this index
-    final currentGradeId = currentIndex < _rincianGradeListPerAnimal[animalIndex].length 
-        ? _rincianGradeListPerAnimal[animalIndex][currentIndex].gradeId 
-        : null;
+    final currentGradeId =
+        currentIndex < _rincianGradeListPerAnimal[animalIndex].length
+            ? _rincianGradeListPerAnimal[animalIndex][currentIndex].gradeId
+            : null;
     return _gradeMasterList
         .where((grade) =>
             !selectedGradeIds.contains(grade['id']) ||
@@ -195,7 +196,7 @@ class _PelaporanTernakPanenScreenState
 
   double _calculateTotalRealisasiPanen(int animalIndex) {
     if (animalIndex >= _rincianGradeListPerAnimal.length) return 0.0;
-    
+
     double total = 0.0;
     for (var rincian in _rincianGradeListPerAnimal[animalIndex]) {
       final jumlahText = rincian.jumlahController.text;
@@ -327,19 +328,22 @@ class _PelaporanTernakPanenScreenState
     if (isLoading) return;
 
     // Validate grade data for all animals
-    for (int animalIndex = 0; animalIndex < _rincianGradeListPerAnimal.length; animalIndex++) {
+    for (int animalIndex = 0;
+        animalIndex < _rincianGradeListPerAnimal.length;
+        animalIndex++) {
       if (_rincianGradeListPerAnimal[animalIndex].isNotEmpty) {
         final selectedGradeIds = <String>[];
         for (var rincian in _rincianGradeListPerAnimal[animalIndex]) {
-          if (rincian.gradeId == null || rincian.jumlahController.text.isEmpty) {
+          if (rincian.gradeId == null ||
+              rincian.jumlahController.text.isEmpty) {
             showAppToast(context,
                 'Harap pilih grade dan isi jumlah pada setiap rincian grade untuk hewan ${animalIndex + 1}.');
             return;
           }
           if (double.tryParse(rincian.jumlahController.text) == null ||
               double.parse(rincian.jumlahController.text) <= 0) {
-            showAppToast(
-                context, 'Jumlah pada rincian grade hewan ${animalIndex + 1} harus angka positif.');
+            showAppToast(context,
+                'Jumlah pada rincian grade hewan ${animalIndex + 1} harus angka positif.');
             return;
           }
 
@@ -402,8 +406,8 @@ class _PelaporanTernakPanenScreenState
         final imageUrl = await _imageService.uploadImage(imageList[i]!);
 
         // Calculate total realisasi panen from grades for this animal
-        double totalRealisasiPanen = i < _rincianGradeListPerAnimal.length 
-            ? _calculateTotalRealisasiPanen(i) 
+        double totalRealisasiPanen = i < _rincianGradeListPerAnimal.length
+            ? _calculateTotalRealisasiPanen(i)
             : 0.0;
 
         final data = {
@@ -422,7 +426,8 @@ class _PelaporanTernakPanenScreenState
             if (widget.data?['unitBudidaya']?['tipe'] == 'kolektif')
               'jumlahHewan': int.parse(jumlahHewanControllers[i].text),
             // Add grade data if available for this animal
-            if (i < _rincianGradeListPerAnimal.length && _rincianGradeListPerAnimal[i].isNotEmpty)
+            if (i < _rincianGradeListPerAnimal.length &&
+                _rincianGradeListPerAnimal[i].isNotEmpty)
               'rincianGrade': _rincianGradeListPerAnimal[i]
                   .map((rincian) => {
                         'gradeId': rincian.gradeId,
@@ -508,9 +513,11 @@ class _PelaporanTernakPanenScreenState
                 ),
                 ...List.generate(objekBudidayaList.length, (i) {
                   final objek = objekBudidayaList[i];
-                  final animalName = (objek?['name'] != null && (objek?['name'] as String).isNotEmpty) 
+                  final animalName = (objek?['name'] != null &&
+                          (objek?['name'] as String).isNotEmpty)
                       ? objek!['name'] as String
-                      : (widget.data?['komoditas']?['name'] as String? ?? 'Hewan ${i + 1}');
+                      : (widget.data?['komoditas']?['name'] as String? ??
+                          'Hewan ${i + 1}');
                   return Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -633,21 +640,23 @@ class _PelaporanTernakPanenScreenState
                               decoration: BoxDecoration(
                                 color: green1.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: green1.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                    color: green1.withValues(alpha: 0.3)),
                               ),
                               child: Row(
                                 children: [
                                   Icon(
-                                    _isGradeExpanded 
-                                      ? Icons.expand_less 
-                                      : Icons.expand_more,
+                                    _isGradeExpanded
+                                        ? Icons.expand_less
+                                        : Icons.expand_more,
                                     color: green1,
                                     size: 24,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Rincian Grade Panen - $animalName',
@@ -655,17 +664,20 @@ class _PelaporanTernakPanenScreenState
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          _isGradeExpanded 
-                                            ? 'Tap untuk menyembunyikan rincian grade'
-                                            : 'Tap untuk mengatur rincian grade panen',
-                                          style: regular12.copyWith(color: dark2),
+                                          _isGradeExpanded
+                                              ? 'Tap untuk menyembunyikan rincian grade'
+                                              : 'Tap untuk mengatur rincian grade panen',
+                                          style:
+                                              regular12.copyWith(color: dark2),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  if (i < _rincianGradeListPerAnimal.length && _rincianGradeListPerAnimal[i].isNotEmpty)
+                                  if (i < _rincianGradeListPerAnimal.length &&
+                                      _rincianGradeListPerAnimal[i].isNotEmpty)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: green1,
                                         borderRadius: BorderRadius.circular(12),
@@ -678,7 +690,8 @@ class _PelaporanTernakPanenScreenState
                                   if (_isGradeExpanded)
                                     IconButton(
                                       key: Key('tambah_rincian_grade_$i'),
-                                      icon: Icon(Icons.add_circle, color: green1),
+                                      icon:
+                                          Icon(Icons.add_circle, color: green1),
                                       onPressed: () => _tambahRincianGrade(i),
                                       tooltip: "Tambah Rincian Grade",
                                       padding: EdgeInsets.zero,
@@ -689,7 +702,8 @@ class _PelaporanTernakPanenScreenState
                             ),
                           ),
                           // Collapsible Grade Content
-                          if (_isGradeExpanded && i < _rincianGradeListPerAnimal.length) ...[
+                          if (_isGradeExpanded &&
+                              i < _rincianGradeListPerAnimal.length) ...[
                             const SizedBox(height: 16),
                             if (_isLoadingGrade)
                               const Center(
@@ -704,17 +718,21 @@ class _PelaporanTernakPanenScreenState
                                 decoration: BoxDecoration(
                                   color: Colors.orange.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                                  border: Border.all(
+                                      color:
+                                          Colors.orange.withValues(alpha: 0.3)),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                                    const Icon(Icons.info_outline,
+                                        color: Colors.orange, size: 20),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         key: Key('no_grade_found_$i'),
                                         "Data master grade tidak ditemukan. Tidak dapat menambahkan rincian.",
-                                        style: medium12.copyWith(color: Colors.orange),
+                                        style: medium12.copyWith(
+                                            color: Colors.orange),
                                       ),
                                     ),
                                   ],
@@ -727,7 +745,8 @@ class _PelaporanTernakPanenScreenState
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: _rincianGradeListPerAnimal[i].length,
                                 itemBuilder: (context, gradeIndex) {
-                                  final rincian = _rincianGradeListPerAnimal[i][gradeIndex];
+                                  final rincian =
+                                      _rincianGradeListPerAnimal[i][gradeIndex];
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 12),
                                     padding: const EdgeInsets.all(12),
@@ -736,7 +755,8 @@ class _PelaporanTernakPanenScreenState
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // Header with Delete Button
                                         Row(
@@ -744,16 +764,23 @@ class _PelaporanTernakPanenScreenState
                                             Expanded(
                                               child: Text(
                                                 'Grade ${gradeIndex + 1}',
-                                                style: semibold14.copyWith(color: dark1),
+                                                style: semibold14.copyWith(
+                                                    color: dark1),
                                               ),
                                             ),
-                                            if (_rincianGradeListPerAnimal[i].length > 1)
+                                            if (_rincianGradeListPerAnimal[i]
+                                                    .length >
+                                                1)
                                               IconButton(
-                                                icon: Icon(Icons.delete_outline, color: red, size: 20),
-                                                onPressed: () => _hapusRincianGrade(i, gradeIndex),
+                                                icon: Icon(Icons.delete_outline,
+                                                    color: red, size: 20),
+                                                onPressed: () =>
+                                                    _hapusRincianGrade(
+                                                        i, gradeIndex),
                                                 tooltip: 'Hapus Grade',
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                               ),
                                           ],
                                         ),
@@ -763,20 +790,24 @@ class _PelaporanTernakPanenScreenState
                                           key: rincian.gradeFieldKey,
                                           label: 'Pilih Grade Kualitas',
                                           hint: 'Pilih Grade',
-                                          items: _getAvailableGradesForIndex(i, gradeIndex),
+                                          items: _getAvailableGradesForIndex(
+                                              i, gradeIndex),
                                           selectedValue: rincian.gradeNama,
-                                          onChanged: (String? selectedNamaGrade) {
+                                          onChanged:
+                                              (String? selectedNamaGrade) {
                                             setState(() {
-                                              rincian.gradeNama = selectedNamaGrade;
+                                              rincian.gradeNama =
+                                                  selectedNamaGrade;
                                               if (selectedNamaGrade != null &&
                                                   _gradeMasterList.any((g) =>
                                                       g['nama'] ==
                                                       selectedNamaGrade)) {
-                                                rincian.gradeId = _gradeMasterList
+                                                rincian
+                                                    .gradeId = _gradeMasterList
                                                         .firstWhere((grade) =>
                                                             grade['nama'] ==
-                                                            selectedNamaGrade)['id']
-                                                    as String?;
+                                                            selectedNamaGrade)[
+                                                    'id'] as String?;
                                               } else {
                                                 rincian.gradeId = null;
                                               }
@@ -796,12 +827,12 @@ class _PelaporanTernakPanenScreenState
                                           hint:
                                               "Contoh: 5${satuanList != null ? ' ${satuanList!['nama']}' : ''}",
                                           controller: rincian.jumlahController,
-                                          keyboardType:
-                                              const TextInputType.numberWithOptions(
-                                                  decimal: true),
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
                                           suffixIcon: satuanList != null
                                               ? Padding(
-                                                  padding: const EdgeInsets.all(12.0),
+                                                  padding: const EdgeInsets.all(
+                                                      12.0),
                                                   child: Text(
                                                     satuanList!['nama'],
                                                     style: medium14.copyWith(
@@ -810,16 +841,19 @@ class _PelaporanTernakPanenScreenState
                                                 )
                                               : null,
                                           validator: (value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return 'Jumlah wajib diisi';
                                             }
                                             final sanitizedValue =
                                                 value.replaceAll(',', '.');
-                                            if (double.tryParse(sanitizedValue) ==
+                                            if (double.tryParse(
+                                                    sanitizedValue) ==
                                                 null) {
                                               return 'Harus angka';
                                             }
-                                            if (double.parse(sanitizedValue) <= 0) {
+                                            if (double.parse(sanitizedValue) <=
+                                                0) {
                                               return 'Harus > 0';
                                             }
                                             return null;
@@ -842,7 +876,8 @@ class _PelaporanTernakPanenScreenState
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Total Realisasi Panen:",
