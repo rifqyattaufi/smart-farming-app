@@ -180,6 +180,44 @@ class _DetailLaporanPanenTernakScreenState
                                   _laporanPanenTernak?['catatan'] ?? '-',
                                   style: regular14.copyWith(color: dark2),
                                 ),
+                                // Add Grade Information Section
+                                const SizedBox(height: 16),
+                                Text("Detail Grade Hasil Panen",
+                                    style: bold18.copyWith(color: dark1)),
+                                const SizedBox(height: 8),
+                                // Check if grade data exists
+                                if (_laporanPanenTernak?['Panen']?['PanenRincianGrades'] != null && 
+                                    (_laporanPanenTernak!['Panen']['PanenRincianGrades'] as List).isNotEmpty) ...[
+                                  // Display each grade
+                                  ...(_laporanPanenTernak!['Panen']['PanenRincianGrades'] as List<dynamic>)
+                                      .map((grade) {
+                                    return infoItem(
+                                        '${grade['Grade']['nama'] ?? '-'}',
+                                        '${grade['jumlah'] ?? '-'} ${_laporanPanenTernak?['Panen']['komoditas']['Satuan']['lambang'] ?? ''}');
+                                  }).toList(),
+                                ] else ...[
+                                  // Show message when no grade data available
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.info_outline, color: Colors.grey, size: 20),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            'Tidak ada rincian grade untuk laporan panen ini.',
+                                            style: medium12.copyWith(color: Colors.grey),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
