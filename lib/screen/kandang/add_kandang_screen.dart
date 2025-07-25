@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:smart_farming_app/service/image_service.dart';
 import 'package:smart_farming_app/service/jenis_budidaya_service.dart';
+import 'package:smart_farming_app/service/objek_budidaya_service.dart';
 import 'package:smart_farming_app/service/schedule_unit_notification_service.dart';
 import 'package:smart_farming_app/service/unit_budidaya_service.dart';
 import 'package:smart_farming_app/theme.dart';
@@ -31,6 +33,7 @@ class AddKandangScreen extends StatefulWidget {
 class AddKandangScreenState extends State<AddKandangScreen> {
   final JenisBudidayaService _jenisBudidayaService = JenisBudidayaService();
   final UnitBudidayaService _unitBudidayaService = UnitBudidayaService();
+  final ObjekBudidayaService _objekBudidayaService = ObjekBudidayaService();
   final ScheduleUnitNotificationService _scheduleUnitNotification =
       ScheduleUnitNotificationService();
   final ImageService _imageService = ImageService();
@@ -45,10 +48,15 @@ class AddKandangScreenState extends State<AddKandangScreen> {
   String? selectedHariNutrisi;
   String? initialJumlahHewan;
   List<Map<String, dynamic>> jenisHewanList = [];
+  List<Map<String, dynamic>> allObjekBudidaya = [];
+  bool isLoadingObjek = false;
+  int totalExistingObjek = 0; // Track total existing objects
+  Timer? _debounceTimer;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _sizeController = TextEditingController();
+  final TextEditingController _kapasitasController = TextEditingController();
   final TextEditingController _jumlahController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _waktuNotifikasiPanenController =
@@ -159,6 +167,7 @@ class AddKandangScreenState extends State<AddKandangScreen> {
         _nameController.text = data['nama'] ?? '';
         _locationController.text = data['lokasi'] ?? '';
         _sizeController.text = data['luas']?.toString() ?? '';
+        _kapasitasController.text = data['kapasitas']?.toString() ?? '';
         _jumlahController.text = data['jumlah']?.toString() ?? '';
         initialJumlahHewan = data['jumlah']?.toString();
         _descriptionController.text = data['deskripsi'] ?? '';
@@ -250,12 +259,243 @@ class AddKandangScreenState extends State<AddKandangScreen> {
     }
   }
 
+  Future<void> _fetchObjekBudidaya() async {
+    if (widget.idKandang == null) return;
+
+    setState(() {
+      isLoadingObjek = true;
+    });
+
+    try {
+      final response = await _objekBudidayaService
+          .getObjekBudidayaByUnitBudidaya(widget.idKandang!);
+
+      if (response['status'] && response['data'] != null) {
+        final List<dynamic> existingObjek = response['data'];
+        final int capacity = int.tryParse(_kapasitasController.text) ?? 0;
+
+        // Store total existing objects
+        totalExistingObjek = existingObjek.length;
+
+        // Create grid items based on capacity
+        List<Map<String, dynamic>> gridItems = [];
+
+        // Get jenis budidaya name for slot naming
+        String jenisNama = '';
+        if (selectedJenisHewan != null && jenisHewanList.isNotEmpty) {
+          final jenis = jenisHewanList.firstWhere(
+            (item) => item['id'] == selectedJenisHewan,
+            orElse: () => {'nama': 'Hewan'},
+          );
+          jenisNama = jenis['nama'] ?? 'Hewan';
+        }
+
+        // Create a map to store existing objek by their slot number
+        Map<int, Map<String, dynamic>> slotMap = {};
+
+        for (var objek in existingObjek) {
+          String namaId = objek['namaId'] ?? '';
+          // Extract slot number from namaId (e.g., "Ayam#1" -> 1)
+          RegExp regExp = RegExp(r'#(\d+)$');
+          Match? match = regExp.firstMatch(namaId);
+
+          if (match != null) {
+            int slotNumber = int.parse(match.group(1)!);
+            slotMap[slotNumber] = {
+              'id': objek['id'],
+              'namaId': objek['namaId'],
+              'name': objek['namaId'],
+              'gambar': objek['gambar'],
+              'isAvailable': true,
+              'slotNumber': slotNumber,
+            };
+          }
+        }
+
+        // Create grid items only for empty slots
+        for (int i = 1; i <= capacity; i++) {
+          if (!slotMap.containsKey(i)) {
+            // Slot is empty - create placeholder that can be clicked
+            gridItems.add({
+              'id': null,
+              'namaId': '$jenisNama#$i',
+              'name': '$jenisNama#$i',
+              'gambar': null,
+              'isAvailable': false,
+              'slotNumber': i,
+            });
+          }
+        }
+
+        setState(() {
+          allObjekBudidaya = gridItems;
+          isLoadingObjek = false;
+        });
+      } else {
+        setState(() {
+          allObjekBudidaya = [];
+          isLoadingObjek = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        allObjekBudidaya = [];
+        isLoadingObjek = false;
+      });
+      showAppToast(context, 'Terjadi kesalahan: $e. Silakan coba lagi',
+          title: 'Error Tidak Terduga 😢');
+    }
+  }
+
+  void _debouncedRefreshObjek() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (widget.isEdit &&
+          widget.idKandang != null &&
+          jenisPencatatan == 'Individu') {
+        _fetchObjekBudidaya();
+      }
+    });
+  }
+
+  Widget _buildObjekGrid() {
+    if (isLoadingObjek) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: dark4.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: dark3.withValues(alpha: 0.3)),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (allObjekBudidaya.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: dark3.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: dark3.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: dark3, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Semua slot terisi atau belum ada slot kosong',
+                style: medium12.copyWith(color: dark3),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Count existing animals from database vs available slots
+    final capacity = int.tryParse(_kapasitasController.text) ?? 0;
+    final availableSlots = allObjekBudidaya.length; // This is empty slots count
+    final filledSlots = totalExistingObjek; // Use the stored count
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Show capacity info
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: blue1.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: blue1.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, color: blue1, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Kapasitas: $capacity slot | Terisi: $filledSlots hewan | Kosong: $availableSlots slot',
+                  style: medium12.copyWith(color: blue1),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: allObjekBudidaya.length,
+          itemBuilder: (context, index) {
+            final objek = allObjekBudidaya[index];
+
+            return GestureDetector(
+              onTap: isLoadingObjek
+                  ? null
+                  : () {
+                      _createObjekBudidaya(objek['namaId']);
+                    },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: green1.withValues(alpha: 0.1),
+                  border: Border.all(
+                    color: green1,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_circle_outline,
+                      color: green1,
+                      size: 22,
+                    ),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: Text(
+                        objek['namaId']?.toString() ?? 'Slot ${index + 1}',
+                        style: regular10.copyWith(
+                          color: green1,
+                          fontSize: 9,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _getJenisHewan();
     if (widget.isEdit) {
-      _fetchKandang();
+      _fetchKandang().then((_) {
+        if (mounted && jenisPencatatan == 'Individu') {
+          _fetchObjekBudidaya();
+        }
+      });
     }
   }
 
@@ -319,6 +559,9 @@ class AddKandangScreenState extends State<AddKandangScreen> {
         'lokasi': _locationController.text,
         'tipe': jenisPencatatan,
         'luas': _sizeController.text,
+        'kapasitas': _kapasitasController.text.isEmpty
+            ? null
+            : int.tryParse(_kapasitasController.text),
         'jumlah': _jumlahController.text,
         'status': statusKandang == 'Aktif',
         'deskripsi': _descriptionController.text,
@@ -331,9 +574,9 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                   'scheduledTime': _waktuNotifikasiPanenController.text,
                   'dayOfMonth': selectedTipePanen == 'Bulanan'
                       ? (int.tryParse(
-                              _tanggalNotifikasiPanenController.text.isEmpty
-                                  ? '0'
-                                  : _tanggalNotifikasiPanenController.text))
+                          _tanggalNotifikasiPanenController.text.isEmpty
+                              ? '0'
+                              : _tanggalNotifikasiPanenController.text))
                       : null,
                   'dayOfWeek': selectedTipePanen == 'Mingguan'
                       ? dayToInt[selectedHariPanen]
@@ -347,9 +590,9 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                   'scheduledTime': _waktuNotifikasiNutrisiController.text,
                   'dayOfMonth': selectedTipeNutrisi == 'Bulanan'
                       ? (int.tryParse(
-                              _tanggalNotifikasiNutrisiController.text.isEmpty
-                                  ? '0'
-                                  : _tanggalNotifikasiNutrisiController.text))
+                          _tanggalNotifikasiNutrisiController.text.isEmpty
+                              ? '0'
+                              : _tanggalNotifikasiNutrisiController.text))
                       : null,
                   'dayOfWeek': selectedTipeNutrisi == 'Mingguan'
                       ? dayToInt[selectedHariNutrisi]
@@ -441,6 +684,60 @@ class AddKandangScreenState extends State<AddKandangScreen> {
         });
 
     return pickedDay;
+  }
+
+  Future<void> _createObjekBudidaya(String namaId) async {
+    print('_createObjekBudidaya called with namaId: $namaId');
+
+    setState(() {
+      isLoadingObjek = true;
+    });
+
+    try {
+      final response = await _objekBudidayaService.createObjekBudidaya({
+        'unitBudidayaId': widget.idKandang,
+        'namaId': namaId,
+        'jenisBudidayaId': selectedJenisHewan,
+      });
+
+      print(
+          'Create objek response: ${response['status']}, message: ${response['message']}');
+
+      if (response['status']) {
+        // Simply increment the jumlah controller by 1
+        final currentJumlah = int.tryParse(_jumlahController.text) ?? 0;
+        final newJumlah = currentJumlah + 1;
+
+        // Update totalExistingObjek for validation
+        totalExistingObjek = newJumlah;
+
+        setState(() {
+          _jumlahController.text = newJumlah.toString();
+        });
+
+        print('Updated jumlah from $currentJumlah to $newJumlah');
+
+        // Refresh the grid after successful creation
+        await _fetchObjekBudidaya();
+
+        showAppToast(
+          context,
+          'Berhasil menambahkan $namaId',
+          isError: false,
+        );
+      } else {
+        setState(() {
+          isLoadingObjek = false;
+        });
+        showAppToast(context, response['message'] ?? 'Gagal menambahkan objek');
+      }
+    } catch (e) {
+      print('Error in _createObjekBudidaya: $e');
+      setState(() {
+        isLoadingObjek = false;
+      });
+      showAppToast(context, 'Terjadi kesalahan: $e');
+    }
   }
 
   @override
@@ -535,6 +832,8 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                                 orElse: () => {'id': null},
                               )['id'];
                             });
+                            // Refresh objek grid when jenis hewan changes
+                            _debouncedRefreshObjek();
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -545,9 +844,41 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                           isEdit: widget.isEdit,
                         ),
                         InputFieldWidget(
+                            label: "Kapasitas Kandang",
+                            hint: "Contoh: 50",
+                            controller: _kapasitasController,
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              // Refresh objek grid when capacity changes (debounced)
+                              _debouncedRefreshObjek();
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Kapasitas kandang tidak boleh kosong';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Kapasitas kandang harus berupa angka';
+                              }
+                              final capacity = int.parse(value);
+                              if (capacity <= 0) {
+                                return 'Kapasitas kandang harus lebih dari 0';
+                              }
+
+                              // Validate capacity against current animal count when editing individual type
+                              if (widget.isEdit &&
+                                  jenisPencatatan == 'Individu') {
+                                // Use totalExistingObjek which contains the actual count of animals
+                                if (capacity < totalExistingObjek) {
+                                  return 'Kapasitas tidak boleh kurang dari jumlah hewan saat ini ($totalExistingObjek ekor)';
+                                }
+                              }
+
+                              return null;
+                            }),
+                        InputFieldWidget(
                             key: const Key('jumlah_hewan_input'),
                             label: "Jumlah hewan ternak",
-                            hint: "Contoh: 20.5 (satuan ekor)",
+                            hint: "Contoh: 20 (satuan ekor)",
                             controller: _jumlahController,
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
@@ -593,6 +924,15 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                             setState(() {
                               jenisPencatatan = value;
                             });
+                            // Refresh objek grid when type changes to/from individual
+                            if (value == 'Individu') {
+                              _debouncedRefreshObjek();
+                            } else {
+                              // Clear grid data when switching to kolektif
+                              setState(() {
+                                allObjekBudidaya.clear();
+                              });
+                            }
                           },
                         ),
                         ImagePickerWidget(
@@ -615,6 +955,18 @@ class AddKandangScreenState extends State<AddKandangScreen> {
                               return null;
                             }),
                         const SizedBox(height: 16),
+                        if (widget.isEdit && jenisPencatatan == 'Individu') ...[
+                          Text("Daftar Slot Kandang Kosong",
+                              style: bold18.copyWith(color: dark1)),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Grid ini menampilkan slot kosong yang tersedia. Klik slot untuk menambahkan hewan baru dengan nama yang sesuai.",
+                            style: regular12.copyWith(color: dark2),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildObjekGrid(),
+                          const SizedBox(height: 16),
+                        ],
                         Text("Pengaturan Notifikasi",
                             style: bold18.copyWith(color: dark1)),
                         const SizedBox(height: 16),
@@ -916,5 +1268,11 @@ class AddKandangScreenState extends State<AddKandangScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }

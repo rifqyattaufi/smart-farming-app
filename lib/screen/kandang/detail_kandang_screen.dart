@@ -192,6 +192,8 @@ class _DetailKandangScreenState extends State<DetailKandangScreen> {
                         ),
                       ),
                       infoItem("Tipe kandang", _kandang['tipe'] ?? ''),
+                      infoItem("Kapasitas kandang",
+                          _kandang['kapasitas']?.toString() ?? '0'),
                       infoItem(
                           "Jumlah Hewan", _kandang['jumlah']?.toString() ?? ''),
                       infoItem(

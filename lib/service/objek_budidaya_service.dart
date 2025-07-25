@@ -41,4 +41,45 @@ class ObjekBudidayaService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> createObjekBudidaya(
+      Map<String, dynamic> data) async {
+    final resolvedToken = await _authService.getToken();
+    final headers = {
+      'Authorization': 'Bearer $resolvedToken',
+      'Content-Type': 'application/json',
+    };
+    final url = Uri.parse(baseUrl);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: json.encode(data),
+      );
+      final body = response.body;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'status': true,
+          'message': 'success',
+          'data': json.decode(body)['data'],
+        };
+      } else if (response.statusCode == 401) {
+        await _authService.refreshToken();
+        return await createObjekBudidaya(data);
+      } else {
+        return {
+          'status': false,
+          'message':
+              json.decode(body)['message'] ?? 'Failed to create objek budidaya',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'An error occurred: ${e.toString()}',
+      };
+    }
+  }
 }

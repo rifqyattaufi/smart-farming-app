@@ -15,7 +15,7 @@ import 'package:smart_farming_app/widget/dropdown_field.dart';
 import 'package:smart_farming_app/widget/header.dart';
 import 'package:smart_farming_app/widget/img_picker.dart';
 import 'package:smart_farming_app/widget/input_field.dart';
-import 'package:smart_farming_app/widget/objek_selection_grid.dart';
+import 'package:smart_farming_app/widget/capacity_objek_selection_grid.dart';
 
 class RincianGradeForm {
   String? gradeId;
@@ -106,8 +106,54 @@ class _PelaporanTernakPanenScreenState
           .getObjekBudidayaByUnitBudidaya(widget.data!['unitBudidaya']['id']);
 
       if (response['status'] && response['data'] != null) {
+        final List<dynamic> existingObjek = response['data'];
+        final int capacity = widget.data?['unitBudidaya']?['kapasitas'] ?? 0;
+
+        // Create grid items based on capacity
+        List<Map<String, dynamic>> gridItems = [];
+
+        // Create a map to store existing objek by their slot number
+        Map<int, Map<String, dynamic>> slotMap = {};
+
+        for (var objek in existingObjek) {
+          String namaId = objek['namaId'] ?? '';
+          // Extract slot number from namaId (e.g., "Ayam#1" -> 1)
+          RegExp regExp = RegExp(r'#(\d+)$');
+          Match? match = regExp.firstMatch(namaId);
+
+          if (match != null) {
+            int slotNumber = int.parse(match.group(1)!);
+            slotMap[slotNumber] = {
+              'id': objek['id'],
+              'namaId': objek['namaId'],
+              'name': objek['namaId'], // Use namaId as display name
+              'gambar': objek['gambar'],
+              'isAvailable': true,
+              'slotNumber': slotNumber,
+            };
+          }
+        }
+
+        // Create grid items for all slots up to capacity
+        for (int i = 1; i <= capacity; i++) {
+          if (slotMap.containsKey(i)) {
+            // Slot is filled with actual objek
+            gridItems.add(slotMap[i]!);
+          } else {
+            // Slot is empty - create placeholder
+            gridItems.add({
+              'id': null,
+              'namaId': 'Slot #$i',
+              'name': 'Slot #$i',
+              'gambar': null,
+              'isAvailable': false,
+              'slotNumber': i,
+            });
+          }
+        }
+
         setState(() {
-          allObjekBudidaya = List<Map<String, dynamic>>.from(response['data']);
+          allObjekBudidaya = gridItems;
           isLoadingObjek = false;
         });
       } else {
@@ -287,18 +333,31 @@ class _PelaporanTernakPanenScreenState
   }
 
   void _toggleObjekSelection(String objekId) {
-    setState(() {
-      if (selectedObjekIds.contains(objekId)) {
-        selectedObjekIds.remove(objekId);
-      } else {
-        selectedObjekIds.add(objekId);
-      }
-    });
+    // Find the objek to check if it's available
+    final objek = allObjekBudidaya.firstWhere(
+      (item) => item['id']?.toString() == objekId,
+      orElse: () => {},
+    );
+
+    // Only allow selection if the objek is available (has actual ID)
+    if (objek.isNotEmpty &&
+        objek['isAvailable'] == true &&
+        objek['id'] != null) {
+      setState(() {
+        if (selectedObjekIds.contains(objekId)) {
+          selectedObjekIds.remove(objekId);
+        } else {
+          selectedObjekIds.add(objekId);
+        }
+      });
+    }
   }
 
   void _selectAllObjek() {
     setState(() {
+      // Only select objek that are available (not empty slots)
       selectedObjekIds = allObjekBudidaya
+          .where((objek) => objek['isAvailable'] == true && objek['id'] != null)
           .map((objek) => objek['id']?.toString() ?? '')
           .where((id) => id.isNotEmpty)
           .toSet();
@@ -312,7 +371,7 @@ class _PelaporanTernakPanenScreenState
   }
 
   Widget _buildObjekGrid() {
-    return ObjekSelectionGrid(
+    return CapacityObjekSelectionGrid(
       objektList: allObjekBudidaya,
       selectedObjekIds: selectedObjekIds,
       onObjekTap: _toggleObjekSelection,

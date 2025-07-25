@@ -193,7 +193,8 @@ class _PilihKandangScreenState extends State<PilihKandangScreen> {
                               'icon': item['gambar'],
                               'category': item['JenisBudidaya']['nama'],
                               'tipe': item['tipe'],
-                              'latin': item['JenisBudidaya']['latin']
+                              'latin': item['JenisBudidaya']['latin'],
+                              'kapasitas': item['kapasitas'] ?? 0,
                             })
                         .toList(),
                     onItemTap: (context, item) {
